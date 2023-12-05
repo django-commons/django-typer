@@ -36,7 +36,7 @@ jobs:
         run: |
           poetry config virtualenvs.in-project true
           poetry run pip install --upgrade pip
-          poetry install -E all
+          poetry install
           poetry run pip install -U "${{ matrix.django-version }}"
       - name: Run Static Analysis
         run: |
@@ -87,7 +87,7 @@ jobs:
       run: |
         poetry config virtualenvs.in-project true
         poetry run pip install --upgrade pip
-        poetry install -E all
+        poetry install
         poetry run pip install -U "${{ matrix.django-version }}"
     - name: Run Unit Tests
       run: |
