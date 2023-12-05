@@ -7,7 +7,7 @@
      |__/             |___/               |___/|_|              
 
 """
-VERSION = (0, 1, 0)
+VERSION = (0, 1, '0b')
 
 __title__ = 'Django Typer'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -17,8 +17,8 @@ __copyright__ = 'Copyright 2023 Brian Kohan'
 
 
 import sys
-from types import MethodType, SimpleNamespace
-from typing import Annotated, Any, Callable, Dict, List, Optional, Type, Union
+from types import SimpleNamespace
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import click
 import typer
@@ -196,8 +196,6 @@ def command(
 ):
     
     def decorator(func: CommandFunctionType):
-        import ipdb
-        ipdb.set_trace()
         func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.command(
             *args,
             cls=cls,
