@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "django-typer"
 version = "0.1.0"
-description = "Use Typer as the CLI interface for Django management commands."
+description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
 readme = "README.rst"
@@ -13,7 +13,7 @@ classifiers = [
     "Framework :: Django",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Framework :: Django :: 3.2",
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.1",
@@ -44,3 +44,18 @@ exclude = ["django_typer/tests"]
 python = ">=3.7,<4.0"
 Django = ">=3.2,<5.0"
 typer = "^0.9.0"
+
+[tool.poetry.group.dev.dependencies]
+django-click = "^2.3.0"
+ipdb = "^0.13.13"
+rich = "^13.7.0"
+pytest-django = "^4.5.2"
+isort = "^5.6.4"
+pytest-cov = "^4.0.0"
+Sphinx = "^5.0.2"
+sphinx-rtd-theme = "^1.0.0"
+mypy = ">=0.991,<1.5"
+pylint = [
+    { version = "<3.0", markers = "python_version <= '3.7'" },
+    { version = "^3.0", markers = "python_version > '3.7'" },
+]

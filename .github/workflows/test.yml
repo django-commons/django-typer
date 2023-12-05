@@ -1,0 +1,99 @@
+name: test
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # run static analysis on bleeding and trailing edges
+        python-version: [ '3.9', '3.12' ]
+        django-version:
+          - 'Django~=3.2.0' # LTS April 2024
+          - 'Django~=4.2.0' # LTS April 2026
+        exclude:
+          - python-version: '3.9'
+            django-version: 'Django~=4.2.0'
+          - python-version: '3.12'
+            django-version: 'Django~=3.2.0'
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Install Dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry run pip install --upgrade pip
+          poetry install -E all
+          poetry run pip install -U "${{ matrix.django-version }}"
+      - name: Run Static Analysis
+        run: |
+          poetry run pylint django_typer
+          poetry run mypy django_typer
+          poetry run doc8 -q doc
+          poetry check
+          poetry run pip check
+          poetry export --without-hashes --format=requirements.txt | poetry run safety check --stdin
+          poetry run python -m readme_renderer ./README.rst -o /tmp/README.html
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        django-version:
+          - 'Django~=3.2.0' # LTS April 2024
+          - 'Django~=4.1.0' # December 2023
+          - 'Django~=4.2.0' # LTS April 2026
+        exclude:
+          - python-version: '3.7'
+            django-version: 'Django~=4.1.0'
+          - python-version: '3.7'
+            django-version: 'Django~=4.2.0'
+          - python-version: '3.11'
+            django-version: 'Django~=3.2.0'
+          - python-version: '3.12'
+            django-version: 'Django~=3.2.0'
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.5.1
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Install Release Dependencies
+      run: |
+        poetry config virtualenvs.in-project true
+        poetry run pip install --upgrade pip
+        poetry install -E all
+        poetry run pip install -U "${{ matrix.django-version }}"
+    - name: Run Unit Tests
+      run: |
+        poetry run pytest
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
