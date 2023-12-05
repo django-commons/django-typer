@@ -52,16 +52,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         django-version:
           - 'Django~=3.2.0' # LTS April 2024
           - 'Django~=4.1.0' # December 2023
           - 'Django~=4.2.0' # LTS April 2026
         exclude:
-          - python-version: '3.7'
-            django-version: 'Django~=4.1.0'
-          - python-version: '3.7'
-            django-version: 'Django~=4.2.0'
           - python-version: '3.11'
             django-version: 'Django~=3.2.0'
           - python-version: '3.12'
