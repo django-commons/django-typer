@@ -51,5 +51,5 @@ isort = "^5.6.4"
 pytest-cov = "^4.0.0"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^2.0.0"
-mypy = ">=0.991,<1.5"
+mypy = ">=0.991,<1.8"
 pylint = '^3.0'
