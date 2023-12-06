@@ -1,4 +1,5 @@
 import json
+
 from django_typer import TyperCommand
 
 

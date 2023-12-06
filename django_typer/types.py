@@ -1,15 +1,21 @@
+"""
+Common types for command line argument specification.
+"""
 
 import sys
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
-from django.apps import AppConfig
 from typer import Option, echo
 
-_common_panel = 'Django'
+_COMMON_PANEL = 'Django'
 
 
-def print_version(context, option, value):
+def print_version(context, _, value):
+    """
+    A callback to run the get_version() routine of the 
+    command when --version is specified.
+    """
     if value:
         echo(context.django_command.get_version())
         sys.exit()
@@ -22,7 +28,7 @@ Version = Annotated[
         help="Show program's version number and exit.",
         callback=print_version,
         is_eager=True,
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -36,7 +42,7 @@ Verbosity = Annotated[
         show_choices=True,
         min=0,
         max=3,
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -48,18 +54,18 @@ Settings = Annotated[
             '"myproject.settings.main". If this isn\'t provided, the '
             'DJANGO_SETTINGS_MODULE environment variable will be used.'
         ),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
 PythonPath = Annotated[
-    Path,
+    Optional[Path],
     Option(
         help=(
             'A directory to add to the Python path, e.g. '
             '"/home/djangoprojects/myproject".'
         ),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -68,7 +74,7 @@ Traceback = Annotated[
     Option(
         '--traceback',
         help=('Raise on CommandError exceptions'),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -77,7 +83,7 @@ NoColor = Annotated[
     Option(
         '--no-color',
         help=('Don\'t colorize the command output.'),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -86,7 +92,7 @@ ForceColor = Annotated[
     Option(
         '--force-color',
         help=('Force colorization of the command output.'),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]
 
@@ -95,6 +101,6 @@ SkipChecks = Annotated[
     Option(
         '--skip-checks',
         help=('Skip system checks.'),
-        rich_help_panel=_common_panel
+        rich_help_panel=_COMMON_PANEL
     )
 ]

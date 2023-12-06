@@ -5,7 +5,11 @@ from io import StringIO
 from pathlib import Path
 
 import django
-from django.core.management import call_command
+from django.core.management import (
+    call_command,
+    load_command_class,
+    get_commands
+)
 from django.test import TestCase
 
 manage_py = Path(__file__).parent.parent.parent / 'manage.py'
@@ -59,4 +63,21 @@ class BasicTests(TestCase):
         self.assertEqual(
             run_command('basic', '--version').strip(),
             django.get_version()
+        )
+
+    def test_call_direct(self):
+        basic = load_command_class(get_commands()['basic'], 'basic')
+        self.assertEqual(
+            json.loads(
+                basic.handle('a1', 'a2')
+            ),
+            {'arg1': 'a1', 'arg2': 'a2', 'arg3': 0.5, 'arg4': 1}
+        )
+
+        from django_typer.tests.test_app.management.commands.basic import Command as Basic
+        self.assertEqual(
+            json.loads(
+                Basic()('a1', 'a2', arg3=0.75, arg4=2)
+            ),
+            {'arg1': 'a1', 'arg2': 'a2', 'arg3': 0.75, 'arg4': 2}
         )
