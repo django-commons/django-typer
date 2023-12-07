@@ -85,12 +85,15 @@ class Context(TyperContext):
     def __init__(
         self,
         command: click.Command,  # pylint: disable=redefined-outer-name
-        django_command: 'TyperCommand',
+        parent: Optional['Context'] = None,
+        django_command: Optional['TyperCommand'] = None,
         _resolved_params: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
         super().__init__(command, **kwargs)
         self.django_command = django_command
+        if not django_command and parent:
+            self.django_command = parent.django_command
         self.params.update(_resolved_params or {})
 
 
@@ -152,18 +155,23 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
 
 
 def callback(
-    name: Optional[str] = None,
+    name: Optional[str] = Default(None),
     *,
     cls: Type[TyperGroupWrapper] = TyperGroupWrapper,
-    context_settings: Optional[Dict[Any, Any]] = None,
-    help: Optional[str] = None,  # pylint: disable=redefined-builtin
-    epilog: Optional[str] = None,
-    short_help: Optional[str] = None,
-    options_metavar: str = "[OPTIONS]",
-    add_help_option: bool = True,
-    no_args_is_help: bool = False,
-    hidden: bool = False,
-    deprecated: bool = False,
+    invoke_without_command: bool = Default(False),
+    no_args_is_help: bool = Default(False),
+    subcommand_metavar: Optional[str] = Default(None),
+    chain: bool = Default(False),
+    result_callback: Optional[Callable[..., Any]] = Default(None),
+    # Command
+    context_settings: Optional[Dict[Any, Any]] = Default(None),
+    help: Optional[str] = Default(None),
+    epilog: Optional[str] = Default(None),
+    short_help: Optional[str] = Default(None),
+    options_metavar: str = Default("[OPTIONS]"),
+    add_help_option: bool = Default(True),
+    hidden: bool = Default(False),
+    deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: Union[str, None] = Default(None),
     **kwargs
@@ -173,6 +181,10 @@ def callback(
         func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.callback(
             name=name,
             cls=cls,
+            invoke_without_command=invoke_without_command,
+            subcommand_metavar=subcommand_metavar,
+            chain=chain,
+            result_callback=result_callback,
             context_settings=context_settings,
             help=help,
             epilog=epilog,
@@ -192,15 +204,39 @@ def callback(
 
 
 def command(
+    name: Optional[str] = None,
     *args,
     cls: Type[TyperCommandWrapper] = TyperCommandWrapper,
+    context_settings: Optional[Dict[Any, Any]] = None,
+    help: Optional[str] = None,
+    epilog: Optional[str] = None,
+    short_help: Optional[str] = None,
+    options_metavar: str = "[OPTIONS]",
+    add_help_option: bool = True,
+    no_args_is_help: bool = False,
+    hidden: bool = False,
+    deprecated: bool = False,
+    # Rich settings
+    rich_help_panel: Union[str, None] = Default(None),
     **kwargs
 ):
 
     def decorator(func: CommandFunctionType):
         func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.command(
+            name=name,
             *args,
             cls=cls,
+            context_settings=context_settings,
+            help=help,
+            epilog=epilog,
+            short_help=short_help,
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            no_args_is_help=no_args_is_help,
+            hidden=hidden,
+            deprecated=deprecated,
+            # Rich settings
+            rich_help_panel=rich_help_panel,
             **kwargs,
             **extra
         )(func)
