@@ -29,7 +29,6 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.5.1
           virtualenvs-create: true
           virtualenvs-in-project: true
       - name: Install Dependencies
@@ -55,9 +54,11 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         django-version:
           - 'Django~=3.2.0' # LTS April 2024
-          - 'Django~=4.1.0' # December 2023
           - 'Django~=4.2.0' # LTS April 2026
+          - 'Django~=5.0.0' # April 2025
         exclude:
+          - python-version: '3.9'
+            django-version: 'Django~=5.0.0'
           - python-version: '3.11'
             django-version: 'Django~=3.2.0'
           - python-version: '3.12'
@@ -76,7 +77,6 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.5.1
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Install Release Dependencies

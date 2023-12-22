@@ -1,10 +1,10 @@
-.. include:: refs.rst
+.. include:: ./refs.rst
 
 ============
 Django Typer
 ============
 
-Full and natural support for enumerations_ as Django model fields.
+Use Typer as the CLI interface for Django management commands.
 
 
 Installation

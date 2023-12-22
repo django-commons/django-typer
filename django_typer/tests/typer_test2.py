@@ -1,10 +1,11 @@
 import typer
+
 from django_typer import TyperCommandWrapper, _common_options
 
-app = typer.Typer(epilog='Typer Epilog')
+app = typer.Typer(epilog="Typer Epilog")
 
 
-@app.command(epilog='Main Epilog')
+@app.command(epilog="Main Epilog")
 def main(verbose: bool = False):
     """
     Manage users in the awesome CLI app.

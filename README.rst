@@ -1,5 +1,5 @@
 |MIT license| |PyPI version fury.io| |PyPI pyversions| |PyPi djversions| |PyPI status| |Documentation Status|
-|Code Cov| |Test Status|
+|Code Cov| |Test Status| |Code Style|
 
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://lbesson.mit-license.org/
@@ -24,6 +24,9 @@
 
 .. |Test Status| image:: https://github.com/bckohan/django-typer/workflows/test/badge.svg
    :target: https://github.com/bckohan/django-typer/actions
+
+.. |Code Style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
 
 
 django-typer

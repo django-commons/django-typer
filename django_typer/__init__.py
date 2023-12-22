@@ -16,12 +16,10 @@ import click
 import typer
 from django.core.management.base import BaseCommand
 from typer import Typer
+from typer.core import TyperArgument
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
-from typer.main import (
-    get_command,
-    get_params_convertors_ctx_param_name_from_function,
-)
+from typer.main import get_command, get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default
@@ -38,36 +36,32 @@ from .types import (
     Version,
 )
 
-VERSION = (0, 1, '0b')
+VERSION = (0, 1, 0)
 
-__title__ = 'Django Typer'
-__version__ = '.'.join(str(i) for i in VERSION)
-__author__ = 'Brian Kohan'
-__license__ = 'MIT'
-__copyright__ = 'Copyright 2023 Brian Kohan'
+__title__ = "Django Typer"
+__version__ = ".".join(str(i) for i in VERSION)
+__author__ = "Brian Kohan"
+__license__ = "MIT"
+__copyright__ = "Copyright 2023 Brian Kohan"
 
 
 __all__ = [
-    'TyperCommand',
-    'Context',
-    'TyperGroupWrapper',
-    'TyperCommandWrapper',
-    'callback',
-    'command'
+    "TyperCommand",
+    "Context",
+    "TyperGroupWrapper",
+    "TyperCommandWrapper",
+    "callback",
+    "command",
 ]
 
 
 class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
-
     def __init__(self, args, **kwargs):
         super().__init__(**kwargs)
         self.args = args
 
     def _get_kwargs(self):
-        return {
-            "args": self.args,
-            **_common_options()
-        }
+        return {"args": self.args, **_common_options()}
 
 
 class Context(TyperContext):
@@ -80,15 +74,15 @@ class Context(TyperContext):
     within the Version type itself.
     """
 
-    django_command: 'TyperCommand'
+    django_command: "TyperCommand"
 
     def __init__(
         self,
         command: click.Command,  # pylint: disable=redefined-outer-name
-        parent: Optional['Context'] = None,
-        django_command: Optional['TyperCommand'] = None,
+        parent: Optional["Context"] = None,
+        django_command: Optional["TyperCommand"] = None,
         _resolved_params: Optional[Dict[str, Any]] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(command, **kwargs)
         self.django_command = django_command
@@ -108,41 +102,36 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
             Callable[..., Any]
         ] = None,
         params: Optional[List[click.Parameter]] = None,
-        **kwargs
+        **kwargs,
     ):
         params = params or []
         self._callback = callback
         expected = [param.name for param in params[1:]]
-        self_arg = params[0].name if params else 'self'
+        self_arg = params[0].name if params else "self"
 
         def do_callback(*args, **kwargs):
             if callback:
                 return callback(
                     *args,
                     **{
-                        param: val for param, val in kwargs.items()
-                        if param in expected
+                        param: val for param, val in kwargs.items() if param in expected
                     },
                     **{
                         self_arg: getattr(
-                            click.get_current_context(),
-                            'django_command',
-                            None
+                            click.get_current_context(), "django_command", None
                         )
-                    }
+                    },
                 )
+            return None
 
         super().__init__(  # type: ignore
             *args,
             params=[
                 *params[1:],
-                *[
-                    param for param in COMMON_PARAMS
-                    if param.name not in expected
-                ]
+                *[param for param in COMMON_PARAMS if param.name not in expected],
             ],
             callback=do_callback,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -154,7 +143,7 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
     pass
 
 
-def callback(
+def callback(  # pylint: disable=too-many-local-variables
     name: Optional[str] = Default(None),
     *,
     cls: Type[TyperGroupWrapper] = TyperGroupWrapper,
@@ -174,9 +163,8 @@ def callback(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: Union[str, None] = Default(None),
-    **kwargs
+    **kwargs,
 ):
-
     def decorator(func: CommandFunctionType):
         func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.callback(
             name=name,
@@ -196,7 +184,7 @@ def callback(
             deprecated=deprecated,
             rich_help_panel=rich_help_panel,
             **kwargs,
-            **extra
+            **extra,
         )(func)
         return func
 
@@ -218,9 +206,8 @@ def command(
     deprecated: bool = False,
     # Rich settings
     rich_help_panel: Union[str, None] = Default(None),
-    **kwargs
+    **kwargs,
 ):
-
     def decorator(func: CommandFunctionType):
         func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.command(
             name=name,
@@ -238,7 +225,7 @@ def command(
             # Rich settings
             rich_help_panel=rich_help_panel,
             **kwargs,
-            **extra
+            **extra,
         )(func)
         return func
 
@@ -246,16 +233,15 @@ def command(
 
 
 class _TyperCommandMeta(type):
-
     def __new__(mcs, name, bases, attrs, **kwargs):
         """
         This method is called when a new class is created.
         """
         typer_app = Typer(
-            name=mcs.__module__.rsplit('.', maxsplit=1)[-1],
+            name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
             cls=TyperGroupWrapper,
-            help=attrs.get('help', typer.models.Default(None)),
-            **kwargs
+            help=attrs.get("help", typer.models.Default(None)),
+            **kwargs,
         )
 
         def handle(self, *args, **options):
@@ -263,7 +249,7 @@ class _TyperCommandMeta(type):
                 args=args,
                 standalone_mode=False,
                 _resolved_params=options,
-                django_command=self
+                django_command=self,
             )
 
         return super().__new__(
@@ -271,33 +257,29 @@ class _TyperCommandMeta(type):
             name,
             bases,
             {
-                '_handle': attrs.pop('handle', None),
+                "_handle": attrs.pop("handle", None),
                 **attrs,
-                'handle': handle,
-                'typer_app': typer_app
-            }
+                "handle": handle,
+                "typer_app": typer_app,
+            },
         )
 
     def __init__(cls, name, bases, attrs, **kwargs):
         """
         This method is called after a new class is created.
         """
-        cls.typer_app.info.name = cls.__module__.rsplit('.', maxsplit=1)[-1]
+        cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
         if cls._handle:
-            if hasattr(cls._handle, '_typer_constructor_'):
-                cls._handle._typer_constructor_(
-                    cls,
-                    name=cls.typer_app.info.name
-                )
+            if hasattr(cls._handle, "_typer_constructor_"):
+                cls._handle._typer_constructor_(cls, name=cls.typer_app.info.name)
                 del cls._handle._typer_constructor_
             else:
-                cls.typer_app.command(
-                    cls.typer_app.info.name,
-                    cls=TyperCommandWrapper
-                )(cls._handle)
+                cls.typer_app.command(cls.typer_app.info.name, cls=TyperCommandWrapper)(
+                    cls._handle
+                )
 
         for attr in attrs.values():
-            if hasattr(attr, '_typer_constructor_'):
+            if hasattr(attr, "_typer_constructor_"):
                 attr._typer_constructor_(cls)
                 del attr._typer_constructor_
 
@@ -305,75 +287,60 @@ class _TyperCommandMeta(type):
 
 
 class _TyperParserAdapter:
-
     _actions: List[Any] = []
     _mutually_exclusive_groups: List[Any] = []
 
-    django_command: 'TyperCommand'
+    django_command: "TyperCommand"
     prog_name: str
     subcommand: str
 
-    def __init__(
-        self,
-        django_command: 'TyperCommand',
-        prog_name,
-        subcommand
-    ):
+    def __init__(self, django_command: "TyperCommand", prog_name, subcommand):
         self.django_command = django_command
         self.prog_name = prog_name
         self.subcommand = subcommand
 
     def print_help(self):
-        typer.echo(
-            CliRunner().invoke(
-                self.django_command.typer_app,
-                ['--help']
-            ).output
-        )
+        typer.echo(CliRunner().invoke(self.django_command.typer_app, ["--help"]).output)
 
-    def parse_args(self, args = None, namespace=None):
+    def parse_args(self, args=None, namespace=None):
         try:
             cmd = get_command(self.django_command.typer_app)
             with cmd.make_context(
-                f'{self.prog_name} {self.subcommand}',
+                f"{self.prog_name} {self.subcommand}",
                 list(args or []),
-                django_command=self.django_command
+                django_command=self.django_command,
             ) as ctx:
                 if ctx.protected_args:
                     p_args = [*ctx.protected_args, *ctx.args]
                     if not cmd.chain:  # type: ignore
-                        (
-                            cmd_name,
-                            cmd,
-                            c_args
-                        ) = cmd.resolve_command(  # type: ignore
-                            ctx,
-                            p_args
+                        (cmd_name, cmd, c_args) = cmd.resolve_command(  # type: ignore
+                            ctx, p_args
                         )
                         assert cmd is not None
                         sub_ctx = cmd.make_context(
                             cmd_name,
                             c_args,
                             parent=ctx,
-                            django_command=self.django_command
+                            django_command=self.django_command,
                         )
+
+                        c_args = []
+                        for param in ctx.command.params:
+                            if isinstance(param, TyperArgument):
+                                import ipdb
+
+                                ipdb.set_trace()
+                                c_args.append(ctx.params.pop(param.name))
+
                         return _ParsedArgs(
-                            args=p_args,
-                            **{
-                                **_common_options(),
-                                **ctx.params,
-                                **sub_ctx.params
-                            }
+                            args=[*c_args, *p_args],
+                            **{**_common_options(), **ctx.params, **sub_ctx.params},
                         )
                     else:
                         pass
                 else:
                     return _ParsedArgs(
-                        args=args or [],
-                        **{
-                            **_common_options(),
-                            **ctx.params
-                        }
+                        args=args or [], **{**_common_options(), **ctx.params}
                     )
 
         except click.exceptions.Exit:
@@ -386,52 +353,50 @@ class _TyperParserAdapter:
 def _common_options(
     version: Version = False,
     verbosity: Verbosity = 1,
-    settings: Settings = '',
+    settings: Settings = "",
     pythonpath: PythonPath = None,
     traceback: Traceback = False,
     no_color: NoColor = False,
     force_color: ForceColor = False,
-    skip_checks: SkipChecks = False
+    skip_checks: SkipChecks = False,
 ):
     return {
-        'version': version,
-        'verbosity': verbosity,
-        'settings': settings,
-        'pythonpath': pythonpath,
-        'traceback': traceback,
-        'no_color': no_color,
-        'force_color': force_color,
-        'skip_checks': skip_checks
+        "version": version,
+        "verbosity": verbosity,
+        "settings": settings,
+        "pythonpath": pythonpath,
+        "traceback": traceback,
+        "no_color": no_color,
+        "force_color": force_color,
+        "skip_checks": skip_checks,
     }
 
 
-COMMON_PARAMS = get_params_convertors_ctx_param_name_from_function(
-    _common_options
-)[0]
+COMMON_PARAMS = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
 COMMON_PARAM_NAMES = [param.name for param in COMMON_PARAMS]
 
 
 class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     """
-    A BaseCommand extension class that uses the Typer library to parse 
+    A BaseCommand extension class that uses the Typer library to parse
     arguments and options. This class adapts BaseCommand using a light touch
     that relies on most of the original BaseCommand implementation to handle
     default arguments and behaviors.
 
-    The goal of django_typer is to provide full typer style functionality 
+    The goal of django_typer is to provide full typer style functionality
     while maintaining compatibility with the Django management command system.
-    This means that the BaseCommand interface is preserved and the Typer 
+    This means that the BaseCommand interface is preserved and the Typer
     interface is added on top of it. This means that this code base is more
     robust to changes in the Django management command system - because most
-    of the base class functionality is preserved but many typer and click 
-    internals are used directly to achieve this. We rely on robust CI to 
+    of the base class functionality is preserved but many typer and click
+    internals are used directly to achieve this. We rely on robust CI to
     catch breaking changes in the click/typer dependencies.
 
 
     TODO - there is a problem with subcommand resolution and make_context()
-    that needs to be addressed. Need to understand exactly how click/typer 
-    does this so it can be broken apart and be interface compatible with 
-    Django. Also when are callbacks invoked, etc - during make_context? or 
+    that needs to be addressed. Need to understand exactly how click/typer
+    does this so it can be broken apart and be interface compatible with
+    Django. Also when are callbacks invoked, etc - during make_context? or
     invoke? There is a complexity here with execute().
     """
 
@@ -440,7 +405,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     @property
     def stealth_options(self):
         """
-        This is the only way to inject the set of valid parameters into 
+        This is the only way to inject the set of valid parameters into
         call_command because it does its own parameter validation - otherwise
         TypeErrors are thrown.
         """
@@ -460,6 +425,6 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """
         Call this command's handle() directly.
         """
-        if hasattr(self, '_handle'):
+        if hasattr(self, "_handle"):
             return self._handle(*args, **kwargs)
-        raise NotImplementedError(f'{self.__class__}')
+        raise NotImplementedError(f"{self.__class__}")

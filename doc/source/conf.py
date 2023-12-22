@@ -30,7 +30,7 @@ copyright = f'2023-{datetime.now().year}, Brian Kohan'
 author = 'Brian Kohan'
 
 # The full version, including alpha/beta/rc tags
-release = django_enum.__version__
+release = django_typer.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,8 +41,8 @@ release = django_enum.__version__
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
-    'sphinxarg.ext',
-    'sphinx.ext.todo'
+    'sphinx.ext.todo',
+    'sphinxcontrib.typer'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -57,12 +57,12 @@ justified is acceptable:
 .. code-block::
 
     poetry run isort django_typer
+    poetry run black django_typer
     poetry run pylint django_typer
     poetry run mypy django_typer
     poetry run doc8 -q doc
     poetry check
     poetry run pip check
-    poetry run safety check --full-report
     poetry run python -m readme_renderer ./README.rst
 
 

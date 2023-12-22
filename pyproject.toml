@@ -43,13 +43,93 @@ Django = ">=3.2,<5.0"
 typer = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
-django-click = "^2.3.0"
 ipdb = "^0.13.13"
 rich = "^13.7.0"
-pytest-django = "^4.5.2"
-isort = "^5.6.4"
-pytest-cov = "^4.0.0"
-Sphinx = ">=5.0.2,<8.0.0"
+pytest-django = "^4.7.0"
+isort = "^5.13.0"
+pytest-cov = "^4.1.0"
+Sphinx = ">=7.2.0"
 sphinx-rtd-theme = "^2.0.0"
-mypy = ">=0.991,<1.8"
+mypy = "^1.8"
 pylint = '^3.0'
+black = "^23.12.0"
+doc8 = "^1.1.1"
+aiohttp = "^3.9.1"
+readme-renderer = "^42.0"
+sphinxcontrib-typer = "^0.1.4"
+
+[tool.mypy]
+# The mypy configurations: http://bit.ly/2zEl9WI
+allow_redefinition = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+disallow_any_explicit = false
+disallow_any_generics = false
+disallow_untyped_calls = true
+ignore_errors = false
+ignore_missing_imports = true
+implicit_reexport = false
+strict_optional = true
+strict_equality = true
+local_partial_types = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+warn_no_return = true
+exclude = "tests"
+
+
+[tool.doc8]
+ignore-path = "doc/_build"
+max-line-length = 100
+sphinx = true
+
+[isort]
+# isort configuration:
+# https://github.com/timothycrosley/isort/wiki/isort-Settings
+include_trailing_comma = true
+use_parentheses = true
+# See https://github.com/timothycrosley/isort#multi-line-output-modes
+multi_line_output = 3
+default_section = "FIRSTPARTY"
+line_length = 88
+
+
+[tool.pytest.ini_options]
+# py.test options:
+DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
+python_files = "tests.py"
+norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
+
+addopts = [
+  "--strict-markers",
+  "--cov=django_typer",
+  "--cov-branch",
+  "--cov-report=term-missing:skip-covered",
+  "--cov-report=html",
+  "--cov-report=xml",
+  "--cov-fail-under=70"
+]
+
+[tool.coverage]
+# dont exempt tests from coverage - useful to make sure they're being run
+omit = [
+  "django_typer/tests/**/*py"
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+
+[pylint]
+output-format = "colorized"
+max-line-length = 88
+
+[tool.pylint.'DESIGN']
+max-args=30
+
+[tool.pylint.'MASTER']
+ignore="tests"

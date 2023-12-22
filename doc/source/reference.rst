@@ -1,4 +1,4 @@
-.. include:: refs.rst
+.. include:: ./refs.rst
 
 .. _reference:
 

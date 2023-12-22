@@ -1,11 +1,11 @@
-from django_typer import TyperCommand, command
-from typing import List
 import json
+from typing import List
+
+from django_typer import TyperCommand, command
 
 
 class Command(TyperCommand):
-    
-    help = 'Test multiple sub-commands.'
+    help = "Test multiple sub-commands."
 
     @command()
     def cmd1(self, files: List[str], flag1: bool = False):
@@ -13,11 +13,8 @@ class Command(TyperCommand):
         A command that takes a list of files and a flag.
         """
         assert self.__class__ == Command
-        return json.dumps({
-            'files': files,
-            'flag1': flag1
-        })
-    
+        return json.dumps({"files": files, "flag1": flag1})
+
     @command()
     def sum(self, numbers: List[float]):
         """
