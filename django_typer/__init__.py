@@ -92,7 +92,6 @@ class Context(TyperContext):
 
 
 class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
-
     context_class: Type[click.Context] = Context
 
     def __init__(
