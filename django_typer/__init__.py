@@ -59,6 +59,17 @@ __all__ = [
     "get_command",
 ]
 
+"""
+TODO
+- move django commands into a top level callback
+  - make sure they get put into execute()
+  - handle case where user defines a callback
+- add @group() support
+- test base class option functionality (e.g. --no-color, --skip-checks, etc)
+- documentation
+- linting
+- type hints
+"""
 
 def get_command(
     command_name: str,
@@ -411,6 +422,7 @@ class TyperParser:
                 params = ctx.params
 
                 def discover_parsed_args(ctx):
+                    # todo is this necessary?
                     for child in ctx.children:
                         discover_parsed_args(child)
                         params.update(child.params)
