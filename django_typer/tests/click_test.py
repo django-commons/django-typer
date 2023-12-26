@@ -1,10 +1,13 @@
-import click
 from pprint import pprint
 
+import click
 
 params = {}
 
-@click.group(context_settings={'allow_interspersed_args': True, 'ignore_unknown_options': True})
+
+@click.group(
+    context_settings={"allow_interspersed_args": True, "ignore_unknown_options": True}
+)
 @click.argument("name")
 @click.option("--verbose", "-v", is_flag=True, help="Enables verbose mode.")
 def main(name: str, verbose: bool = False):

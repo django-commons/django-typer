@@ -1,16 +1,17 @@
 import inspect
 import json
+import os
 import subprocess
 import sys
 from io import StringIO
 from pathlib import Path
-import os
 
 import django
 import typer
-from django_typer import get_command
 from django.core.management import call_command
 from django.test import TestCase
+
+from django_typer import get_command
 
 manage_py = Path(__file__).parent.parent.parent / "manage.py"
 
@@ -29,7 +30,9 @@ def run_command(command, *args):
     try:
         os.chdir(manage_py.parent)
         result = subprocess.run(
-            [sys.executable, f'./{manage_py.name}', command, *args], capture_output=True, text=True
+            [sys.executable, f"./{manage_py.name}", command, *args],
+            capture_output=True,
+            text=True,
         )
 
         # Check the return code to ensure the script ran successfully
@@ -44,6 +47,7 @@ def run_command(command, *args):
                 return result.stdout
     finally:
         os.chdir(cwd)
+
 
 class BasicTests(TestCase):
     def test_command_line(self):
@@ -78,7 +82,7 @@ class BasicTests(TestCase):
         )
 
     def test_call_direct(self):
-        basic = get_command('basic')
+        basic = get_command("basic")
         self.assertEqual(
             json.loads(basic.handle("a1", "a2")),
             {"arg1": "a1", "arg2": "a2", "arg3": 0.5, "arg4": 1},
@@ -208,51 +212,58 @@ class MultiTests(TestCase):
 
         self.assertEqual(json.loads(multi.cmd3()), {})
 
-class TestGetCommand(TestCase):
 
+class TestGetCommand(TestCase):
     def test_get_command(self):
-        from django_typer.tests.test_app.management.commands.basic import Command as Basic
-        basic = get_command('basic')
+        from django_typer.tests.test_app.management.commands.basic import (
+            Command as Basic,
+        )
+
+        basic = get_command("basic")
         assert basic.__class__ == Basic
 
-        from django_typer.tests.test_app.management.commands.multi import Command as Multi
-        multi = get_command('multi')
+        from django_typer.tests.test_app.management.commands.multi import (
+            Command as Multi,
+        )
+
+        multi = get_command("multi")
         assert multi.__class__ == Multi
-        cmd1 = get_command('multi', 'cmd1')
+        cmd1 = get_command("multi", "cmd1")
         assert cmd1.__func__ is multi.cmd1.__func__
-        sum = get_command('multi', 'sum')
+        sum = get_command("multi", "sum")
         assert sum.__func__ is multi.sum.__func__
-        cmd3 = get_command('multi', 'cmd3')
+        cmd3 = get_command("multi", "cmd3")
         assert cmd3.__func__ is multi.cmd3.__func__
 
-        from django_typer.tests.test_app.management.commands.callback1 import Command as Callback1
-        callback1 = get_command('callback1')
+        from django_typer.tests.test_app.management.commands.callback1 import (
+            Command as Callback1,
+        )
+
+        callback1 = get_command("callback1")
         assert callback1.__class__ == Callback1
 
         # callbacks are not commands
         with self.assertRaises(ValueError):
-            get_command('callback1', 'init')
-        
+            get_command("callback1", "init")
+
 
 class CallbackTests(TestCase):
-
-    cmd_name = 'callback1'
+    cmd_name = "callback1"
 
     def test_helps(self, top_level_only=False):
         buffer = StringIO()
         cmd = get_command(self.cmd_name, stdout=buffer)
 
-        help_output_top = run_command(self.cmd_name, '--help')
-        cmd.print_help('./manage.py', self.cmd_name)
+        help_output_top = run_command(self.cmd_name, "--help")
+        cmd.print_help("./manage.py", self.cmd_name)
         self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
 
         if not top_level_only:
             buffer.truncate(0)
             buffer.seek(0)
-            callback_help = run_command(self.cmd_name, '5', self.cmd_name, '--help')
-            cmd.print_help('./manage.py', self.cmd_name, self.cmd_name)
+            callback_help = run_command(self.cmd_name, "5", self.cmd_name, "--help")
+            cmd.print_help("./manage.py", self.cmd_name, self.cmd_name)
             self.assertEqual(callback_help.strip(), buffer.getvalue().strip())
-        
 
     def test_command_line(self):
         self.assertEqual(
@@ -298,7 +309,7 @@ class CallbackTests(TestCase):
             call_command(
                 self.cmd_name,
                 *["5", self.cmd_name, "a1", "a2"],
-                **{'p1': 5, 'arg1': 'a1', 'arg2': 'a2'}
+                **{"p1": 5, "arg1": "a1", "arg2": "a2"},
             )
         )
         self.assertEqual(
@@ -359,7 +370,7 @@ class CallbackTests(TestCase):
                     "0.2",
                     "--arg4",
                     "9",
-                ]
+                ],
             ),
             lambda: call_command(
                 self.cmd_name,
@@ -373,9 +384,9 @@ class CallbackTests(TestCase):
                     "n1",
                     "n2",
                     "--arg3",
-                    "0.2"
-                ]
-            )
+                    "0.2",
+                ],
+            ),
         ]
         expected = {
             "p1": 6,
@@ -384,7 +395,7 @@ class CallbackTests(TestCase):
             "arg1": "n1",
             "arg2": "n2",
             "arg3": 0.2,
-            "arg4": 9
+            "arg4": 9,
         }
         if should_raise:
             for call_cmd in interspersed:
@@ -393,7 +404,6 @@ class CallbackTests(TestCase):
                         call_cmd()
                 else:
                     self.assertEqual(json.loads(call_cmd()), expected)
-            
 
     def test_call_command_stdout(self):
         out = StringIO()
@@ -409,9 +419,9 @@ class CallbackTests(TestCase):
                 "--arg3",
                 "0.75",
                 "--arg4",
-                "2"
+                "2",
             ],
-            stdout=out
+            stdout=out,
         )
 
         self.assertEqual(
@@ -429,26 +439,24 @@ class CallbackTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            run_command(self.cmd_name, '--version').strip(),
-            django.get_version()
+            run_command(self.cmd_name, "--version").strip(), django.get_version()
         )
         self.assertEqual(
-            run_command(self.cmd_name, '6', self.cmd_name, '--version').strip(),
-            django.get_version()
+            run_command(self.cmd_name, "6", self.cmd_name, "--version").strip(),
+            django.get_version(),
         )
 
     def test_call_direct(self):
         cmd = get_command(self.cmd_name)
 
         self.assertEqual(
-            json.loads(cmd(arg1='a1', arg2='a2', arg3=0.2)),
-            {'arg1': 'a1', 'arg2': 'a2', 'arg3': 0.2, 'arg4': 1}
+            json.loads(cmd(arg1="a1", arg2="a2", arg3=0.2)),
+            {"arg1": "a1", "arg2": "a2", "arg3": 0.2, "arg4": 1},
         )
 
 
 class Callback2Tests(CallbackTests):
-    
-    cmd_name = 'callback2'
+    cmd_name = "callback2"
 
     def test_call_command(self):
         super().test_call_command(should_raise=False)

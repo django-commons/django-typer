@@ -3,7 +3,7 @@ import typer
 
 from django_typer import TyperCommandWrapper, _common_options
 
-app = typer.Typer(name='test')
+app = typer.Typer(name="test")
 state = {"verbose": False}
 
 

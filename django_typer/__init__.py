@@ -8,24 +8,26 @@ r"""
 
 """
 
+import contextlib
 import sys
-from types import SimpleNamespace, MethodType
 import typing as t
+from dataclasses import dataclass
+from importlib import import_module
+from types import MethodType, SimpleNamespace
 
 import click
 import typer
-from importlib import import_module
-from django.core.management.base import BaseCommand
 from django.core.management import get_commands
+from django.core.management.base import BaseCommand
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
-from typer.main import get_command as get_typer_command, MarkupMode, get_params_convertors_ctx_param_name_from_function
+from typer.main import MarkupMode
+from typer.main import get_command as get_typer_command
+from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default
-from dataclasses import dataclass
-import contextlib
 
 from .types import (
     ForceColor,
@@ -54,21 +56,26 @@ __all__ = [
     "TyperCommandWrapper",
     "callback",
     "command",
-    "get_command"
+    "get_command",
 ]
+
 
 def get_command(
     command_name: str,
-    *subcommand: str, 
-    stdout: t.Optional[t.IO[str]]=None,
-    stderr: t.Optional[t.IO[str]]=None,
-    no_color: bool=False,
-    force_color: bool=False
+    *subcommand: str,
+    stdout: t.Optional[t.IO[str]] = None,
+    stderr: t.Optional[t.IO[str]] = None,
+    no_color: bool = False,
+    force_color: bool = False,
 ):
     # todo - add a __call__ method to the command class if it is not a TyperCommand and has no
     # __call__ method - this will allow this interface to be used for standard commands
-    module = import_module(f'{get_commands()[command_name]}.management.commands.{command_name}')
-    cmd = module.Command(stdout=stdout, stderr=stderr, no_color=no_color, force_color=force_color)
+    module = import_module(
+        f"{get_commands()[command_name]}.management.commands.{command_name}"
+    )
+    cmd = module.Command(
+        stdout=stdout, stderr=stderr, no_color=no_color, force_color=force_color
+    )
     if subcommand:
         method = cmd.get_subcommand(*subcommand).command._callback.__wrapped__
         return MethodType(method, cmd)  # return the bound method
@@ -140,7 +147,9 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
                         param: val for param, val in kwargs.items() if param in expected
                     },
                     **{
-                        self_arg: getattr(click.get_current_context(), "django_command", None)
+                        self_arg: getattr(
+                            click.get_current_context(), "django_command", None
+                        )
                     },
                 )
             return None
@@ -279,7 +288,7 @@ class _TyperCommandMeta(type):
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: bool = True,
         pretty_exceptions_show_locals: bool = True,
-        pretty_exceptions_short: bool = True
+        pretty_exceptions_short: bool = True,
     ):
         """
         This method is called when a new class is created.
@@ -306,7 +315,7 @@ class _TyperCommandMeta(type):
             rich_help_panel=rich_help_panel,
             pretty_exceptions_enable=pretty_exceptions_enable,
             pretty_exceptions_show_locals=pretty_exceptions_show_locals,
-            pretty_exceptions_short=pretty_exceptions_short
+            pretty_exceptions_short=pretty_exceptions_short,
         )
 
         def handle(self, *args, **options):
@@ -329,13 +338,7 @@ class _TyperCommandMeta(type):
             },
         )
 
-    def __init__(
-        cls,
-        name,
-        bases,
-        attrs,
-        **kwargs
-    ):
+    def __init__(cls, name, bases, attrs, **kwargs):
         """
         This method is called after a new class is created.
         """
@@ -358,7 +361,6 @@ class _TyperCommandMeta(type):
 
 
 class TyperParser:
-
     @dataclass(frozen=True)
     class Action:
         dest: str
@@ -380,7 +382,7 @@ class TyperParser:
         self.django_command = django_command
         self.prog_name = prog_name
         self.subcommand = subcommand
-        
+
         def populate_params(node):
             for param in node.command.params:
                 self._actions.append(self.Action(param.name))
@@ -388,9 +390,11 @@ class TyperParser:
                 populate_params(child)
 
         populate_params(self.django_command.command_tree)
- 
+
     def print_help(self, *command_path: str):
-        self.django_command.command_tree.context.info_name = f'{self.prog_name} {self.subcommand}'
+        self.django_command.command_tree.context.info_name = (
+            f"{self.prog_name} {self.subcommand}"
+        )
         command_node = self.django_command.get_subcommand(*command_path)
         with contextlib.redirect_stdout(self.django_command.stdout):
             command_node.print_help()
@@ -399,21 +403,20 @@ class TyperParser:
         try:
             cmd = get_typer_command(self.django_command.typer_app)
             with cmd.make_context(
-                info_name=f'{self.prog_name} {self.subcommand}',
+                info_name=f"{self.prog_name} {self.subcommand}",
                 django_command=self.django_command,
-                args=list(args or [])
+                args=list(args or []),
             ) as ctx:
                 params = ctx.params
+
                 def discover_parsed_args(ctx):
                     for child in ctx.children:
                         discover_parsed_args(child)
                         params.update(child.params)
 
                 discover_parsed_args(ctx)
-                
-                return _ParsedArgs(
-                    args=args or [], **{**_common_options(), **params}
-                )
+
+                return _ParsedArgs(args=args or [], **{**_common_options(), **params})
         except click.exceptions.Exit:
             sys.exit()
 
@@ -473,13 +476,12 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     TODO - lazy loaded command overrides.
     Should be able to attach to another TyperCommand like this and conflicts would resolve
     based on INSTALLED_APP precedence.
-    
+
     class Command(TyperCommand, attach='app_label.command_name.subcommand1.subcommand2'):
         ...
     """
 
     class CommandNode:
-        
         name: str
         command: t.Union[TyperCommandWrapper, TyperGroupWrapper]
         context: TyperContext
@@ -489,7 +491,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             self,
             name: str,
             command: t.Union[TyperCommandWrapper, TyperGroupWrapper],
-            context: TyperContext
+            context: TyperContext,
         ):
             self.name = name
             self.command = command
@@ -513,20 +515,24 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
 
     def __init__(
         self,
-        stdout: t.Optional[t.IO[str]]=None,
-        stderr: t.Optional[t.IO[str]]=None,
-        no_color: bool=False,
-        force_color: bool=False,
-        **kwargs
+        stdout: t.Optional[t.IO[str]] = None,
+        stderr: t.Optional[t.IO[str]] = None,
+        no_color: bool = False,
+        force_color: bool = False,
+        **kwargs,
     ):
-        super().__init__(stdout=stdout, stderr=stderr, no_color=no_color, force_color=force_color, **kwargs)
-        self.command_tree = self._build_cmd_tree(
-            get_typer_command(self.typer_app)
+        super().__init__(
+            stdout=stdout,
+            stderr=stderr,
+            no_color=no_color,
+            force_color=force_color,
+            **kwargs,
         )
-   
+        self.command_tree = self._build_cmd_tree(get_typer_command(self.typer_app))
+
     def get_subcommand(self, *command_path: str):
         return self.command_tree.get_command(*command_path)
-    
+
     def _filter_commands(
         self, ctx: TyperContext, cmd_filter: t.Optional[t.List[str]] = None
     ):
@@ -535,13 +541,14 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                 cmd
                 for name, cmd in getattr(
                     ctx.command,
-                    'commands',
+                    "commands",
                     {
                         name: ctx.command.get_command(ctx, name)
-                        for name in getattr(
-                            ctx.command, 'list_commands', lambda _: []
-                        )(ctx)
-                        or cmd_filter or []
+                        for name in getattr(ctx.command, "list_commands", lambda _: [])(
+                            ctx
+                        )
+                        or cmd_filter
+                        or []
                     },
                 ).items()
                 if not cmd_filter or name in cmd_filter
@@ -554,14 +561,9 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         cmd: CoreTyperCommand,
         parent: t.Optional[Context] = None,
         info_name: t.Optional[str] = None,
-        node: t.Optional[CommandNode] = None
+        node: t.Optional[CommandNode] = None,
     ):
-        ctx = Context(
-            cmd,
-            info_name=info_name,
-            parent=parent,
-            django_command=self
-        )
+        ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
         current = self.CommandNode(cmd.name, cmd, ctx)
         if node:
             node.children[cmd.name] = current
@@ -569,14 +571,13 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             self._build_cmd_tree(cmd, ctx, info_name=cmd.name, node=current)
         return current
 
-
     def __init_subclass__(cls, **_):
         """Avoid passing typer arguments up the subclass init chain"""
         return super().__init_subclass__()
 
     def create_parser(self, prog_name: str, subcommand: str, **_):
         return TyperParser(self, prog_name, subcommand)
-    
+
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
         Print the help message for this command, derived from

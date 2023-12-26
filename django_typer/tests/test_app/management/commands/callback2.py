@@ -1,4 +1,5 @@
 import json
+
 from django_typer import TyperCommand, callback, command
 
 
@@ -9,8 +10,8 @@ class Command(TyperCommand, invoke_without_command=True):
 
     @callback(
         context_settings={
-            'allow_interspersed_args': True,
-            'ignore_unknown_options': True
+            "allow_interspersed_args": True,
+            "ignore_unknown_options": True,
         }
     )
     def init(self, p1: int, flag1: bool = False, flag2: bool = True):
@@ -20,11 +21,11 @@ class Command(TyperCommand, invoke_without_command=True):
         assert self.__class__ == Command
         self.parameters = {"p1": p1, "flag1": flag1, "flag2": flag2}
         return json.dumps(self.parameters)
-    
+
     @command(
         context_settings={
-            'allow_interspersed_args': True,
-            'ignore_unknown_options': True
+            "allow_interspersed_args": True,
+            "ignore_unknown_options": True,
         }
     )
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
