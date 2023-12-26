@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 import typer
 
 from django_typer import TyperCommandWrapper, _common_options
 
-app = typer.Typer()
+app = typer.Typer(name='test')
 state = {"verbose": False}
 
 
-@app.command(context_settings={"allow_interspersed_args": True})
+@app.command()
 def create(username: str, flag: bool = False):
     if state["verbose"]:
         print("About to create a user")
@@ -16,17 +17,17 @@ def create(username: str, flag: bool = False):
     print(f"flag: {flag}")
 
 
-@app.command(epilog="Delete Epilog")
-def delete(username: str):
-    if state["verbose"]:
-        print("About to delete a user")
-    print(f"Deleting user: {username}")
-    if state["verbose"]:
-        print("Just deleted a user")
+# @app.command(epilog="Delete Epilog")
+# def delete(username: str):
+#     if state["verbose"]:
+#         print("About to delete a user")
+#     print(f"Deleting user: {username}")
+#     if state["verbose"]:
+#         print("Just deleted a user")
 
 
 @app.callback(epilog="Main Epilog")
-def main(verbose: bool = False):
+def main(arg: int, verbose: bool = False):
     """
     Manage users in the awesome CLI app.
     """
@@ -35,17 +36,14 @@ def main(verbose: bool = False):
         state["verbose"] = True
 
 
-app.command(name="common")(_common_options)
+# app.command(name="common")(_common_options)
 
 
-@app.command(cls=TyperCommandWrapper)
-def wrapped(name: str):
-    """This is a wrapped command"""
-    print("wrapped(%s)" % name)
+# @app.command(cls=TyperCommandWrapper)
+# def wrapped(name: str):
+#     """This is a wrapped command"""
+#     print("wrapped(%s)" % name)
 
 
 if __name__ == "__main__":
-    import ipdb
-
-    ipdb.set_trace()
     app()

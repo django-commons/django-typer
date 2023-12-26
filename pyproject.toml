@@ -113,8 +113,7 @@ addopts = [
   "--cov-fail-under=70"
 ]
 
-[tool.coverage]
-# dont exempt tests from coverage - useful to make sure they're being run
+[tool.coverage.run]
 omit = [
   "django_typer/tests/**/*py"
 ]
