@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Annotated, Optional
 
-from typer import Option, echo
+from typer import Option
 
 _COMMON_PANEL = "Django"
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-typer"
-version = "0.1.0b"
+version = "0.2.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
@@ -13,11 +13,12 @@ classifiers = [
     "Framework :: Django",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Framework :: Django :: 3.2",
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
@@ -39,7 +40,7 @@ exclude = ["django_typer/tests"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-Django = ">=3.2,<5.0"
+Django = ">=3.2,<6.0"
 typer = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -110,7 +111,7 @@ addopts = [
   "--cov-report=term-missing:skip-covered",
   "--cov-report=html",
   "--cov-report=xml",
-  "--cov-fail-under=70"
+  "--cov-fail-under=90"
 ]
 
 [tool.coverage.run]

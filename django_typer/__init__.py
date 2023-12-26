@@ -112,7 +112,7 @@ class Context(TyperContext):
         _resolved_params: t.Optional[t.Dict[str, t.Any]] = None,
         **kwargs,
     ):
-        super().__init__(command, **kwargs)
+        super().__init__(command, parent=parent, **kwargs)
         self.django_command = django_command
         if not django_command and parent:
             self.django_command = parent.django_command
@@ -324,6 +324,7 @@ class _TyperCommandMeta(type):
                 standalone_mode=False,
                 _resolved_params=options,
                 django_command=self,
+                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
             )
 
         return super().__new__(
@@ -485,6 +486,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         name: str
         command: t.Union[TyperCommandWrapper, TyperGroupWrapper]
         context: TyperContext
+        parent: t.Optional["CommandNode"] = None
         children: t.Dict[str, "CommandNode"]
 
         def __init__(
@@ -492,10 +494,12 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             name: str,
             command: t.Union[TyperCommandWrapper, TyperGroupWrapper],
             context: TyperContext,
+            parent: t.Optional["CommandNode"] = None,
         ):
             self.name = name
             self.command = command
             self.context = context
+            self.parent = parent
             self.children = {}
 
         def print_help(self):
@@ -564,11 +568,11 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         node: t.Optional[CommandNode] = None,
     ):
         ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
-        current = self.CommandNode(cmd.name, cmd, ctx)
+        current = self.CommandNode(cmd.name, cmd, ctx, parent=node)
         if node:
             node.children[cmd.name] = current
         for cmd in self._filter_commands(ctx):
-            self._build_cmd_tree(cmd, ctx, info_name=cmd.name, node=current)
+            self._build_cmd_tree(cmd, parent=ctx, info_name=cmd.name, node=current)
         return current
 
     def __init_subclass__(cls, **_):

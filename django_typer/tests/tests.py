@@ -257,6 +257,7 @@ class CallbackTests(TestCase):
         help_output_top = run_command(self.cmd_name, "--help")
         cmd.print_help("./manage.py", self.cmd_name)
         self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
+        self.assertIn(f"Usage: ./manage.py {self.cmd_name} [OPTIONS]", help_output_top)
 
         if not top_level_only:
             buffer.truncate(0)
@@ -264,6 +265,10 @@ class CallbackTests(TestCase):
             callback_help = run_command(self.cmd_name, "5", self.cmd_name, "--help")
             cmd.print_help("./manage.py", self.cmd_name, self.cmd_name)
             self.assertEqual(callback_help.strip(), buffer.getvalue().strip())
+            self.assertIn(
+                f"Usage: ./manage.py {self.cmd_name} P1 {self.cmd_name} [OPTIONS] ARG1 ARG2",
+                callback_help,
+            )
 
     def test_command_line(self):
         self.assertEqual(
