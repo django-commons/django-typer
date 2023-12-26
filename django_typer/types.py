@@ -17,7 +17,9 @@ def print_version(context, _, value):
     command when --version is specified.
     """
     if value:
-        echo(context.django_command.get_version())
+        context.django_command.stdout.write(
+            context.django_command.get_version()
+        )
         sys.exit()
 
 

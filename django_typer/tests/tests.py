@@ -78,7 +78,7 @@ class BasicTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            run_command("basic", "--version").strip(), django.get_version()
+            str(run_command("basic", "--version")).strip(), django.get_version()
         )
 
     def test_call_direct(self):
@@ -183,16 +183,16 @@ class MultiTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            run_command("multi", "--version").strip(), django.get_version()
+            str(run_command("multi", "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            run_command("multi", "cmd1", "--version").strip(), django.get_version()
+            str(run_command("multi", "cmd1", "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            run_command("multi", "sum", "--version").strip(), django.get_version()
+            str(run_command("multi", "sum", "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            run_command("multi", "cmd3", "--version").strip(), django.get_version()
+            str(run_command("multi", "cmd3", "--version")).strip(), django.get_version()
         )
 
     def test_call_direct(self):
@@ -439,10 +439,10 @@ class CallbackTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            run_command(self.cmd_name, "--version").strip(), django.get_version()
+            str(run_command(self.cmd_name, "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            run_command(self.cmd_name, "6", self.cmd_name, "--version").strip(),
+            str(run_command(self.cmd_name, "6", self.cmd_name, "--version")).strip(),
             django.get_version(),
         )
 
