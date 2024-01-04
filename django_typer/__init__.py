@@ -9,6 +9,7 @@ r"""
 """
 
 import contextlib
+import inspect
 import sys
 import typing as t
 from dataclasses import dataclass
@@ -16,7 +17,9 @@ from importlib import import_module
 from types import MethodType, SimpleNamespace
 
 import click
+import ipdb
 import typer
+from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from typer import Typer
@@ -61,15 +64,13 @@ __all__ = [
 
 """
 TODO
-- move django commands into a top level callback
-  - make sure they get put into execute()
-  - handle case where user defines a callback
 - add @group() support
 - test base class option functionality (e.g. --no-color, --skip-checks, etc)
 - documentation
 - linting
 - type hints
 """
+
 
 def get_command(
     command_name: str,
@@ -93,13 +94,33 @@ def get_command(
     return cmd
 
 
+def _common_options(
+    version: Version = False,
+    verbosity: Verbosity = 1,
+    settings: Settings = "",
+    pythonpath: PythonPath = None,
+    traceback: Traceback = False,
+    no_color: NoColor = False,
+    force_color: ForceColor = False,
+    skip_checks: SkipChecks = False,
+):
+    pass
+
+
+COMMON_PARAMS = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
+COMMON_DEFAULTS = {
+    key: value.default
+    for key, value in inspect.signature(_common_options).parameters.items()
+}
+
+
 class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
     def __init__(self, args, **kwargs):
         super().__init__(**kwargs)
         self.args = args
 
     def _get_kwargs(self):
-        return {"args": self.args, **_common_options()}
+        return {"args": self.args, **COMMON_DEFAULTS}
 
 
 class Context(TyperContext):
@@ -135,6 +156,11 @@ class Context(TyperContext):
 
 class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
     context_class: t.Type[click.Context] = Context
+    django_command: "TyperCommand"
+    callback_is_method: bool = True
+
+    def common_params(self):
+        return []
 
     def __init__(
         self,
@@ -157,19 +183,27 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
                     **{
                         param: val for param, val in kwargs.items() if param in expected
                     },
-                    **{
-                        self_arg: getattr(
-                            click.get_current_context(), "django_command", None
-                        )
-                    },
+                    **(
+                        {
+                            self_arg: getattr(
+                                click.get_current_context(), "django_command", None
+                            )
+                        }
+                        if self.callback_is_method
+                        else {}
+                    ),
                 )
             return None
 
         super().__init__(  # type: ignore
             *args,
             params=[
-                *params[1:],
-                *[param for param in COMMON_PARAMS if param.name not in expected],
+                *(params[1:] if self.callback_is_method else params),
+                *[
+                    param
+                    for param in self.common_params()
+                    if param.name not in expected
+                ],
             ],
             callback=call_with_self,
             **kwargs,
@@ -177,11 +211,28 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
 
 
 class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
-    pass
+    def common_params(self):
+        if (
+            self.django_command._num_commands < 2
+            and not self.django_command._has_callback
+        ):
+            return [
+                param
+                for param in COMMON_PARAMS
+                if param.name in (self.django_command.django_params or [])
+            ]
+        return []
 
 
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
-    pass
+    def common_params(self):
+        if self.django_command._has_callback:
+            return [
+                param
+                for param in COMMON_PARAMS
+                if param.name in (self.django_command.django_params or [])
+            ]
+        return []
 
 
 def callback(  # pylint: disable=too-mt.Any-local-variables
@@ -207,9 +258,9 @@ def callback(  # pylint: disable=too-mt.Any-local-variables
     **kwargs,
 ):
     def decorator(func: CommandFunctionType):
-        func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.callback(
+        func._typer_callback_ = lambda cmd, **extra: cmd.typer_app.callback(
             name=name or extra.pop("name", None),
-            cls=cls,
+            cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
             invoke_without_command=invoke_without_command,
             subcommand_metavar=subcommand_metavar,
             chain=chain,
@@ -250,10 +301,10 @@ def command(
     **kwargs,
 ):
     def decorator(func: CommandFunctionType):
-        func._typer_constructor_ = lambda cmd, **extra: cmd.typer_app.command(
+        func._typer_command_ = lambda cmd, **extra: cmd.typer_app.command(
             name=name or extra.pop("name", None),
             *args,
-            cls=cls,
+            cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
             context_settings=context_settings,
             help=help,
             epilog=epilog,
@@ -355,19 +406,45 @@ class _TyperCommandMeta(type):
         This method is called after a new class is created.
         """
         cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
+
+        def get_ctor(attr):
+            return getattr(
+                attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
+            )
+
+        cls._num_commands = 0
+        cls._has_callback = False
+
+        for attr in [*attrs.values(), cls._handle]:
+            cls._num_commands += hasattr(attr, "_typer_command_")
+            cls._has_callback |= hasattr(attr, "_typer_callback_")
+
         if cls._handle:
-            if hasattr(cls._handle, "_typer_constructor_"):
-                cls._handle._typer_constructor_(cls, name=cls.typer_app.info.name)
-                del cls._handle._typer_constructor_
+            ctor = get_ctor(cls._handle)
+            if ctor:
+                ctor(cls, name=cls.typer_app.info.name)
             else:
-                cls.typer_app.command(cls.typer_app.info.name, cls=TyperCommandWrapper)(
-                    cls._handle
-                )
+                cls._num_commands += 1
+                cls.typer_app.command(
+                    cls.typer_app.info.name,
+                    cls=type(
+                        "_AdaptedCommand",
+                        (TyperCommandWrapper,),
+                        {"django_command": cls},
+                    ),
+                )(cls._handle)
 
         for attr in attrs.values():
-            if hasattr(attr, "_typer_constructor_"):
-                attr._typer_constructor_(cls)
-                del attr._typer_constructor_
+            (get_ctor(attr) or (lambda _: None))(cls)
+
+        if cls._num_commands > 1 and not cls.typer_app.registered_callback:
+            cls.typer_app.callback(
+                cls=type(
+                    "_AdaptedCallback",
+                    (TyperGroupWrapper,),
+                    {"django_command": cls, "callback_is_method": False},
+                )
+            )(_common_options)
 
         super().__init__(name, bases, attrs, **kwargs)
 
@@ -429,38 +506,12 @@ class TyperParser:
 
                 discover_parsed_args(ctx)
 
-                return _ParsedArgs(args=args or [], **{**_common_options(), **params})
+                return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **params})
         except click.exceptions.Exit:
             sys.exit()
 
     def add_argument(self, *args, **kwargs):
         pass
-
-
-def _common_options(
-    version: Version = False,
-    verbosity: Verbosity = 1,
-    settings: Settings = "",
-    pythonpath: PythonPath = None,
-    traceback: Traceback = False,
-    no_color: NoColor = False,
-    force_color: ForceColor = False,
-    skip_checks: SkipChecks = False,
-):
-    return {
-        "version": version,
-        "verbosity": verbosity,
-        "settings": settings,
-        "pythonpath": pythonpath,
-        "traceback": traceback,
-        "no_color": no_color,
-        "force_color": force_color,
-        "skip_checks": skip_checks,
-    }
-
-
-COMMON_PARAMS = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
-COMMON_PARAM_NAMES = [param.name for param in COMMON_PARAMS]
 
 
 class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
@@ -493,6 +544,23 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     class Command(TyperCommand, attach='app_label.command_name.subcommand1.subcommand2'):
         ...
     """
+
+    # we do not use verbosity because the base command does not do anything with it
+    # if users want to use a verbosity flag like the base django command adds
+    # they can use the type from django_typer.types.Verbosity
+    django_params: t.Optional[
+        t.List[
+            t.Literal[
+                "version",
+                "settings",
+                "pythonpath",
+                "traceback",
+                "no_color",
+                "force_color",
+                "skip_checks",
+            ]
+        ]
+    ] = [param.name for param in COMMON_PARAMS if param.name != "verbosity"]
 
     class CommandNode:
         name: str
@@ -601,9 +669,6 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """
         parser = self.create_parser(prog_name, subcommand)
         parser.print_help(*cmd_path)
-
-    def handle(self, *args: t.Any, **options: t.Any) -> t.Any:
-        pass  # pragma: no cover
 
     def __call__(self, *args, **kwargs):
         """

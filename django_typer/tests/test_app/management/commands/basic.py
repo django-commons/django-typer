@@ -1,6 +1,7 @@
 import json
 
 from django_typer import TyperCommand
+from django_typer.tests.utils import log_django_parameters
 
 
 class Command(TyperCommand):

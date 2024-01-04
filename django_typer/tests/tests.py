@@ -12,6 +12,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from django_typer import get_command
+from django_typer.tests.utils import read_django_parameters
 
 manage_py = Path(__file__).parent.parent.parent / "manage.py"
 
@@ -37,14 +38,15 @@ def run_command(command, *args):
 
         # Check the return code to ensure the script ran successfully
         if result.returncode != 0:
-            raise RuntimeError(result.stderr)
+            return result.stderr or result.stdout or ""
 
         # Parse the output
         if result.stdout:
             try:
                 return json.loads(result.stdout)
             except json.JSONDecodeError:
-                return result.stdout
+                return result.stdout or result.stderr or ""
+        return result.stderr or ""
     finally:
         os.chdir(cwd)
 
@@ -100,7 +102,7 @@ class BasicTests(TestCase):
 
 class InterfaceTests(TestCase):
     """
-    Make sure the django_typer decorator inerfaces match the
+    Make sure the django_typer decorator interfaces match the
     typer decorator interfaces. We don't simply pass variadic arguments
     to the typer decorator because we want the IDE to offer auto complete
     suggestions.
@@ -186,13 +188,13 @@ class MultiTests(TestCase):
             str(run_command("multi", "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            str(run_command("multi", "cmd1", "--version")).strip(), django.get_version()
+            str(run_command("multi", "--version", "cmd1")).strip(), django.get_version()
         )
         self.assertEqual(
-            str(run_command("multi", "sum", "--version")).strip(), django.get_version()
+            str(run_command("multi", "--version", "sum")).strip(), django.get_version()
         )
         self.assertEqual(
-            str(run_command("multi", "cmd3", "--version")).strip(), django.get_version()
+            str(run_command("multi", "--version", "cmd3")).strip(), django.get_version()
         )
 
     def test_call_direct(self):
@@ -447,7 +449,7 @@ class CallbackTests(TestCase):
             str(run_command(self.cmd_name, "--version")).strip(), django.get_version()
         )
         self.assertEqual(
-            str(run_command(self.cmd_name, "6", self.cmd_name, "--version")).strip(),
+            str(run_command(self.cmd_name, "--version", "6", self.cmd_name)).strip(),
             django.get_version(),
         )
 
@@ -471,3 +473,78 @@ class Callback2Tests(CallbackTests):
         # interspersed args are allowed its impossible to get the
         # subcommand to print its help
         super().test_helps(top_level_only=True)
+
+
+class TestDjangoParameters(TestCase):
+    commands = [
+        ("dj_params1", []),
+        ("dj_params2", ["cmd1"]),
+        ("dj_params2", ["cmd2"]),
+        ("dj_params3", ["cmd1"]),
+        ("dj_params3", ["cmd2"]),
+        ("dj_params4", []),
+    ]
+
+    def test_settings(self):
+        for cmd, args in self.commands:
+            run_command(cmd, "--settings", "django_typer.tests.settings2", *args)
+            self.assertEqual(read_django_parameters().get("settings", None), 2)
+
+    def test_color_params(self):
+        for cmd, args in self.commands:
+            run_command(cmd, "--no-color", *args)
+            self.assertEqual(read_django_parameters().get("no_color", False), True)
+            run_command(cmd, "--force-color", *args)
+            self.assertEqual(read_django_parameters().get("no_color", True), False)
+
+            result = run_command(cmd, "--force-color", "--no-color", *args)
+            self.assertTrue("CommandError" in result)
+            self.assertTrue("--no-color" in result)
+            self.assertTrue("--force-color" in result)
+
+    def test_pythonpath(self):
+        added = str(Path(__file__).parent.absolute())
+        self.assertTrue(added not in sys.path)
+        for cmd, args in self.commands:
+            run_command(cmd, "--pythonpath", added, *args)
+            self.assertTrue(added in read_django_parameters().get("python_path", []))
+
+    def test_skip_checks(self):
+        for cmd, args in self.commands:
+            result = run_command(
+                cmd, "--settings", "django_typer.tests.settings_fail_check", *args
+            )
+            self.assertTrue("SystemCheckError" in result)
+            self.assertTrue("test_app.E001" in result)
+
+            result = run_command(
+                cmd,
+                "--skip-checks",
+                "--settings",
+                "django_typer.tests.settings_fail_check",
+                *args,
+            )
+            self.assertFalse("SystemCheckError" in result)
+            self.assertFalse("test_app.E001" in result)
+
+    def test_traceback(self):
+        for cmd, args in self.commands:
+            result = run_command(cmd, *args, "--throw")
+            self.assertFalse("Traceback" in result)
+            result_tb = run_command(cmd, "--traceback", *args, "--throw")
+            self.assertTrue("Traceback" in result_tb)
+
+    def test_verbosity(self):
+        run_command("dj_params3", "cmd1")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+        run_command("dj_params3", "--verbosity", "2", "cmd1")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+        run_command("dj_params3", "--verbosity", "0", "cmd2")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 0)
+
+        run_command("dj_params4")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+        run_command("dj_params4", "--verbosity", "2")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+        run_command("dj_params4", "--verbosity", "0")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 0)
