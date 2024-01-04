@@ -8,7 +8,7 @@ from typing import Annotated, Optional
 
 from typer import Option
 
-_COMMON_PANEL = "Django"
+COMMON_PANEL = "Django"
 
 
 def print_version(context, _, value):
@@ -28,7 +28,7 @@ Version = Annotated[
         help="Show program's version number and exit.",
         callback=print_version,
         is_eager=True,
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -42,7 +42,7 @@ Verbosity = Annotated[
         show_choices=True,
         min=0,
         max=3,
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -54,7 +54,7 @@ Settings = Annotated[
             '"myproject.settings.main". If this isn\'t provided, the '
             "DJANGO_SETTINGS_MODULE environment variable will be used."
         ),
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -65,7 +65,7 @@ PythonPath = Annotated[
             "A directory to add to the Python path, e.g. "
             '"/home/djangoprojects/myproject".'
         ),
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -74,7 +74,7 @@ Traceback = Annotated[
     Option(
         "--traceback",
         help=("Raise on CommandError exceptions"),
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -83,7 +83,7 @@ NoColor = Annotated[
     Option(
         "--no-color",
         help=("Don't colorize the command output."),
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
@@ -92,13 +92,13 @@ ForceColor = Annotated[
     Option(
         "--force-color",
         help=("Force colorization of the command output."),
-        rich_help_panel=_COMMON_PANEL,
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 
 SkipChecks = Annotated[
     bool,
     Option(
-        "--skip-checks", help=("Skip system checks."), rich_help_panel=_COMMON_PANEL
+        "--skip-checks", help=("Skip system checks."), rich_help_panel=COMMON_PANEL
     ),
 ]

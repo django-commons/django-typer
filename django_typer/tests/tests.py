@@ -530,9 +530,16 @@ class TestDjangoParameters(TestCase):
     def test_traceback(self):
         for cmd, args in self.commands:
             result = run_command(cmd, *args, "--throw")
-            self.assertFalse("Traceback" in result)
-            result_tb = run_command(cmd, "--traceback", *args, "--throw")
-            self.assertTrue("Traceback" in result_tb)
+            if cmd != 'dj_params4':
+                self.assertFalse("Traceback" in result)
+            else:
+                self.assertTrue("Traceback" in result)
+            if cmd != 'dj_params4':
+                result_tb = run_command(cmd, "--traceback", *args, "--throw")
+                self.assertTrue("Traceback" in result_tb)
+            else:
+                result_tb = run_command(cmd, "--no-traceback", *args, "--throw")
+                self.assertFalse("Traceback" in result_tb)
 
     def test_verbosity(self):
         run_command("dj_params3", "cmd1")
