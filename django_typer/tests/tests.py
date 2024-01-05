@@ -9,7 +9,7 @@ from pathlib import Path
 import django
 import typer
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from django_typer import get_command
 from django_typer.tests.utils import read_django_parameters
@@ -502,6 +502,13 @@ class TestDjangoParameters(TestCase):
             self.assertTrue("--no-color" in result)
             self.assertTrue("--force-color" in result)
 
+            call_command(cmd, args, no_color=True)
+            self.assertEqual(read_django_parameters().get("no_color", False), True)
+            call_command(cmd, args, force_color=True)
+            self.assertEqual(read_django_parameters().get("no_color", True), False)
+            with self.assertRaises(BaseException):
+                call_command(cmd, args, force_color=True, no_color=True)
+
     def test_pythonpath(self):
         added = str(Path(__file__).parent.absolute())
         self.assertTrue(added not in sys.path)
@@ -527,14 +534,28 @@ class TestDjangoParameters(TestCase):
             self.assertFalse("SystemCheckError" in result)
             self.assertFalse("test_app.E001" in result)
 
+    @override_settings(DJANGO_TYPER_FAIL_CHECK=True)
+    def test_skip_checks_call(self):
+        for cmd, args in self.commands:
+            from django.core.management.base import SystemCheckError
+
+            with self.assertRaises(SystemCheckError):
+                call_command(cmd, *args, skip_checks=False)
+
+            # when you call_command and don't supply skip_checks, it will default to True!
+            call_command(cmd, *args, skip_checks=True)
+            call_command(cmd, *args)
+
     def test_traceback(self):
+        # traceback does not come into play with call_command
         for cmd, args in self.commands:
             result = run_command(cmd, *args, "--throw")
-            if cmd != 'dj_params4':
+            if cmd != "dj_params4":
                 self.assertFalse("Traceback" in result)
             else:
                 self.assertTrue("Traceback" in result)
-            if cmd != 'dj_params4':
+
+            if cmd != "dj_params4":
                 result_tb = run_command(cmd, "--traceback", *args, "--throw")
                 self.assertTrue("Traceback" in result_tb)
             else:
@@ -544,14 +565,36 @@ class TestDjangoParameters(TestCase):
     def test_verbosity(self):
         run_command("dj_params3", "cmd1")
         self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+
+        call_command("dj_params3", ["cmd1"])
+        self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+
         run_command("dj_params3", "--verbosity", "2", "cmd1")
         self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+
+        call_command("dj_params3", ["cmd1"], verbosity=2)
+        self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+
         run_command("dj_params3", "--verbosity", "0", "cmd2")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 0)
+
+        call_command("dj_params3", ["cmd2"], verbosity=0)
         self.assertEqual(read_django_parameters().get("verbosity", None), 0)
 
         run_command("dj_params4")
         self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+
+        call_command("dj_params4")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 1)
+
         run_command("dj_params4", "--verbosity", "2")
         self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+
+        call_command("dj_params4", [], verbosity=2)
+        self.assertEqual(read_django_parameters().get("verbosity", None), 2)
+
         run_command("dj_params4", "--verbosity", "0")
+        self.assertEqual(read_django_parameters().get("verbosity", None), 0)
+
+        call_command("dj_params4", [], verbosity=0)
         self.assertEqual(read_django_parameters().get("verbosity", None), 0)

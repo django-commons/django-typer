@@ -1,6 +1,8 @@
-from django.core.management import CommandError
 from typing import Annotated
+
+from django.core.management import CommandError
 from typer import Option
+
 from django_typer import TyperCommand, callback, command, types
 from django_typer.tests.utils import log_django_parameters
 
@@ -19,7 +21,7 @@ class Command(TyperCommand):
                 help=("Raise on CommandError exceptions"),
                 rich_help_panel=types.COMMON_PANEL,
             ),
-        ] = True  # this should change the default!
+        ] = True,  # this should change the default!
     ):
         assert self.__class__ == Command
         log_django_parameters(self, verbosity=verbosity, traceback=traceback)

@@ -17,7 +17,6 @@ from importlib import import_module
 from types import MethodType, SimpleNamespace
 
 import click
-import ipdb
 import typer
 from django.conf import settings
 from django.core.management import get_commands
@@ -43,7 +42,7 @@ from .types import (
     Version,
 )
 
-VERSION = (0, 1, 0)
+VERSION = (0, 2, "0b")
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -65,7 +64,7 @@ __all__ = [
 """
 TODO
 - add @group() support
-- test base class option functionality (e.g. --no-color, --skip-checks, etc)
+- add translation support in helps
 - documentation
 - linting
 - type hints
@@ -136,19 +135,38 @@ class Context(TyperContext):
     django_command: "TyperCommand"
     children: t.List["Context"]
 
+    class ParamDict(dict):
+        """
+        An extension of dict we use to block updates to parameters that were supplied
+        when the command was invoked via call_command. This complexity is introduced
+        by the hybrid parsing and option passing inherent to call_command.
+        """
+
+        def __init__(self, *args, supplied):
+            super().__init__(*args)
+            self.supplied = supplied
+
+        def __setitem__(self, key, value):
+            if key not in self.supplied:
+                super().__setitem__(key, value)
+
     def __init__(
         self,
         command: click.Command,  # pylint: disable=redefined-outer-name
         parent: t.Optional["Context"] = None,
         django_command: t.Optional["TyperCommand"] = None,
-        _resolved_params: t.Optional[t.Dict[str, t.Any]] = None,
+        supplied_params: t.Optional[t.Dict[str, t.Any]] = None,
         **kwargs,
     ):
         super().__init__(command, parent=parent, **kwargs)
+        supplied_params = supplied_params or {}
         self.django_command = django_command
         if not django_command and parent:
             self.django_command = parent.django_command
-        self.params.update(_resolved_params or {})
+        self.params = self.ParamDict(
+            {**self.params, **supplied_params},
+            supplied=list(supplied_params.keys()),
+        )
         self.children = []
         if parent:
             parent.children.append(self)
@@ -384,7 +402,7 @@ class _TyperCommandMeta(type):
             return self.typer_app(
                 args=args,
                 standalone_mode=False,
-                _resolved_params=options,
+                supplied_params=options,
                 django_command=self,
                 prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
             )

@@ -98,7 +98,5 @@ ForceColor = Annotated[
 
 SkipChecks = Annotated[
     bool,
-    Option(
-        "--skip-checks", help=("Skip system checks."), rich_help_panel=COMMON_PANEL
-    ),
+    Option("--skip-checks", help=("Skip system checks."), rich_help_panel=COMMON_PANEL),
 ]
