@@ -63,12 +63,20 @@ __all__ = [
 
 """
 TODO
-- add @group() support
 - add translation support in helps
 - documentation
 - linting
 - type hints
 """
+
+try:
+    from rich.traceback import install
+
+    traceback_config = getattr(settings, "RICH_TRACEBACK_CONFIG", {"show_locals": True})
+    if isinstance(traceback_config, dict):
+        install(**traceback_config)
+except ImportError:
+    pass
 
 
 def get_command(
@@ -231,8 +239,10 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
 class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
     def common_params(self):
         if (
-            self.django_command._num_commands < 2
+            hasattr(self, "django_command")
+            and self.django_command._num_commands < 2
             and not self.django_command._has_callback
+            and not self.django_command._root_groups
         ):
             return [
                 param
@@ -244,13 +254,81 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
 
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
     def common_params(self):
-        if self.django_command._has_callback:
+        if hasattr(self, "django_command") and self.django_command._has_callback:
             return [
                 param
                 for param in COMMON_PARAMS
                 if param.name in (self.django_command.django_params or [])
             ]
         return []
+
+
+class TyperWrapper(Typer):
+    bound: bool = False
+    django_command_cls: t.Type["TyperCommand"]
+
+    def bind(self, django_command_cls: t.Type["TyperCommand"]):
+        self.django_command_cls = django_command_cls
+        self.django_command_cls.typer_app.add_typer(self)
+
+    def callback(self, *args, **kwargs):
+        raise NotImplementedError(
+            "callback is not supported - the function decorated by group() is the callback."
+        )
+
+    def command(
+        self, *args, cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper, **kwargs
+    ):
+        return super().command(*args, cls=cls, **kwargs)
+
+    def group(
+        self,
+        name: t.Optional[str] = Default(None),
+        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        invoke_without_command: bool = Default(False),
+        no_args_is_help: bool = Default(False),
+        subcommand_metavar: t.Optional[str] = Default(None),
+        chain: bool = Default(False),
+        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        # Command
+        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
+        help: t.Optional[str] = Default(None),
+        epilog: t.Optional[str] = Default(None),
+        short_help: t.Optional[str] = Default(None),
+        options_metavar: str = Default("[OPTIONS]"),
+        add_help_option: bool = Default(True),
+        hidden: bool = Default(False),
+        deprecated: bool = Default(False),
+        # Rich settings
+        rich_help_panel: t.Union[str, None] = Default(None),
+        **kwargs,
+    ):
+        def create_app(func: CommandFunctionType):
+            app = TyperWrapper(
+                name=name,
+                cls=cls,
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                callback=func,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )
+            self.add_typer(app)
+            app.bound = True
+            return app
+
+        return create_app
 
 
 def callback(  # pylint: disable=too-mt.Any-local-variables
@@ -342,6 +420,52 @@ def command(
     return decorator
 
 
+def group(
+    name: t.Optional[str] = Default(None),
+    cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+    invoke_without_command: bool = Default(False),
+    no_args_is_help: bool = Default(False),
+    subcommand_metavar: t.Optional[str] = Default(None),
+    chain: bool = Default(False),
+    result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+    # Command
+    context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
+    help: t.Optional[str] = Default(None),
+    epilog: t.Optional[str] = Default(None),
+    short_help: t.Optional[str] = Default(None),
+    options_metavar: str = Default("[OPTIONS]"),
+    add_help_option: bool = Default(True),
+    hidden: bool = Default(False),
+    deprecated: bool = Default(False),
+    # Rich settings
+    rich_help_panel: t.Union[str, None] = Default(None),
+    **kwargs,
+):
+    def create_app(func: CommandFunctionType):
+        return TyperWrapper(
+            name=name,
+            cls=cls,
+            invoke_without_command=invoke_without_command,
+            no_args_is_help=no_args_is_help,
+            subcommand_metavar=subcommand_metavar,
+            chain=chain,
+            result_callback=result_callback,
+            callback=func,
+            context_settings=context_settings,
+            help=help,
+            epilog=epilog,
+            short_help=short_help,
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            hidden=hidden,
+            deprecated=deprecated,
+            rich_help_panel=rich_help_panel,
+            **kwargs,
+        )
+
+    return create_app
+
+
 class _TyperCommandMeta(type):
     def __new__(
         mcs,
@@ -373,30 +497,40 @@ class _TyperCommandMeta(type):
         """
         This method is called when a new class is created.
         """
-        typer_app = Typer(
-            name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
-            cls=cls,
-            help=help or attrs.get("help", typer.models.Default(None)),
-            invoke_without_command=invoke_without_command,
-            no_args_is_help=no_args_is_help,
-            subcommand_metavar=subcommand_metavar,
-            chain=chain,
-            result_callback=result_callback,
-            context_settings=context_settings,
-            callback=callback,
-            epilog=epilog,
-            short_help=short_help,
-            options_metavar=options_metavar,
-            add_help_option=add_help_option,
-            hidden=hidden,
-            deprecated=deprecated,
-            add_completion=add_completion,
-            rich_markup_mode=rich_markup_mode,
-            rich_help_panel=rich_help_panel,
-            pretty_exceptions_enable=pretty_exceptions_enable,
-            pretty_exceptions_show_locals=pretty_exceptions_show_locals,
-            pretty_exceptions_short=pretty_exceptions_short,
-        )
+        typer_app = None
+        for base in bases:
+            try:
+                if isinstance(base, TyperCommand):
+                    typer_app = base.typer_app
+                    break
+            except NameError:
+                pass
+
+        if not typer_app:
+            typer_app = Typer(
+                name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
+                cls=cls,
+                help=help or attrs.get("help", typer.models.Default(None)),
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                context_settings=context_settings,
+                callback=callback,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                hidden=hidden,
+                deprecated=deprecated,
+                add_completion=add_completion,
+                rich_markup_mode=rich_markup_mode,
+                rich_help_panel=rich_help_panel,
+                pretty_exceptions_enable=pretty_exceptions_enable,
+                pretty_exceptions_show_locals=pretty_exceptions_show_locals,
+                pretty_exceptions_short=pretty_exceptions_short,
+            )
 
         def handle(self, *args, **options):
             return self.typer_app(
@@ -432,10 +566,24 @@ class _TyperCommandMeta(type):
 
         cls._num_commands = 0
         cls._has_callback = False
+        cls._root_groups = 0
+
+        for base in bases:
+            try:
+                if issubclass(base, TyperCommand):
+                    cls._num_commands += base._num_commands
+                    cls._has_callback |= base._has_callback
+                    cls._root_groups += base._root_groups
+                    break
+            except NameError:
+                pass
 
         for attr in [*attrs.values(), cls._handle]:
             cls._num_commands += hasattr(attr, "_typer_command_")
             cls._has_callback |= hasattr(attr, "_typer_callback_")
+            if isinstance(attr, TyperWrapper) and not attr.bound:
+                attr.bind(cls)
+                cls._root_groups += 1
 
         if cls._handle:
             ctor = get_ctor(cls._handle)
@@ -455,7 +603,9 @@ class _TyperCommandMeta(type):
         for attr in attrs.values():
             (get_ctor(attr) or (lambda _: None))(cls)
 
-        if cls._num_commands > 1 and not cls.typer_app.registered_callback:
+        if (
+            cls._num_commands > 1 or cls._root_groups > 0
+        ) and not cls.typer_app.registered_callback:
             cls.typer_app.callback(
                 cls=type(
                     "_AdaptedCallback",
