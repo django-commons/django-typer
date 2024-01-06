@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from django_typer import TyperCommand, callback
+from django_typer import TyperCommand, initialize
 
 
 class Command(TyperCommand):
@@ -9,7 +9,7 @@ class Command(TyperCommand):
 
     parameters = {}
 
-    @callback()
+    @initialize()
     def init(self, p1: int, flag1: bool = False, flag2: bool = True):
         """
         The callback to initialize the command.

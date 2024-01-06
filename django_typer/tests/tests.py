@@ -137,12 +137,12 @@ class InterfaceTests(TestCase):
         self.assertFalse(command_params.symmetric_difference(typer_params))
 
     def test_callback_interface_matches(self):
-        from django_typer import callback
+        from django_typer import initialize
 
-        callback_params = set(get_named_arguments(callback))
+        initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
-        self.assertFalse(callback_params.symmetric_difference(typer_params))
+        self.assertFalse(initialize_params.symmetric_difference(typer_params))
 
 
 class MultiTests(TestCase):

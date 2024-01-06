@@ -1,13 +1,13 @@
 from django.core.management import CommandError
 
-from django_typer import TyperCommand, callback, command, types
+from django_typer import TyperCommand, initialize, command, types
 from django_typer.tests.utils import log_django_parameters
 
 
 class Command(TyperCommand):
     help = "Test that django parameters work as expected"
 
-    @callback()
+    @initialize()
     def init(self, verbosity: types.Verbosity = 1):
         """
         The callback to initialize the command.

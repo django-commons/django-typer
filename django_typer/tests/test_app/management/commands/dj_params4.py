@@ -3,7 +3,7 @@ from typing import Annotated
 from django.core.management import CommandError
 from typer import Option
 
-from django_typer import TyperCommand, callback, command, types
+from django_typer import TyperCommand, command, types
 from django_typer.tests.utils import log_django_parameters
 
 

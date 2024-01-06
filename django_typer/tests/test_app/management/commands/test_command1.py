@@ -1,12 +1,12 @@
 import json
 
-from django_typer import TyperCommand, callback, command
+from django_typer import TyperCommand, initialize, command
 
 
 class Command(TyperCommand, add_completion=False):
     help = "This is a test help message"
 
-    @callback(epilog="This is a test callback epilog")
+    @initialize(epilog="This is a test callback epilog")
     def preamble(self, pre_arg: str = "pre_arg"):
         print(f"This is a test preamble, {pre_arg}")
 

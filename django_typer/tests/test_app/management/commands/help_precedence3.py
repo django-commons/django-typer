@@ -2,11 +2,12 @@ import json
 
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, callback, command
+from django_typer import TyperCommand, initialize, command
 
 
 class Command(TyperCommand):
-    @callback(help="Test minimal TyperCommand subclass - callback method")
+    
+    @initialize(help="Test minimal TyperCommand subclass - callback method")
     def init(self, verbosity: int = 1):
         """
         Test minimal TyperCommand subclass - callback docstring

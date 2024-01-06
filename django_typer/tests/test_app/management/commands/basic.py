@@ -2,8 +2,7 @@ import json
 
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, command
-from django_typer.tests.utils import log_django_parameters
+from django_typer import TyperCommand
 
 
 class Command(TyperCommand):

@@ -56,7 +56,7 @@ __all__ = [
     "Context",
     "TyperGroupWrapper",
     "TyperCommandWrapper",
-    "callback",
+    "initialize",
     "command",
     "get_command",
 ]
@@ -338,7 +338,7 @@ class TyperWrapper(Typer):
         return create_app
 
 
-def callback(  # pylint: disable=too-mt.Any-local-variables
+def initialize(  # pylint: disable=too-mt.Any-local-variables
     name: t.Optional[str] = Default(None),
     *,
     cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
