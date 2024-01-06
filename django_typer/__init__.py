@@ -42,7 +42,7 @@ from .types import (
     Version,
 )
 
-VERSION = (0, 2, "0b")
+VERSION = (0, 3, "0b")
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
