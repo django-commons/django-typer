@@ -1,0 +1,8 @@
+                                                                                
+ Usage: ./manage.py groups string STRING strip [OPTIONS]                        
+                                                                                
+ Strip white space off the ends of the string                                   
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯

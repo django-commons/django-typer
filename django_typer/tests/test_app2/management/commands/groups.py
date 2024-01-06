@@ -8,7 +8,8 @@ from django_typer.tests.test_app.management.commands.groups import (
 )
 
 
-class Command(GroupsCommand):
+class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_app."):
+
     help = "Test groups command inheritance."
 
     precision = 2
@@ -31,7 +32,19 @@ class Command(GroupsCommand):
         ] = 1,
     ):
         """
-        Echo the given message.
+        Echo the given message the given number of times.
         """
         assert self.__class__ is Command
         return " ".join([message] * echoes)
+
+    # test override base class command and remove arguments
+    @GroupsCommand.case.command()
+    def upper(self):
+        return super().upper(0, None)
+
+    @GroupsCommand.string.command()
+    def strip(self):
+        """Strip white space off the ends of the string"""
+        return self.string.strip()
+
+    

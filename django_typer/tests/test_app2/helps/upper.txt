@@ -1,0 +1,8 @@
+                                                                                
+ Usage: ./manage.py groups string STRING case upper [OPTIONS]                   
+                                                                                
+ Convert the given string to upper case.                                        
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯

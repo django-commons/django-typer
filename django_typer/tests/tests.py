@@ -13,8 +13,26 @@ from django.test import TestCase, override_settings
 
 from django_typer import get_command
 from django_typer.tests.utils import read_django_parameters
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+def similarity(text1, text2):
+    """
+    Compute the cosine similarity between two texts.
+    https://en.wikipedia.org/wiki/Cosine_similarity
+
+    We use this to lazily evaluate the output of --help to our
+    renderings.
+    """
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])    
+    return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+
 
 manage_py = Path(__file__).parent.parent.parent / "manage.py"
+TESTS_DIR = Path(__file__).parent
 
 
 def get_named_arguments(function):
@@ -598,3 +616,102 @@ class TestDjangoParameters(TestCase):
 
         call_command("dj_params4", [], verbosity=0)
         self.assertEqual(read_django_parameters().get("verbosity", None), 0)
+
+
+class TestHelpPrecedence(TestCase):
+
+    def test_help_precedence1(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence1", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence1")
+        self.assertTrue(re.search(r"help_precedence1\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+        self.assertIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+
+    def test_help_precedence2(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence2", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence2")
+        self.assertIn("Test minimal TyperCommand subclass - class member", buffer.getvalue())
+        self.assertTrue(re.search(r"help_precedence2\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+
+    def test_help_precedence3(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence3", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence3")
+        self.assertTrue(re.search(r"help_precedence3\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+        self.assertIn("Test minimal TyperCommand subclass - callback method", buffer.getvalue())
+
+    def test_help_precedence4(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence4", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence4")
+        self.assertIn("Test minimal TyperCommand subclass - callback docstring", buffer.getvalue())
+        self.assertTrue(re.search(r"help_precedence4\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+
+    def test_help_precedence5(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence5", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence5")
+        self.assertIn("Test minimal TyperCommand subclass - command method", buffer.getvalue())
+   
+    def test_help_precedence6(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence6", stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence6")
+        self.assertIn("Test minimal TyperCommand subclass - docstring", buffer.getvalue())
+
+
+class TestGroups(TestCase):
+    """
+    A collection of tests that test complex grouping commands and also that
+    command inheritance behaves as expected.
+    """
+    def test_helps(self, app='test_app'):
+        os.environ['TERMINAL_WIDTH'] = '80'
+        for cmds in [
+            ('groups',),
+            ('groups', 'echo'),
+            ('groups', 'math'),
+            ('groups', 'math', 'divide'),
+            ('groups', 'math', 'multiply'),
+            ('groups', 'string'),
+            ('groups', 'string', 'case'),
+            ('groups', 'string', 'case', 'lower'),
+            ('groups', 'string', 'case', 'upper'),
+            ('groups', 'string', 'strip'),
+            ('groups', 'string', 'split'),
+        ]:
+            if app == 'test_app' and cmds[-1] == 'strip':
+                continue
+
+            buffer = StringIO()
+            cmd = get_command(cmds[0], stdout=buffer)
+            cmd.print_help("./manage.py", *cmds)
+            hlp = buffer.getvalue()
+            self.assertGreater(
+                sim := similarity(
+                    hlp,
+                    (TESTS_DIR / app / 'helps' / f'{cmds[-1]}.txt').read_text()
+                ),
+                0.95
+            )
+            print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
+
+        del os.environ['TERMINAL_WIDTH']
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "django_typer.tests.test_app2",
+            "django_typer.tests.test_app",
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+        ],
+    )
+    def test_helps_override(self):
+        self.test_helps(app='test_app2')

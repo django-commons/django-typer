@@ -17,7 +17,7 @@ class Command(TyperCommand):
         """
         Echo the given message.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         return json.dumps({"echo": message})
 
     @group()
@@ -25,7 +25,7 @@ class Command(TyperCommand):
         """
         Do some math at the given precision.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         self.precision = precision
 
     @math.command()
@@ -48,7 +48,7 @@ class Command(TyperCommand):
         """
         Multiply the given numbers.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         res = number1 * number2
         for n in numbers:
             res *= n
@@ -73,7 +73,7 @@ class Command(TyperCommand):
         """
         Divide the given numbers.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         res = number1 / number2
         for n in numbers:
             res /= n
@@ -89,7 +89,7 @@ class Command(TyperCommand):
         """
         String operations.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         self.op_string = string
 
     @string.group()
@@ -97,18 +97,18 @@ class Command(TyperCommand):
         """
         Case operations.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
 
     @case.command()
     def upper(
         self,
-        begin: t.Annotated[int, Argument()] = 0,
-        end: t.Annotated[t.Optional[int], Argument()] = None,
+        begin: t.Annotated[int, Argument(help="The starting index of the string to operate on.")] = 0,
+        end: t.Annotated[t.Optional[int], Argument(help="The ending index of the string to operate on.")] = None,
     ):
         """
         Convert the given string to upper case.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         return json.dumps(
             {
                 "upper": f'{self.op_string[0:begin]}{self.op_string[begin:end].upper()}{self.op_string[end:None] if end else ""}'
@@ -118,13 +118,13 @@ class Command(TyperCommand):
     @case.command()
     def lower(
         self,
-        begin: t.Annotated[int, Argument()] = 0,
-        end: t.Annotated[t.Optional[int], Argument()] = None,
+        begin: t.Annotated[int, Argument(help="The starting index of the string to operate on.")] = 0,
+        end: t.Annotated[t.Optional[int], Argument(help="The ending index of the string to operate on.")] = None,
     ):
         """
         Convert the given string to upper case.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         return json.dumps(
             {
                 "lower": f'{self.op_string[0:begin]}{self.op_string[begin:end].lower()}{self.op_string[end:None] if end else ""}'
@@ -136,5 +136,5 @@ class Command(TyperCommand):
         """
         Split the given string on the given separator.
         """
-        assert self.__class__ is Command
+        assert issubclass(self.__class__, Command)
         return json.dumps({"split": self.op_string.split(sep)})

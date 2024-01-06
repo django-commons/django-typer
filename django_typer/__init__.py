@@ -17,7 +17,6 @@ from importlib import import_module
 from types import MethodType, SimpleNamespace
 
 import click
-import typer
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
@@ -30,6 +29,7 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default
+from copy import deepcopy
 
 from .types import (
     ForceColor,
@@ -362,7 +362,7 @@ def callback(  # pylint: disable=too-mt.Any-local-variables
             chain=chain,
             result_callback=result_callback,
             context_settings=context_settings,
-            help=help,
+            help=cmd.typer_app.info.help or help,
             epilog=epilog,
             short_help=short_help,
             options_metavar=options_metavar,
@@ -497,20 +497,18 @@ class _TyperCommandMeta(type):
         """
         This method is called when a new class is created.
         """
+        try:
+            TyperCommand
+            is_base_init = False
+        except NameError:
+            is_base_init = True
         typer_app = None
-        for base in bases:
-            try:
-                if isinstance(base, TyperCommand):
-                    typer_app = base.typer_app
-                    break
-            except NameError:
-                pass
 
-        if not typer_app:
+        if not is_base_init:
             typer_app = Typer(
                 name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
                 cls=cls,
-                help=help or attrs.get("help", typer.models.Default(None)),
+                help=help or attrs.get("help", Default(None)),
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
                 subcommand_metavar=subcommand_metavar,
@@ -532,87 +530,77 @@ class _TyperCommandMeta(type):
                 pretty_exceptions_short=pretty_exceptions_short,
             )
 
-        def handle(self, *args, **options):
-            return self.typer_app(
-                args=args,
-                standalone_mode=False,
-                supplied_params=options,
-                django_command=self,
-                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
-            )
-
-        return super().__new__(
-            mcs,
-            name,
-            bases,
-            {
+            def handle(self, *args, **options):
+                return self.typer_app(
+                    args=args,
+                    standalone_mode=False,
+                    supplied_params=options,
+                    django_command=self,
+                    prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
+                )
+            
+            attrs = {
                 "_handle": attrs.pop("handle", None),
                 **attrs,
                 "handle": handle,
                 "typer_app": typer_app,
-            },
-        )
+            }
+
+        return super().__new__(mcs, name, bases, attrs)
 
     def __init__(cls, name, bases, attrs, **kwargs):
         """
         This method is called after a new class is created.
         """
-        cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
+        if cls.typer_app is not None:
+            cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
 
-        def get_ctor(attr):
-            return getattr(
-                attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
-            )
-
-        cls._num_commands = 0
-        cls._has_callback = False
-        cls._root_groups = 0
-
-        for base in bases:
-            try:
-                if issubclass(base, TyperCommand):
-                    cls._num_commands += base._num_commands
-                    cls._has_callback |= base._has_callback
-                    cls._root_groups += base._root_groups
-                    break
-            except NameError:
-                pass
-
-        for attr in [*attrs.values(), cls._handle]:
-            cls._num_commands += hasattr(attr, "_typer_command_")
-            cls._has_callback |= hasattr(attr, "_typer_callback_")
-            if isinstance(attr, TyperWrapper) and not attr.bound:
-                attr.bind(cls)
-                cls._root_groups += 1
-
-        if cls._handle:
-            ctor = get_ctor(cls._handle)
-            if ctor:
-                ctor(cls, name=cls.typer_app.info.name)
-            else:
-                cls._num_commands += 1
-                cls.typer_app.command(
-                    cls.typer_app.info.name,
-                    cls=type(
-                        "_AdaptedCommand",
-                        (TyperCommandWrapper,),
-                        {"django_command": cls},
-                    ),
-                )(cls._handle)
-
-        for attr in attrs.values():
-            (get_ctor(attr) or (lambda _: None))(cls)
-
-        if (
-            cls._num_commands > 1 or cls._root_groups > 0
-        ) and not cls.typer_app.registered_callback:
-            cls.typer_app.callback(
-                cls=type(
-                    "_AdaptedCallback",
-                    (TyperGroupWrapper,),
-                    {"django_command": cls, "callback_is_method": False},
+            def get_ctor(attr):
+                return getattr(
+                    attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
                 )
-            )(_common_options)
+
+            # because we're mapping a non-class based interface onto a class based interface, we have to
+            # handle this class mro stuff manually here
+            for cmd_cls, cls_attrs in [*[(base, vars(base)) for base in reversed(bases)], (cls, attrs)]:
+                if not issubclass(cmd_cls, TyperCommand) or cmd_cls is TyperCommand:
+                    continue
+                for attr in [*cls_attrs.values(), cls._handle]:
+                    cls._num_commands += hasattr(attr, "_typer_command_")
+                    cls._has_callback |= hasattr(attr, "_typer_callback_")
+                    if isinstance(attr, TyperWrapper) and not attr.bound:
+                        attr.bind(cls)
+                        cls._root_groups += 1
+
+                if cmd_cls._handle:
+                    ctor = get_ctor(cmd_cls._handle)
+                    if ctor:
+                        ctor(cls, name=cls.typer_app.info.name)
+                    else:
+                        cls._num_commands += 1
+                        cls.typer_app.command(
+                            cls.typer_app.info.name,
+                            cls=type(
+                                "_AdaptedCommand",
+                                (TyperCommandWrapper,),
+                                {"django_command": cls},
+                            ),
+                            help=cls.typer_app.info.help or None
+                        )(cmd_cls._handle)
+
+                for attr in cls_attrs.values():
+                    (get_ctor(attr) or (lambda _: None))(cls)
+
+            if (
+                cls._num_commands > 1 or cls._root_groups > 0
+            ) and not cls.typer_app.registered_callback:
+                cls.typer_app.callback(
+                    cls=type(
+                        "_AdaptedCallback",
+                        (TyperGroupWrapper,),
+                        {"django_command": cls, "callback_is_method": False},
+                    )
+                )(_common_options)
 
         super().__init__(name, bases, attrs, **kwargs)
 
@@ -761,7 +749,10 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             except KeyError:
                 raise ValueError(f'No such command "{command_path[0]}"')
 
-    typer_app: Typer
+    typer_app: t.Optional[Typer] = None
+    _num_commands: int = 0
+    _has_callback: bool = False
+    _root_groups: int = 0
 
     command_tree: CommandNode
 

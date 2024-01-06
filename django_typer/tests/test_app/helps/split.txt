@@ -1,0 +1,9 @@
+                                                                                
+ Usage: ./manage.py groups string STRING split [OPTIONS]                        
+                                                                                
+ Split the given string on the given separator.                                 
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --sep         TEXT  [default:  ]                                             │
+│ --help              Show this message and exit.                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
