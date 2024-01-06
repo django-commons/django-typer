@@ -7,9 +7,7 @@ from django_typer.tests.test_app.management.commands.groups import (
     Command as GroupsCommand,
 )
 
-
 class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_app."):
-
     help = "Test groups command inheritance."
 
     precision = 2
@@ -46,5 +44,3 @@ class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_
     def strip(self):
         """Strip white space off the ends of the string"""
         return self.op_string.strip()
-
-    

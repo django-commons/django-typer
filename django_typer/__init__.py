@@ -15,6 +15,7 @@ import typing as t
 from dataclasses import dataclass
 from importlib import import_module
 from types import MethodType, SimpleNamespace
+from copy import deepcopy
 
 import click
 from django.conf import settings
@@ -29,7 +30,6 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default
-from copy import deepcopy
 
 from .types import (
     ForceColor,
@@ -267,9 +267,16 @@ class TyperWrapper(Typer):
     bound: bool = False
     django_command_cls: t.Type["TyperCommand"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def bind(self, django_command_cls: t.Type["TyperCommand"]):
         self.django_command_cls = django_command_cls
-        self.django_command_cls.typer_app.add_typer(self)
+        # the deepcopy is necessary for instances where classes derive
+        # from Command classes and replace/extend commands on groups
+        # defined in the base class - this avoids the extending class
+        # polluting the base class's command tree
+        self.django_command_cls.typer_app.add_typer(deepcopy(self))
 
     def callback(self, *args, **kwargs):
         raise NotImplementedError(
@@ -538,7 +545,7 @@ class _TyperCommandMeta(type):
                     django_command=self,
                     prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
                 )
-            
+
             attrs = {
                 "_handle": attrs.pop("handle", None),
                 **attrs,
@@ -562,7 +569,10 @@ class _TyperCommandMeta(type):
 
             # because we're mapping a non-class based interface onto a class based interface, we have to
             # handle this class mro stuff manually here
-            for cmd_cls, cls_attrs in [*[(base, vars(base)) for base in reversed(bases)], (cls, attrs)]:
+            for cmd_cls, cls_attrs in [
+                *[(base, vars(base)) for base in reversed(bases)],
+                (cls, attrs),
+            ]:
                 if not issubclass(cmd_cls, TyperCommand) or cmd_cls is TyperCommand:
                     continue
                 for attr in [*cls_attrs.values(), cls._handle]:
@@ -585,7 +595,7 @@ class _TyperCommandMeta(type):
                                 (TyperCommandWrapper,),
                                 {"django_command": cls},
                             ),
-                            help=cls.typer_app.info.help or None
+                            help=cls.typer_app.info.help or None,
                         )(cmd_cls._handle)
 
                 for attr in cls_attrs.values():

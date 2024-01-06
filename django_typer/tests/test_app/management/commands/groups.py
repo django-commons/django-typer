@@ -102,8 +102,13 @@ class Command(TyperCommand):
     @case.command()
     def upper(
         self,
-        begin: t.Annotated[int, Argument(help="The starting index of the string to operate on.")] = 0,
-        end: t.Annotated[t.Optional[int], Argument(help="The ending index of the string to operate on.")] = None,
+        begin: t.Annotated[
+            int, Argument(help="The starting index of the string to operate on.")
+        ] = 0,
+        end: t.Annotated[
+            t.Optional[int],
+            Argument(help="The ending index of the string to operate on."),
+        ] = None,
     ):
         """
         Convert the given string to upper case.
@@ -114,8 +119,13 @@ class Command(TyperCommand):
     @case.command()
     def lower(
         self,
-        begin: t.Annotated[int, Argument(help="The starting index of the string to operate on.")] = 0,
-        end: t.Annotated[t.Optional[int], Argument(help="The ending index of the string to operate on.")] = None,
+        begin: t.Annotated[
+            int, Argument(help="The starting index of the string to operate on.")
+        ] = 0,
+        end: t.Annotated[
+            t.Optional[int],
+            Argument(help="The ending index of the string to operate on."),
+        ] = None,
     ):
         """
         Convert the given string to upper case.

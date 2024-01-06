@@ -1,6 +1,7 @@
 import inspect
 import json
 import os
+import re
 import subprocess
 import sys
 from io import StringIO
@@ -10,12 +11,11 @@ import django
 import typer
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from django_typer import get_command
 from django_typer.tests.utils import read_django_parameters
-import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 
 def similarity(text1, text2):
@@ -27,7 +27,7 @@ def similarity(text1, text2):
     renderings.
     """
     vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([text1, text2])    
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 
@@ -621,12 +621,16 @@ class TestDjangoParameters(TestCase):
 
 
 class TestHelpPrecedence(TestCase):
-
     def test_help_precedence1(self):
         buffer = StringIO()
         cmd = get_command("help_precedence1", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence1")
-        self.assertTrue(re.search(r"help_precedence1\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+        self.assertTrue(
+            re.search(
+                r"help_precedence1\s+Test minimal TyperCommand subclass - command method",
+                buffer.getvalue(),
+            )
+        )
         self.assertIn(
             "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
         )
@@ -635,34 +639,59 @@ class TestHelpPrecedence(TestCase):
         buffer = StringIO()
         cmd = get_command("help_precedence2", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence2")
-        self.assertIn("Test minimal TyperCommand subclass - class member", buffer.getvalue())
-        self.assertTrue(re.search(r"help_precedence2\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+        self.assertIn(
+            "Test minimal TyperCommand subclass - class member", buffer.getvalue()
+        )
+        self.assertTrue(
+            re.search(
+                r"help_precedence2\s+Test minimal TyperCommand subclass - command method",
+                buffer.getvalue(),
+            )
+        )
 
     def test_help_precedence3(self):
         buffer = StringIO()
         cmd = get_command("help_precedence3", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence3")
-        self.assertTrue(re.search(r"help_precedence3\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
-        self.assertIn("Test minimal TyperCommand subclass - callback method", buffer.getvalue())
+        self.assertTrue(
+            re.search(
+                r"help_precedence3\s+Test minimal TyperCommand subclass - command method",
+                buffer.getvalue(),
+            )
+        )
+        self.assertIn(
+            "Test minimal TyperCommand subclass - callback method", buffer.getvalue()
+        )
 
     def test_help_precedence4(self):
         buffer = StringIO()
         cmd = get_command("help_precedence4", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence4")
-        self.assertIn("Test minimal TyperCommand subclass - callback docstring", buffer.getvalue())
-        self.assertTrue(re.search(r"help_precedence4\s+Test minimal TyperCommand subclass - command method", buffer.getvalue()))
+        self.assertIn(
+            "Test minimal TyperCommand subclass - callback docstring", buffer.getvalue()
+        )
+        self.assertTrue(
+            re.search(
+                r"help_precedence4\s+Test minimal TyperCommand subclass - command method",
+                buffer.getvalue(),
+            )
+        )
 
     def test_help_precedence5(self):
         buffer = StringIO()
         cmd = get_command("help_precedence5", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence5")
-        self.assertIn("Test minimal TyperCommand subclass - command method", buffer.getvalue())
-   
+        self.assertIn(
+            "Test minimal TyperCommand subclass - command method", buffer.getvalue()
+        )
+
     def test_help_precedence6(self):
         buffer = StringIO()
         cmd = get_command("help_precedence6", stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence6")
-        self.assertIn("Test minimal TyperCommand subclass - docstring", buffer.getvalue())
+        self.assertIn(
+            "Test minimal TyperCommand subclass - docstring", buffer.getvalue()
+        )
 
 
 class TestGroups(TestCase):
@@ -670,22 +699,33 @@ class TestGroups(TestCase):
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
     """
-    def test_helps(self, app='test_app'):
-        os.environ['TERMINAL_WIDTH'] = '80'
+    @override_settings(
+        INSTALLED_APPS=[
+            "django_typer.tests.test_app",
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+        ],
+    )
+    def test_helps(self, app="test_app"):
+        os.environ["TERMINAL_WIDTH"] = "80"
         for cmds in [
-            ('groups',),
-            ('groups', 'echo'),
-            ('groups', 'math'),
-            ('groups', 'math', 'divide'),
-            ('groups', 'math', 'multiply'),
-            ('groups', 'string'),
-            ('groups', 'string', 'case'),
-            ('groups', 'string', 'case', 'lower'),
-            ('groups', 'string', 'case', 'upper'),
-            ('groups', 'string', 'strip'),
-            ('groups', 'string', 'split'),
+            ("groups",),
+            ("groups", "echo"),
+            ("groups", "math"),
+            ("groups", "math", "divide"),
+            ("groups", "math", "multiply"),
+            ("groups", "string"),
+            ("groups", "string", "case"),
+            ("groups", "string", "case", "lower"),
+            ("groups", "string", "case", "upper"),
+            ("groups", "string", "strip"),
+            ("groups", "string", "split"),
         ]:
-            if app == 'test_app' and cmds[-1] == 'strip':
+            if app == "test_app" and cmds[-1] == "strip":
                 continue
 
             buffer = StringIO()
@@ -694,14 +734,13 @@ class TestGroups(TestCase):
             hlp = buffer.getvalue()
             self.assertGreater(
                 sim := similarity(
-                    hlp,
-                    (TESTS_DIR / app / 'helps' / f'{cmds[-1]}.txt').read_text()
+                    hlp, (TESTS_DIR / app / "helps" / f"{cmds[-1]}.txt").read_text()
                 ),
-                0.95
+                0.998,
             )
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
-        del os.environ['TERMINAL_WIDTH']
+        del os.environ["TERMINAL_WIDTH"]
 
     @override_settings(
         INSTALLED_APPS=[
@@ -716,63 +755,111 @@ class TestGroups(TestCase):
         ],
     )
     def test_helps_override(self):
-        self.test_helps(app='test_app2')
+        self.test_helps.__wrapped__(self, app="test_app2")
 
+    @override_settings(
+        INSTALLED_APPS=[
+            "django_typer.tests.test_app",
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+        ],
+    )
     def test_command_line(self, settings=None):
-
         override = settings is not None
-        settings = ('--settings', settings) if settings else []
+        settings = ("--settings", settings) if settings else []
 
         self.assertEqual(
             run_command("groups", *settings, "echo", "hey!").strip(),
-             "hey!"
+            call_command("groups", "echo", 'hey!').strip(),
+            "hey!"
+        )
+        self.assertEqual(
+            get_command("groups", "echo")("hey!").strip(),
+            get_command("groups", "echo")(message="hey!").strip(),
+            "hey!"
         )
 
         result = run_command("groups", *settings, "echo", "hey!", "5")
         if override:
-            self.assertEqual(result.strip(), ("hey! "*5).strip())
+            self.assertEqual(result.strip(), ("hey! " * 5).strip())
         else:
-            self.assertIn('UsageError', result)
+            self.assertIn("UsageError", result)
 
         self.assertEqual(
-            run_command("groups", *settings, "math", "--precision", "5", "multiply", "1.2", "3.5", " -12.3", parse_json=False).strip(),
+            run_command(
+                "groups",
+                *settings,
+                "math",
+                "--precision",
+                "5",
+                "multiply",
+                "1.2",
+                "3.5",
+                " -12.3",
+                parse_json=False,
+            ).strip(),
             "-51.66000",
         )
 
         self.assertEqual(
-            run_command("groups", *settings, "math", "divide", "1.2", "3.5", " -12.3", parse_json=False).strip(),
-            "-0.03"
+            run_command(
+                "groups",
+                *settings,
+                "math",
+                "divide",
+                "1.2",
+                "3.5",
+                " -12.3",
+                parse_json=False,
+            ).strip(),
+            "-0.03",
         )
 
         self.assertEqual(
-            run_command("groups", *settings, "string", "ANNAmontes", "case", "lower").strip(),
+            run_command(
+                "groups", *settings, "string", "ANNAmontes", "case", "lower"
+            ).strip(),
             "annamontes",
         )
 
         self.assertEqual(
-            run_command("groups", *settings, "string", "annaMONTES", "case", "upper").strip(),
+            run_command(
+                "groups", *settings, "string", "annaMONTES", "case", "upper"
+            ).strip(),
             "ANNAMONTES",
         )
 
         self.assertEqual(
-            run_command("groups", *settings, "string", "ANNAMONTES", "case", "lower", "4", "9").strip(),
+            run_command(
+                "groups", *settings, "string", "ANNAMONTES", "case", "lower", "4", "9"
+            ).strip(),
             "ANNAmonteS",
         )
 
-        result = run_command("groups", *settings, "string", "annamontes", "case", "upper", "4", "9").strip()
+        result = run_command(
+            "groups", *settings, "string", "annamontes", "case", "upper", "4", "9"
+        ).strip()
         if override:
-            self.assertIn('UsageError', result)
+            self.assertIn("UsageError", result)
         else:
             self.assertEqual(result, "annaMONTEs")
 
-        result = run_command("groups", *settings, "string", ' emmatc  ', "strip", parse_json=False)
+        result = run_command(
+            "groups", *settings, "string", " emmatc  ", "strip", parse_json=False
+        )
         if override:
             self.assertEqual(result, "emmatc\n")
         else:
-            self.assertIn('UsageError', result)
+            self.assertIn("UsageError", result)
 
         self.assertEqual(
-            run_command("groups", *settings, "string", "c,a,i,t,l,y,n", "split", "--sep", ",").strip(),
+            run_command(
+                "groups", *settings, "string", "c,a,i,t,l,y,n", "split", "--sep", ","
+            ).strip(),
             "c a i t l y n",
         )
 
@@ -789,4 +876,4 @@ class TestGroups(TestCase):
         ],
     )
     def test_command_line_override(self):
-        self.test_command_line(settings='django_typer.tests.override')
+        self.test_command_line.__wrapped__(self, settings="django_typer.tests.override")
