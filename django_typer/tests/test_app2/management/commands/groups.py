@@ -45,6 +45,6 @@ class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_
     @GroupsCommand.string.command()
     def strip(self):
         """Strip white space off the ends of the string"""
-        return self.string.strip()
+        return self.op_string.strip()
 
     

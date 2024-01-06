@@ -44,7 +44,7 @@ def get_named_arguments(function):
     ]
 
 
-def run_command(command, *args):
+def run_command(command, *args, parse_json=True):
     cwd = os.getcwd()
     try:
         os.chdir(manage_py.parent)
@@ -60,10 +60,12 @@ def run_command(command, *args):
 
         # Parse the output
         if result.stdout:
-            try:
-                return json.loads(result.stdout)
-            except json.JSONDecodeError:
-                return result.stdout or result.stderr or ""
+            if parse_json:
+                try:
+                    return json.loads(result.stdout)
+                except json.JSONDecodeError:
+                    return result.stdout or result.stderr or ""
+            return result.stdout
         return result.stderr or ""
     finally:
         os.chdir(cwd)
@@ -715,3 +717,76 @@ class TestGroups(TestCase):
     )
     def test_helps_override(self):
         self.test_helps(app='test_app2')
+
+    def test_command_line(self, settings=None):
+
+        override = settings is not None
+        settings = ('--settings', settings) if settings else []
+
+        self.assertEqual(
+            run_command("groups", *settings, "echo", "hey!").strip(),
+             "hey!"
+        )
+
+        result = run_command("groups", *settings, "echo", "hey!", "5")
+        if override:
+            self.assertEqual(result.strip(), ("hey! "*5).strip())
+        else:
+            self.assertIn('UsageError', result)
+
+        self.assertEqual(
+            run_command("groups", *settings, "math", "--precision", "5", "multiply", "1.2", "3.5", " -12.3", parse_json=False).strip(),
+            "-51.66000",
+        )
+
+        self.assertEqual(
+            run_command("groups", *settings, "math", "divide", "1.2", "3.5", " -12.3", parse_json=False).strip(),
+            "-0.03"
+        )
+
+        self.assertEqual(
+            run_command("groups", *settings, "string", "ANNAmontes", "case", "lower").strip(),
+            "annamontes",
+        )
+
+        self.assertEqual(
+            run_command("groups", *settings, "string", "annaMONTES", "case", "upper").strip(),
+            "ANNAMONTES",
+        )
+
+        self.assertEqual(
+            run_command("groups", *settings, "string", "ANNAMONTES", "case", "lower", "4", "9").strip(),
+            "ANNAmonteS",
+        )
+
+        result = run_command("groups", *settings, "string", "annamontes", "case", "upper", "4", "9").strip()
+        if override:
+            self.assertIn('UsageError', result)
+        else:
+            self.assertEqual(result, "annaMONTEs")
+
+        result = run_command("groups", *settings, "string", ' emmatc  ', "strip", parse_json=False)
+        if override:
+            self.assertEqual(result, "emmatc\n")
+        else:
+            self.assertIn('UsageError', result)
+
+        self.assertEqual(
+            run_command("groups", *settings, "string", "c,a,i,t,l,y,n", "split", "--sep", ",").strip(),
+            "c a i t l y n",
+        )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "django_typer.tests.test_app2",
+            "django_typer.tests.test_app",
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+        ],
+    )
+    def test_command_line_override(self):
+        self.test_command_line(settings='django_typer.tests.override')

@@ -18,7 +18,7 @@ class Command(TyperCommand):
         Echo the given message.
         """
         assert issubclass(self.__class__, Command)
-        return json.dumps({"echo": message})
+        return message
 
     @group()
     def math(self, precision: int = precision):
@@ -52,7 +52,7 @@ class Command(TyperCommand):
         res = number1 * number2
         for n in numbers:
             res *= n
-        return json.dumps({"multiply": f"{res:.{self.precision}f}"})
+        return f"{res:.{self.precision}f}"
 
     @math.command()
     def divide(
@@ -77,7 +77,7 @@ class Command(TyperCommand):
         res = number1 / number2
         for n in numbers:
             res /= n
-        return json.dumps({"divide": f"{res:.{self.precision}f}"})
+        return f"{res:.{self.precision}f}"
 
     @group()
     def string(
@@ -109,11 +109,7 @@ class Command(TyperCommand):
         Convert the given string to upper case.
         """
         assert issubclass(self.__class__, Command)
-        return json.dumps(
-            {
-                "upper": f'{self.op_string[0:begin]}{self.op_string[begin:end].upper()}{self.op_string[end:None] if end else ""}'
-            }
-        )
+        return f'{self.op_string[0:begin]}{self.op_string[begin:end].upper()}{self.op_string[end:None] if end else ""}'
 
     @case.command()
     def lower(
@@ -125,11 +121,7 @@ class Command(TyperCommand):
         Convert the given string to upper case.
         """
         assert issubclass(self.__class__, Command)
-        return json.dumps(
-            {
-                "lower": f'{self.op_string[0:begin]}{self.op_string[begin:end].lower()}{self.op_string[end:None] if end else ""}'
-            }
-        )
+        return f'{self.op_string[0:begin]}{self.op_string[begin:end].lower()}{self.op_string[end:None] if end else ""}'
 
     @string.command()
     def split(self, sep: str = " "):
@@ -137,4 +129,4 @@ class Command(TyperCommand):
         Split the given string on the given separator.
         """
         assert issubclass(self.__class__, Command)
-        return json.dumps({"split": self.op_string.split(sep)})
+        return " ".join(self.op_string.split(sep))
