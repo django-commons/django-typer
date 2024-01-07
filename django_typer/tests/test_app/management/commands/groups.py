@@ -3,10 +3,11 @@ import typing as t
 from typer import Argument
 
 from django_typer import TyperCommand, command, group
+from django.utils.translation import gettext_lazy as _
 
 
 class Command(TyperCommand):
-    help = "Test multiple groups commands and callbacks"
+    help = _("Test multiple groups commands and callbacks")
 
     precision = 2
     verbosity = 1
@@ -31,15 +32,15 @@ class Command(TyperCommand):
     def multiply(
         self,
         number1: t.Annotated[
-            float, Argument(help="The first number.", show_default=False)
+            float, Argument(help=_("The first number."), show_default=False)
         ],
         number2: t.Annotated[
-            float, Argument(help="The second number.", show_default=False)
+            float, Argument(help=_("The second number."), show_default=False)
         ],
         numbers: t.Annotated[
             t.List[float],
             Argument(
-                help=("The list of numbers to multiple: n1*n2*n3*...*nN. "),
+                help=_("The list of numbers to multiply: n1*n2*n3*...*nN. "),
                 show_default=False,
             ),
         ],
@@ -57,15 +58,15 @@ class Command(TyperCommand):
     def divide(
         self,
         number1: t.Annotated[
-            float, Argument(help="The numerator.", show_default=False)
+            float, Argument(help=_("The numerator."), show_default=False)
         ],
         number2: t.Annotated[
-            float, Argument(help="The denominator.", show_default=False)
+            float, Argument(help=_("The denominator."), show_default=False)
         ],
         numbers: t.Annotated[
             t.List[float],
             Argument(
-                help=("Additional denominators: n1/n2/n3/.../nN. "), show_default=False
+                help=_("Additional denominators: n1/n2/n3/.../nN."), show_default=False
             ),
         ],
     ):
@@ -82,7 +83,7 @@ class Command(TyperCommand):
     def string(
         self,
         string: t.Annotated[
-            str, Argument(help="The string to operate on.", show_default=False)
+            str, Argument(help=_("The string to operate on."), show_default=False)
         ],
     ):
         """
@@ -102,11 +103,11 @@ class Command(TyperCommand):
     def upper(
         self,
         begin: t.Annotated[
-            int, Argument(help="The starting index of the string to operate on.")
+            int, Argument(help=_("The starting index of the string to operate on."))
         ] = 0,
         end: t.Annotated[
             t.Optional[int],
-            Argument(help="The ending index of the string to operate on."),
+            Argument(help=_("The ending index of the string to operate on.")),
         ] = None,
     ):
         """
@@ -119,11 +120,11 @@ class Command(TyperCommand):
     def lower(
         self,
         begin: t.Annotated[
-            int, Argument(help="The starting index of the string to operate on.")
+            int, Argument(help=_("The starting index of the string to operate on."))
         ] = 0,
         end: t.Annotated[
             t.Optional[int],
-            Argument(help="The ending index of the string to operate on."),
+            Argument(help=_("The ending index of the string to operate on.")),
         ] = None,
     ):
         """

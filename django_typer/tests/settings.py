@@ -9,6 +9,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# Set default terminal width for help outputs - necessary for
+# testing help output in CI environments.
+os.environ["TERMINAL_WIDTH"] = "80"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +35,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django_typer.tests.test_app",
+    "django_typer",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -100,6 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
+#LANGUAGE_CODE = 'de'
+
 
 TIME_ZONE = "UTC"
 

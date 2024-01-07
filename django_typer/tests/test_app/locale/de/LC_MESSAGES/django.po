@@ -1,0 +1,104 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-07 10:41-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: test_app/management/commands/groups.py:10
+msgid "Test multiple groups commands and callbacks"
+msgstr "Teste Befehle und Rückrufe mehrerer Gruppen"
+
+#: test_app/management/commands/groups.py:17
+msgid ""
+"\n"
+"        Echo the given message.\n"
+"        "
+msgstr ""
+"\n"
+"        Gebe die angegebene Nachricht wieder.\n"
+"        "
+
+#: test_app/management/commands/groups.py:25
+msgid ""
+"\n"
+"        Do some math at the given precision.\n"
+"        "
+msgstr ""
+"\n"
+"        Führe einige mathematische Berechnungen mit der angegebenen Genauigkeit durch.\n"
+"        "
+
+#: test_app/management/commands/groups.py:35
+msgid "The first number."
+msgstr "Die erste Zahl."
+
+#: test_app/management/commands/groups.py:38
+msgid "The second number."
+msgstr "Die zweite Zahl."
+
+#: test_app/management/commands/groups.py:43
+msgid "The list of numbers to multiply: n1*n2*n3*...*nN. "
+msgstr "Die Liste der zu multiplizierenden Zahlen: n1*n2*n3*...*nN."
+
+#: test_app/management/commands/groups.py:61
+msgid "The numerator."
+msgstr "Der Zähler."
+
+#: test_app/management/commands/groups.py:64
+msgid "The denominator."
+msgstr "Der Nenner."
+
+#: test_app/management/commands/groups.py:69
+msgid "Additional denominators: n1/n2/n3/.../nN."
+msgstr "Zusätzliche Nenner: n1/n2/n3/.../nN."
+
+#: test_app/management/commands/groups.py:86
+msgid "The string to operate on."
+msgstr "Der zu bearbeitende String."
+
+#: test_app/management/commands/groups.py:106
+#: test_app/management/commands/groups.py:123
+msgid "The starting index of the string to operate on."
+msgstr "Der Startindex des zu bearbeitenden Strings."
+
+#: test_app/management/commands/groups.py:110
+#: test_app/management/commands/groups.py:127
+msgid "The ending index of the string to operate on."
+msgstr "Der Endindex des zu bearbeitenden Strings."
+
+#: test_app/management/commands/help_precedence1.py:8
+msgid "Test minimal TyperCommand subclass - typer param"
+msgstr "Teste minimale TyperCommand-Unterklasse - Typer-Parameter"
+
+#: test_app/management/commands/help_precedence1.py:9
+#: test_app/management/commands/help_precedence2.py:9
+msgid "Test minimal TyperCommand subclass - class member"
+msgstr "Teste minimale TyperCommand-Unterklasse - Klassenmitglied"
+
+#: test_app/management/commands/help_precedence1.py:11
+#: test_app/management/commands/help_precedence2.py:11
+#: test_app/management/commands/help_precedence3.py:10
+msgid "Test minimal TyperCommand subclass - callback method"
+msgstr "Teste minimale TyperCommand-Unterklasse - Rückrufmethode"
+
+#: test_app/management/commands/help_precedence1.py:19
+#: test_app/management/commands/help_precedence2.py:19
+#: test_app/management/commands/help_precedence3.py:18
+#: test_app/management/commands/help_precedence4.py:18
+#: test_app/management/commands/help_precedence5.py:9
+msgid "Test minimal TyperCommand subclass - command method"
+msgstr "Teste minimale TyperCommand-Unterklasse - Befehlsmethode"

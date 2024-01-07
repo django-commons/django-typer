@@ -64,6 +64,7 @@ __all__ = [
 """
 TODO
 - add translation support in helps
+- useful django types (app label, etc)
 - documentation
 - linting
 - type hints
@@ -114,7 +115,15 @@ def _common_options(
     pass
 
 
-COMMON_PARAMS = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
+# cache common params to avoid this extra work on every command
+# we cant resolve these at module scope because translations break it
+_common_params = []
+def _get_common_params():
+    global _common_params
+    if not _common_params:
+        _common_params = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
+    return _common_params
+
 COMMON_DEFAULTS = {
     key: value.default
     for key, value in inspect.signature(_common_options).parameters.items()
@@ -221,6 +230,8 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
                 )
             return None
 
+        from django.utils.translation import gettext_lazy
+        bool(gettext_lazy('test'))
         super().__init__(  # type: ignore
             *args,
             params=[
@@ -246,7 +257,7 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
         ):
             return [
                 param
-                for param in COMMON_PARAMS
+                for param in _get_common_params()
                 if param.name in (self.django_command.django_params or [])
             ]
         return []
@@ -257,7 +268,7 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
         if hasattr(self, "django_command") and self.django_command._has_callback:
             return [
                 param
-                for param in COMMON_PARAMS
+                for param in _get_common_params()
                 if param.name in (self.django_command.django_params or [])
             ]
         return []
@@ -284,9 +295,38 @@ class TyperWrapper(Typer):
         )
 
     def command(
-        self, *args, cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper, **kwargs
+        self,
+        name: t.Optional[str] = None,
+        *,
+        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        help: t.Optional[str] = None,
+        epilog: t.Optional[str] = None,
+        short_help: t.Optional[str] = None,
+        options_metavar: str = "[OPTIONS]",
+        add_help_option: bool = True,
+        no_args_is_help: bool = False,
+        hidden: bool = False,
+        deprecated: bool = False,
+        # Rich settings
+        rich_help_panel: t.Union[str, None] = Default(None),
+        **kwargs
     ):
-        return super().command(*args, cls=cls, **kwargs)
+        return super().command(
+            name=name,
+            cls=cls,
+            context_settings=context_settings,
+            help=help,
+            epilog=epilog,
+            short_help=short_help,
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            no_args_is_help=no_args_is_help,
+            hidden=hidden,
+            deprecated=deprecated,
+            rich_help_panel=rich_help_panel,
+            **kwargs
+        )
 
     def group(
         self,
@@ -726,7 +766,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                 "skip_checks",
             ]
         ]
-    ] = [param.name for param in COMMON_PARAMS if param.name != "verbosity"]
+    ] = [name for name in COMMON_DEFAULTS.keys() if name != "verbosity"]
 
     class CommandNode:
         name: str

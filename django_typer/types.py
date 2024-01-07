@@ -5,6 +5,7 @@ Common types for command line argument specification.
 import sys
 from pathlib import Path
 from typing import Annotated, Optional
+from django.utils.translation import gettext_lazy as _
 
 from typer import Option
 
@@ -25,7 +26,7 @@ Version = Annotated[
     bool,
     Option(
         "--version",
-        help="Show program's version number and exit.",
+        help=_("Show program's version number and exit."),
         callback=print_version,
         is_eager=True,
         rich_help_panel=COMMON_PANEL,
@@ -35,7 +36,7 @@ Version = Annotated[
 Verbosity = Annotated[
     int,
     Option(
-        help=(
+        help=_(
             "Verbosity level; 0=minimal output, 1=normal output, "
             "2=verbose output, 3=very verbose output"
         ),
@@ -49,7 +50,7 @@ Verbosity = Annotated[
 Settings = Annotated[
     str,
     Option(
-        help=(
+        help=_(
             "The Python path to a settings module, e.g. "
             '"myproject.settings.main". If this isn\'t provided, the '
             "DJANGO_SETTINGS_MODULE environment variable will be used."
@@ -61,7 +62,7 @@ Settings = Annotated[
 PythonPath = Annotated[
     Optional[Path],
     Option(
-        help=(
+        help=_(
             "A directory to add to the Python path, e.g. "
             '"/home/djangoprojects/myproject".'
         ),
@@ -73,7 +74,7 @@ Traceback = Annotated[
     bool,
     Option(
         "--traceback",
-        help=("Raise on CommandError exceptions"),
+        help=_("Raise on CommandError exceptions"),
         rich_help_panel=COMMON_PANEL,
     ),
 ]
@@ -82,7 +83,7 @@ NoColor = Annotated[
     bool,
     Option(
         "--no-color",
-        help=("Don't colorize the command output."),
+        help=_("Don't colorize the command output."),
         rich_help_panel=COMMON_PANEL,
     ),
 ]
@@ -91,12 +92,12 @@ ForceColor = Annotated[
     bool,
     Option(
         "--force-color",
-        help=("Force colorization of the command output."),
+        help=_("Force colorization of the command output."),
         rich_help_panel=COMMON_PANEL,
     ),
 ]
 
 SkipChecks = Annotated[
     bool,
-    Option("--skip-checks", help=("Skip system checks."), rich_help_panel=COMMON_PANEL),
+    Option("--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL),
 ]

@@ -6,8 +6,8 @@ from django_typer import TyperCommand, initialize, command
 
 
 class Command(TyperCommand):
-    
-    @initialize(help="Test minimal TyperCommand subclass - callback method")
+
+    @initialize(help=_("Test minimal TyperCommand subclass - callback method"))
     def init(self, verbosity: int = 1):
         """
         Test minimal TyperCommand subclass - callback docstring
@@ -15,7 +15,7 @@ class Command(TyperCommand):
         assert self.__class__ is Command
         self.verbosity = verbosity
 
-    @command(help="Test minimal TyperCommand subclass - command method")
+    @command(help=_("Test minimal TyperCommand subclass - command method"))
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
         """
         Test minimal TyperCommand subclass - docstring
