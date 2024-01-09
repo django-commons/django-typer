@@ -5,8 +5,8 @@ Common types for command line argument specification.
 import sys
 from pathlib import Path
 from typing import Annotated, Optional
-from django.utils.translation import gettext_lazy as _
 
+from django.utils.translation import gettext_lazy as _
 from typer import Option
 
 COMMON_PANEL = "Django"
@@ -99,5 +99,7 @@ ForceColor = Annotated[
 
 SkipChecks = Annotated[
     bool,
-    Option("--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL),
+    Option(
+        "--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL
+    ),
 ]

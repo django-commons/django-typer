@@ -62,3 +62,7 @@ msgstr "Die Befehlsausgabe nicht einfärben."
 #: types.py:102
 msgid "Skip system checks."
 msgstr "Systemprüfungen überspringen."
+
+
+msgid "Show this message and exit."
+msgstr "Zeige diese Nachricht und beende."

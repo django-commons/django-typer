@@ -699,6 +699,7 @@ class TestGroups(TestCase):
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
     """
+
     @override_settings(
         INSTALLED_APPS=[
             "django_typer.tests.test_app",
@@ -771,13 +772,13 @@ class TestGroups(TestCase):
 
         self.assertEqual(
             run_command("groups", *settings, "echo", "hey!").strip(),
-            call_command("groups", "echo", 'hey!').strip(),
-            "hey!"
+            call_command("groups", "echo", "hey!").strip(),
+            "hey!",
         )
         self.assertEqual(
             get_command("groups", "echo")("hey!").strip(),
             get_command("groups", "echo")(message="hey!").strip(),
-            "hey!"
+            "hey!",
         )
 
         result = run_command("groups", *settings, "echo", "hey!", "5")

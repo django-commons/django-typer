@@ -12,10 +12,10 @@ import contextlib
 import inspect
 import sys
 import typing as t
+from copy import deepcopy
 from dataclasses import dataclass
 from importlib import import_module
 from types import MethodType, SimpleNamespace
-from copy import deepcopy
 
 import click
 from django.conf import settings
@@ -42,7 +42,7 @@ from .types import (
     Version,
 )
 
-VERSION = (0, 3, "0b")
+VERSION = (0, 4, "0b")
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -63,7 +63,6 @@ __all__ = [
 
 """
 TODO
-- add translation support in helps
 - useful django types (app label, etc)
 - documentation
 - linting
@@ -118,11 +117,16 @@ def _common_options(
 # cache common params to avoid this extra work on every command
 # we cant resolve these at module scope because translations break it
 _common_params = []
+
+
 def _get_common_params():
     global _common_params
     if not _common_params:
-        _common_params = get_params_convertors_ctx_param_name_from_function(_common_options)[0]
+        _common_params = get_params_convertors_ctx_param_name_from_function(
+            _common_options
+        )[0]
     return _common_params
+
 
 COMMON_DEFAULTS = {
     key: value.default
@@ -202,7 +206,7 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
         *args,
         callback: t.Optional[  # pylint: disable=redefined-outer-name
             t.Callable[..., t.Any]
-        ] = None,
+        ],
         params: t.Optional[t.List[click.Parameter]] = None,
         **kwargs,
     ):
@@ -212,26 +216,20 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
         self_arg = params[0].name if params else "self"
 
         def call_with_self(*args, **kwargs):
-            if callback:
-                return callback(
-                    *args,
-                    **{
-                        param: val for param, val in kwargs.items() if param in expected
-                    },
-                    **(
-                        {
-                            self_arg: getattr(
-                                click.get_current_context(), "django_command", None
-                            )
-                        }
-                        if self.callback_is_method
-                        else {}
-                    ),
-                )
-            return None
+            return callback(
+                *args,
+                **{param: val for param, val in kwargs.items() if param in expected},
+                **(
+                    {
+                        self_arg: getattr(
+                            click.get_current_context(), "django_command", None
+                        )
+                    }
+                    if self.callback_is_method
+                    else {}
+                ),
+            )
 
-        from django.utils.translation import gettext_lazy
-        bool(gettext_lazy('test'))
         super().__init__(  # type: ignore
             *args,
             params=[
@@ -310,7 +308,7 @@ class TyperWrapper(Typer):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs
+        **kwargs,
     ):
         return super().command(
             name=name,
@@ -325,7 +323,7 @@ class TyperWrapper(Typer):
             hidden=hidden,
             deprecated=deprecated,
             rich_help_panel=rich_help_panel,
-            **kwargs
+            **kwargs,
         )
 
     def group(

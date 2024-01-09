@@ -8,8 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Set default terminal width for help outputs - necessary for
 # testing help output in CI environments.
@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-#LANGUAGE_CODE = 'de'
+# LANGUAGE_CODE = 'de'
 
 
 TIME_ZONE = "UTC"

@@ -1,9 +1,9 @@
 import typing as t
 
+from django.utils.translation import gettext_lazy as _
 from typer import Argument
 
 from django_typer import TyperCommand, command, group
-from django.utils.translation import gettext_lazy as _
 
 
 class Command(TyperCommand):

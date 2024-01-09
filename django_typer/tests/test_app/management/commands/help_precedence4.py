@@ -2,11 +2,10 @@ import json
 
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, initialize, command
+from django_typer import TyperCommand, command, initialize
 
 
 class Command(TyperCommand):
-
     @initialize()
     def init(self, verbosity: int = 1):
         """

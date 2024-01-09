@@ -2,13 +2,13 @@ import typing as t
 
 from typer import Argument
 
-from django_typer import initialize, command, types
+from django_typer import command, initialize, types
 from django_typer.tests.test_app.management.commands.groups import (
     Command as GroupsCommand,
 )
 
-class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_app."):
 
+class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_app."):
     help = "Test groups command inheritance."
 
     precision = 2

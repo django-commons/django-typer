@@ -1,6 +1,6 @@
 from django.core.management import CommandError
 
-from django_typer import TyperCommand, initialize, command, types
+from django_typer import TyperCommand, command, initialize, types
 from django_typer.tests.utils import log_django_parameters
 
 
