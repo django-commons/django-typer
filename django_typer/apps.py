@@ -50,9 +50,6 @@ def check_traceback_config(app_configs, **kwargs):
     return warnings
 
 
-from django import conf
-
-
 class DjangoTyperConfig(AppConfig):
     name = "django_typer"
     label = name.replace(".", "_")
