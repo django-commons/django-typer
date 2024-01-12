@@ -21,6 +21,7 @@ import click
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext_lazy as _
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -29,7 +30,7 @@ from typer.main import get_command as get_typer_command
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
-from typer.models import Default
+from typer.models import Default, DefaultPlaceholder
 
 from .types import (
     ForceColor,
@@ -67,16 +68,22 @@ TODO
 - documentation
 - linting
 - type hints
+
+design decision: no monkey-patching for call_command. call_command converts arguments to
+strings. This is unavoidable and will just be a noted caveat that is also consistent with
+how native django commands work. For calls with previously resolved types - the direct
+callbacks should be invoked - either Command() or Command.group(). call_command however
+*requires* options to be passed by value instead of by string. This should be fixed.
+
+behavior should align with native django commands
 """
 
-try:
-    from rich.traceback import install
 
-    traceback_config = getattr(settings, "RICH_TRACEBACK_CONFIG", {"show_locals": True})
-    if isinstance(traceback_config, dict):
-        install(**traceback_config)
-except ImportError:
-    pass
+def traceback_config():
+    cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
+    if cfg:
+        return {"show_locals": True, **cfg}
+    return cfg
 
 
 def get_command(
@@ -87,8 +94,6 @@ def get_command(
     no_color: bool = False,
     force_color: bool = False,
 ):
-    # todo - add a __call__ method to the command class if it is not a TyperCommand and has no
-    # __call__ method - this will allow this interface to be used for standard commands
     module = import_module(
         f"{get_commands()[command_name]}.management.commands.{command_name}"
     )
@@ -155,6 +160,7 @@ class Context(TyperContext):
 
     django_command: "TyperCommand"
     children: t.List["Context"]
+    _supplied_params: t.Dict[str, t.Any]
 
     class ParamDict(dict):
         """
@@ -171,6 +177,16 @@ class Context(TyperContext):
             if key not in self.supplied:
                 super().__setitem__(key, value)
 
+    @property
+    def supplied_params(self):
+        """
+        Get the parameters that were supplied when the command was invoked via call_command,
+        only the root context has these.
+        """
+        if self.parent:
+            return self.parent.supplied_params
+        return getattr(self, "_supplied_params", {})
+
     def __init__(
         self,
         command: click.Command,  # pylint: disable=redefined-outer-name
@@ -180,13 +196,15 @@ class Context(TyperContext):
         **kwargs,
     ):
         super().__init__(command, parent=parent, **kwargs)
-        supplied_params = supplied_params or {}
+        if supplied_params:
+            self._supplied_params = supplied_params
         self.django_command = django_command
         if not django_command and parent:
             self.django_command = parent.django_command
+
         self.params = self.ParamDict(
-            {**self.params, **supplied_params},
-            supplied=list(supplied_params.keys()),
+            {**self.params, **self.supplied_params},
+            supplied=list(self.supplied_params.keys()),
         )
         self.children = []
         if parent:
@@ -216,15 +234,25 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
         self_arg = params[0].name if params else "self"
 
         def call_with_self(*args, **kwargs):
+            ctx = click.get_current_context()
+
+            # process supplied parameters incase they need type conversion
+            def process_value(name, value):
+                if name in ctx.supplied_params:
+                    for prm in self.params:
+                        if prm.name == name:
+                            return prm.process_value(ctx, value)
+                return value
+
             return callback(
                 *args,
-                **{param: val for param, val in kwargs.items() if param in expected},
+                **{
+                    param: process_value(param, val)
+                    for param, val in kwargs.items()
+                    if param in expected
+                },
                 **(
-                    {
-                        self_arg: getattr(
-                            click.get_current_context(), "django_command", None
-                        )
-                    }
+                    {self_arg: getattr(ctx, "django_command", None)}
                     if self.callback_is_method
                     else {}
                 ),
@@ -258,7 +286,7 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
                 for param in _get_common_params()
                 if param.name in (self.django_command.django_params or [])
             ]
-        return []
+        return super().common_params()
 
 
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
@@ -269,7 +297,7 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
                 for param in _get_common_params()
                 if param.name in (self.django_command.django_params or [])
             ]
-        return []
+        return super().common_params()
 
 
 class TyperWrapper(Typer):
@@ -289,7 +317,9 @@ class TyperWrapper(Typer):
 
     def callback(self, *args, **kwargs):
         raise NotImplementedError(
-            "callback is not supported - the function decorated by group() is the callback."
+            _(
+                "callback is not supported - the function decorated by group() is the callback."
+            )
         )
 
     def command(
@@ -535,9 +565,9 @@ class _TyperCommandMeta(type):
         add_completion: bool = True,
         rich_markup_mode: MarkupMode = None,
         rich_help_panel: t.Union[str, None] = Default(None),
-        pretty_exceptions_enable: bool = True,
-        pretty_exceptions_show_locals: bool = True,
-        pretty_exceptions_short: bool = True,
+        pretty_exceptions_enable: bool = Default(True),
+        pretty_exceptions_show_locals: bool = Default(True),
+        pretty_exceptions_short: bool = Default(True),
     ):
         """
         This method is called when a new class is created.
@@ -550,6 +580,21 @@ class _TyperCommandMeta(type):
         typer_app = None
 
         if not is_base_init:
+            # conform the pretty exception defaults to the settings traceback config
+            tb_config = traceback_config()
+            if isinstance(pretty_exceptions_enable, DefaultPlaceholder):
+                pretty_exceptions_enable = isinstance(tb_config, dict)
+
+            tb_config = tb_config or {}
+            if isinstance(pretty_exceptions_show_locals, DefaultPlaceholder):
+                pretty_exceptions_show_locals = tb_config.get(
+                    "show_locals", pretty_exceptions_show_locals
+                )
+            if isinstance(pretty_exceptions_short, DefaultPlaceholder):
+                pretty_exceptions_short = tb_config.get(
+                    "short", pretty_exceptions_short
+                )
+
             typer_app = Typer(
                 name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
                 cls=cls,
@@ -715,7 +760,7 @@ class TyperParser:
             sys.exit()
 
     def add_argument(self, *args, **kwargs):
-        pass
+        raise NotImplementedError(_("add_argument() is not supported"))
 
 
 class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
@@ -881,6 +926,10 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """
         Call this command's handle() directly.
         """
-        if hasattr(self, "_handle"):
+        if getattr(self, "_handle", None):
             return self._handle(*args, **kwargs)
-        raise NotImplementedError(f"{self.__class__}")
+        raise NotImplementedError(
+            _(
+                "{cls} does not implement handle(), you must call the other command functions directly."
+            ).format(cls=self.__class__)
+        )

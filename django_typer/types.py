@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from typing import Annotated, Optional
 
+from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -101,5 +102,14 @@ SkipChecks = Annotated[
     bool,
     Option(
         "--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL
+    ),
+]
+
+
+AppLabel = Annotated[
+    AppConfig,
+    Option(
+        help=_("Specifies the application configuration to use."),
+        rich_help_panel=COMMON_PANEL,
     ),
 ]

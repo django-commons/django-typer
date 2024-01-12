@@ -6,15 +6,17 @@ import subprocess
 import sys
 from io import StringIO
 from pathlib import Path
+from typing import Any
 
 import django
 import typer
+from django.apps import apps
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from django_typer import get_command
+from django_typer import TyperCommand, get_command, group
 from django_typer.tests.utils import read_django_parameters
 
 
@@ -119,6 +121,43 @@ class BasicTests(TestCase):
             {"arg1": "a1", "arg2": "a2", "arg3": 0.75, "arg4": 2},
         )
 
+    def test_parser(self):
+        basic_cmd = get_command("basic")
+        parser = basic_cmd.create_parser("./manage.py", "basic")
+        with self.assertRaises(NotImplementedError):
+            parser.add_argument()
+
+
+class CommandDefinitionTests(TestCase):
+    def test_group_callback_throws(self):
+        class CBTestCommand(TyperCommand):
+            @group()
+            def grp():
+                pass
+
+            grp.group()
+
+            def grp2():
+                pass
+
+        with self.assertRaises(NotImplementedError):
+
+            class CommandBad(TyperCommand):
+                @group()
+                def grp():
+                    pass
+
+                @grp.callback()
+                def bad_callback():
+                    pass
+
+        with self.assertRaises(NotImplementedError):
+
+            class CommandBad(CBTestCommand):
+                @CBTestCommand.grp.callback()
+                def bad_callback():
+                    pass
+
 
 class InterfaceTests(TestCase):
     """
@@ -136,13 +175,36 @@ class InterfaceTests(TestCase):
 
         self.assertFalse(command_params.symmetric_difference(typer_params))
 
-    def test_callback_interface_matches(self):
+    def test_initialize_interface_matches(self):
         from django_typer import initialize
 
         initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(initialize_params.symmetric_difference(typer_params))
+
+    def test_typer_command_interface_matches(self):
+        from django_typer import _TyperCommandMeta
+
+        typer_command_params = set(get_named_arguments(_TyperCommandMeta.__new__))
+        typer_params = set(get_named_arguments(typer.Typer.__init__))
+        typer_params.remove("name")
+        self.assertFalse(typer_command_params.symmetric_difference(typer_params))
+
+    def test_group_interface_matches(self):
+        from django_typer import TyperWrapper
+
+        typer_command_params = set(get_named_arguments(TyperWrapper.group))
+        typer_params = set(get_named_arguments(typer.Typer.add_typer))
+        typer_params.remove("callback")
+        self.assertFalse(typer_command_params.symmetric_difference(typer_params))
+
+    def test_group_command_interface_matches(self):
+        from django_typer import TyperWrapper
+
+        typer_command_params = set(get_named_arguments(TyperWrapper.command))
+        typer_params = set(get_named_arguments(typer.Typer.command))
+        self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
 
 class MultiTests(TestCase):
@@ -700,6 +762,10 @@ class TestGroups(TestCase):
     command inheritance behaves as expected.
     """
 
+    def test_group_call(self):
+        with self.assertRaises(NotImplementedError):
+            get_command("groups")()
+
     @override_settings(
         INSTALLED_APPS=[
             "django_typer.tests.test_app",
@@ -772,20 +838,54 @@ class TestGroups(TestCase):
 
         self.assertEqual(
             run_command("groups", *settings, "echo", "hey!").strip(),
+            "hey!",
+        )
+
+        self.assertEqual(
             call_command("groups", "echo", "hey!").strip(),
             "hey!",
         )
         self.assertEqual(
             get_command("groups", "echo")("hey!").strip(),
+            "hey!",
+        )
+        self.assertEqual(
             get_command("groups", "echo")(message="hey!").strip(),
             "hey!",
         )
 
+        self.assertEqual(get_command("groups").echo("hey!").strip(), "hey!")
+
+        self.assertEqual(get_command("groups").echo(message="hey!").strip(), "hey!")
+
         result = run_command("groups", *settings, "echo", "hey!", "5")
         if override:
             self.assertEqual(result.strip(), ("hey! " * 5).strip())
+            self.assertEqual(
+                get_command("groups").echo("hey!", 5).strip(), ("hey! " * 5).strip()
+            )
+            self.assertEqual(
+                get_command("groups").echo(message="hey!", echoes=5).strip(),
+                ("hey! " * 5).strip(),
+            )
+            self.assertEqual(
+                call_command("groups", "echo", "hey!", "5").strip(),
+                ("hey! " * 5).strip(),
+            )
+            self.assertEqual(
+                call_command("groups", "echo", "hey!", echoes=5).strip(),
+                ("hey! " * 5).strip(),
+            )
+            self.assertEqual(
+                call_command("groups", "echo", "hey!", echoes="5").strip(),
+                ("hey! " * 5).strip(),
+            )
         else:
             self.assertIn("UsageError", result)
+            with self.assertRaises(TypeError):
+                call_command("groups", "echo", "hey!", echoes=5)
+            with self.assertRaises(TypeError):
+                get_command("groups").echo(message="hey!", echoes=5)
 
         self.assertEqual(
             run_command(
@@ -875,3 +975,181 @@ class TestGroups(TestCase):
     )
     def test_command_line_override(self):
         self.test_command_line.__wrapped__(self, settings="django_typer.tests.override")
+
+
+class TestCallCommandArgs(TestCase):
+    @override_settings(
+        INSTALLED_APPS=[
+            "django_typer.tests.test_app2",
+            "django_typer.tests.test_app",
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+        ],
+    )
+    def test_completion_args(self):
+        # call_command converts all args to strings - todo - fix this? or accept it? fixing it
+        # would require a monkey patch. I think accepting it and trying to allow Arguments to
+        # be passed in as named parameters would be a good compromise. Users can always invoke
+        # the typer commands directly using () or the functions directly.
+
+        # if autocompletion ends up requiring a monkey patch, consider fixing it
+
+        # turns out call_command will also turn options values into strings you've flagged them as required
+        # and they're passed in as named parameters
+
+        test_app = apps.get_app_config("django_typer_tests_test_app")
+        test_app2 = apps.get_app_config("django_typer_tests_test_app2")
+
+        out = StringIO()
+        call_command(
+            "completion",
+            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+            stdout=out,
+        )
+        printed_options = json.loads(out.getvalue())
+        self.assertEqual(
+            printed_options,
+            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+        )
+
+        out = StringIO()
+        printed_options = json.loads(get_command("completion")([test_app, test_app2]))
+        self.assertEqual(
+            printed_options,
+            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+        )
+
+
+class TestTracebackConfig(TestCase):
+    rich_installed = True
+
+    def test_default_traceback(self):
+        result = run_command("test_command1", "delete", "me", "--throw")
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: This is a test exception", result)
+        if self.rich_installed:
+            self.assertIn("────────", result)
+            # locals should be present
+            self.assertIn("name = 'me'", result)
+            self.assertIn("throw = True", result)
+            # by default we get only the last frame
+            self.assertEqual(len(re.findall(r"\.py:\d+", result) or []), 1)
+        else:
+            self.assertNotIn("────────", result)
+
+    def test_tb_command_overrides(self):
+        result = run_command("test_tb_overrides", "delete", "me", "--throw")
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: This is a test exception", result)
+        if self.rich_installed:
+            self.assertIn("────────", result)
+            # locals should be present
+            self.assertNotIn("name = 'me'", result)
+            self.assertNotIn("throw = True", result)
+            # should get a full length stack trace
+            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 1)
+        else:
+            self.assertNotIn("────────", result)
+
+    def test_turn_traceback_off_false(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "django_typer.tests.settings_tb_false",
+            "delete",
+            "me",
+            "--throw",
+        )
+        self.assertNotIn("────────", result)
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: This is a test exception", result)
+
+    def test_turn_traceback_off_none(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "django_typer.tests.settings_tb_none",
+            "delete",
+            "me",
+            "--throw",
+        )
+        self.assertNotIn("────────", result)
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: This is a test exception", result)
+
+    def test_traceback_no_locals_short_false(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "django_typer.tests.settings_tb_change_defaults",
+            "delete",
+            "me",
+            "--throw",
+        )
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: This is a test exception", result)
+        # locals should not be present
+        self.assertNotIn("name = 'me'", result)
+        self.assertNotIn("throw = True", result)
+        if self.rich_installed:
+            self.assertIn("────────", result)
+            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 1)
+        else:
+            self.assertNotIn("────────", result)
+
+    def test_rich_install(self):
+        if self.rich_installed:
+            result = run_command(
+                "test_command1",
+                "--settings",
+                "django_typer.tests.settings_throw_init_exception",
+                "delete",
+                "me",
+            )
+            self.assertIn("Traceback (most recent call last)", result)
+            self.assertIn("Exception: Test ready exception", result)
+            self.assertIn("────────", result)
+            self.assertIn("── locals ──", result)
+
+    @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
+    def test_tb_no_install(self):
+        if self.rich_installed:
+            result = run_command(
+                "test_command1",
+                "--settings",
+                "django_typer.tests.settings_tb_no_install",
+                "delete",
+                "me",
+            )
+            self.assertIn("Traceback (most recent call last)", result)
+            self.assertIn("Exception: Test ready exception", result)
+            self.assertNotIn("────────", result)
+            self.assertNotIn("── locals ──", result)
+
+
+class TestTracebackConfigNoRich(TestTracebackConfig):
+    rich_installed = False
+
+    def setUp(self):
+        subprocess.run(["pip", "uninstall", "-y", "rich"], check=True)
+
+    def tearDown(self):
+        subprocess.run(["pip", "install", "rich"], check=True)
+
+
+class TestSettingsSystemCheck(TestCase):
+    def test_warning_thrown(self):
+        result = run_command(
+            "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
+        )
+        self.assertIn(
+            "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
+            result,
+        )
+        self.assertIn(
+            "HINT: Unexpected parameters encountered: unexpected_setting.", result
+        )
