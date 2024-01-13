@@ -55,10 +55,9 @@ __copyright__ = "Copyright 2023 Brian Kohan"
 __all__ = [
     "TyperCommand",
     "Context",
-    "TyperGroupWrapper",
-    "TyperCommandWrapper",
     "initialize",
     "command",
+    "group",
     "get_command",
 ]
 
@@ -180,8 +179,8 @@ class Context(TyperContext):
     @property
     def supplied_params(self):
         """
-        Get the parameters that were supplied when the command was invoked via call_command,
-        only the root context has these.
+        Get the parameters that were supplied when the command was invoked via
+        call_command, only the root context has these.
         """
         if self.parent:
             return self.parent.supplied_params
@@ -215,6 +214,7 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
     context_class: t.Type[click.Context] = Context
     django_command: "TyperCommand"
     callback_is_method: bool = True
+    param_converters: t.Dict[str, t.Callable[..., t.Any]] = {}
 
     def common_params(self):
         return []
@@ -235,19 +235,15 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
 
         def call_with_self(*args, **kwargs):
             ctx = click.get_current_context()
-
-            # process supplied parameters incase they need type conversion
-            def process_value(name, value):
-                if name in ctx.supplied_params:
-                    for prm in self.params:
-                        if prm.name == name:
-                            return prm.process_value(ctx, value)
-                return value
-
             return callback(
                 *args,
                 **{
-                    param: process_value(param, val)
+                    # process supplied parameters incase they need type conversion
+                    param: self.param_converters.get(param, lambda _, value: value)(
+                        ctx, val
+                    )
+                    if param in ctx.supplied_params
+                    else val
                     for param, val in kwargs.items()
                     if param in expected
                 },
@@ -271,6 +267,9 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
             callback=call_with_self,
             **kwargs,
         )
+        self.param_converters = {
+            param.name: param.process_value for param in self.params
+        }
 
 
 class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
@@ -300,11 +299,25 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
         return super().common_params()
 
 
-class TyperWrapper(Typer):
+class GroupFunction(Typer):
     bound: bool = False
     django_command_cls: t.Type["TyperCommand"]
+    _callback: t.Callable[..., t.Any]
+
+    def __get__(self, obj, obj_type=None):
+        """
+        Our Typer app wrapper also doubles as a descriptor, so when
+        it is accessed on the instance, we return the wrapped function
+        so it may be called directly - but when accessed on the class
+        the app itself is returned so it can modified by other decorators
+        on the class and subclasses.
+        """
+        if obj is None:
+            return self
+        return MethodType(self._callback, obj)
 
     def __init__(self, *args, **kwargs):
+        self._callback = kwargs["callback"]
         super().__init__(*args, **kwargs)
 
     def bind(self, django_command_cls: t.Type["TyperCommand"]):
@@ -379,7 +392,7 @@ class TyperWrapper(Typer):
         **kwargs,
     ):
         def create_app(func: CommandFunctionType):
-            app = TyperWrapper(
+            grp = GroupFunction(
                 name=name,
                 cls=cls,
                 invoke_without_command=invoke_without_command,
@@ -399,9 +412,9 @@ class TyperWrapper(Typer):
                 rich_help_panel=rich_help_panel,
                 **kwargs,
             )
-            self.add_typer(app)
-            app.bound = True
-            return app
+            self.add_typer(grp)
+            grp.bound = True
+            return grp
 
         return create_app
 
@@ -517,7 +530,7 @@ def group(
     **kwargs,
 ):
     def create_app(func: CommandFunctionType):
-        return TyperWrapper(
+        grp = GroupFunction(
             name=name,
             cls=cls,
             invoke_without_command=invoke_without_command,
@@ -537,6 +550,7 @@ def group(
             rich_help_panel=rich_help_panel,
             **kwargs,
         )
+        return grp
 
     return create_app
 
@@ -650,8 +664,8 @@ class _TyperCommandMeta(type):
                     attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
                 )
 
-            # because we're mapping a non-class based interface onto a class based interface, we have to
-            # handle this class mro stuff manually here
+            # because we're mapping a non-class based interface onto a class based
+            # interface, we have to handle this class mro stuff manually here
             for cmd_cls, cls_attrs in [
                 *[(base, vars(base)) for base in reversed(bases)],
                 (cls, attrs),
@@ -661,7 +675,7 @@ class _TyperCommandMeta(type):
                 for attr in [*cls_attrs.values(), cls._handle]:
                     cls._num_commands += hasattr(attr, "_typer_command_")
                     cls._has_callback |= hasattr(attr, "_typer_callback_")
-                    if isinstance(attr, TyperWrapper) and not attr.bound:
+                    if isinstance(attr, GroupFunction) and not attr.bound:
                         attr.bind(cls)
                         cls._root_groups += 1
 
@@ -747,13 +761,13 @@ class TyperParser:
             ) as ctx:
                 params = ctx.params
 
-                def discover_parsed_args(ctx):
-                    # todo is this necessary?
-                    for child in ctx.children:
-                        discover_parsed_args(child)
-                        params.update(child.params)
+                # def discover_parsed_args(ctx):
+                #     # todo is this necessary?
+                #     for child in ctx.children:
+                #         discover_parsed_args(child)
+                #         params.update(child.params)
 
-                discover_parsed_args(ctx)
+                # discover_parsed_args(ctx)
 
                 return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **params})
         except click.exceptions.Exit:
@@ -930,6 +944,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             return self._handle(*args, **kwargs)
         raise NotImplementedError(
             _(
-                "{cls} does not implement handle(), you must call the other command functions directly."
+                "{cls} does not implement handle(), you must call the other command "
+                "functions directly."
             ).format(cls=self.__class__)
         )

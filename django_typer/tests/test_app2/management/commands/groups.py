@@ -1,8 +1,10 @@
 import typing as t
 
-from typer import Argument
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from typer import Argument, Option
 
-from django_typer import command, initialize, types
+from django_typer import command, group, initialize, types
 from django_typer.tests.test_app.management.commands.groups import (
     Command as GroupsCommand,
 )
@@ -45,3 +47,26 @@ class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_
     def strip(self):
         """Strip white space off the ends of the string"""
         return self.op_string.strip()
+
+    @group()
+    def setting(
+        self, setting: t.Annotated[str, Argument(help=_("The setting variable name."))]
+    ):
+        """
+        Get or set Django settings.
+        """
+        assert self.__class__ is Command
+        self.setting = setting
+
+    @setting.command()
+    def print(
+        self,
+        safe: t.Annotated[bool, Option(help=_("Do not assume the setting exists."))],
+    ):
+        """
+        Print the setting value.
+        """
+        assert self.__class__ is Command
+        if safe:
+            return getattr(settings, self.setting, None)
+        return getattr(settings, self.setting)

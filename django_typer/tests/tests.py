@@ -10,6 +10,7 @@ from typing import Any
 
 import django
 import typer
+from click.exceptions import UsageError
 from django.apps import apps
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -192,17 +193,17 @@ class InterfaceTests(TestCase):
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
     def test_group_interface_matches(self):
-        from django_typer import TyperWrapper
+        from django_typer import GroupFunction
 
-        typer_command_params = set(get_named_arguments(TyperWrapper.group))
+        typer_command_params = set(get_named_arguments(GroupFunction.group))
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
         typer_params.remove("callback")
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
     def test_group_command_interface_matches(self):
-        from django_typer import TyperWrapper
+        from django_typer import GroupFunction
 
-        typer_command_params = set(get_named_arguments(TyperWrapper.command))
+        typer_command_params = set(get_named_arguments(GroupFunction.command))
         typer_params = set(get_named_arguments(typer.Typer.command))
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
@@ -790,8 +791,13 @@ class TestGroups(TestCase):
             ("groups", "string", "case", "upper"),
             ("groups", "string", "strip"),
             ("groups", "string", "split"),
+            ("groups", "setting"),
+            ("groups", "setting", "print"),
         ]:
-            if app == "test_app" and cmds[-1] == "strip":
+            if app == "test_app" and cmds[-1] in ["strip", "setting", "print"]:
+                with self.assertRaises(ValueError):
+                    cmd = get_command(cmds[0], stdout=buffer)
+                    cmd.print_help("./manage.py", *cmds)
                 continue
 
             buffer = StringIO()
@@ -802,7 +808,7 @@ class TestGroups(TestCase):
                 sim := similarity(
                     hlp, (TESTS_DIR / app / "helps" / f"{cmds[-1]}.txt").read_text()
                 ),
-                0.95,  # width inconsistences drive this number < 1
+                0.96,  # width inconsistences drive this number < 1
             )
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
@@ -903,6 +909,24 @@ class TestGroups(TestCase):
             "-51.66000",
         )
 
+        grp_cmd = get_command("groups")
+        grp_cmd.math(precision=5)
+        self.assertEqual(grp_cmd.multiply(1.2, 3.5, [-12.3]), "-51.66000")
+
+        self.assertEqual(
+            call_command(
+                "groups", "math", "multiply", "1.2", "3.5", " -12.3", precision=5
+            ),
+            "-51.66000",
+        )
+
+        self.assertEqual(
+            call_command(
+                "groups", "math", "multiply", "1.2", "3.5", " -12.3", precision="5"
+            ),
+            "-51.66000",
+        )
+
         self.assertEqual(
             run_command(
                 "groups",
@@ -918,11 +942,37 @@ class TestGroups(TestCase):
         )
 
         self.assertEqual(
+            call_command(
+                "groups",
+                "math",
+                "divide",
+                "1.2",
+                "3.5",
+                " -12.3",
+            ),
+            "-0.03",
+        )
+
+        self.assertEqual(get_command("groups").divide(1.2, 3.5, [-12.3]), "-0.03")
+        self.assertEqual(
+            get_command("groups", "math", "divide")(1.2, 3.5, [-12.3]), "-0.03"
+        )
+
+        self.assertEqual(
             run_command(
                 "groups", *settings, "string", "ANNAmontes", "case", "lower"
             ).strip(),
             "annamontes",
         )
+
+        self.assertEqual(
+            call_command("groups", "string", "ANNAmontes", "case", "lower"),
+            "annamontes",
+        )
+
+        grp_cmd = get_command("groups")
+        grp_cmd.string("ANNAmontes")
+        self.assertEqual(grp_cmd.lower(), "annamontes")
 
         self.assertEqual(
             run_command(
@@ -931,28 +981,98 @@ class TestGroups(TestCase):
             "ANNAMONTES",
         )
 
+        grp_cmd.string("annaMONTES")
+        self.assertEqual(grp_cmd.upper(), "ANNAMONTES")
+
         self.assertEqual(
             run_command(
-                "groups", *settings, "string", "ANNAMONTES", "case", "lower", "4", "9"
+                "groups",
+                *settings,
+                "string",
+                "ANNAMONTES",
+                "case",
+                "lower",
+                "--begin",
+                "4",
+                "--end",
+                "9",
             ).strip(),
             "ANNAmonteS",
         )
+
+        self.assertEqual(
+            call_command(
+                "groups",
+                "string",
+                "ANNAMONTES",
+                "case",
+                "lower",
+                "--begin",
+                "4",
+                "--end",
+                "9",
+            ).strip(),
+            "ANNAmonteS",
+        )
+
+        self.assertEqual(
+            call_command(
+                "groups", "string", "ANNAMONTES", "case", "lower", begin=4, end=9
+            ).strip(),
+            "ANNAmonteS",
+        )
+
+        grp_cmd.string("ANNAMONTES")
+        self.assertEqual(grp_cmd.lower(begin=4, end=9), "ANNAmonteS")
+        grp_cmd.string("ANNAMONTES")
+        self.assertEqual(grp_cmd.lower(4, 9), "ANNAmonteS")
 
         result = run_command(
             "groups", *settings, "string", "annamontes", "case", "upper", "4", "9"
         ).strip()
         if override:
             self.assertIn("UsageError", result)
+            grp_cmd.string("annamontes")
+            with self.assertRaises(TypeError):
+                self.assertEqual(grp_cmd.upper(4, 9), "annaMONTEs")
+
+            with self.assertRaises(UsageError):
+                self.assertEqual(
+                    call_command(
+                        "groups", "string", "annamontes", "case", "upper", "4", "9"
+                    ).strip(),
+                    "annaMONTEs",
+                )
         else:
             self.assertEqual(result, "annaMONTEs")
+            grp_cmd.string("annamontes")
+            self.assertEqual(grp_cmd.upper(4, 9), "annaMONTEs")
+            self.assertEqual(
+                call_command(
+                    "groups", "string", "annamontes", "case", "upper", "4", "9"
+                ).strip(),
+                "annaMONTEs",
+            )
 
         result = run_command(
             "groups", *settings, "string", " emmatc  ", "strip", parse_json=False
         )
         if override:
             self.assertEqual(result, "emmatc\n")
+            self.assertEqual(
+                call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
+            )
+            grp_cmd.string(" emmatc  ")
+            self.assertEqual(grp_cmd.strip(), "emmatc")
         else:
             self.assertIn("UsageError", result)
+            with self.assertRaises(UsageError):
+                self.assertEqual(
+                    call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
+                )
+            with self.assertRaises(AttributeError):
+                grp_cmd.string(" emmatc  ")
+                self.assertEqual(grp_cmd.strip(), "emmatc")
 
         self.assertEqual(
             run_command(
@@ -960,6 +1080,20 @@ class TestGroups(TestCase):
             ).strip(),
             "c a i t l y n",
         )
+        self.assertEqual(
+            call_command(
+                "groups", "string", "c,a,i,t,l,y,n", "split", "--sep", ","
+            ).strip(),
+            "c a i t l y n",
+        )
+        self.assertEqual(
+            call_command("groups", "string", "c,a,i,t,l,y,n", "split", sep=",").strip(),
+            "c a i t l y n",
+        )
+        grp_cmd.string("c,a,i,t,l,y,n")
+        self.assertEqual(grp_cmd.split(sep=","), "c a i t l y n")
+        grp_cmd.string("c,a,i,t,l,y,n")
+        self.assertEqual(grp_cmd.split(","), "c a i t l y n")
 
     @override_settings(
         INSTALLED_APPS=[

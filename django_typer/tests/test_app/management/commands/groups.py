@@ -1,7 +1,7 @@
 import typing as t
 
 from django.utils.translation import gettext_lazy as _
-from typer import Argument
+from typer import Argument, Option
 
 from django_typer import TyperCommand, command, group
 
@@ -120,11 +120,11 @@ class Command(TyperCommand):
     def lower(
         self,
         begin: t.Annotated[
-            int, Argument(help=_("The starting index of the string to operate on."))
+            int, Option(help=_("The starting index of the string to operate on."))
         ] = 0,
         end: t.Annotated[
             t.Optional[int],
-            Argument(help=_("The ending index of the string to operate on.")),
+            Option(help=_("The ending index of the string to operate on.")),
         ] = None,
     ):
         """
