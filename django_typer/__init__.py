@@ -13,7 +13,6 @@ import inspect
 import sys
 import typing as t
 from copy import deepcopy
-from dataclasses import dataclass
 from importlib import import_module
 from types import MethodType, SimpleNamespace
 
@@ -21,7 +20,9 @@ import click
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
+from django.core.management.color import no_style
 from django.utils.translation import gettext_lazy as _
+from django.utils.functional import lazy
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -76,6 +77,15 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 
 behavior should align with native django commands
 """
+
+# def get_color_system(default):
+#     ctx = click.get_current_context(silent=True)
+#     if ctx:
+#         return None if ctx.django_command.style == no_style() else default
+#     return default
+
+# COLOR_SYSTEM = lazy(get_color_system, str)
+# rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
 
 
 def traceback_config():
@@ -145,6 +155,14 @@ class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
 
     def _get_kwargs(self):
         return {"args": self.args, **COMMON_DEFAULTS}
+
+
+# class _Augment:
+#     pass
+
+
+# def augment(cls):
+#     return type('', (_Augment, cls), {})
 
 
 class Context(TyperContext):
@@ -576,7 +594,6 @@ class _TyperCommandMeta(type):
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
-        add_completion: bool = True,
         rich_markup_mode: MarkupMode = None,
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: bool = Default(True),
@@ -626,7 +643,7 @@ class _TyperCommandMeta(type):
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
-                add_completion=add_completion,
+                add_completion=False,  # see autocomplete command instead!
                 rich_markup_mode=rich_markup_mode,
                 rich_help_panel=rich_help_panel,
                 pretty_exceptions_enable=pretty_exceptions_enable,
@@ -713,14 +730,35 @@ class _TyperCommandMeta(type):
 
 
 class TyperParser:
-    @dataclass(frozen=True)
+
     class Action:
-        dest: str
+
+        param: click.Parameter
         required: bool = False
+
+        def __init__(self, param: click.Parameter):
+            self.param = param
+
+        @property
+        def dest(self):
+            return self.param.name
+        
+        @property
+        def nargs(self):
+            return (
+                0
+                if getattr(self.param, 'is_flag', False) else
+                self.param.nargs
+            )
 
         @property
         def option_strings(self):
-            return [self.dest]
+            return (
+                list(self.param.opts)
+                if isinstance(self.param, click.Option) else
+                []
+            )
+
 
     _actions: t.List[t.Any]
     _mutually_exclusive_groups: t.List[t.Any] = []
@@ -737,7 +775,7 @@ class TyperParser:
 
         def populate_params(node):
             for param in node.command.params:
-                self._actions.append(self.Action(param.name))
+                self._actions.append(self.Action(param))
             for child in node.children.values():
                 populate_params(child)
 

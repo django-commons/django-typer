@@ -10,7 +10,7 @@ from django_typer.tests.test_app.management.commands.groups import (
 )
 
 
-class Command(GroupsCommand, add_completion=False, epilog="Overridden from test_app."):
+class Command(GroupsCommand, epilog="Overridden from test_app."):
     help = "Test groups command inheritance."
 
     precision = 2

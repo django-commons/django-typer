@@ -190,6 +190,7 @@ class InterfaceTests(TestCase):
         typer_command_params = set(get_named_arguments(_TyperCommandMeta.__new__))
         typer_params = set(get_named_arguments(typer.Typer.__init__))
         typer_params.remove("name")
+        typer_params.remove("add_completion")
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
     def test_group_interface_matches(self):
@@ -337,7 +338,7 @@ class CallbackTests(TestCase):
 
     def test_helps(self, top_level_only=False):
         buffer = StringIO()
-        cmd = get_command(self.cmd_name, stdout=buffer)
+        cmd = get_command(self.cmd_name, stdout=buffer, no_color=True)
 
         help_output_top = run_command(self.cmd_name, "--help")
         cmd.print_help("./manage.py", self.cmd_name)

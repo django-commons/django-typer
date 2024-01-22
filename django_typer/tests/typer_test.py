@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import typer
 
-from django_typer import TyperCommandWrapper, _common_options
-
 app = typer.Typer(name="test")
 state = {"verbose": False}
 

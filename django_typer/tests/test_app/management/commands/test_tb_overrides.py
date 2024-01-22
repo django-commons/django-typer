@@ -5,7 +5,6 @@ from django_typer import TyperCommand, command, initialize
 
 class Command(
     TyperCommand,
-    add_completion=False,
     pretty_exceptions_enable=True,
     pretty_exceptions_show_locals=False,
     pretty_exceptions_short=False,

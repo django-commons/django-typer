@@ -26,3 +26,5 @@ class TestAppConfig(AppConfig):
     def ready(self):
         if getattr(settings, "DJANGO_TYPER_THROW_TEST_EXCEPTION", False):
             raise Exception("Test ready exception")
+
+        # print(self.label)

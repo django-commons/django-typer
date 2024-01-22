@@ -3,7 +3,7 @@ import json
 from django_typer import TyperCommand, command, initialize
 
 
-class Command(TyperCommand, add_completion=False):
+class Command(TyperCommand):
     help = "This is a test help message"
 
     @initialize(epilog="This is a test callback epilog")
