@@ -21,8 +21,8 @@ from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
-from django.utils.translation import gettext_lazy as _
 from django.utils.functional import lazy
+from django.utils.translation import gettext_lazy as _
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -730,9 +730,7 @@ class _TyperCommandMeta(type):
 
 
 class TyperParser:
-
     class Action:
-
         param: click.Parameter
         required: bool = False
 
@@ -742,23 +740,14 @@ class TyperParser:
         @property
         def dest(self):
             return self.param.name
-        
+
         @property
         def nargs(self):
-            return (
-                0
-                if getattr(self.param, 'is_flag', False) else
-                self.param.nargs
-            )
+            return 0 if getattr(self.param, "is_flag", False) else self.param.nargs
 
         @property
         def option_strings(self):
-            return (
-                list(self.param.opts)
-                if isinstance(self.param, click.Option) else
-                []
-            )
-
+            return list(self.param.opts) if isinstance(self.param, click.Option) else []
 
     _actions: t.List[t.Any]
     _mutually_exclusive_groups: t.List[t.Any] = []
