@@ -17,6 +17,7 @@ from importlib import import_module
 from types import MethodType, SimpleNamespace
 
 import click
+from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
@@ -60,6 +61,7 @@ __all__ = [
     "command",
     "group",
     "get_command",
+    "COMPLETE_VAR"
 ]
 
 """
@@ -87,6 +89,7 @@ behavior should align with native django commands
 # COLOR_SYSTEM = lazy(get_color_system, str)
 # rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
 
+COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
 
 def traceback_config():
     cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
@@ -233,6 +236,17 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
     django_command: "TyperCommand"
     callback_is_method: bool = True
     param_converters: t.Dict[str, t.Callable[..., t.Any]] = {}
+
+    def shell_complete(self, ctx: Context, incomplete: str) -> t.List[CompletionItem]:
+        """
+        By default if the incomplete string is a space and there are no completions
+        the click infrastructure will return _files. We'd rather return parameters
+        for the command if there are any available.
+        """
+        completions = super().shell_complete(ctx, incomplete)
+        if not completions and (incomplete.isspace() or not incomplete) and getattr(ctx, '_opt_prefixes', None):
+            completions = super().shell_complete(ctx, min(ctx._opt_prefixes))
+        return completions
 
     def common_params(self):
         return []
@@ -657,6 +671,7 @@ class _TyperCommandMeta(type):
                     standalone_mode=False,
                     supplied_params=options,
                     django_command=self,
+                    complete_var=None,
                     prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
                 )
 

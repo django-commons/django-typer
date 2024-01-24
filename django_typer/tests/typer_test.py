@@ -15,13 +15,13 @@ def create(username: str, flag: bool = False):
     print(f"flag: {flag}")
 
 
-# @app.command(epilog="Delete Epilog")
-# def delete(username: str):
-#     if state["verbose"]:
-#         print("About to delete a user")
-#     print(f"Deleting user: {username}")
-#     if state["verbose"]:
-#         print("Just deleted a user")
+@app.command(epilog="Delete Epilog")
+def delete(username: str):
+    if state["verbose"]:
+        print("About to delete a user")
+    print(f"Deleting user: {username}")
+    if state["verbose"]:
+        print("Just deleted a user")
 
 
 @app.callback(epilog="Main Epilog")

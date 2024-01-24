@@ -10,10 +10,6 @@ from django_typer import TyperCommand
 
 
 def parse_app_label(label: t.Union[str, AppConfig]):
-    if label == "django_apps":
-        import ipdb
-
-        ipdb.set_trace()
     if isinstance(label, AppConfig):
         return label
     return apps.get_app_config(label)

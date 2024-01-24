@@ -48,22 +48,22 @@ jobs:
           poetry export --without-hashes --format=requirements.txt | poetry run safety check --stdin
           poetry run python -m readme_renderer ./README.rst -o /tmp/README.html
 
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         django-version:
-          - 'Django~=3.2.0' # LTS April 2024
-          - 'Django~=4.2.0' # LTS April 2026
-          - 'Django~=5.0.0' # April 2025
+          - '3.2' # LTS April 2024
+          - '4.2' # LTS April 2026
+          - '5.0' # April 2025
         exclude:
           - python-version: '3.9'
-            django-version: 'Django~=5.0.0'
+            django-version: '5.0'
           - python-version: '3.11'
-            django-version: 'Django~=3.2.0'
+            django-version: '3.2'
           - python-version: '3.12'
-            django-version: 'Django~=3.2.0'
+            django-version: '3.2'
 
     steps:
     - uses: actions/checkout@v3
@@ -85,14 +85,54 @@ jobs:
         poetry config virtualenvs.in-project true
         poetry run pip install --upgrade pip
         poetry install
-        poetry run pip install -U "${{ matrix.django-version }}"
+        poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Run Unit Tests
       run: |
         poetry run pytest
+        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
       with:
-        file: ./coverage.xml
+        name: coverage-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+  coverage-combine:
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+    
+      - name: Install Release Dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry run pip install --upgrade pip
+          poetry install
+
+      - name: Get coverage files
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+
+      - run: ls -la *.coverage
+      - run: poetry run coverage combine *.coverage
+      - run: poetry run coverage report
+      - run: poetry run coverage xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+      

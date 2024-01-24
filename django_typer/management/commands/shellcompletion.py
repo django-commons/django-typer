@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option, echo
 from typer.completion import Shells, completion_init
 
-from django_typer import TyperCommand, command, get_command
+from django_typer import TyperCommand, command, get_command, COMPLETE_VAR
 
 try:
     from shellingham import detect_shell
@@ -68,8 +68,6 @@ class Command(TyperCommand):
     ]
 
     _shell: Shells
-
-    COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
 
     @cached_property
     def manage_script(self) -> t.Union[str, Path]:
@@ -137,8 +135,8 @@ class Command(TyperCommand):
             self,
             "_shell",
             Shells(
-                os.environ[self.COMPLETE_VAR].partition("_")[2]
-                if self.COMPLETE_VAR in os.environ
+                os.environ[COMPLETE_VAR].partition("_")[2]
+                if COMPLETE_VAR in os.environ
                 else detect_shell()[0]
             ),
         )
@@ -279,7 +277,7 @@ class Command(TyperCommand):
         install_path = install(
             shell=self.shell.value,
             prog_name=manage_script or self.manage_script_name,
-            complete_var=self.COMPLETE_VAR,
+            complete_var=COMPLETE_VAR,
         )[1]
         self.stdout.write(
             self.style.SUCCESS(
@@ -388,18 +386,27 @@ class Command(TyperCommand):
                 except Exception:
                     pass
                 return (
-                    cwords,
-                    cwords[-1] if len(cwords) and not command[-1].isspace() else "",
+                    cwords[:-1],
+                    cwords[-1] if len(cwords) and not command[-1].isspace() else ' ',
                 )
 
             CompletionClass.get_completion_args = get_completion_args
-            add_completion_class(self.shell.value, CompletionClass)
+
+        _get_completions = CompletionClass.get_completions
+        def get_completions(self, args, incomplete):
+            """
+            need to remove the django command name from the arg completions
+            """
+            return _get_completions(self, args[1:], incomplete)
+        CompletionClass.get_completions = get_completions
+
+        add_completion_class(self.shell.value, CompletionClass)
 
         args, incomplete = CompletionClass(
-            cli=self.noop_command,
-            ctx_args=self.noop_command,
+            cli=self.noop_command.command,
+            ctx_args={},
             prog_name=sys.argv[0],
-            complete_var=self.COMPLETE_VAR,
+            complete_var=COMPLETE_VAR,
         ).get_completion_args()
 
         def call_fallback(fb):
@@ -413,21 +420,24 @@ class Command(TyperCommand):
             call_fallback(fallback)
         else:
             try:
-                os.environ[self.COMPLETE_VAR] = os.environ.get(
-                    self.COMPLETE_VAR, f"complete_{self.shell.value}"
+                os.environ[COMPLETE_VAR] = os.environ.get(
+                    COMPLETE_VAR, f"complete_{self.shell.value}"
                 )
                 cmd = get_command(args[0])
-                if isinstance(cmd, TyperCommand):
-                    # invoking the command will trigger the autocompletion?
-                    cmd.command_tree.command._main_shell_completion(
-                        ctx_args={},
-                        prog_name=f"{sys.argv[0]} {cmd.command_tree.command.name}",
-                        complete_var=self.COMPLETE_VAR,
-                    )
-                    return
-                else:
-                    call_fallback(fallback)
-            except Exception as e:
+            except Exception:
+                call_fallback(fallback)
+                return
+            
+            if isinstance(cmd, TyperCommand):
+                cmd.typer_app(
+                    args=args[1:],
+                    standalone_mode=True,
+                    django_command=cmd,
+                    complete_var=COMPLETE_VAR,
+                    prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
+                )
+                return
+            else:
                 call_fallback(fallback)
 
     def django_fallback(self):
@@ -462,10 +472,10 @@ class Command(TyperCommand):
         CompletionClass.get_completions = get_completions
         echo(
             CompletionClass(
-                cli=self.noop_command,
+                cli=self.noop_command.command,
                 ctx_args={},
                 prog_name=self.manage_script_name,
-                complete_var=self.COMPLETE_VAR,
+                complete_var=COMPLETE_VAR,
             ).complete()
         )
 
