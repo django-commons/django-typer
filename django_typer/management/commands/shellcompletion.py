@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option, echo
 from typer.completion import Shells, completion_init
 
-from django_typer import TyperCommand, command, get_command, COMPLETE_VAR
+from django_typer import COMPLETE_VAR, TyperCommand, command, get_command
 
 try:
     from shellingham import detect_shell
@@ -387,17 +387,19 @@ class Command(TyperCommand):
                     pass
                 return (
                     cwords[:-1],
-                    cwords[-1] if len(cwords) and not command[-1].isspace() else ' ',
+                    cwords[-1] if len(cwords) and not command[-1].isspace() else " ",
                 )
 
             CompletionClass.get_completion_args = get_completion_args
 
         _get_completions = CompletionClass.get_completions
+
         def get_completions(self, args, incomplete):
             """
             need to remove the django command name from the arg completions
             """
             return _get_completions(self, args[1:], incomplete)
+
         CompletionClass.get_completions = get_completions
 
         add_completion_class(self.shell.value, CompletionClass)
@@ -427,7 +429,7 @@ class Command(TyperCommand):
             except Exception:
                 call_fallback(fallback)
                 return
-            
+
             if isinstance(cmd, TyperCommand):
                 cmd.typer_app(
                     args=args[1:],

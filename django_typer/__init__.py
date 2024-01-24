@@ -61,7 +61,7 @@ __all__ = [
     "command",
     "group",
     "get_command",
-    "COMPLETE_VAR"
+    "COMPLETE_VAR",
 ]
 
 """
@@ -90,6 +90,7 @@ behavior should align with native django commands
 # rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
 
 COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
+
 
 def traceback_config():
     cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
@@ -244,7 +245,11 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
         for the command if there are any available.
         """
         completions = super().shell_complete(ctx, incomplete)
-        if not completions and (incomplete.isspace() or not incomplete) and getattr(ctx, '_opt_prefixes', None):
+        if (
+            not completions
+            and (incomplete.isspace() or not incomplete)
+            and getattr(ctx, "_opt_prefixes", None)
+        ):
             completions = super().shell_complete(ctx, min(ctx._opt_prefixes))
         return completions
 
