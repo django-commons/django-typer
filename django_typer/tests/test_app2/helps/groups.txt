@@ -12,8 +12,6 @@
 │                                               2=verbose output, 3=very       │
 │                                               verbose output                 │
 │                                               [default: 1]                   │
-│ --version                                     Show program's version number  │
-│                                               and exit.                      │
 │ --settings           TEXT                     The Python path to a settings  │
 │                                               module, e.g.                   │
 │                                               "myproject.settings.main". If  │

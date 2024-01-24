@@ -327,7 +327,12 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
 
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
     def common_params(self):
-        if hasattr(self, "django_command") and self.django_command._has_callback:
+        if (
+            (
+                hasattr(self, "django_command") and
+                self.django_command._has_callback
+            ) or getattr(self, "common_init", False)
+        ):
             return [
                 param
                 for param in _get_common_params()
@@ -742,9 +747,9 @@ class _TyperCommandMeta(type):
                     cls=type(
                         "_AdaptedCallback",
                         (TyperGroupWrapper,),
-                        {"django_command": cls, "callback_is_method": False},
+                        {"django_command": cls, "callback_is_method": False, "common_init": True},
                     )
-                )(_common_options)
+                )(lambda: None)
 
         super().__init__(name, bases, attrs, **kwargs)
 

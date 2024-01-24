@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option, echo
 from typer.completion import Shells, completion_init
 
-from django_typer import COMPLETE_VAR, TyperCommand, command, get_command
+from django_typer import COMPLETE_VAR, TyperCommand, command, get_command, initialize
 
 try:
     from shellingham import detect_shell
