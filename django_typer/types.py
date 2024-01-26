@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 from typing import Annotated, Optional
 
-from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -23,6 +22,9 @@ def print_version(context, _, value):
         sys.exit()
 
 
+"""
+https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
+"""
 Version = Annotated[
     bool,
     Option(
@@ -34,6 +36,9 @@ Version = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-verbosity
+"""
 Verbosity = Annotated[
     int,
     Option(
@@ -48,6 +53,9 @@ Verbosity = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-settings
+"""
 Settings = Annotated[
     str,
     Option(
@@ -60,6 +68,9 @@ Settings = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-pythonpath
+"""
 PythonPath = Annotated[
     Optional[Path],
     Option(
@@ -71,6 +82,9 @@ PythonPath = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-traceback
+"""
 Traceback = Annotated[
     bool,
     Option(
@@ -80,6 +94,9 @@ Traceback = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-no-color
+"""
 NoColor = Annotated[
     bool,
     Option(
@@ -89,6 +106,10 @@ NoColor = Annotated[
     ),
 ]
 
+
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-force-color
+"""
 ForceColor = Annotated[
     bool,
     Option(
@@ -98,18 +119,12 @@ ForceColor = Annotated[
     ),
 ]
 
+"""
+https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-skip-checks
+"""
 SkipChecks = Annotated[
     bool,
     Option(
         "--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL
-    ),
-]
-
-
-AppLabel = Annotated[
-    AppConfig,
-    Option(
-        help=_("Specifies the application configuration to use."),
-        rich_help_panel=COMMON_PANEL,
     ),
 ]

@@ -764,6 +764,27 @@ class TestGroups(TestCase):
     command inheritance behaves as expected.
     """
 
+    default_color_system: str
+
+    def setUp(self) -> None:
+        # colors in terminal output screw up github CI runs - todo less intrusive
+        # way around this??
+        try:
+            from typer import rich_utils
+            self.default_color_system = rich_utils.COLOR_SYSTEM
+            rich_utils.COLOR_SYSTEM = None
+        except ImportError:
+            pass
+        return super().setUp()
+    
+    def tearDown(self) -> None:
+        try:
+            from typer import rich_utils
+            rich_utils.COLOR_SYSTEM = self.default_color_system
+        except ImportError:
+            pass
+        return super().tearDown()
+
     def test_group_call(self):
         with self.assertRaises(NotImplementedError):
             get_command("groups")()

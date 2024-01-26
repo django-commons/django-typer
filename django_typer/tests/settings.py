@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "django_typer.tests.test_app",
     "django_typer",
+    "django_typer.tests.polls.apps.PollsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -126,3 +127,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 SETTINGS_FILE = 1
+
+ROOT_URLCONF = "django_typer.tests.urls"

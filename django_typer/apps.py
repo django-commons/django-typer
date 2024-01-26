@@ -1,3 +1,7 @@
+"""
+Django Typer app config. This module includes settings check and rich traceback
+installation logic.
+"""
 import inspect
 
 from django.apps import AppConfig
@@ -12,6 +16,7 @@ try:
 
     tb_config = traceback_config()
     if isinstance(tb_config, dict) and not tb_config.get("no_install", False):
+        # install rich tracebacks if we've been configured to do so (default)
         rich.traceback.install(
             **{
                 param: value
@@ -26,6 +31,10 @@ except ImportError:
 
 @register("settings")
 def check_traceback_config(app_configs, **kwargs):
+    """
+    A system check that validates that the traceback config is valid and
+    contains only the expected parameters.
+    """
     warnings = []
     tb_cfg = traceback_config()
     if isinstance(tb_cfg, dict):
@@ -51,6 +60,10 @@ def check_traceback_config(app_configs, **kwargs):
 
 
 class DjangoTyperConfig(AppConfig):
+    """
+    Django Typer app config.
+    """
+
     name = "django_typer"
-    label = name.replace(".", "_")
+    label = name
     verbose_name = "Django Typer"

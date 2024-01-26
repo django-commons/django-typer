@@ -16,11 +16,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
     precision = 2
     verbosity = 1
 
-    django_params = [
-        param
-        for param in GroupsCommand.django_params
-        if param != 'version'
-    ]
+    suppressed_base_arguments = ['--version']
 
     @initialize()
     def init(self, verbosity: types.Verbosity = verbosity):

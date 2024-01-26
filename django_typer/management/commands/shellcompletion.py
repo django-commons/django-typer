@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option, echo
 from typer.completion import Shells, completion_init
 
-from django_typer import COMPLETE_VAR, TyperCommand, command, get_command, initialize
+from django_typer import TyperCommand, command, get_command, initialize
 
 try:
     from shellingham import detect_shell
@@ -61,13 +61,11 @@ class Command(TyperCommand):
     requires_migrations_checks = False
 
     # remove unnecessary django command base parameters - these just clutter the help
-    django_params = [
-        cmd
-        for cmd in TyperCommand.django_params
-        if cmd not in ["version", "skip_checks", "no_color", "force_color"]
-    ]
+    suppressed_base_arguments = {'version', 'skip_checks', 'no_color', 'force_color', 'verbosity'}
 
     _shell: Shells
+
+    COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
 
     @cached_property
     def manage_script(self) -> t.Union[str, Path]:
@@ -135,8 +133,8 @@ class Command(TyperCommand):
             self,
             "_shell",
             Shells(
-                os.environ[COMPLETE_VAR].partition("_")[2]
-                if COMPLETE_VAR in os.environ
+                os.environ[self.COMPLETE_VAR].partition("_")[2]
+                if self.COMPLETE_VAR in os.environ
                 else detect_shell()[0]
             ),
         )
@@ -277,7 +275,7 @@ class Command(TyperCommand):
         install_path = install(
             shell=self.shell.value,
             prog_name=manage_script or self.manage_script_name,
-            complete_var=COMPLETE_VAR,
+            complete_var=self.COMPLETE_VAR,
         )[1]
         self.stdout.write(
             self.style.SUCCESS(
@@ -378,6 +376,8 @@ class Command(TyperCommand):
             # because our entry point was not an installed completion script
             def get_completion_args(self) -> t.Tuple[t.List[str], str]:
                 cwords = split_arg_string(command)
+                if command[-1].isspace():
+                    cwords.append('')
                 # allow users to not specify the manage script, but allow for it
                 # if they do by lopping it off - same behavior as upstream classes
                 try:
@@ -387,7 +387,7 @@ class Command(TyperCommand):
                     pass
                 return (
                     cwords[:-1],
-                    cwords[-1] if len(cwords) and not command[-1].isspace() else " ",
+                    cwords[-1] if len(cwords) else "",
                 )
 
             CompletionClass.get_completion_args = get_completion_args
@@ -408,8 +408,11 @@ class Command(TyperCommand):
             cli=self.noop_command.command,
             ctx_args={},
             prog_name=sys.argv[0],
-            complete_var=COMPLETE_VAR,
+            complete_var=self.COMPLETE_VAR,
         ).get_completion_args()
+
+        with open('test.txt', 'w') as f:
+            f.write(f'{args}\n"{incomplete}"')
 
         def call_fallback(fb):
             fallback = import_string(fb) if fb else self.django_fallback
@@ -422,8 +425,8 @@ class Command(TyperCommand):
             call_fallback(fallback)
         else:
             try:
-                os.environ[COMPLETE_VAR] = os.environ.get(
-                    COMPLETE_VAR, f"complete_{self.shell.value}"
+                os.environ[self.COMPLETE_VAR] = os.environ.get(
+                    self.COMPLETE_VAR, f"complete_{self.shell.value}"
                 )
                 cmd = get_command(args[0])
             except Exception:
@@ -435,7 +438,7 @@ class Command(TyperCommand):
                     args=args[1:],
                     standalone_mode=True,
                     django_command=cmd,
-                    complete_var=COMPLETE_VAR,
+                    complete_var=self.COMPLETE_VAR,
                     prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
                 )
                 return
@@ -477,7 +480,7 @@ class Command(TyperCommand):
                 cli=self.noop_command.command,
                 ctx_args={},
                 prog_name=self.manage_script_name,
-                complete_var=COMPLETE_VAR,
+                complete_var=self.COMPLETE_VAR,
             ).complete()
         )
 
@@ -492,7 +495,7 @@ class Command(TyperCommand):
     def noop(self):
         """
         This is a no-op command that is used to bootstrap click Completion classes. It
-        has no use other than to avoid any potential attribute errors when we spoof
+        has no use other than to avoid any potential attribute access errors when we spoof
         completion logic
         """
         pass

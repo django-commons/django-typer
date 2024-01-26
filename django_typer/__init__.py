@@ -60,8 +60,7 @@ __all__ = [
     "initialize",
     "command",
     "group",
-    "get_command",
-    "COMPLETE_VAR",
+    "get_command"
 ]
 
 """
@@ -80,19 +79,29 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 behavior should align with native django commands
 """
 
-# def get_color_system(default):
-#     ctx = click.get_current_context(silent=True)
-#     if ctx:
-#         return None if ctx.django_command.style == no_style() else default
-#     return default
+# try:
+#     from typer import rich_utils
+#     def get_color_system(default):
+#         return None
+#         ctx = click.get_current_context(silent=True)
+#         if ctx:
+#             return None if ctx.django_command.style == no_style() else default
+#         return default
 
-# COLOR_SYSTEM = lazy(get_color_system, str)
-# rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
-
-COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
-
+#     COLOR_SYSTEM = lazy(get_color_system, str)
+#     rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
+# except ImportError:
+#     pass
 
 def traceback_config():
+    """
+    Fetch the rich traceback installation parameters from our settings. By default
+    rich tracebacks are on with show_locals = True. If the config is set to False
+    or None rich tracebacks will not be installed even if the library is present.
+
+    This allows us to have a common traceback configuration for all commands. If rich
+    tracebacks are managed separately this setting can also be switched off.
+    """
     cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
     if cfg:
         return {"show_locals": True, **cfg}
@@ -129,7 +138,7 @@ def _common_options(
     force_color: ForceColor = False,
     skip_checks: SkipChecks = False,
 ):
-    pass
+    pass  # pragma: no cover
 
 
 # cache common params to avoid this extra work on every command
@@ -243,6 +252,9 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
         By default if the incomplete string is a space and there are no completions
         the click infrastructure will return _files. We'd rather return parameters
         for the command if there are any available.
+
+        TODO - remove parameters that are already provided and do not allow multiple
+        specifications.
         """
         completions = super().shell_complete(ctx, incomplete)
         if (
@@ -320,7 +332,7 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
             return [
                 param
                 for param in _get_common_params()
-                if param.name in (self.django_command.django_params or [])
+                if param.name not in (self.django_command.suppressed_base_arguments or [])
             ]
         return super().common_params()
 
@@ -336,7 +348,7 @@ class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
             return [
                 param
                 for param in _get_common_params()
-                if param.name in (self.django_command.django_params or [])
+                if param.name not in (self.django_command.suppressed_base_arguments or [])
             ]
         return super().common_params()
 
@@ -689,7 +701,7 @@ class _TyperCommandMeta(type):
                 "_handle": attrs.pop("handle", None),
                 **attrs,
                 "handle": handle,
-                "typer_app": typer_app,
+                "typer_app": typer_app
             }
 
         return super().__new__(mcs, name, bases, attrs)
@@ -700,6 +712,10 @@ class _TyperCommandMeta(type):
         """
         if cls.typer_app is not None:
             cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
+            cls.suppressed_base_arguments = {
+                arg.lstrip('--').replace('-', '_')
+                for arg in cls.suppressed_base_arguments
+            } # per django docs - allow these to be specified by either the option or param name
 
             def get_ctor(attr):
                 return getattr(
@@ -811,17 +827,7 @@ class TyperParser:
                 django_command=self.django_command,
                 args=list(args or []),
             ) as ctx:
-                params = ctx.params
-
-                # def discover_parsed_args(ctx):
-                #     # todo is this necessary?
-                #     for child in ctx.children:
-                #         discover_parsed_args(child)
-                #         params.update(child.params)
-
-                # discover_parsed_args(ctx)
-
-                return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **params})
+                return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **ctx.params})
         except click.exceptions.Exit:
             sys.exit()
 
@@ -863,19 +869,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     # we do not use verbosity because the base command does not do anything with it
     # if users want to use a verbosity flag like the base django command adds
     # they can use the type from django_typer.types.Verbosity
-    django_params: t.Optional[
-        t.List[
-            t.Literal[
-                "version",
-                "settings",
-                "pythonpath",
-                "traceback",
-                "no_color",
-                "force_color",
-                "skip_checks",
-            ]
-        ]
-    ] = [name for name in COMMON_DEFAULTS.keys() if name != "verbosity"]
+    suppressed_base_arguments: t.Optional[t.Iterable[str]] = {'verbosity'}
 
     class CommandNode:
         name: str
