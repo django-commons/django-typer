@@ -3,6 +3,16 @@ The shellcompletion command is a Django management command that installs and rem
 shellcompletion scripts for supported shells (bash, fish, zsh, powershell). This
 command is also the entry point for running the completion logic and can be used to
 debug completer code.
+
+It invokes typer's shell completion installation logic, but does have to patch the
+installed scripts. This is because there is only one installation for all django
+management commands, not each individual command. The completion logic here will
+failover to django's builtin autocomplete if the command in question is not a 
+TyperCommand. To promote compatibility with other management command libraries or
+custom completion logic, a fallback completion function can also be specified. A
+needed refactoring here would be to provide root hooks for completion logic in django
+that base classes can register for. This would provide a coordinated way for libraries
+like django-typer to plug in their own completion logic.
 """
 
 import contextlib

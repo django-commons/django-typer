@@ -701,7 +701,7 @@ class TestDjangoParameters(TestCase):
 class TestHelpPrecedence(TestCase):
     def test_help_precedence1(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence1", stdout=buffer)
+        cmd = get_command("help_precedence1", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence1")
         self.assertTrue(
             re.search(
@@ -715,7 +715,7 @@ class TestHelpPrecedence(TestCase):
 
     def test_help_precedence2(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence2", stdout=buffer)
+        cmd = get_command("help_precedence2", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence2")
         self.assertIn(
             "Test minimal TyperCommand subclass - class member", buffer.getvalue()
@@ -729,7 +729,7 @@ class TestHelpPrecedence(TestCase):
 
     def test_help_precedence3(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence3", stdout=buffer)
+        cmd = get_command("help_precedence3", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence3")
         self.assertTrue(
             re.search(
@@ -743,7 +743,7 @@ class TestHelpPrecedence(TestCase):
 
     def test_help_precedence4(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence4", stdout=buffer)
+        cmd = get_command("help_precedence4", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence4")
         self.assertIn(
             "Test minimal TyperCommand subclass - callback docstring", buffer.getvalue()
@@ -757,7 +757,7 @@ class TestHelpPrecedence(TestCase):
 
     def test_help_precedence5(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence5", stdout=buffer)
+        cmd = get_command("help_precedence5", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence5")
         self.assertIn(
             "Test minimal TyperCommand subclass - command method", buffer.getvalue()
@@ -765,7 +765,7 @@ class TestHelpPrecedence(TestCase):
 
     def test_help_precedence6(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence6", stdout=buffer)
+        cmd = get_command("help_precedence6", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence6")
         self.assertIn(
             "Test minimal TyperCommand subclass - docstring", buffer.getvalue()

@@ -22,6 +22,7 @@ from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
+from django.core.management.color import no_style
 from django.utils.translation import gettext as _
 
 # this has to go here before rich Consoles are instantiated by Typer
@@ -778,7 +779,13 @@ class TyperParser:
         )
         command_node = self.django_command.get_subcommand(*command_path)
         with contextlib.redirect_stdout(self.django_command.stdout):
+            unset = False
+            if self.django_command.style == no_style():
+                os.environ['NO_COLOR'] = '1'
+                unset = True
             command_node.print_help()
+            if unset:
+                os.environ.pop('NO_COLOR')
 
     def parse_args(self, args=None, namespace=None):
         try:
