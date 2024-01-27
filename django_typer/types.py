@@ -102,6 +102,7 @@ NoColor = Annotated[
     Option(
         "--no-color",
         help=_("Don't colorize the command output."),
+        is_eager=True,
         rich_help_panel=COMMON_PANEL,
     ),
 ]

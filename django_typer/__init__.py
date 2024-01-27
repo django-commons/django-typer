@@ -21,8 +21,6 @@ from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
-from django.core.management.color import no_style
-from django.utils.functional import lazy
 from django.utils.translation import gettext as _
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
@@ -72,19 +70,18 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 behavior should align with native django commands
 """
 
-# try:
-#     from typer import rich_utils
-#     def get_color_system(default):
-#         return None
-#         ctx = click.get_current_context(silent=True)
-#         if ctx:
-#             return None if ctx.django_command.style == no_style() else default
-#         return default
-
-#     COLOR_SYSTEM = lazy(get_color_system, str)
-#     rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
-# except ImportError:
-#     pass
+try:
+    from typer import rich_utils
+    console_getter = rich_utils._get_rich_console
+    def get_console():
+        console = console_getter()
+        ctx = click.get_current_context(silent=True)
+        if ctx and ctx.params.get('no_color', False):
+            console._color_system = None
+        return console
+    rich_utils._get_rich_console = get_console
+except ImportError:
+    pass
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
