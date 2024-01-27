@@ -9,7 +9,7 @@ from django.apps import AppConfig, apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import CommandError
 from django.db.models import Model
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 
 class ModelObjectParser:
@@ -61,15 +61,12 @@ class ModelObjectParser:
             return self.model_cls.objects.get(**{self.lookup_field: value})
         except self.model_cls.DoesNotExist as err:
             if self.on_error:
-                self.on_error(self.model_cls, value, err)
-            else:
-                raise CommandError(
-                    _(
-                        '{model} "{value}" does not exist!'.format(
-                            model=self.model_cls.__name__, value=value
-                        )
-                    )
+                return self.on_error(self.model_cls, value, err)
+            raise CommandError(
+                _('{model} "{value}" does not exist!').format(
+                    model=self.model_cls.__name__, value=value
                 )
+            ) from err
 
 
 def parse_app_label(label: t.Union[str, AppConfig]):
@@ -85,14 +82,14 @@ def parse_app_label(label: t.Union[str, AppConfig]):
         return label
     try:
         return apps.get_app_config(label)
-    except LookupError:
+    except LookupError as err:
         label = label.lower()
         for cfg in apps.get_app_configs():
             if cfg.label.lower() == label:
                 return cfg
-            elif cfg.name.lower() == label:
+            if cfg.name.lower() == label:
                 return cfg
 
-    raise CommandError(
-        _("{label} does not match any installed app label.".format(label=label))
-    )
+        raise CommandError(
+            _("{label} does not match any installed app label.").format(label=label)
+        ) from err

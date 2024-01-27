@@ -113,6 +113,7 @@ DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
 python_files = "tests.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 
+
 addopts = [
   "--strict-markers",
   "--cov=django_typer",
@@ -140,3 +141,9 @@ max-args=30
 
 [tool.pylint.'MASTER']
 ignore="tests"
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+    'R0903',  # to few public methods - seriously?
+    'W0613', # unused argument - unavoidable in generic base interfaces
+]

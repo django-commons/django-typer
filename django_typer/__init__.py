@@ -23,7 +23,7 @@ from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
 from django.utils.functional import lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -87,7 +87,7 @@ behavior should align with native django commands
 #     pass
 
 
-def traceback_config():
+def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
     """
     Fetch the rich traceback installation parameters from our settings. By default
     rich tracebacks are on with show_locals = True. If the config is set to False
@@ -99,7 +99,7 @@ def traceback_config():
     cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
     if cfg:
         return {"show_locals": True, **cfg}
-    return cfg
+    return bool(cfg)
 
 
 def get_command(
