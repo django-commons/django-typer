@@ -781,11 +781,13 @@ class TyperParser:
         with contextlib.redirect_stdout(self.django_command.stdout):
             unset = False
             if self.django_command.style == no_style():
+                unset = os.environ.get('NO_COLOR', None)
                 os.environ['NO_COLOR'] = '1'
-                unset = True
             command_node.print_help()
-            if unset:
+            if unset is not False:
                 os.environ.pop('NO_COLOR')
+                if unset:
+                    os.environ['NO_COLOR'] = unset
 
     def parse_args(self, args=None, namespace=None):
         try:
