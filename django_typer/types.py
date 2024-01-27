@@ -3,9 +3,10 @@ Common types for command line argument specification.
 """
 
 import sys
+import os
 from pathlib import Path
 from typing import Annotated, Optional
-
+from django.core.management import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -21,6 +22,22 @@ def print_version(context, _, value):
         context.django_command.stdout.write(context.django_command.get_version())
         sys.exit()
 
+
+def set_no_color(context, param, value):
+    """
+    A callback to run the get_version() routine of the
+    command when --version is specified.
+    """
+    if value:
+        if not context.params.get('force_color', False):
+            os.environ["NO_COLOR"] = "1"
+            try:
+                from rich.console import Console
+                Console._environ = os.environ
+            except ImportError:
+                pass
+        else:
+            raise CommandError(_('--no-color and --force-color are mutually exclusive.'))
 
 """
 https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
@@ -103,6 +120,7 @@ NoColor = Annotated[
         "--no-color",
         help=_("Don't colorize the command output."),
         is_eager=True,
+        callback=set_no_color,
         rich_help_panel=COMMON_PANEL,
     ),
 ]
@@ -116,6 +134,7 @@ ForceColor = Annotated[
     Option(
         "--force-color",
         help=_("Force colorization of the command output."),
+        is_eager=True,
         rich_help_panel=COMMON_PANEL,
     ),
 ]

@@ -11,6 +11,7 @@ r"""
 import contextlib
 import inspect
 import sys
+import os
 import typing as t
 from copy import deepcopy
 from importlib import import_module
@@ -22,6 +23,10 @@ from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
+
+if '--no-color' in sys.argv and '--force-color' not in sys.argv:
+    os.environ["NO_COLOR"] = "1"
+
 from typer import Typer
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -70,23 +75,6 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 behavior should align with native django commands
 """
 
-try:
-    # todo - this monkey patch is required because typer does
-    # not expose a good way to custom configure the Console objects
-    # it uses.
-    from typer import rich_utils
-    console_getter = rich_utils._get_rich_console
-    def get_console():
-        console = console_getter()
-        ctx = click.get_current_context(silent=True)
-        if ctx and ctx.params.get('no_color', False):
-            console._color_system = None
-        return console
-    rich_utils._get_rich_console = get_console
-except ImportError:
-    pass
-
-
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
     """
     Fetch the rich traceback installation parameters from our settings. By default
@@ -132,7 +120,7 @@ def _common_options(
     force_color: ForceColor = False,
     skip_checks: SkipChecks = False,
 ):
-    pass  # pragma: no cover
+    pass
 
 
 # cache common params to avoid this extra work on every command
@@ -162,14 +150,6 @@ class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
 
     def _get_kwargs(self):
         return {"args": self.args, **COMMON_DEFAULTS}
-
-
-# class _Augment:
-#     pass
-
-
-# def augment(cls):
-#     return type('', (_Augment, cls), {})
 
 
 class Context(TyperContext):
@@ -378,11 +358,10 @@ class GroupFunction(Typer):
         self.django_command_cls.typer_app.add_typer(deepcopy(self))
 
     def callback(self, *args, **kwargs):
-        raise NotImplementedError(
-            _(
-                "callback is not supported - the function decorated by group() is the callback."
-            )
-        )
+        raise NotImplementedError(_(
+            "callback is not supported - the function decorated by group() is the "
+            "callback."
+        ))
 
     def command(
         self,

@@ -38,31 +38,6 @@ manage_py = Path(__file__).parent.parent.parent / "manage.py"
 TESTS_DIR = Path(__file__).parent
 
 
-class NoColorMixin:
-    default_color_system: str
-
-    def setUp(self):
-        # colors in terminal output screw up github CI runs - todo less intrusive
-        # way around this??
-        try:
-            from typer import rich_utils
-
-            self.default_color_system = rich_utils.COLOR_SYSTEM
-            rich_utils.COLOR_SYSTEM = None
-        except ImportError:
-            pass
-        return super().setUp()
-
-    def tearDown(self):
-        try:
-            from typer import rich_utils
-
-            rich_utils.COLOR_SYSTEM = self.default_color_system
-        except ImportError:
-            pass
-        return super().tearDown()
-
-
 def get_named_arguments(function):
     sig = inspect.signature(function)
     return [
@@ -72,14 +47,18 @@ def get_named_arguments(function):
     ]
 
 
-def run_command(command, *args, parse_json=True):
+def run_command(command, *args, parse_json=True, no_color=True):
     cwd = os.getcwd()
     try:
+        env = os.environ.copy()
+        if no_color:
+            env['NO_COLOR'] = '1'
         os.chdir(manage_py.parent)
         result = subprocess.run(
             [sys.executable, f"./{manage_py.name}", command, *args],
             capture_output=True,
             text=True,
+            env=env
         )
 
         # Check the return code to ensure the script ran successfully
@@ -100,6 +79,11 @@ def run_command(command, *args, parse_json=True):
 
 
 class BasicTests(TestCase):
+
+    def test_common_options_function(self):
+        from django_typer import _common_options
+        self.assertIsNone(_common_options())
+
     def test_command_line(self):
         self.assertEqual(
             run_command("basic", "a1", "a2"),
@@ -358,7 +342,7 @@ class TestGetCommand(TestCase):
             get_command("callback1", "init")
 
 
-class CallbackTests(NoColorMixin, TestCase):
+class CallbackTests(TestCase):
     cmd_name = "callback1"
 
     def test_helps(self, top_level_only=False):
@@ -601,12 +585,12 @@ class TestDjangoParameters(TestCase):
 
     def test_color_params(self):
         for cmd, args in self.commands:
-            run_command(cmd, "--no-color", *args)
+            run_command(cmd, "--no-color", *args, no_color=False)
             self.assertEqual(read_django_parameters().get("no_color", False), True)
-            run_command(cmd, "--force-color", *args)
+            run_command(cmd, "--force-color", *args, no_color=False)
             self.assertEqual(read_django_parameters().get("no_color", True), False)
 
-            result = run_command(cmd, "--force-color", "--no-color", *args)
+            result = run_command(cmd, "--force-color", "--no-color", *args, no_color=False)
             self.assertTrue("CommandError" in result)
             self.assertTrue("--no-color" in result)
             self.assertTrue("--force-color" in result)
@@ -709,7 +693,7 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(read_django_parameters().get("verbosity", None), 0)
 
 
-class TestHelpPrecedence(NoColorMixin, TestCase):
+class TestHelpPrecedence(TestCase):
     def test_help_precedence1(self):
         buffer = StringIO()
         cmd = get_command("help_precedence1", stdout=buffer)
@@ -783,7 +767,7 @@ class TestHelpPrecedence(NoColorMixin, TestCase):
         )
 
 
-class TestGroups(NoColorMixin, TestCase):
+class TestGroups(TestCase):
     """
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
