@@ -38,6 +38,30 @@ manage_py = Path(__file__).parent.parent.parent / "manage.py"
 TESTS_DIR = Path(__file__).parent
 
 
+class NoColorMixin:
+
+    default_color_system: str
+    
+    def setUp(self):
+        # colors in terminal output screw up github CI runs - todo less intrusive
+        # way around this??
+        try:
+            from typer import rich_utils
+            self.default_color_system = rich_utils.COLOR_SYSTEM
+            rich_utils.COLOR_SYSTEM = None
+        except ImportError:
+            pass
+        return super().setUp()
+    
+    def tearDown(self):
+        try:
+            from typer import rich_utils
+            rich_utils.COLOR_SYSTEM = self.default_color_system
+        except ImportError:
+            pass
+        return super().tearDown()
+
+
 def get_named_arguments(function):
     sig = inspect.signature(function)
     return [
@@ -684,7 +708,8 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(read_django_parameters().get("verbosity", None), 0)
 
 
-class TestHelpPrecedence(TestCase):
+class TestHelpPrecedence(NoColorMixin, TestCase):
+
     def test_help_precedence1(self):
         buffer = StringIO()
         cmd = get_command("help_precedence1", stdout=buffer)
@@ -758,32 +783,11 @@ class TestHelpPrecedence(TestCase):
         )
 
 
-class TestGroups(TestCase):
+class TestGroups(NoColorMixin, TestCase):
     """
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
     """
-
-    default_color_system: str
-
-    def setUp(self) -> None:
-        # colors in terminal output screw up github CI runs - todo less intrusive
-        # way around this??
-        try:
-            from typer import rich_utils
-            self.default_color_system = rich_utils.COLOR_SYSTEM
-            rich_utils.COLOR_SYSTEM = None
-        except ImportError:
-            pass
-        return super().setUp()
-    
-    def tearDown(self) -> None:
-        try:
-            from typer import rich_utils
-            rich_utils.COLOR_SYSTEM = self.default_color_system
-        except ImportError:
-            pass
-        return super().tearDown()
 
     def test_group_call(self):
         with self.assertRaises(NotImplementedError):
