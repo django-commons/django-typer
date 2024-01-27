@@ -27,22 +27,24 @@ def print_version(context, _, value):
 
 def set_no_color(context, param, value):
     """
-    A callback to run the get_version() routine of the
-    command when --version is specified.
+    If the value was provided set it on the command.
     """
     if value:
-        if not context.params.get("force_color", False):
-            os.environ["NO_COLOR"] = "1"
-            try:
-                from rich.console import Console
-
-                Console._environ = os.environ
-            except ImportError:
-                pass
-        else:
+        context.django_command.no_color = value
+        if context.params.get("force_color", False):
             raise CommandError(
-                _("--no-color and --force-color are mutually exclusive.")
+                _("The --no-color and --force-color options can't be used together.")
             )
+    return value
+
+
+def set_force_color(context, param, value):
+    """
+    If the value was provided set it on the command.
+    """
+    if value:
+        context.django_command.force_color = value
+    return value
 
 
 # https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
@@ -123,7 +125,7 @@ NoColor = Annotated[
     Option(
         "--no-color",
         help=_("Don't colorize the command output."),
-        is_eager=True,
+        # is_eager=True,
         callback=set_no_color,
         rich_help_panel=COMMON_PANEL,
     ),
@@ -138,7 +140,8 @@ ForceColor = Annotated[
     Option(
         "--force-color",
         help=_("Force colorization of the command output."),
-        is_eager=True,
+        # is_eager=True,
+        callback=set_force_color,
         rich_help_panel=COMMON_PANEL,
     ),
 ]

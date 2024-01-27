@@ -132,7 +132,7 @@ class Command(TyperCommand):
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                 )
-            except subprocess.CalledProcessError:
+            except (subprocess.CalledProcessError, FileNotFoundError):
                 return cmd_pth.absolute()
         return cmd_pth.name
 
@@ -392,7 +392,7 @@ class Command(TyperCommand):
         cmd_str: t.Annotated[
             t.Optional[str],
             Argument(
-                "command",
+                metavar="command",
                 help=_("The command string to generate completion suggestions for."),
             ),
         ] = None,
@@ -459,9 +459,6 @@ class Command(TyperCommand):
             prog_name=sys.argv[0],
             complete_var=self.COMPLETE_VAR,
         ).get_completion_args()
-
-        with open("test.txt", "w", encoding="utf-8") as f:
-            f.write(f'{args}\n"{incomplete}"')
 
         def call_fallback(fb: t.Optional[str]) -> None:
             fallback = import_string(fb) if fb else self.django_fallback

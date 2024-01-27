@@ -22,7 +22,6 @@ from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
-from django.core.management.color import no_style
 from django.utils.translation import gettext as _
 
 # this has to go here before rich Consoles are instantiated by Typer
@@ -779,15 +778,7 @@ class TyperParser:
         )
         command_node = self.django_command.get_subcommand(*command_path)
         with contextlib.redirect_stdout(self.django_command.stdout):
-            unset = False
-            if self.django_command.style == no_style():
-                unset = os.environ.get('NO_COLOR', None)
-                os.environ['NO_COLOR'] = '1'
             command_node.print_help()
-            if unset is not False:
-                os.environ.pop('NO_COLOR')
-                if unset:
-                    os.environ['NO_COLOR'] = unset
 
     def parse_args(self, args=None, namespace=None):
         try:
@@ -850,6 +841,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         name: str
         command: t.Union[TyperCommandWrapper, TyperGroupWrapper]
         context: TyperContext
+        django_command: "TyperCommand"
         parent: t.Optional["CommandNode"] = None
         children: t.Dict[str, "CommandNode"]
 
@@ -858,16 +850,26 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             name: str,
             command: t.Union[TyperCommandWrapper, TyperGroupWrapper],
             context: TyperContext,
+            django_command: "TyperCommand",
             parent: t.Optional["CommandNode"] = None,
         ):
             self.name = name
             self.command = command
             self.context = context
+            self.django_command = django_command
             self.parent = parent
             self.children = {}
 
         def print_help(self):
+            unset = None
+            if self.django_command.no_color:
+                unset = os.environ.get("NO_COLOR", None)
+                os.environ["NO_COLOR"] = "1"
             self.command.get_help(self.context)
+            if unset:
+                os.environ["NO_COLOR"] = unset
+            else:
+                os.environ.pop("NO_COLOR", None)
 
         def get_command(self, *command_path: str):
             if not command_path:
@@ -878,6 +880,8 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                 raise ValueError(f'No such command "{command_path[0]}"')
 
     typer_app: Typer
+    no_color: bool = False
+    force_color: bool = False
     _num_commands: int = 0
     _has_callback: bool = False
     _root_groups: int = 0
@@ -888,10 +892,12 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         self,
         stdout: t.Optional[t.IO[str]] = None,
         stderr: t.Optional[t.IO[str]] = None,
-        no_color: bool = False,
-        force_color: bool = False,
+        no_color: bool = no_color,
+        force_color: bool = force_color,
         **kwargs,
     ):
+        self.force_color = force_color
+        self.no_color = no_color
         super().__init__(
             stdout=stdout,
             stderr=stderr,
@@ -935,7 +941,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         node: t.Optional[CommandNode] = None,
     ):
         ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
-        current = self.CommandNode(cmd.name, cmd, ctx, parent=node)
+        current = self.CommandNode(cmd.name, cmd, ctx, self, parent=node)
         if node:
             node.children[cmd.name] = current
         for cmd in self._filter_commands(ctx):
@@ -979,3 +985,10 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             complete_var=None,
             prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
         )
+
+    def execute(self, *args, **options):
+        if options.get("no_color", None) is not None:
+            self.no_color = options["no_color"]
+        if options.get("force_color", None) is not None:
+            self.force_color = options["force_color"]
+        return super().execute(*args, **options)

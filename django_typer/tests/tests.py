@@ -589,9 +589,13 @@ class TestDjangoParameters(TestCase):
     def test_color_params(self):
         for cmd, args in self.commands:
             run_command(cmd, "--no-color", *args, no_color=False)
-            self.assertEqual(read_django_parameters().get("no_color", False), True)
+            params = read_django_parameters()
+            self.assertEqual(params.get("no_color", False), True)
+            self.assertEqual(params.get("no_color_attr", False), True)
             run_command(cmd, "--force-color", *args, no_color=False)
-            self.assertEqual(read_django_parameters().get("no_color", True), False)
+            params = read_django_parameters()
+            self.assertEqual(params.get("no_color", True), False)
+            self.assertEqual(params.get("no_color_attr", True), False)
 
             result = run_command(
                 cmd, "--force-color", "--no-color", *args, no_color=False
@@ -601,9 +605,13 @@ class TestDjangoParameters(TestCase):
             self.assertTrue("--force-color" in result)
 
             call_command(cmd, args, no_color=True)
-            self.assertEqual(read_django_parameters().get("no_color", False), True)
+            params = read_django_parameters()
+            self.assertEqual(params.get("no_color", False), True)
+            self.assertEqual(params.get("no_color_attr", False), True)
             call_command(cmd, args, force_color=True)
-            self.assertEqual(read_django_parameters().get("no_color", True), False)
+            params = read_django_parameters()
+            self.assertEqual(params.get("no_color", True), False)
+            self.assertEqual(params.get("no_color_attr", True), False)
             with self.assertRaises(BaseException):
                 call_command(cmd, args, force_color=True, no_color=True)
 

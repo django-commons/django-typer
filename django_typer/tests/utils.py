@@ -19,6 +19,8 @@ def log_django_parameters(django_command, **extra):
                 "settings": settings.SETTINGS_FILE,
                 "python_path": sys.path,
                 "no_color": django_command.style == no_style(),
+                "no_color_attr": django_command.no_color,
+                "force_color_attr": django_command.force_color,
                 **extra,
             },
             f,
