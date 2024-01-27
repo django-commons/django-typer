@@ -821,11 +821,12 @@ class TestGroups(TestCase):
             if app == "test_app" and cmds[-1] in ["strip", "setting", "print"]:
                 with self.assertRaises(ValueError):
                     cmd = get_command(cmds[0], stdout=buffer, no_color=True)
+                    self.assertTrue(cmd.no_color)
                     cmd.print_help("./manage.py", *cmds)
                 continue
 
             buffer = StringIO()
-            cmd = get_command(cmds[0], stdout=buffer)
+            cmd = get_command(cmds[0], stdout=buffer, no_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
             self.assertGreater(

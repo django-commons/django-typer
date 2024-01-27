@@ -987,8 +987,13 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         )
 
     def execute(self, *args, **options):
+        no_color = self.no_color
+        force_color = self.force_color
         if options.get("no_color", None) is not None:
             self.no_color = options["no_color"]
         if options.get("force_color", None) is not None:
             self.force_color = options["force_color"]
-        return super().execute(*args, **options)
+        result = super().execute(*args, **options)
+        self.no_color = no_color
+        self.force_color = force_color
+        return result
