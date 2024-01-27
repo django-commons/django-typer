@@ -39,23 +39,24 @@ TESTS_DIR = Path(__file__).parent
 
 
 class NoColorMixin:
-
     default_color_system: str
-    
+
     def setUp(self):
         # colors in terminal output screw up github CI runs - todo less intrusive
         # way around this??
         try:
             from typer import rich_utils
+
             self.default_color_system = rich_utils.COLOR_SYSTEM
             rich_utils.COLOR_SYSTEM = None
         except ImportError:
             pass
         return super().setUp()
-    
+
     def tearDown(self):
         try:
             from typer import rich_utils
+
             rich_utils.COLOR_SYSTEM = self.default_color_system
         except ImportError:
             pass
@@ -570,7 +571,7 @@ class CallbackTests(TestCase):
         )
 
 
-class Callback2Tests(CallbackTests):
+class Callback2Tests(NoColorMixin, CallbackTests):
     cmd_name = "callback2"
 
     def test_call_command(self):
@@ -709,7 +710,6 @@ class TestDjangoParameters(TestCase):
 
 
 class TestHelpPrecedence(NoColorMixin, TestCase):
-
     def test_help_precedence1(self):
         buffer = StringIO()
         cmd = get_command("help_precedence1", stdout=buffer)

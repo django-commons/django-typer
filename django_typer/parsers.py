@@ -4,11 +4,12 @@ Pass these parsers to the `parser` argument of typer.Option and
 typer.Argument.
 """
 import typing as t
+
+from django.apps import AppConfig, apps
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import CommandError
 from django.db.models import Model
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
-from django.apps import apps, AppConfig
 
 
 class ModelObjectParser:
@@ -27,16 +28,16 @@ class ModelObjectParser:
     error_handler = t.Callable[[t.Type[Model], str, ObjectDoesNotExist], None]
 
     model_cls: t.Type[Model]
-    lookup_field: str = 'pk'
+    lookup_field: str = "pk"
     on_error: t.Optional[error_handler] = None
 
-    __name__ = 'ModelObjectParser'  # typer internals expect this
+    __name__ = "ModelObjectParser"  # typer internals expect this
 
     def __init__(
         self,
         model_cls: t.Type[Model],
         lookup_field: str = lookup_field,
-        on_error: t.Optional[error_handler] = on_error
+        on_error: t.Optional[error_handler] = on_error,
     ):
         self.model_cls = model_cls
         self.lookup_field = lookup_field
@@ -63,10 +64,11 @@ class ModelObjectParser:
                 self.on_error(self.model_cls, value, err)
             else:
                 raise CommandError(
-                    _('{model} "{value}" does not exist!'.format(
-                        model=self.model_cls.__name__,
-                        value=value
-                    ))
+                    _(
+                        '{model} "{value}" does not exist!'.format(
+                            model=self.model_cls.__name__, value=value
+                        )
+                    )
                 )
 
 
@@ -90,7 +92,7 @@ def parse_app_label(label: t.Union[str, AppConfig]):
                 return cfg
             elif cfg.name.lower() == label:
                 return cfg
-            
+
     raise CommandError(
-        _('{label} does not match any installed app label.'.format(label=label))
+        _("{label} does not match any installed app label.".format(label=label))
     )

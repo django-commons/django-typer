@@ -16,7 +16,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
     precision = 2
     verbosity = 1
 
-    suppressed_base_arguments = ['--version']
+    suppressed_base_arguments = ["--version"]
 
     @initialize()
     def init(self, verbosity: types.Verbosity = verbosity):

@@ -5,26 +5,21 @@ for various kinds of django objects.
 
 import typing as t
 from types import MethodType
+
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
-from django.db.models import Q, Model, Max
-from django.db.models import (
-    IntegerField,
-    FloatField,
-    DecimalField,
+from django.apps import apps
+from django.db.models import (  # TODO:; GenericIPAddressField,; TimeField,; DateField,; DateTimeField,; DurationField,; FilePathField,; FileField
     CharField,
+    DecimalField,
+    FloatField,
+    IntegerField,
+    Max,
+    Model,
+    Q,
     TextField,
     UUIDField,
-    # TODO:
-    # GenericIPAddressField,
-    # TimeField,
-    # DateField,
-    # DateTimeField,
-    # DurationField,
-    # FilePathField,
-    # FileField
 )
-from django.apps import apps
 
 
 class ModelObjectCompleter:
@@ -40,9 +35,9 @@ class ModelObjectCompleter:
     :param lookup_field: The name of the model field to use for lookup.
     :param help_field: The name of the model field to use for help text or None if
         no help text should be provided.
-    :param query: A callable that accepts the completer object instance, the click 
-        context, the click parameter, and the incomplete string and returns a Q 
-        object to use for filtering the queryset. The default query will use the 
+    :param query: A callable that accepts the completer object instance, the click
+        context, the click parameter, and the incomplete string and returns a Q
+        object to use for filtering the queryset. The default query will use the
         relevant class methods depending on the lookup field class. See the
         query methods for details.
     :param limit: The maximum number of completion items to return. If None, all
@@ -56,20 +51,18 @@ class ModelObjectCompleter:
         given for the parameter on the command line.
     """
 
-    QueryBuilder = t.Callable[['ModelObjectCompleter', Context, Parameter, str], Q]
+    QueryBuilder = t.Callable[["ModelObjectCompleter", Context, Parameter, str], Q]
 
     model_cls: t.Type[Model]
-    lookup_field: str = 'id'
+    lookup_field: str = "id"
     help_field: t.Optional[str] = None
     query: QueryBuilder
     limit: t.Optional[int] = 50
     case_insensitive: bool = True
     distinct: bool = True
-    
-    def default_query(self, 
-        context: Context,
-        parameter: Parameter,
-        incomplete: str
+
+    def default_query(
+        self, context: Context, parameter: Parameter, incomplete: str
     ) -> Q:
         """
         The default completion query builder. This method will route to the
@@ -94,14 +87,9 @@ class ModelObjectCompleter:
             return self.uuid_query(context, parameter, incomplete)
         elif issubclass(field.__class__, (FloatField, DecimalField)):
             return self.float_query(context, parameter, incomplete)
-        raise ValueError(f'Unsupported lookup field class: {field.__class__.__name__}')
-    
-    def int_query(
-        self,
-        context: Context,
-        parameter: Parameter,
-        incomplete: str
-    ) -> Q:
+        raise ValueError(f"Unsupported lookup field class: {field.__class__.__name__}")
+
+    def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
         The default completion query builder for integer fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -116,20 +104,17 @@ class ModelObjectCompleter:
         :raises TypeError: If the incomplete string is not a valid integer.
         """
         lower = int(incomplete)
-        upper = lower+1
-        max_val = self.model_cls.objects.aggregate(Max(self.lookup_field))['id__max']
-        qry = Q(**{f'{self.lookup_field}': lower})
-        while (lower:=lower*10) <= max_val:
+        upper = lower + 1
+        max_val = self.model_cls.objects.aggregate(Max(self.lookup_field))["id__max"]
+        qry = Q(**{f"{self.lookup_field}": lower})
+        while (lower := lower * 10) <= max_val:
             upper *= 10
-            qry |= Q(**{f'{self.lookup_field}__gte': lower}) & Q(**{f'{self.lookup_field}__lt': upper})
+            qry |= Q(**{f"{self.lookup_field}__gte": lower}) & Q(
+                **{f"{self.lookup_field}__lt": upper}
+            )
         return qry
-    
-    def float_query(
-        self,
-        context: Context,
-        parameter: Parameter,
-        incomplete: str
-    ):
+
+    def float_query(self, context: Context, parameter: Parameter, incomplete: str):
         """
         The default completion query builder for float fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -143,12 +128,14 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is not a valid float.
         :raises TypeError: If the incomplete string is not a valid float.
         """
-        if '.' not in incomplete:
+        if "." not in incomplete:
             return self.int_query(context, parameter, incomplete)
-        incomplete = incomplete.rstrip('0')
+        incomplete = incomplete.rstrip("0")
         lower = float(incomplete)
         upper = lower + float(f'0.{"0"*(len(incomplete)-incomplete.index(".")-2)}1')
-        return Q(**{f'{self.lookup_field}__gte': lower}) & Q(**{f'{self.lookup_field}__lt': upper})
+        return Q(**{f"{self.lookup_field}__gte": lower}) & Q(
+            **{f"{self.lookup_field}__lt": upper}
+        )
 
     def text_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
@@ -162,16 +149,16 @@ class ModelObjectCompleter:
         :return: A Q object to use for filtering the queryset.
         """
         if self.case_insensitive:
-            return Q(**{f'{self.lookup_field}__istartswith': incomplete})
-        return Q(**{f'{self.lookup_field}__startswith': incomplete})
-    
+            return Q(**{f"{self.lookup_field}__istartswith": incomplete})
+        return Q(**{f"{self.lookup_field}__startswith": incomplete})
+
     def uuid_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
         The default completion query builder for UUID fields. This method will
         return a Q object that will match any value that starts with the incomplete
         string. The incomplete string will be stripped of all non-alphanumeric
         characters and padded with zeros to 32 characters. For example, if the
-        incomplete string is "a", the query will match 
+        incomplete string is "a", the query will match
         a0000000-0000-0000-0000-000000000000 to affffffff-ffff-ffff-ffff-ffffffffffff.
 
         :param context: The click context.
@@ -181,25 +168,27 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is too long or contains invalid
             UUID characters. Anything other than (0-9a-fA-F).
         """
-        uuid = ''
+        uuid = ""
         for char in incomplete:
             if char.isalnum():
                 uuid += char
         if len(uuid) > 32:
-            raise ValueError(f'Too many UUID characters: {incomplete}')
-        min_uuid = uuid + '0'*(32-len(uuid))
-        max_uuid = uuid + 'f'*(32-len(uuid))
-        return Q(**{f'{self.lookup_field}__gte': min_uuid}) & Q(**{f'{self.lookup_field}__lte': max_uuid})
+            raise ValueError(f"Too many UUID characters: {incomplete}")
+        min_uuid = uuid + "0" * (32 - len(uuid))
+        max_uuid = uuid + "f" * (32 - len(uuid))
+        return Q(**{f"{self.lookup_field}__gte": min_uuid}) & Q(
+            **{f"{self.lookup_field}__lte": max_uuid}
+        )
 
     def __init__(
-            self,
-            model_cls: t.Type[Model],
-            lookup_field: str = lookup_field,
-            help_field: t.Optional[str] = help_field,
-            query: QueryBuilder = default_query,
-            limit: t.Optional[int] = limit,
-            case_insensitive: bool = case_insensitive,
-            distinct: bool = distinct
+        self,
+        model_cls: t.Type[Model],
+        lookup_field: str = lookup_field,
+        help_field: t.Optional[str] = help_field,
+        query: QueryBuilder = default_query,
+        limit: t.Optional[int] = limit,
+        case_insensitive: bool = case_insensitive,
+        distinct: bool = distinct,
     ):
         self.model_cls = model_cls
         self.lookup_field = lookup_field
@@ -210,10 +199,7 @@ class ModelObjectCompleter:
         self.distinct = distinct
 
     def __call__(
-        self,
-        context: Context,
-        parameter: Parameter,
-        incomplete: str
+        self, context: Context, parameter: Parameter, incomplete: str
     ) -> t.Union[t.List[CompletionItem], t.List[str]]:
         """
         The completer method. This method will return a list of CompletionItem
@@ -228,7 +214,7 @@ class ModelObjectCompleter:
         :param incomplete: The incomplete string.
         :return: A list of CompletionItem objects.
         """
-        
+
         completion_qry = Q()
 
         if incomplete:
@@ -240,8 +226,11 @@ class ModelObjectCompleter:
         return [
             CompletionItem(
                 value=str(getattr(obj, self.lookup_field)),
-                help=getattr(obj, self.help_field, None) if self.help_field else ''
-            ) for obj in self.model_cls.objects.filter(completion_qry).distinct()[0:self.limit]
+                help=getattr(obj, self.help_field, None) if self.help_field else "",
+            )
+            for obj in self.model_cls.objects.filter(completion_qry).distinct()[
+                0 : self.limit
+            ]
         ]
 
 
@@ -257,6 +246,7 @@ def complete_app_label(ctx: Context, param: Parameter, incomplete: str):
     """
     present = [app.label for app in (ctx.params.get(param.name) or [])]
     return [
-        app.label for app in apps.get_app_configs()
+        app.label
+        for app in apps.get_app_configs()
         if app.label.lower().startswith(incomplete.lower()) and app.label not in present
     ]

@@ -54,14 +54,7 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2023 Brian Kohan"
 
 
-__all__ = [
-    "TyperCommand",
-    "Context",
-    "initialize",
-    "command",
-    "group",
-    "get_command"
-]
+__all__ = ["TyperCommand", "Context", "initialize", "command", "group", "get_command"]
 
 """
 TODO
@@ -92,6 +85,7 @@ behavior should align with native django commands
 #     rich_utils.COLOR_SYSTEM = COLOR_SYSTEM(rich_utils.COLOR_SYSTEM)
 # except ImportError:
 #     pass
+
 
 def traceback_config():
     """
@@ -332,7 +326,8 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
             return [
                 param
                 for param in _get_common_params()
-                if param.name not in (self.django_command.suppressed_base_arguments or [])
+                if param.name
+                not in (self.django_command.suppressed_base_arguments or [])
             ]
         return super().common_params()
 
@@ -340,15 +335,13 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
     def common_params(self):
         if (
-            (
-                hasattr(self, "django_command") and
-                self.django_command._has_callback
-            ) or getattr(self, "common_init", False)
-        ):
+            hasattr(self, "django_command") and self.django_command._has_callback
+        ) or getattr(self, "common_init", False):
             return [
                 param
                 for param in _get_common_params()
-                if param.name not in (self.django_command.suppressed_base_arguments or [])
+                if param.name
+                not in (self.django_command.suppressed_base_arguments or [])
             ]
         return super().common_params()
 
@@ -701,7 +694,7 @@ class _TyperCommandMeta(type):
                 "_handle": attrs.pop("handle", None),
                 **attrs,
                 "handle": handle,
-                "typer_app": typer_app
+                "typer_app": typer_app,
             }
 
         return super().__new__(mcs, name, bases, attrs)
@@ -713,9 +706,9 @@ class _TyperCommandMeta(type):
         if cls.typer_app is not None:
             cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
             cls.suppressed_base_arguments = {
-                arg.lstrip('--').replace('-', '_')
+                arg.lstrip("--").replace("-", "_")
                 for arg in cls.suppressed_base_arguments
-            } # per django docs - allow these to be specified by either the option or param name
+            }  # per django docs - allow these to be specified by either the option or param name
 
             def get_ctor(attr):
                 return getattr(
@@ -763,7 +756,11 @@ class _TyperCommandMeta(type):
                     cls=type(
                         "_AdaptedCallback",
                         (TyperGroupWrapper,),
-                        {"django_command": cls, "callback_is_method": False, "common_init": True},
+                        {
+                            "django_command": cls,
+                            "callback_is_method": False,
+                            "common_init": True,
+                        },
                     )
                 )(lambda: None)
 
@@ -869,7 +866,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     # we do not use verbosity because the base command does not do anything with it
     # if users want to use a verbosity flag like the base django command adds
     # they can use the type from django_typer.types.Verbosity
-    suppressed_base_arguments: t.Optional[t.Iterable[str]] = {'verbosity'}
+    suppressed_base_arguments: t.Optional[t.Iterable[str]] = {"verbosity"}
 
     class CommandNode:
         name: str

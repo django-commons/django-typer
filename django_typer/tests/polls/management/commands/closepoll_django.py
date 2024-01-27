@@ -28,6 +28,6 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
             )
-            
+
             if options["delete"]:
                 poll.delete()

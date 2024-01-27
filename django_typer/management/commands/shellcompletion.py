@@ -61,7 +61,13 @@ class Command(TyperCommand):
     requires_migrations_checks = False
 
     # remove unnecessary django command base parameters - these just clutter the help
-    suppressed_base_arguments = {'version', 'skip_checks', 'no_color', 'force_color', 'verbosity'}
+    suppressed_base_arguments = {
+        "version",
+        "skip_checks",
+        "no_color",
+        "force_color",
+        "verbosity",
+    }
 
     _shell: Shells
 
@@ -377,7 +383,7 @@ class Command(TyperCommand):
             def get_completion_args(self) -> t.Tuple[t.List[str], str]:
                 cwords = split_arg_string(command)
                 if command[-1].isspace():
-                    cwords.append('')
+                    cwords.append("")
                 # allow users to not specify the manage script, but allow for it
                 # if they do by lopping it off - same behavior as upstream classes
                 try:
@@ -411,7 +417,7 @@ class Command(TyperCommand):
             complete_var=self.COMPLETE_VAR,
         ).get_completion_args()
 
-        with open('test.txt', 'w') as f:
+        with open("test.txt", "w") as f:
             f.write(f'{args}\n"{incomplete}"')
 
         def call_fallback(fb):
