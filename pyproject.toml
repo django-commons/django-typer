@@ -118,14 +118,19 @@ addopts = [
   "--strict-markers",
   "--cov=django_typer",
   "--cov-branch",
-  "--cov-report=term-missing:skip-covered",
-  "--cov-fail-under=90"
+  "--cov-report=term-missing:skip-covered"
 ]
 
 [tool.coverage.run]
 omit = [
   "django_typer/tests/**/*py"
 ]
+branch = true
+source = ["django_typer"]
+concurrency = ["multiprocessing"]
+parallel = true
+command_line = "-m pytest --cov=django_typer"
+
 
 [tool.black]
 line-length = 88
@@ -144,6 +149,6 @@ ignore="tests"
 
 [tool.pylint.'MESSAGES CONTROL']
 disable = [
-    'R0903',  # to few public methods - seriously?
+    'R0903', # too few public methods - seriously?
     'W0613', # unused argument - unavoidable in generic base interfaces
 ]

@@ -71,6 +71,9 @@ behavior should align with native django commands
 """
 
 try:
+    # todo - this monkey patch is required because typer does
+    # not expose a good way to custom configure the Console objects
+    # it uses.
     from typer import rich_utils
     console_getter = rich_utils._get_rich_console
     def get_console():
