@@ -1,6 +1,15 @@
 """
 A collection of completer classes that can be used to quickly add shell completion
 for various kinds of django objects.
+
+# TODO: - add default query builders for these field types:
+    GenericIPAddressField,
+    TimeField,
+    DateField,
+    DateTimeField,
+    DurationField,
+    FilePathField,
+    FileField
 """
 
 import typing as t
@@ -9,7 +18,7 @@ from types import MethodType
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
 from django.apps import apps
-from django.db.models import (  # TODO:; GenericIPAddressField,; TimeField,; DateField,; DateTimeField,; DurationField,; FilePathField,; FileField
+from django.db.models import (
     CharField,
     DecimalField,
     FloatField,
@@ -78,18 +87,22 @@ class ModelObjectCompleter:
         :raises TypeError: If there is a problem using the incomplete string as a
             lookup given the field class.
         """
-        field = self.model_cls._meta.get_field(self.lookup_field)
+        field = self.model_cls._meta.get_field(
+            self.lookup_field
+        )  # pylint: disable=protected-access
         if issubclass(field.__class__, IntegerField):
             return self.int_query(context, parameter, incomplete)
-        elif issubclass(field.__class__, (CharField, TextField)):
+        if issubclass(field.__class__, (CharField, TextField)):
             return self.text_query(context, parameter, incomplete)
-        elif issubclass(field.__class__, UUIDField):
+        if issubclass(field.__class__, UUIDField):
             return self.uuid_query(context, parameter, incomplete)
-        elif issubclass(field.__class__, (FloatField, DecimalField)):
+        if issubclass(field.__class__, (FloatField, DecimalField)):
             return self.float_query(context, parameter, incomplete)
         raise ValueError(f"Unsupported lookup field class: {field.__class__.__name__}")
 
-    def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def int_query(  # pylint: disable=unused-argument
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
         """
         The default completion query builder for integer fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -114,7 +127,9 @@ class ModelObjectCompleter:
             )
         return qry
 
-    def float_query(self, context: Context, parameter: Parameter, incomplete: str):
+    def float_query(  # pylint: disable=unused-argument
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
         """
         The default completion query builder for float fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -137,7 +152,9 @@ class ModelObjectCompleter:
             **{f"{self.lookup_field}__lt": upper}
         )
 
-    def text_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def text_query(  # pylint: disable=unused-argument
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
         """
         The default completion query builder for text-based fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -152,7 +169,9 @@ class ModelObjectCompleter:
             return Q(**{f"{self.lookup_field}__istartswith": incomplete})
         return Q(**{f"{self.lookup_field}__startswith": incomplete})
 
-    def uuid_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def uuid_query(  # pylint: disable=unused-argument
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
         """
         The default completion query builder for UUID fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -219,7 +238,9 @@ class ModelObjectCompleter:
 
         if incomplete:
             try:
-                completion_qry &= self.query(context, parameter, incomplete)
+                completion_qry &= self.query(  # pylint: disable=not-callable
+                    context, parameter, incomplete
+                )
             except (ValueError, TypeError):
                 return []
 

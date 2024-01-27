@@ -358,7 +358,7 @@ class TestGetCommand(TestCase):
             get_command("callback1", "init")
 
 
-class CallbackTests(TestCase):
+class CallbackTests(NoColorMixin, TestCase):
     cmd_name = "callback1"
 
     def test_helps(self, top_level_only=False):
@@ -571,7 +571,7 @@ class CallbackTests(TestCase):
         )
 
 
-class Callback2Tests(NoColorMixin, CallbackTests):
+class Callback2Tests(CallbackTests):
     cmd_name = "callback2"
 
     def test_call_command(self):
