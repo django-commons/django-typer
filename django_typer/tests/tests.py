@@ -699,9 +699,10 @@ class TestDjangoParameters(TestCase):
 
 
 class TestHelpPrecedence(TestCase):
+
     def test_help_precedence1(self):
         buffer = StringIO()
-        cmd = get_command("help_precedence1", stdout=buffer, no_color=True)
+        cmd = get_command("help_precedence1", no_color=True, stdout=buffer)
         cmd.print_help("./manage.py", "help_precedence1")
         self.assertTrue(
             re.search(
