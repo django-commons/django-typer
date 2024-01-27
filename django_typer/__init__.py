@@ -10,8 +10,8 @@ r"""
 
 import contextlib
 import inspect
-import sys
 import os
+import sys
 import typing as t
 from copy import deepcopy
 from importlib import import_module
@@ -24,10 +24,11 @@ from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
-if '--no-color' in sys.argv and '--force-color' not in sys.argv:
+# this has to go here before rich Consoles are instantiated by Typer
+if "--no-color" in sys.argv and "--force-color" not in sys.argv:
     os.environ["NO_COLOR"] = "1"
 
-from typer import Typer
+from typer import Typer  # pylint disable=wrong-import-position
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
 from typer.main import MarkupMode
@@ -37,16 +38,9 @@ from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
 
-from .types import (
-    ForceColor,
-    NoColor,
-    PythonPath,
-    Settings,
-    SkipChecks,
-    Traceback,
-    Verbosity,
-    Version,
-)
+from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
+from .types import Style as ColorStyle
+from .types import Traceback, Verbosity, Version
 
 VERSION = (0, 4, "0b")
 
@@ -60,12 +54,6 @@ __copyright__ = "Copyright 2023 Brian Kohan"
 __all__ = ["TyperCommand", "Context", "initialize", "command", "group", "get_command"]
 
 """
-TODO
-- useful django types (app label, etc)
-- documentation
-- linting
-- type hints
-
 design decision: no monkey-patching for call_command. call_command converts arguments to
 strings. This is unavoidable and will just be a noted caveat that is also consistent with
 how native django commands work. For calls with previously resolved types - the direct
@@ -74,6 +62,7 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 
 behavior should align with native django commands
 """
+
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
     """
@@ -119,13 +108,15 @@ def _common_options(
     no_color: NoColor = False,
     force_color: ForceColor = False,
     skip_checks: SkipChecks = False,
-):
-    pass
+) -> None:
+    """
+    Common django options.
+    """
 
 
 # cache common params to avoid this extra work on every command
 # we cant resolve these at module scope because translations break it
-_common_params = []
+_common_params: t.List[click.Parameter] = []
 
 
 def _get_common_params():
@@ -298,6 +289,7 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
 
 
 class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
+
     def common_params(self):
         if (
             hasattr(self, "django_command")
@@ -358,10 +350,12 @@ class GroupFunction(Typer):
         self.django_command_cls.typer_app.add_typer(deepcopy(self))
 
     def callback(self, *args, **kwargs):
-        raise NotImplementedError(_(
-            "callback is not supported - the function decorated by group() is the "
-            "callback."
-        ))
+        raise NotImplementedError(
+            _(
+                "callback is not supported - the function decorated by group() is the "
+                "callback."
+            )
+        )
 
     def command(
         self,
@@ -661,20 +655,9 @@ class _TyperCommandMeta(type):
                 pretty_exceptions_short=pretty_exceptions_short,
             )
 
-            def handle(self, *args, **options):
-                return self.typer_app(
-                    args=args,
-                    standalone_mode=False,
-                    supplied_params=options,
-                    django_command=self,
-                    complete_var=None,
-                    prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
-                )
-
             attrs = {
                 "_handle": attrs.pop("handle", None),
                 **attrs,
-                "handle": handle,
                 "typer_app": typer_app,
             }
 
@@ -684,7 +667,7 @@ class _TyperCommandMeta(type):
         """
         This method is called after a new class is created.
         """
-        if cls.typer_app is not None:
+        if getattr(cls, "typer_app", None):
             cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
             cls.suppressed_base_arguments = {
                 arg.lstrip("--").replace("-", "_")
@@ -844,6 +827,11 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         ...
     """
 
+    style: ColorStyle
+    stdout: t.IO[str]
+    stderr: t.IO[str]
+    requires_system_checks: t.Union[t.Sequence[str], str]
+
     # we do not use verbosity because the base command does not do anything with it
     # if users want to use a verbosity flag like the base django command adds
     # they can use the type from django_typer.types.Verbosity
@@ -880,7 +868,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             except KeyError:
                 raise ValueError(f'No such command "{command_path[0]}"')
 
-    typer_app: t.Optional[Typer] = None
+    typer_app: Typer
     _num_commands: int = 0
     _has_callback: bool = False
     _root_groups: int = 0
@@ -971,4 +959,14 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                 "{cls} does not implement handle(), you must call the other command "
                 "functions directly."
             ).format(cls=self.__class__)
+        )
+
+    def handle(self, *args, **options):
+        return self.typer_app(
+            args=args,
+            standalone_mode=False,
+            supplied_params=options,
+            django_command=self,
+            complete_var=None,
+            prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
         )

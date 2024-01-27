@@ -52,13 +52,13 @@ def run_command(command, *args, parse_json=True, no_color=True):
     try:
         env = os.environ.copy()
         if no_color:
-            env['NO_COLOR'] = '1'
+            env["NO_COLOR"] = "1"
         os.chdir(manage_py.parent)
         result = subprocess.run(
             [sys.executable, f"./{manage_py.name}", command, *args],
             capture_output=True,
             text=True,
-            env=env
+            env=env,
         )
 
         # Check the return code to ensure the script ran successfully
@@ -82,6 +82,7 @@ class BasicTests(TestCase):
 
     def test_common_options_function(self):
         from django_typer import _common_options
+
         self.assertIsNone(_common_options())
 
     def test_command_line(self):
@@ -357,7 +358,9 @@ class CallbackTests(TestCase):
         if not top_level_only:
             buffer.truncate(0)
             buffer.seek(0)
-            callback_help = run_command(self.cmd_name, "--no-color", "5", self.cmd_name, "--help")
+            callback_help = run_command(
+                self.cmd_name, "--no-color", "5", self.cmd_name, "--help"
+            )
             cmd.print_help("./manage.py", self.cmd_name, self.cmd_name)
             self.assertEqual(callback_help.strip(), buffer.getvalue().strip())
             self.assertIn(
@@ -590,7 +593,9 @@ class TestDjangoParameters(TestCase):
             run_command(cmd, "--force-color", *args, no_color=False)
             self.assertEqual(read_django_parameters().get("no_color", True), False)
 
-            result = run_command(cmd, "--force-color", "--no-color", *args, no_color=False)
+            result = run_command(
+                cmd, "--force-color", "--no-color", *args, no_color=False
+            )
             self.assertTrue("CommandError" in result)
             self.assertTrue("--no-color" in result)
             self.assertTrue("--force-color" in result)

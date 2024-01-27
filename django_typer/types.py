@@ -2,11 +2,13 @@
 Common types for command line argument specification.
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated, Any, Callable, Optional
+
 from django.core.management import CommandError
+from django.core.management.color import Style as ColorStyle
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -29,19 +31,21 @@ def set_no_color(context, param, value):
     command when --version is specified.
     """
     if value:
-        if not context.params.get('force_color', False):
+        if not context.params.get("force_color", False):
             os.environ["NO_COLOR"] = "1"
             try:
                 from rich.console import Console
+
                 Console._environ = os.environ
             except ImportError:
                 pass
         else:
-            raise CommandError(_('--no-color and --force-color are mutually exclusive.'))
+            raise CommandError(
+                _("--no-color and --force-color are mutually exclusive.")
+            )
 
-"""
-https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
-"""
+
+# https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
 Version = Annotated[
     bool,
     Option(
@@ -148,3 +152,28 @@ SkipChecks = Annotated[
         "--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL
     ),
 ]
+
+
+class Style(ColorStyle):
+    """
+    For type hinting.
+    """
+
+    ERROR: Callable[[Any], str]
+    ERROR_OUTPUT: Callable[[Any], str]
+    HTTP_BAD_REQUEST: Callable[[Any], str]
+    HTTP_INFO: Callable[[Any], str]
+    HTTP_NOT_FOUND: Callable[[Any], str]
+    HTTP_NOT_MODIFIED: Callable[[Any], str]
+    HTTP_REDIRECT: Callable[[Any], str]
+    HTTP_SERVER_ERROR: Callable[[Any], str]
+    HTTP_SUCCESS: Callable[[Any], str]
+    MIGRATE_HEADING: Callable[[Any], str]
+    MIGRATE_LABEL: Callable[[Any], str]
+    NOTICE: Callable[[Any], str]
+    SQL_COLTYPE: Callable[[Any], str]
+    SQL_FIELD: Callable[[Any], str]
+    SQL_KEYWORD: Callable[[Any], str]
+    SQL_TABLE: Callable[[Any], str]
+    SUCCESS: Callable[[Any], str]
+    WARNING: Callable[[Any], str]
