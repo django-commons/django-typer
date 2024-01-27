@@ -282,11 +282,13 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
                 *args,
                 **{
                     # process supplied parameters incase they need type conversion
-                    param: self.param_converters.get(param, lambda _, value: value)(
-                        ctx, val
+                    param: (
+                        self.param_converters.get(param, lambda _, value: value)(
+                            ctx, val
+                        )
+                        if param in ctx.supplied_params
+                        else val
                     )
-                    if param in ctx.supplied_params
-                    else val
                     for param, val in kwargs.items()
                     if param in expected
                 },

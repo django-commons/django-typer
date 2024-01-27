@@ -3,6 +3,7 @@ A collection of parsers that turn strings into useful Django types.
 Pass these parsers to the `parser` argument of typer.Option and
 typer.Argument.
 """
+
 import typing as t
 
 from django.apps import AppConfig, apps

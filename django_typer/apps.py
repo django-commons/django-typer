@@ -2,6 +2,7 @@
 Django Typer app config. This module includes settings check and rich traceback
 installation logic.
 """
+
 import inspect
 import typing as t
 from types import ModuleType
