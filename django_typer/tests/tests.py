@@ -21,10 +21,6 @@ from django_typer import TyperCommand, get_command, group
 from django_typer.tests.utils import read_django_parameters
 
 
-# make sure backgrounded terminals are treated by
-# typer/rich as interactive shells
-os.environ['FORCE_COLOR'] = '1'
-
 def similarity(text1, text2):
     """
     Compute the cosine similarity between two texts.
@@ -1188,7 +1184,7 @@ class TestTracebackConfig(TestCase):
     rich_installed = True
 
     def test_default_traceback(self):
-        result = run_command("test_command1", "delete", "me", "--throw")
+        result = run_command("test_command1", "--no-color", "delete", "me", "--throw")
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         if self.rich_installed:
@@ -1202,7 +1198,7 @@ class TestTracebackConfig(TestCase):
             self.assertNotIn("────────", result)
 
     def test_tb_command_overrides(self):
-        result = run_command("test_tb_overrides", "delete", "me", "--throw")
+        result = run_command("test_tb_overrides", "--no-color", "delete", "me", "--throw")
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         if self.rich_installed:
@@ -1244,6 +1240,7 @@ class TestTracebackConfig(TestCase):
     def test_traceback_no_locals_short_false(self):
         result = run_command(
             "test_command1",
+            "--no-color",
             "--settings",
             "django_typer.tests.settings_tb_change_defaults",
             "delete",
@@ -1267,6 +1264,7 @@ class TestTracebackConfig(TestCase):
                 "test_command1",
                 "--settings",
                 "django_typer.tests.settings_throw_init_exception",
+                "--no-color",
                 "delete",
                 "me",
             )

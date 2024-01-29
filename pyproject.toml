@@ -107,7 +107,8 @@ DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
 python_files = "tests.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 env = [
-    "TERMINAL_WIDTH=80"
+    "TERMINAL_WIDTH=80",
+    "FORCE_COLOR=1"
 ]
 
 addopts = [

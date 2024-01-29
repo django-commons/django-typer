@@ -13,7 +13,6 @@ import inspect
 import os
 import sys
 import typing as t
-from threading import local
 
 from copy import deepcopy
 from importlib import import_module
@@ -26,9 +25,10 @@ from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
-# this has to go here before rich Consoles are instantiated by Typer
-if "--no-color" in sys.argv and "--force-color" not in sys.argv:
-    os.environ["NO_COLOR"] = "1"
+from django_typer import patch
+patch.apply()
+
+from django_typer.utils import push_command
 
 from typer import Typer  # pylint disable=wrong-import-position
 from typer.core import TyperCommand as CoreTyperCommand
@@ -64,60 +64,6 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 
 behavior should align with native django commands
 """
-try:
-    # This monkey patch is required because typer does
-    # not expose a good way to custom configure the Console objects
-    # it uses - revisit this if/when typer exposes control of the
-    # console object.
-    from typer import rich_utils
-    console_getter = rich_utils._get_rich_console
-    def get_console():
-        console = console_getter()
-        ctx = click.get_current_context(silent=True)
-        cmd = get_current_command()
-        console.no_color = (
-            ctx.params.get('no_color', 'NO_COLOR' in os.environ)
-            if ctx else
-            (cmd.no_color if cmd else 'NO_COLOR' in os.environ)
-        )
-        if console.no_color:
-            # also remove highlights so there are
-            # no ansi control characters in the text
-            console._color_system = None
-        return console
-    rich_utils._get_rich_console = get_console
-except ImportError:
-    pass
-
-
-_local = local()
-
-@contextlib.contextmanager
-def push_command(command: "TyperCommand"):
-    """
-    Pushes a new command to the current stack.
-    """
-    _local.__dict__.setdefault("stack", []).append(command)
-    try:
-        yield
-    finally:
-        _local.stack.pop()
-
-def get_current_command() -> t.Optional["TyperCommand"]:
-    """
-    Returns the current typer command. This can be used as a way to
-    access the current command object from anywhere if we are executing
-    inside of one from higher on the stack. We primarily need this because certain
-    monkey patches are required in typer code - namely for enabling/disabling
-    color based on configured parameters.
-
-    :return: The current typer command or None if there is no active command.
-    """
-    try:
-        return t.cast("TyperCommand", _local.stack[-1])
-    except (AttributeError, IndexError) as e:
-        pass
-    return None
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
