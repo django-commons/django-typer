@@ -594,9 +594,7 @@ class TestDjangoParameters(TestCase):
             self.assertEqual(params.get("no_color", True), False)
             self.assertEqual(params.get("no_color_attr", True), False)
 
-            result = run_command(
-                cmd, "--force-color", "--no-color", *args
-            )
+            result = run_command(cmd, "--force-color", "--no-color", *args)
             self.assertTrue("CommandError" in result)
             self.assertTrue("--no-color" in result)
             self.assertTrue("--force-color" in result)
@@ -1198,7 +1196,9 @@ class TestTracebackConfig(TestCase):
             self.assertNotIn("────────", result)
 
     def test_tb_command_overrides(self):
-        result = run_command("test_tb_overrides", "--no-color", "delete", "me", "--throw")
+        result = run_command(
+            "test_tb_overrides", "--no-color", "delete", "me", "--throw"
+        )
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         if self.rich_installed:
@@ -1299,13 +1299,10 @@ class TestTracebackConfig(TestCase):
             self.assertIn("\x1b", result)
 
         result = run_command(
-            "test_command1",
-            "--no-color",
-            "delete",
-            "Brian",
-            "--throw"
+            "test_command1", "--no-color", "delete", "Brian", "--throw"
         )
         self.assertNotIn("\x1b", result)
+
 
 class TestTracebackConfigNoRich(TestTracebackConfig):
     rich_installed = False

@@ -1,10 +1,10 @@
-name: static analysis
+name: linting
 
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
 
-  static-analysis:
+  linting:
     runs-on: ubuntu-latest
     strategy:
       matrix:

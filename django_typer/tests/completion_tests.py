@@ -1,18 +1,20 @@
-from django.test import TestCase
-from django_typer.tests.test_app.models import ShellCompleteTester
-from django_typer.tests.polls.models import Question as Poll
-from django_typer.management.commands.shellcompletion import Command as ShellCompletion
-from django_typer import get_command
-import subprocess
-from shellingham import detect_shell
 import os
-import sys
 import pty
-import time
 import select
-from pathlib import Path
 import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
 import pytest
+from django.test import TestCase
+from shellingham import detect_shell
+
+from django_typer import get_command
+from django_typer.management.commands.shellcompletion import Command as ShellCompletion
+from django_typer.tests.polls.models import Question as Poll
+from django_typer.tests.test_app.models import ShellCompleteTester
 
 
 def read_all_from_fd_with_timeout(fd, timeout):
@@ -39,18 +41,17 @@ def read_all_from_fd_with_timeout(fd, timeout):
     return bytes(all_data).decode()
 
 
-
 class DefaultCompleteTestCase(TestCase):
 
     shell = None
-    manage_script = 'manage.py'
-    launch_script = './manage.py'
+    manage_script = "manage.py"
+    launch_script = "./manage.py"
 
     @property
     def interactive_opt(self):
         # currently all supported shells support -i for interactive mode
         # this includes zsh, bash, fish and powershell
-        return '-i'
+        return "-i"
 
     @property
     def command(self) -> ShellCompletion:
@@ -89,14 +90,17 @@ class DefaultCompleteTestCase(TestCase):
         self.verify_remove(script=script)
 
     def set_environment(self, fd):
-        os.write(fd, f'PATH={Path(sys.executable).parent}:$PATH\n'.encode())
-        os.write(fd, f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode())
+        os.write(fd, f"PATH={Path(sys.executable).parent}:$PATH\n".encode())
+        os.write(
+            fd,
+            f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
+        )
 
     def get_completions(self, *cmds: str) -> list[str]:
 
         def read(fd):
             """Function to read from a file descriptor."""
-            return os.read(fd, 1024*1024).decode()
+            return os.read(fd, 1024 * 1024).decode()
 
         # Create a pseudo-terminal
         master_fd, slave_fd = pty.openpty()
@@ -108,7 +112,7 @@ class DefaultCompleteTestCase(TestCase):
             stdin=slave_fd,
             stdout=slave_fd,
             stderr=slave_fd,
-            text=True
+            text=True,
         )
         self.set_environment(master_fd)
 
@@ -129,7 +133,7 @@ class DefaultCompleteTestCase(TestCase):
         process.terminate()
         process.wait()
         return output
-    
+
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")
         self.assertIn("django_typer", completions)
@@ -155,31 +159,31 @@ class DefaultCompleteTestCase(TestCase):
 class ZshShellTests(DefaultCompleteTestCase):
 
     shell = "zsh"
-    directory = Path('~/.zfunc').expanduser()
+    directory = Path("~/.zfunc").expanduser()
 
     def verify_install(self, script=DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
-        self.assertTrue((self.directory / f'_{script}').exists())
+        self.assertTrue((self.directory / f"_{script}").exists())
 
     def verify_remove(self, script=DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
-        self.assertFalse((self.directory / f'_{script}').exists())
+        self.assertFalse((self.directory / f"_{script}").exists())
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashShellTests(DefaultCompleteTestCase):
 
     shell = "bash"
-    directory = Path('~/.bash_completions').expanduser()
+    directory = Path("~/.bash_completions").expanduser()
 
     def verify_install(self, script=DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
-        self.assertTrue((self.directory / f'{script}.sh').exists())
+        self.assertTrue((self.directory / f"{script}.sh").exists())
 
     def verify_remove(self, script=DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
-        self.assertFalse((self.directory / f'{script}.sh').exists())
+        self.assertFalse((self.directory / f"{script}.sh").exists())

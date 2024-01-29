@@ -4,15 +4,17 @@ a Typer command. This is analogous to click's get_current_context but for
 command execution.
 """
 
+import typing as t
+from contextlib import contextmanager
+
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
 from threading import local
-from contextlib import contextmanager
-import typing as t
 
 _local = local()
 
+
 @contextmanager
-def push_command(command: "TyperCommand"):
+def push_command(command: "TyperCommand"):  # type: ignore
     """
     Pushes a new command to the current stack.
     """
@@ -23,7 +25,7 @@ def push_command(command: "TyperCommand"):
         _local.stack.pop()
 
 
-def get_current_command() -> t.Optional["TyperCommand"]:
+def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
     """
     Returns the current typer command. This can be used as a way to
     access the current command object from anywhere if we are executing
@@ -34,7 +36,7 @@ def get_current_command() -> t.Optional["TyperCommand"]:
     :return: The current typer command or None if there is no active command.
     """
     try:
-        return t.cast("TyperCommand", _local.stack[-1])
-    except (AttributeError, IndexError) as e:
+        return t.cast("TyperCommand", _local.stack[-1])  # type: ignore
+    except (AttributeError, IndexError):
         pass
     return None

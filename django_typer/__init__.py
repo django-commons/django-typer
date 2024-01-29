@@ -13,7 +13,6 @@ import inspect
 import os
 import sys
 import typing as t
-
 from copy import deepcopy
 from importlib import import_module
 from types import MethodType, SimpleNamespace
@@ -26,9 +25,8 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from django_typer import patch
-patch.apply()
 
-from django_typer.utils import push_command
+patch.apply()
 
 from typer import Typer  # pylint disable=wrong-import-position
 from typer.core import TyperCommand as CoreTyperCommand
@@ -39,6 +37,8 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
+
+from django_typer.utils import push_command
 
 from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
 from .types import Style as ColorStyle
