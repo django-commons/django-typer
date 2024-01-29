@@ -6,8 +6,6 @@ jobs:
 
   static-analysis:
     runs-on: ubuntu-latest
-    env:
-      NO_COLOR: true
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges

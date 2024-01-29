@@ -21,6 +21,10 @@ from django_typer import TyperCommand, get_command, group
 from django_typer.tests.utils import read_django_parameters
 
 
+# make sure backgrounded terminals are treated by
+# typer/rich as interactive shells
+os.environ['FORCE_COLOR'] = '1'
+
 def similarity(text1, text2):
     """
     Compute the cosine similarity between two texts.
@@ -47,12 +51,10 @@ def get_named_arguments(function):
     ]
 
 
-def run_command(command, *args, parse_json=True, no_color=True):
+def run_command(command, *args, parse_json=True):
     cwd = os.getcwd()
     try:
         env = os.environ.copy()
-        if no_color:
-            env["NO_COLOR"] = "1"
         os.chdir(manage_py.parent)
         result = subprocess.run(
             [sys.executable, f"./{manage_py.name}", command, *args],
@@ -349,7 +351,6 @@ class CallbackTests(TestCase):
     def test_helps(self, top_level_only=False):
         buffer = StringIO()
         cmd = get_command(self.cmd_name, stdout=buffer, no_color=True)
-
         help_output_top = run_command(self.cmd_name, "--no-color", "--help")
         cmd.print_help("./manage.py", self.cmd_name)
         self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
@@ -588,17 +589,17 @@ class TestDjangoParameters(TestCase):
 
     def test_color_params(self):
         for cmd, args in self.commands:
-            run_command(cmd, "--no-color", *args, no_color=False)
+            run_command(cmd, "--no-color", *args)
             params = read_django_parameters()
             self.assertEqual(params.get("no_color", False), True)
             self.assertEqual(params.get("no_color_attr", False), True)
-            run_command(cmd, "--force-color", *args, no_color=False)
+            run_command(cmd, "--force-color", *args)
             params = read_django_parameters()
             self.assertEqual(params.get("no_color", True), False)
             self.assertEqual(params.get("no_color_attr", True), False)
 
             result = run_command(
-                cmd, "--force-color", "--no-color", *args, no_color=False
+                cmd, "--force-color", "--no-color", *args
             )
             self.assertTrue("CommandError" in result)
             self.assertTrue("--no-color" in result)
@@ -1289,6 +1290,24 @@ class TestTracebackConfig(TestCase):
             self.assertNotIn("────────", result)
             self.assertNotIn("── locals ──", result)
 
+    def test_colored_traceback(self):
+        result = run_command(
+            "test_command1",
+            "delete",
+            "Brian",
+            "--throw",
+        )
+        if self.rich_installed:
+            self.assertIn("\x1b", result)
+
+        result = run_command(
+            "test_command1",
+            "--no-color",
+            "delete",
+            "Brian",
+            "--throw"
+        )
+        self.assertNotIn("\x1b", result)
 
 class TestTracebackConfigNoRich(TestTracebackConfig):
     rich_installed = False

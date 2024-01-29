@@ -64,6 +64,7 @@ aiohttp = "^3.9.1"
 readme-renderer = "^42.0"
 sphinxcontrib-typer = "^0.1.4"
 scikit-learn = "^1.3.2"
+pytest-env = "^1.1.3"
 
 [tool.poetry.extras]
 rich = ["rich"]
@@ -105,6 +106,9 @@ profile = "black"
 DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
 python_files = "tests.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
+env = [
+    "TERMINAL_WIDTH=80"
+]
 
 addopts = [
   "--strict-markers",

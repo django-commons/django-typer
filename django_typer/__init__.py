@@ -13,6 +13,8 @@ import inspect
 import os
 import sys
 import typing as t
+from threading import local
+
 from copy import deepcopy
 from importlib import import_module
 from types import MethodType, SimpleNamespace
@@ -63,23 +65,59 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 behavior should align with native django commands
 """
 try:
-    # todo - this monkey patch is required because typer does
+    # This monkey patch is required because typer does
     # not expose a good way to custom configure the Console objects
-    # it uses.
+    # it uses - revisit this if/when typer exposes control of the
+    # console object.
     from typer import rich_utils
     console_getter = rich_utils._get_rich_console
     def get_console():
         console = console_getter()
         ctx = click.get_current_context(silent=True)
+        cmd = get_current_command()
         console.no_color = (
             ctx.params.get('no_color', 'NO_COLOR' in os.environ)
             if ctx else
-            'NO_COLOR' in os.environ
+            (cmd.no_color if cmd else 'NO_COLOR' in os.environ)
         )
+        if console.no_color:
+            # also remove highlights so there are
+            # no ansi control characters in the text
+            console._color_system = None
         return console
     rich_utils._get_rich_console = get_console
 except ImportError:
     pass
+
+
+_local = local()
+
+@contextlib.contextmanager
+def push_command(command: "TyperCommand"):
+    """
+    Pushes a new command to the current stack.
+    """
+    _local.__dict__.setdefault("stack", []).append(command)
+    try:
+        yield
+    finally:
+        _local.stack.pop()
+
+def get_current_command() -> t.Optional["TyperCommand"]:
+    """
+    Returns the current typer command. This can be used as a way to
+    access the current command object from anywhere if we are executing
+    inside of one from higher on the stack. We primarily need this because certain
+    monkey patches are required in typer code - namely for enabling/disabling
+    color based on configured parameters.
+
+    :return: The current typer command or None if there is no active command.
+    """
+    try:
+        return t.cast("TyperCommand", _local.stack[-1])
+    except (AttributeError, IndexError) as e:
+        pass
+    return None
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
@@ -906,6 +944,10 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
 
     command_tree: CommandNode
 
+    @property
+    def name(self):
+        return self.typer_app.info.name
+
     def __init__(
         self,
         stdout: t.Optional[t.IO[str]] = None,
@@ -916,14 +958,15 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     ):
         self.force_color = force_color
         self.no_color = no_color
-        super().__init__(
-            stdout=stdout,
-            stderr=stderr,
-            no_color=no_color,
-            force_color=force_color,
-            **kwargs,
-        )
-        self.command_tree = self._build_cmd_tree(get_typer_command(self.typer_app))
+        with push_command(self):
+            super().__init__(
+                stdout=stdout,
+                stderr=stderr,
+                no_color=no_color,
+                force_color=force_color,
+                **kwargs,
+            )
+            self.command_tree = self._build_cmd_tree(get_typer_command(self.typer_app))
 
     def get_subcommand(self, *command_path: str):
         return self.command_tree.get_command(*command_path)
@@ -971,28 +1014,31 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         return super().__init_subclass__()
 
     def create_parser(self, prog_name: str, subcommand: str, **_):
-        return TyperParser(self, prog_name, subcommand)
+        with push_command(self):
+            return TyperParser(self, prog_name, subcommand)
 
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
         Print the help message for this command, derived from
         ``self.usage()``.
         """
-        parser = self.create_parser(prog_name, subcommand)
-        parser.print_help(*cmd_path)
+        with push_command(self):
+            parser = self.create_parser(prog_name, subcommand)
+            parser.print_help(*cmd_path)
 
     def __call__(self, *args, **kwargs):
         """
         Call this command's handle() directly.
         """
-        if getattr(self, "_handle", None):
-            return self._handle(*args, **kwargs)
-        raise NotImplementedError(
-            _(
-                "{cls} does not implement handle(), you must call the other command "
-                "functions directly."
-            ).format(cls=self.__class__)
-        )
+        with push_command(self):
+            if getattr(self, "_handle", None):
+                return self._handle(*args, **kwargs)
+            raise NotImplementedError(
+                _(
+                    "{cls} does not implement handle(), you must call the other command "
+                    "functions directly."
+                ).format(cls=self.__class__)
+            )
 
     def handle(self, *args, **options):
         return self.typer_app(
@@ -1004,6 +1050,10 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
         )
 
+    def run_from_argv(self, argv):
+        with push_command(self):
+            return super().run_from_argv(argv)
+
     def execute(self, *args, **options):
         no_color = self.no_color
         force_color = self.force_color
@@ -1011,7 +1061,8 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             self.no_color = options["no_color"]
         if options.get("force_color", None) is not None:
             self.force_color = options["force_color"]
-        result = super().execute(*args, **options)
+        with push_command(self):
+            result = super().execute(*args, **options)
         self.no_color = no_color
         self.force_color = force_color
         return result
