@@ -74,6 +74,9 @@ def apply():
                 # also remove highlights so there are
                 # no ansi control characters in the text
                 console._color_system = None
+            elif cmd and cmd.force_color:
+                console._color_system = 'auto'
+                console._force_terminal = True
             return console
         rich_utils._get_rich_console = get_console
     except ImportError:
