@@ -11,6 +11,8 @@ import pty
 import time
 import select
 from pathlib import Path
+import shutil
+import pytest
 
 
 def read_all_from_fd_with_timeout(fd, timeout):
@@ -149,6 +151,7 @@ class DefaultCompleteTestCase(TestCase):
         self.install()
 
 
+@pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
 class ZshShellTests(DefaultCompleteTestCase):
 
     shell = "zsh"
@@ -165,6 +168,7 @@ class ZshShellTests(DefaultCompleteTestCase):
         self.assertFalse((self.directory / f'_{script}').exists())
 
 
+@pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashShellTests(DefaultCompleteTestCase):
 
     shell = "bash"

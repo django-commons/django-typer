@@ -62,6 +62,21 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 
 behavior should align with native django commands
 """
+try:
+    # todo - this monkey patch is required because typer does
+    # not expose a good way to custom configure the Console objects
+    # it uses.
+    from typer import rich_utils
+    console_getter = rich_utils._get_rich_console
+    def get_console():
+        console = console_getter()
+        ctx = click.get_current_context(silent=True)
+        if ctx and ctx.params.get('no_color', False):
+            console.no_color = True
+        return console
+    rich_utils._get_rich_console = get_console
+except ImportError:
+    pass
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:

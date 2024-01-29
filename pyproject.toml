@@ -106,7 +106,6 @@ DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
 python_files = "tests.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 
-
 addopts = [
   "--strict-markers",
   "--cov=django_typer",
