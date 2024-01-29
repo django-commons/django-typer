@@ -5,7 +5,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
 
   static-analysis:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
