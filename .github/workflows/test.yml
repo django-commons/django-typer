@@ -1,4 +1,4 @@
-name: Test and Coverage
+name: tests
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -23,8 +23,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        node-version: 18
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
