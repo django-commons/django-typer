@@ -5,7 +5,9 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
 
   static-analysis:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    env:
+      NO_COLOR: true
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
@@ -88,7 +90,6 @@ jobs:
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Run Unit Tests
       run: |
-        export NO_COLOR=1
         poetry run pytest
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
