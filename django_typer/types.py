@@ -125,7 +125,7 @@ NoColor = Annotated[
     Option(
         "--no-color",
         help=_("Don't colorize the command output."),
-        # is_eager=True,
+        is_eager=True,
         callback=set_no_color,
         rich_help_panel=COMMON_PANEL,
     ),
@@ -140,7 +140,7 @@ ForceColor = Annotated[
     Option(
         "--force-color",
         help=_("Force colorization of the command output."),
-        # is_eager=True,
+        is_eager=True,
         callback=set_force_color,
         rich_help_panel=COMMON_PANEL,
     ),
