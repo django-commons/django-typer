@@ -71,8 +71,11 @@ try:
     def get_console():
         console = console_getter()
         ctx = click.get_current_context(silent=True)
-        if ctx and ctx.params.get('no_color', False):
-            console.no_color = True
+        console.no_color = (
+            ctx.params.get('no_color', 'NO_COLOR' in os.environ)
+            if ctx else
+            'NO_COLOR' in os.environ
+        )
         return console
     rich_utils._get_rich_console = get_console
 except ImportError:
