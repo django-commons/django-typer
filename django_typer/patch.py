@@ -34,7 +34,7 @@ def apply() -> None:
     Apply monkey patches to get our console objects to recognize django's --no-color
     and --force-color options.
     """
-    global PATCH_APPLIED  # pylint: disable=global-statement
+    global PATCH_APPLIED
     if PATCH_APPLIED:
         return
     PATCH_APPLIED = True

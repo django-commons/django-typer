@@ -16,9 +16,9 @@ from django.core.checks import register
 from django.utils.translation import gettext as _
 
 from django_typer import patch
+from django_typer.utils import traceback_config
 
 patch.apply()
-from django_typer import traceback_config
 
 rich: t.Union[ModuleType, None] = None
 

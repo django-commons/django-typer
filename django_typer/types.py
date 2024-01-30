@@ -2,7 +2,6 @@
 Common types for command line argument specification.
 """
 
-import os
 import sys
 from pathlib import Path
 from typing import Annotated, Any, Callable, Optional

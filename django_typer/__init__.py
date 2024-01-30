@@ -19,17 +19,16 @@ from types import MethodType, SimpleNamespace
 
 import click
 from click.shell_completion import CompletionItem
-from django.conf import settings
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from django_typer import patch
-from django_typer.utils import with_typehint
+from django_typer.utils import with_typehint, push_command, traceback_config
 
 patch.apply()
 
-from typer import Typer  # pylint disable=wrong-import-position
+from typer import Typer
 from typer.core import MarkupMode
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -38,8 +37,6 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
-
-from django_typer.utils import push_command
 
 from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
 from .types import Style as ColorStyle
@@ -66,22 +63,6 @@ callbacks should be invoked - either Command() or Command.group(). call_command 
 behavior should align with native django commands
 """
 
-
-def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
-    """
-    Fetch the rich traceback installation parameters from our settings. By default
-    rich tracebacks are on with show_locals = True. If the config is set to False
-    or None rich tracebacks will not be installed even if the library is present.
-
-    This allows us to have a common traceback configuration for all commands. If rich
-    tracebacks are managed separately this setting can also be switched off.
-    """
-    cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
-    if cfg:
-        return {"show_locals": True, **cfg}
-    return bool(cfg)
-
-
 def get_command(
     command_name: str,
     *subcommand: str,
@@ -90,6 +71,22 @@ def get_command(
     no_color: bool = False,
     force_color: bool = False,
 ):
+    """
+    Get a django command by its name and instantiate it with the provided options. This
+    will work for normal django commands as well as django_typer commands. If subcommands
+    are listed for a typer command, the method that corresponds to the command name will
+    be returned. This method may then be invoked directly. If no subcommands are listed
+    the command instance will be returned.
+
+    :param command_name: the name of the command to get
+    :param subcommand: the subcommand to get if any
+    :param stdout: the stdout stream to use
+    :param stderr: the stderr stream to use
+    :param no_color: whether to disable color
+    :param force_color: whether to force color
+    :raises ModuleNotFoundError: if the command is not found
+    :raises LookupError: if the subcommand is not found
+    """
     module = import_module(
         f"{get_commands()[command_name]}.management.commands.{command_name}"
     )
@@ -97,7 +94,7 @@ def get_command(
         stdout=stdout, stderr=stderr, no_color=no_color, force_color=force_color
     )
     if subcommand:
-        method = cmd.get_subcommand(*subcommand).command._callback.__wrapped__
+        method = cmd.get_subcommand(*subcommand).click_command._callback.__wrapped__
         return MethodType(method, cmd)  # return the bound method
     return cmd
 
@@ -214,7 +211,8 @@ class Context(TyperContext):
             parent.children.append(self)
 
 
-class DjangoAdapterMixin(with_typehint(click.BaseCommand)):  # type: ignore[misc]
+class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
+
     context_class: t.Type[click.Context] = Context
     django_command: "TyperCommand"
     callback_is_method: bool = True
@@ -298,7 +296,7 @@ class DjangoAdapterMixin(with_typehint(click.BaseCommand)):  # type: ignore[misc
         }
 
 
-class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
+class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
 
     def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         if (
@@ -317,7 +315,7 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
         return super().common_params()
 
 
-class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
+class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
     def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         if (
             hasattr(self, "django_command") and self.django_command._has_callback
@@ -375,7 +373,7 @@ class GroupFunction(Typer):
         *,
         cls: t.Type[CoreTyperCommand] = TyperCommandWrapper,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[str] = None,
+        help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = None,
         short_help: t.Optional[str] = None,
         options_metavar: str = "[OPTIONS]",
@@ -414,7 +412,7 @@ class GroupFunction(Typer):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),
+        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[str] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -453,7 +451,7 @@ class GroupFunction(Typer):
         return create_app
 
 
-def initialize(  # pylint: disable=too-mt.Any-local-variables
+def initialize(
     name: t.Optional[str] = Default(None),
     *,
     cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
@@ -464,7 +462,7 @@ def initialize(  # pylint: disable=too-mt.Any-local-variables
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[str] = Default(None),
+    help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = Default(None),
     short_help: t.Optional[str] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
@@ -505,12 +503,12 @@ def initialize(  # pylint: disable=too-mt.Any-local-variables
     return decorator
 
 
-def command(
+def command(  # pylint: disable=keyword-arg-before-vararg
     name: t.Optional[str] = None,
     *args,
     cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-    help: t.Optional[str] = None,
+    help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = None,
     short_help: t.Optional[str] = None,
     options_metavar: str = "[OPTIONS]",
@@ -560,7 +558,7 @@ def group(
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[str] = Default(None),
+    help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = Default(None),
     short_help: t.Optional[str] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
@@ -599,6 +597,19 @@ def group(
 
 class _TyperCommandMeta(type):
 
+    style: ColorStyle
+    stdout: t.IO[str]
+    stderr: t.IO[str]
+    requires_system_checks: t.Union[t.Sequence[str], str]
+    suppressed_base_arguments: t.Optional[t.Iterable[str]]
+    typer_app: Typer
+    no_color: bool
+    force_color: bool
+    _num_commands: int = 0
+    _has_callback: bool = False
+    _root_groups: int = 0
+    _handle: t.Optional[t.Callable[..., t.Any]]
+
     def __new__(
         mcs,
         name,
@@ -612,7 +623,7 @@ class _TyperCommandMeta(type):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
         callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),
+        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[str] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -631,7 +642,7 @@ class _TyperCommandMeta(type):
         This method is called when a new class is created.
         """
         try:
-            TyperCommand
+            TyperCommand  # pylint: disable=pointless-statement
             is_base_init = False
         except NameError:
             is_base_init = True
@@ -693,7 +704,6 @@ class _TyperCommandMeta(type):
         This method is called after a new class is created.
         """
         if getattr(cls, "typer_app", None):
-            cls = t.cast("TyperCommand", cls)  # mypy thinks cls is the meta class
             cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
             cls.suppressed_base_arguments = {
                 arg.lstrip("--").replace("-", "_")
@@ -717,7 +727,7 @@ class _TyperCommandMeta(type):
                     cls._num_commands += hasattr(attr, "_typer_command_")
                     cls._has_callback |= hasattr(attr, "_typer_callback_")
                     if isinstance(attr, GroupFunction) and not attr.bound:
-                        attr.bind(cls)
+                        attr.bind(cls)  # type: ignore
                         cls._root_groups += 1
 
                 if cmd_cls._handle:
@@ -759,7 +769,7 @@ class _TyperCommandMeta(type):
 
 class CommandNode:
     name: str
-    command: click.Command
+    click_command: click.Command
     context: TyperContext
     django_command: "TyperCommand"
     parent: t.Optional["CommandNode"] = None
@@ -768,13 +778,13 @@ class CommandNode:
     def __init__(
         self,
         name: str,
-        command: click.Command,
+        click_command: click.Command,
         context: TyperContext,
         django_command: "TyperCommand",
         parent: t.Optional["CommandNode"] = None,
     ):
         self.name = name
-        self.command = command
+        self.click_command = click_command
         self.context = context
         self.django_command = django_command
         self.parent = parent
@@ -785,7 +795,7 @@ class CommandNode:
         if self.django_command.no_color:
             unset = os.environ.get("NO_COLOR", None)
             os.environ["NO_COLOR"] = "1"
-        self.command.get_help(self.context)
+        self.click_command.get_help(self.context)
         if unset:
             os.environ["NO_COLOR"] = unset
         else:
@@ -796,8 +806,8 @@ class CommandNode:
             return self
         try:
             return self.children[command_path[0]].get_command(*command_path[1:])
-        except KeyError:
-            raise ValueError(f'No such command "{command_path[0]}"')
+        except KeyError as err:
+            raise LookupError(f'No such command "{command_path[0]}"') from err
 
 
 class TyperParser:
@@ -834,7 +844,7 @@ class TyperParser:
         self.subcommand = subcommand
 
         def populate_params(node: CommandNode) -> None:
-            for param in node.command.params:
+            for param in node.click_command.params:
                 self._actions.append(self.Action(param))
             for child in node.children.values():
                 populate_params(child)
@@ -977,8 +987,8 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         current = CommandNode(cmd.name, cmd, ctx, self, parent=node)
         if node:
             node.children[cmd.name] = current
-        for cmd in self._filter_commands(ctx):
-            self._build_cmd_tree(cmd, parent=ctx, info_name=cmd.name, node=current)
+        for sub_cmd in self._filter_commands(ctx):
+            self._build_cmd_tree(sub_cmd, parent=ctx, info_name=sub_cmd.name, node=current)
         return current
 
     def __init_subclass__(cls, **_):

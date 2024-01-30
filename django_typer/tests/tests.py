@@ -337,7 +337,7 @@ class TestGetCommand(TestCase):
         assert callback1.__class__ == Callback1
 
         # callbacks are not commands
-        with self.assertRaises(ValueError):
+        with self.assertRaises(LookupError):
             get_command("callback1", "init")
 
 
@@ -814,7 +814,7 @@ class TestGroups(TestCase):
             ("groups", "setting", "print"),
         ]:
             if app == "test_app" and cmds[-1] in ["strip", "setting", "print"]:
-                with self.assertRaises(ValueError):
+                with self.assertRaises(LookupError):
                     cmd = get_command(cmds[0], stdout=buffer, no_color=True)
                     self.assertTrue(cmd.no_color)
                     cmd.print_help("./manage.py", *cmds)

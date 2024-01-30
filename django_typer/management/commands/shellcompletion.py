@@ -453,12 +453,12 @@ class Command(TyperCommand):
 
         add_completion_class(CompletionClass, self.shell.value)
 
-        args, incomplete = CompletionClass(
+        args = CompletionClass(
             cli=self.noop_command.command,
             ctx_args={},
             prog_name=sys.argv[0],
             complete_var=self.COMPLETE_VAR,
-        ).get_completion_args()
+        ).get_completion_args()[0]
 
         def call_fallback(fb: t.Optional[str]) -> None:
             fallback = import_string(fb) if fb else self.django_fallback
