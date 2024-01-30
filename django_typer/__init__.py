@@ -25,13 +25,14 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from django_typer import patch
+from django_typer.utils import with_typehint
 
 patch.apply()
 
 from typer import Typer  # pylint disable=wrong-import-position
+from typer.core import MarkupMode
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
-from typer.main import MarkupMode
 from typer.main import get_command as get_typer_command
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import CommandFunctionType
@@ -118,10 +119,10 @@ def _common_options(
 
 # cache common params to avoid this extra work on every command
 # we cant resolve these at module scope because translations break it
-_common_params: t.List[click.Parameter] = []
+_common_params: t.Sequence[t.Union[click.Argument, click.Option]] = []
 
 
-def _get_common_params():
+def _get_common_params() -> t.Sequence[t.Union[click.Argument, click.Option]]:
     global _common_params
     if not _common_params:
         _common_params = get_params_convertors_ctx_param_name_from_function(
@@ -137,7 +138,7 @@ COMMON_DEFAULTS = {
 
 
 class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
-    def __init__(self, args, **kwargs):
+    def __init__(self, args: t.Sequence[t.Any], **kwargs):
         super().__init__(**kwargs)
         self.args = args
 
@@ -159,6 +160,8 @@ class Context(TyperContext):
     children: t.List["Context"]
     _supplied_params: t.Dict[str, t.Any]
 
+    parent: "Context"
+
     class ParamDict(dict):
         """
         An extension of dict we use to block updates to parameters that were supplied
@@ -166,7 +169,9 @@ class Context(TyperContext):
         by the hybrid parsing and option passing inherent to call_command.
         """
 
-        def __init__(self, *args, supplied):
+        supplied: t.Sequence[str]
+
+        def __init__(self, *args, supplied: t.Sequence[str]):
             super().__init__(*args)
             self.supplied = supplied
 
@@ -175,7 +180,7 @@ class Context(TyperContext):
                 super().__setitem__(key, value)
 
     @property
-    def supplied_params(self):
+    def supplied_params(self) -> t.Dict[str, t.Any]:
         """
         Get the parameters that were supplied when the command was invoked via
         call_command, only the root context has these.
@@ -195,8 +200,9 @@ class Context(TyperContext):
         super().__init__(command, parent=parent, **kwargs)
         if supplied_params:
             self._supplied_params = supplied_params
-        self.django_command = django_command
-        if not django_command and parent:
+        if django_command:
+            self.django_command = django_command
+        elif parent:
             self.django_command = parent.django_command
 
         self.params = self.ParamDict(
@@ -208,13 +214,15 @@ class Context(TyperContext):
             parent.children.append(self)
 
 
-class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
+class DjangoAdapterMixin(with_typehint(click.BaseCommand)):  # type: ignore[misc]
     context_class: t.Type[click.Context] = Context
     django_command: "TyperCommand"
     callback_is_method: bool = True
-    param_converters: t.Dict[str, t.Callable[..., t.Any]] = {}
+    param_converters: t.Dict[str, t.Callable[[Context, t.Any], t.Any]] = {}
 
-    def shell_complete(self, ctx: Context, incomplete: str) -> t.List[CompletionItem]:
+    def shell_complete(
+        self, ctx: click.Context, incomplete: str
+    ) -> t.List[CompletionItem]:
         """
         By default if the incomplete string is a space and there are no completions
         the click infrastructure will return _files. We'd rather return parameters
@@ -232,32 +240,32 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
             completions = super().shell_complete(ctx, min(ctx._opt_prefixes))
         return completions
 
-    def common_params(self):
+    def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         return []
 
     def __init__(
         self,
         *args,
-        callback: t.Optional[  # pylint: disable=redefined-outer-name
-            t.Callable[..., t.Any]
-        ],
+        callback: t.Callable[..., t.Any],
         params: t.Optional[t.List[click.Parameter]] = None,
         **kwargs,
     ):
         params = params or []
         self._callback = callback
-        expected = [param.name for param in params[1:]]
-        self_arg = params[0].name if params else "self"
+        expected = [param.name for param in params[1:] if param.name]
+        self_arg = params[0].name if params and params[0].name else "self"
 
         def call_with_self(*args, **kwargs):
-            ctx = click.get_current_context()
+            ctx = t.cast(Context, click.get_current_context())
             return callback(
                 *args,
                 **{
                     # process supplied parameters incase they need type conversion
                     param: (
-                        self.param_converters.get(param, lambda _, value: value)(
-                            ctx, val
+                        (
+                            self.param_converters[param](ctx, val)
+                            if param in self.param_converters
+                            else val
                         )
                         if param in ctx.supplied_params
                         else val
@@ -272,7 +280,7 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
                 ),
             )
 
-        super().__init__(  # type: ignore
+        super().__init__(
             *args,
             params=[
                 *(params[1:] if self.callback_is_method else params),
@@ -292,7 +300,7 @@ class DjangoAdapterMixin:  # pylint: disable=too-few-public-methods
 
 class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
 
-    def common_params(self):
+    def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         if (
             hasattr(self, "django_command")
             and self.django_command._num_commands < 2
@@ -303,19 +311,21 @@ class TyperCommandWrapper(DjangoAdapterMixin, CoreTyperCommand):
                 param
                 for param in _get_common_params()
                 if param.name
+                and param.name
                 not in (self.django_command.suppressed_base_arguments or [])
             ]
         return super().common_params()
 
 
 class TyperGroupWrapper(DjangoAdapterMixin, CoreTyperGroup):
-    def common_params(self):
+    def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         if (
             hasattr(self, "django_command") and self.django_command._has_callback
         ) or getattr(self, "common_init", False):
             return [
                 param
                 for param in _get_common_params()
+                if param.name
                 if param.name
                 not in (self.django_command.suppressed_base_arguments or [])
             ]
@@ -359,11 +369,11 @@ class GroupFunction(Typer):
             )
         )
 
-    def command(
+    def command(  # type: ignore
         self,
         name: t.Optional[str] = None,
         *,
-        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        cls: t.Type[CoreTyperCommand] = TyperCommandWrapper,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
         help: t.Optional[str] = None,
         epilog: t.Optional[str] = None,
@@ -396,7 +406,7 @@ class GroupFunction(Typer):
     def group(
         self,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[CoreTyperGroup] = TyperGroupWrapper,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -416,7 +426,7 @@ class GroupFunction(Typer):
         **kwargs,
     ):
         def create_app(func: CommandFunctionType):
-            grp = GroupFunction(
+            grp = GroupFunction(  # type: ignore
                 name=name,
                 cls=cls,
                 invoke_without_command=invoke_without_command,
@@ -466,26 +476,30 @@ def initialize(  # pylint: disable=too-mt.Any-local-variables
     **kwargs,
 ):
     def decorator(func: CommandFunctionType):
-        func._typer_callback_ = lambda cmd, **extra: cmd.typer_app.callback(
-            name=name or extra.pop("name", None),
-            cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
-            invoke_without_command=invoke_without_command,
-            subcommand_metavar=subcommand_metavar,
-            chain=chain,
-            result_callback=result_callback,
-            context_settings=context_settings,
-            help=cmd.typer_app.info.help or help,
-            epilog=epilog,
-            short_help=short_help,
-            options_metavar=options_metavar,
-            add_help_option=add_help_option,
-            no_args_is_help=no_args_is_help,
-            hidden=hidden,
-            deprecated=deprecated,
-            rich_help_panel=rich_help_panel,
-            **kwargs,
-            **extra,
-        )(func)
+        setattr(
+            func,
+            "_typer_callback_",
+            lambda cmd, **extra: cmd.typer_app.callback(
+                name=name or extra.pop("name", None),
+                cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
+                invoke_without_command=invoke_without_command,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                context_settings=context_settings,
+                help=cmd.typer_app.info.help or help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+                **extra,
+            )(func),
+        )
         return func
 
     return decorator
@@ -509,24 +523,28 @@ def command(
     **kwargs,
 ):
     def decorator(func: CommandFunctionType):
-        func._typer_command_ = lambda cmd, **extra: cmd.typer_app.command(
-            name=name or extra.pop("name", None),
-            *args,
-            cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
-            context_settings=context_settings,
-            help=help,
-            epilog=epilog,
-            short_help=short_help,
-            options_metavar=options_metavar,
-            add_help_option=add_help_option,
-            no_args_is_help=no_args_is_help,
-            hidden=hidden,
-            deprecated=deprecated,
-            # Rich settings
-            rich_help_panel=rich_help_panel,
-            **kwargs,
-            **extra,
-        )(func)
+        setattr(
+            func,
+            "_typer_command_",
+            lambda cmd, **extra: cmd.typer_app.command(
+                name=name or extra.pop("name", None),
+                *args,
+                cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                # Rich settings
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+                **extra,
+            )(func),
+        )
         return func
 
     return decorator
@@ -554,7 +572,7 @@ def group(
     **kwargs,
 ):
     def create_app(func: CommandFunctionType):
-        grp = GroupFunction(
+        grp = GroupFunction(  # type: ignore
             name=name,
             cls=cls,
             invoke_without_command=invoke_without_command,
@@ -580,6 +598,7 @@ def group(
 
 
 class _TyperCommandMeta(type):
+
     def __new__(
         mcs,
         name,
@@ -602,9 +621,11 @@ class _TyperCommandMeta(type):
         deprecated: bool = Default(False),
         rich_markup_mode: MarkupMode = None,
         rich_help_panel: t.Union[str, None] = Default(None),
-        pretty_exceptions_enable: bool = Default(True),
-        pretty_exceptions_show_locals: bool = Default(True),
-        pretty_exceptions_short: bool = Default(True),
+        pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
+        pretty_exceptions_show_locals: t.Union[DefaultPlaceholder, bool] = Default(
+            True
+        ),
+        pretty_exceptions_short: t.Union[DefaultPlaceholder, bool] = Default(True),
     ):
         """
         This method is called when a new class is created.
@@ -622,7 +643,7 @@ class _TyperCommandMeta(type):
             if isinstance(pretty_exceptions_enable, DefaultPlaceholder):
                 pretty_exceptions_enable = isinstance(tb_config, dict)
 
-            tb_config = tb_config or {}
+            tb_config = tb_config if isinstance(tb_config, dict) else {}
             if isinstance(pretty_exceptions_show_locals, DefaultPlaceholder):
                 pretty_exceptions_show_locals = tb_config.get(
                     "show_locals", pretty_exceptions_show_locals
@@ -653,8 +674,10 @@ class _TyperCommandMeta(type):
                 rich_markup_mode=rich_markup_mode,
                 rich_help_panel=rich_help_panel,
                 pretty_exceptions_enable=pretty_exceptions_enable,
-                pretty_exceptions_show_locals=pretty_exceptions_show_locals,
-                pretty_exceptions_short=pretty_exceptions_short,
+                pretty_exceptions_show_locals=t.cast(
+                    bool, pretty_exceptions_show_locals
+                ),
+                pretty_exceptions_short=t.cast(bool, pretty_exceptions_short),
             )
 
             attrs = {
@@ -670,13 +693,14 @@ class _TyperCommandMeta(type):
         This method is called after a new class is created.
         """
         if getattr(cls, "typer_app", None):
+            cls = t.cast("TyperCommand", cls)  # mypy thinks cls is the meta class
             cls.typer_app.info.name = cls.__module__.rsplit(".", maxsplit=1)[-1]
             cls.suppressed_base_arguments = {
                 arg.lstrip("--").replace("-", "_")
-                for arg in cls.suppressed_base_arguments
+                for arg in cls.suppressed_base_arguments or []
             }  # per django docs - allow these to be specified by either the option or param name
 
-            def get_ctor(attr):
+            def get_ctor(attr: str) -> t.Optional[t.Callable[..., t.Any]]:
                 return getattr(
                     attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
                 )
@@ -733,6 +757,49 @@ class _TyperCommandMeta(type):
         super().__init__(name, bases, attrs, **kwargs)
 
 
+class CommandNode:
+    name: str
+    command: click.Command
+    context: TyperContext
+    django_command: "TyperCommand"
+    parent: t.Optional["CommandNode"] = None
+    children: t.Dict[str, "CommandNode"]
+
+    def __init__(
+        self,
+        name: str,
+        command: click.Command,
+        context: TyperContext,
+        django_command: "TyperCommand",
+        parent: t.Optional["CommandNode"] = None,
+    ):
+        self.name = name
+        self.command = command
+        self.context = context
+        self.django_command = django_command
+        self.parent = parent
+        self.children = {}
+
+    def print_help(self):
+        unset = None
+        if self.django_command.no_color:
+            unset = os.environ.get("NO_COLOR", None)
+            os.environ["NO_COLOR"] = "1"
+        self.command.get_help(self.context)
+        if unset:
+            os.environ["NO_COLOR"] = unset
+        else:
+            os.environ.pop("NO_COLOR", None)
+
+    def get_command(self, *command_path: str):
+        if not command_path:
+            return self
+        try:
+            return self.children[command_path[0]].get_command(*command_path[1:])
+        except KeyError:
+            raise ValueError(f'No such command "{command_path[0]}"')
+
+
 class TyperParser:
     class Action:
         param: click.Parameter
@@ -766,7 +833,7 @@ class TyperParser:
         self.prog_name = prog_name
         self.subcommand = subcommand
 
-        def populate_params(node):
+        def populate_params(node: CommandNode) -> None:
             for param in node.command.params:
                 self._actions.append(self.Action(param))
             for child in node.children.values():
@@ -839,48 +906,6 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     # they can use the type from django_typer.types.Verbosity
     suppressed_base_arguments: t.Optional[t.Iterable[str]] = {"verbosity"}
 
-    class CommandNode:
-        name: str
-        command: t.Union[TyperCommandWrapper, TyperGroupWrapper]
-        context: TyperContext
-        django_command: "TyperCommand"
-        parent: t.Optional["CommandNode"] = None
-        children: t.Dict[str, "CommandNode"]
-
-        def __init__(
-            self,
-            name: str,
-            command: t.Union[TyperCommandWrapper, TyperGroupWrapper],
-            context: TyperContext,
-            django_command: "TyperCommand",
-            parent: t.Optional["CommandNode"] = None,
-        ):
-            self.name = name
-            self.command = command
-            self.context = context
-            self.django_command = django_command
-            self.parent = parent
-            self.children = {}
-
-        def print_help(self):
-            unset = None
-            if self.django_command.no_color:
-                unset = os.environ.get("NO_COLOR", None)
-                os.environ["NO_COLOR"] = "1"
-            self.command.get_help(self.context)
-            if unset:
-                os.environ["NO_COLOR"] = unset
-            else:
-                os.environ.pop("NO_COLOR", None)
-
-        def get_command(self, *command_path: str):
-            if not command_path:
-                return self
-            try:
-                return self.children[command_path[0]].get_command(*command_path[1:])
-            except KeyError:
-                raise ValueError(f'No such command "{command_path[0]}"')
-
     typer_app: Typer
     no_color: bool = False
     force_color: bool = False
@@ -927,12 +952,12 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                     ctx.command,
                     "commands",
                     {
-                        name: ctx.command.get_command(ctx, name)
-                        for name in getattr(ctx.command, "list_commands", lambda _: [])(
-                            ctx
+                        name: ctx.command.get_command(ctx, name)  # type: ignore[attr-defined]
+                        for name in (
+                            ctx.command.list_commands(ctx)
+                            if isinstance(ctx.command, click.MultiCommand)
+                            else []
                         )
-                        or cmd_filter
-                        or []
                     },
                 ).items()
                 if not cmd_filter or name in cmd_filter
@@ -942,13 +967,14 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
 
     def _build_cmd_tree(
         self,
-        cmd: CoreTyperCommand,
+        cmd: click.Command,
         parent: t.Optional[Context] = None,
         info_name: t.Optional[str] = None,
         node: t.Optional[CommandNode] = None,
     ):
+        assert cmd.name
         ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
-        current = self.CommandNode(cmd.name, cmd, ctx, self, parent=node)
+        current = CommandNode(cmd.name, cmd, ctx, self, parent=node)
         if node:
             node.children[cmd.name] = current
         for cmd in self._filter_commands(ctx):

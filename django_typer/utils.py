@@ -40,3 +40,19 @@ def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
     except (AttributeError, IndexError):
         pass
     return None
+
+
+T = t.TypeVar("T")  # pylint: disable=C0103
+
+
+def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
+    """
+    Type hinting mixin inheritance is really annoying. The current
+    canonical way is to use Protocols but this is prohibitive when
+    the super classes already exist and are extensive. All we're
+    trying to do is let our type checker know about super() methods
+    etc - this is a simple way to do that.
+    """
+    if t.TYPE_CHECKING:
+        return baseclass  # pragma: no cover
+    return object  # type: ignore
