@@ -454,7 +454,7 @@ class Command(TyperCommand):
         add_completion_class(CompletionClass, self.shell.value)
 
         args = CompletionClass(
-            cli=self.noop_command.command,
+            cli=self.noop_command.click_command,
             ctx_args={},
             prog_name=sys.argv[0],
             complete_var=self.COMPLETE_VAR,
