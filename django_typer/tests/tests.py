@@ -1315,6 +1315,7 @@ class TestTracebackConfigNoRich(TestTracebackConfig):
 
 
 class TestSettingsSystemCheck(TestCase):
+
     def test_warning_thrown(self):
         result = run_command(
             "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
@@ -1326,3 +1327,8 @@ class TestSettingsSystemCheck(TestCase):
         self.assertIn(
             "HINT: Unexpected parameters encountered: unexpected_setting.", result
         )
+
+    
+def test_get_current_command_returns_none():
+    from django_typer.utils import get_current_command
+    assert get_current_command() is None

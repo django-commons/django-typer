@@ -44,6 +44,14 @@ this. This is the reason for the pluggable --fallback awkwardness in shellcomple
 
 4) Too much of the BaseCommand implementation is built assuming argparse. A more
 generalized abstraction of this interface is in order.
+
+5) There is an awkwardness to how parse_args flattens all the arguments and options
+into a single dictionary. This means that when mapping a library like Typer onto the
+BaseCommand interface you cannot allow arguments at different levels
+(e.g. in initialize()) or group() functions above the command to have the same names as
+the command's options. You can work around this by using a different name for the
+option in the command and supplying the desired name in the annotation, but its an odd
+quirk imposed by the base class for users to be aware of.
 """
 
 import contextlib
