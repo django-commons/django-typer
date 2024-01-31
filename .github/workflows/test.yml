@@ -128,8 +128,6 @@ jobs:
         echo "  compinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
-        source ~/.zshrc
-        rm -f ~/.zcompdump; compinit
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
