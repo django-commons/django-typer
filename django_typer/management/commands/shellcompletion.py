@@ -155,10 +155,8 @@ class Command(TyperCommand):
             "_shell",
             Shells(
                 os.environ[self.COMPLETE_VAR].partition("_")[2]
-                if self.COMPLETE_VAR in os.environ
-                else detect_shell()[0]
-            ),
-        )
+            ) if self.COMPLETE_VAR in os.environ else None,
+        ) or Shells(detect_shell()[0])
 
     @shell.setter
     def shell(self, shell: t.Optional[Shells]):
