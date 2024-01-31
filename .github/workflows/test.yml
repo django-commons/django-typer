@@ -120,9 +120,9 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Install Homebrew and Zshell Completion
+      shell: zsh
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-        echo $SHELL
         touch ~/.zshrc
         (echo; echo 'eval "$(brew shellenv)"') >> ~/.zshrc
         eval "$(brew shellenv)"
@@ -145,6 +145,7 @@ jobs:
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Run Unit Tests
+      shell: zsh
       run: |
         poetry run pytest django_typer/tests/completion_tests.py
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
