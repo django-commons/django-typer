@@ -153,9 +153,11 @@ class Command(TyperCommand):
         return getattr(
             self,
             "_shell",
-            Shells(
-                os.environ[self.COMPLETE_VAR].partition("_")[2]
-            ) if self.COMPLETE_VAR in os.environ else None,
+            (
+                Shells(os.environ[self.COMPLETE_VAR].partition("_")[2])
+                if self.COMPLETE_VAR in os.environ
+                else None
+            ),
         ) or Shells(detect_shell()[0])
 
     @shell.setter
