@@ -121,7 +121,6 @@ jobs:
         virtualenvs-in-project: true
     - name: Install Homebrew and Zshell Completion
       run: |
-        xcode-select --install
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         brew install zsh-completions
         echo "if type brew &>/dev/null; then" >> ~/.zshrc
@@ -130,7 +129,7 @@ jobs:
         echo "\tcompinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
-        
+
     - name: Install Release Dependencies
       run: |
         poetry config virtualenvs.in-project true
