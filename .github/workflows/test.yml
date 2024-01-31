@@ -122,6 +122,7 @@ jobs:
     - name: Install Homebrew and Zshell Completion
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        echo $SHELL
         touch ~/.zshrc
         (echo; echo 'eval "$(brew shellenv)"') >> ~/.zshrc
         eval "$(brew shellenv)"
