@@ -115,7 +115,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install Homebrew and Zshell Completion
-      shell: zsh {0} -i
+      shell: zsh {0}
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         touch ~/.zshrc
@@ -142,7 +142,7 @@ jobs:
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Run Unit Tests
-      shell: zsh {0} -i
+      shell: zsh {0}
       run: |
         poetry run pytest django_typer/tests/completion_tests.py
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
