@@ -145,7 +145,7 @@ jobs:
         chmod go-w /usr/local/share
         chmod -R go-w /usr/local/share/zsh
         source ~/.zshrc
-        chsh -s /bin/zsh
+        sudo chsh -s /bin/zsh runner
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
