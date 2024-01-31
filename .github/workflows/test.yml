@@ -150,6 +150,7 @@ jobs:
       shell: bash
       run: |
         brew install bash-completion@2
+        touch ~/.bash_profile
         echo "[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
         source ~/.bash_profile
 
