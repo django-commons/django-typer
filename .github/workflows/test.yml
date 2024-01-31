@@ -124,6 +124,8 @@ jobs:
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         brew install zsh-completions
         touch ~/.zshrc
+        (echo; echo 'eval "$(brew shellenv)"') >> ~/.zshrc
+        eval "$(brew shellenv)"
         echo "if type brew &>/dev/null; then" >> ~/.zshrc
         echo "  FPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH" >> ~/.zshrc
         echo "  autoload -Uz compinit" >> ~/.zshrc
