@@ -130,7 +130,7 @@ jobs:
         echo "  compinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
-        zsh -c "rm -f ~/.zcompdump; compinit"
+        zsh -c "source ~/.zshrc; rm -f ~/.zcompdump; compinit"
 
     - name: Install Release Dependencies
       run: |
