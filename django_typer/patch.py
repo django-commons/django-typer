@@ -22,7 +22,7 @@ import os
 import sys
 import typing as t
 
-from click import get_current_context
+import click
 
 from django_typer.utils import get_current_command
 
@@ -76,7 +76,7 @@ def apply() -> None:
             Of all the patching this is the sketchiest.
             """
             console = console_getter(stderr=stderr)
-            ctx = get_current_context(silent=True)
+            ctx = click.get_current_context(silent=True)
             cmd = get_current_command()
             console.no_color = (
                 ctx.params.get("no_color", "NO_COLOR" in os.environ)
@@ -95,3 +95,29 @@ def apply() -> None:
         rich_utils._get_rich_console = get_console
     except ImportError:
         pass
+
+from typer import __version__ as typer_version
+typer_version = tuple(int(v) for v in typer_version.split("."))
+if (0, 4, 0) <= typer_version <= (0, 9, 0):
+    from typer import main
+    upstream_get_click_param = main.get_click_param
+
+    def patched_get_click_param(
+        param: main.ParamMeta,
+    ) -> t.Tuple[t.Union[click.Argument, click.Option], t.Any]:
+        """
+        Patch this bug: https://github.com/tiangolo/typer/issues/334
+
+        This gets shell completions working for arguments. As of 0.9.0 I have
+        an open PR to fix this problem upstream, but it is enough of an issue
+        that its worth patching here until it gets merged.
+        """
+        click_param = upstream_get_click_param(param)
+        if (
+            isinstance(click_param[0], click.Argument) and
+            getattr(param.default, 'shell_complete', None)
+        ):
+            click_param[0]._custom_shell_complete = param.default.shell_complete
+        return click_param
+
+    main.get_click_param = patched_get_click_param
