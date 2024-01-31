@@ -123,6 +123,7 @@ jobs:
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         brew install zsh-completions
+        touch ~/.zshrc
         echo "if type brew &>/dev/null; then" >> ~/.zshrc
         echo "\tFPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH" >> ~/.zshrc
         echo "\tautoload -Uz compinit" >> ~/.zshrc
