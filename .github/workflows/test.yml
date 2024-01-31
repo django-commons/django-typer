@@ -142,6 +142,8 @@ jobs:
         echo "  compinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
+        chmod go-w /usr/local/share
+        chmod -R go-w /usr/local/share/zsh
         source ~/.zshrc
 
     - name: Install Poetry
