@@ -146,6 +146,12 @@ jobs:
         chmod -R go-w /usr/local/share/zsh
         source ~/.zshrc
         sudo chsh -s /bin/zsh runner
+    - name: Install Bash Completions
+      shell: bash
+      run: |
+        brew install bash-completion@2
+        echo "[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
+        source ~/.bash_profile
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
