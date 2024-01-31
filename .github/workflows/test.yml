@@ -1,6 +1,19 @@
 name: test
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - **
+  pull_request:
+    branches:
+      - **
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 jobs:
 
@@ -108,9 +121,14 @@ jobs:
             django-version: '3.2'
 
     steps:
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       with:
         python-version: ${{ matrix.python-version }}
 
