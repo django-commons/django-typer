@@ -1,18 +1,20 @@
 r"""
-    ___ _                           _____                       
-   /   (_) __ _ _ __   __ _  ___   /__   \_   _ _ __   ___ _ __ 
-  / /\ / |/ _` | '_ \ / _` |/ _ \    / /\/ | | | '_ \ / _ \ '__|
- / /_//| | (_| | | | | (_| | (_) |  / /  | |_| | |_) |  __/ |   
-/___,'_/ |\__,_|_| |_|\__, |\___/   \/    \__, | .__/ \___|_|   
-     |__/             |___/               |___/|_|              
+::
+
+      ___ _                           _____                       
+     /   (_) __ _ _ __   __ _  ___   /__   \_   _ _ __   ___ _ __ 
+    / /\ / |/ _` | '_ \ / _` |/ _ \    / /\/ | | | '_ \ / _ \ '__|
+   / /_//| | (_| | | | | (_| | (_) |  / /  | |_| | |_) |  __/ |   
+  /___,'_/ |\__,_|_| |_|\__, |\___/   \/    \__, | .__/ \___|_|   
+       |__/             |___/               |___/|_|              
 
 
 django-typer provides an extension to the base django management command class that
 melds the typer/click infrastructure with the django infrastructure. The result is
 all the ease of specifying commands, groups and options and arguments using typer and
-click in a way that feels like and is interface compatible with django's base
-management commands This should enable a smooth transition for existing django
-commands and an intuitive feel for implementing new commands.
+click in a way that feels like and is interface compatible with django's BaseCommand_
+This should enable a smooth transition for existing django commands and an intuitive
+feel for implementing new commands.
 
 django-typer also supports shell completion for bash, zsh, fish and powershell and
 extends that support to native django management commands as well.
@@ -46,7 +48,6 @@ generalized abstraction of this interface is in order.
 
 import contextlib
 import inspect
-import os
 import sys
 import typing as t
 from copy import deepcopy
@@ -78,7 +79,7 @@ from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
 from .types import Style as ColorStyle
 from .types import Traceback, Verbosity, Version
 
-VERSION = (0, 4, "0b")
+VERSION = (0, 5, "0b")
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -1288,7 +1289,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     the command tree is built thats used for subcommand resolution in django-typer's
     get_command method and for help output.
 
-    All of the documented BaseCommand functionality works as expected. call_command()
+    All of the documented BaseCommand_ functionality works as expected. call_command()
     also works as expected. TyperCommands however add a few extra features:
 
     - Simple TyperCommands implemented only using handle() can be invoked directly
@@ -1520,7 +1521,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         below this call may use get_current_command() to get a reference
         to the command instance.
 
-        *args and **options are passed to handle().
+        args and options are passed to handle().
 
         :param args: the arguments to pass to the command
         :param options: the options to pass to the command

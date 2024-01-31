@@ -21,5 +21,6 @@ Installation
    :maxdepth: 2
    :caption: Contents:
 
+   commands
    reference
    changelog

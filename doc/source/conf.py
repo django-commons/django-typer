@@ -1,7 +1,12 @@
 from datetime import datetime
 import sys
+import os
 from pathlib import Path
 from sphinx.ext.autodoc import between
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings')
+django.setup()
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 import django_typer
@@ -64,10 +69,18 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = [
+    '_static',
+]
+html_css_files = [
+    'style.css',
+]
 
 todo_include_todos = True
 
+def add_page_class(app, pagename, templatename, context, doctree):
+    from sphinx.builders.html._assets import _CascadingStyleSheet
+    context['css_files'] += [_CascadingStyleSheet(f'_static/{pagename}.css')]
 
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
@@ -76,4 +89,5 @@ def setup(app):
         'autodoc-process-docstring',
         between('^.*[*]{79}.*$', exclude=True)
     )
+    app.connect('html-page-context', add_page_class)
     return app

@@ -41,7 +41,7 @@ All of the BaseCommand functionality is preserved, so that TyperCommand can be a
 
 .. warning::
 
-    This is an early beta release. Expect rapid changes.
+    This is a late beta release. The interface is mostly stable but there may be lingering issues.
 
 
 .. code-block:: python
