@@ -125,11 +125,13 @@ jobs:
         brew install zsh-completions
         touch ~/.zshrc
         echo "if type brew &>/dev/null; then" >> ~/.zshrc
-        echo "\tFPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH" >> ~/.zshrc
-        echo "\tautoload -Uz compinit" >> ~/.zshrc
-        echo "\tcompinit" >> ~/.zshrc
+        echo "  FPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH" >> ~/.zshrc
+        echo "  autoload -Uz compinit" >> ~/.zshrc
+        echo "  compinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
+        rm -f ~/.zcompdump; compinit
+        cat ~/.zshrc
 
     - name: Install Release Dependencies
       run: |
