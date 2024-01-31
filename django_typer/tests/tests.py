@@ -1328,7 +1328,8 @@ class TestSettingsSystemCheck(TestCase):
             "HINT: Unexpected parameters encountered: unexpected_setting.", result
         )
 
-    
+
 def test_get_current_command_returns_none():
     from django_typer.utils import get_current_command
+
     assert get_current_command() is None
