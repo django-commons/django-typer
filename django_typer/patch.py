@@ -96,14 +96,17 @@ def apply() -> None:
     except ImportError:
         pass
 
-from typer import __version__ as typer_version
-typer_version = tuple(int(v) for v in typer_version.split("."))
-if (0, 4, 0) <= typer_version <= (0, 9, 0):
-    from typer import main
-    upstream_get_click_param = main.get_click_param
+
+from typer import __version__
+
+if (0, 4, 0) <= tuple(int(v) for v in __version__.split(".")) <= (0, 9, 0):
+    from typer import main as typer_main
+    from typer.models import ParamMeta
+
+    upstream_get_click_param = typer_main.get_click_param
 
     def patched_get_click_param(
-        param: main.ParamMeta,
+        param: ParamMeta,
     ) -> t.Tuple[t.Union[click.Argument, click.Option], t.Any]:
         """
         Patch this bug: https://github.com/tiangolo/typer/issues/334
@@ -113,11 +116,10 @@ if (0, 4, 0) <= typer_version <= (0, 9, 0):
         that its worth patching here until it gets merged.
         """
         click_param = upstream_get_click_param(param)
-        if (
-            isinstance(click_param[0], click.Argument) and
-            getattr(param.default, 'shell_complete', None)
+        if isinstance(click_param[0], click.Argument) and getattr(
+            param.default, "shell_complete", None
         ):
             click_param[0]._custom_shell_complete = param.default.shell_complete
         return click_param
 
-    main.get_click_param = patched_get_click_param
+    typer_main.get_click_param = patched_get_click_param
