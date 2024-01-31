@@ -97,9 +97,9 @@ def apply() -> None:
         pass
 
 
-from typer import __version__
+from typer import __version__ as typer_version
 
-if (0, 4, 0) <= tuple(int(v) for v in __version__.split(".")) <= (0, 9, 0):
+if (0, 4, 0) <= tuple(int(v) for v in typer_version.split(".")) <= (0, 9, 0):
     from typer import main as typer_main
     from typer.models import ParamMeta
 
