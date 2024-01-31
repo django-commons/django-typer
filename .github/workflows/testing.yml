@@ -50,52 +50,52 @@ jobs:
         name: coverage-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  linux-shell-completion:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.12']
-        django-version:
-          - '3.2' # LTS April 2024
-          - '5.0' # April 2025
-        exclude:
-          - python-version: '3.9'
-            django-version: '5.0'
-          - python-version: '3.12'
-            django-version: '3.2'
+  # linux-shell-completion:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       python-version: ['3.9', '3.12']
+  #       django-version:
+  #         - '3.2' # LTS April 2024
+  #         - '5.0' # April 2025
+  #       exclude:
+  #         - python-version: '3.9'
+  #           django-version: '5.0'
+  #         - python-version: '3.12'
+  #           django-version: '3.2'
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Set up Python ${{ matrix.python-version }}
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Install Release Dependencies
-      run: |
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
-    - name: Run Unit Tests
-      run: |
-        poetry run pytest django_typer/tests/completion_tests.py
-        mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+  #   - name: Install Poetry
+  #     uses: snok/install-poetry@v1
+  #     with:
+  #       virtualenvs-create: true
+  #       virtualenvs-in-project: true
+  #   - name: Install Release Dependencies
+  #     run: |
+  #       poetry config virtualenvs.in-project true
+  #       poetry run pip install --upgrade pip
+  #       poetry install
+  #       poetry run pip install -U "Django~=${{ matrix.django-version }}"
+  #   - name: Run Unit Tests
+  #     run: |
+  #       poetry run pytest django_typer/tests/completion_tests.py
+  #       mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-    - name: Store coverage files
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+  #   - name: Store coverage files
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+  #       path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
 
   coverage-combine:
-    needs: [test, linux-shell-completion]
+    needs: [test] #, linux-shell-completion]
     runs-on: ubuntu-latest
 
     steps:

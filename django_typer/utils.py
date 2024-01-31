@@ -5,8 +5,9 @@ command execution.
 """
 
 import typing as t
-from threading import local
 from contextlib import contextmanager
+from threading import local
+
 from django.conf import settings
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
