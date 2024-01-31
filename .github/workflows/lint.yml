@@ -1,4 +1,4 @@
-name: linting
+name: lint
 
 on: [push, pull_request, workflow_dispatch]
 

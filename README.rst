@@ -22,11 +22,11 @@
 .. |Code Cov| image:: https://codecov.io/gh/bckohan/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL
    :target: https://codecov.io/gh/bckohan/django-typer
 
-.. |Test Status| image:: https://github.com/bckohan/django-typer/workflows/tests/badge.svg
-   :target: https://github.com/bckohan/django-typer/actions/workflows/tests.yml
+.. |Test Status| image:: https://github.com/bckohan/django-typer/workflows/test/badge.svg
+   :target: https://github.com/bckohan/django-typer/actions/workflows/test.yml
 
-.. |Lint Status| image:: https://github.com/bckohan/django-typer/workflows/linting/badge.svg
-   :target: https://github.com/bckohan/django-typer/actions/workflows/linting.yml
+.. |Lint Status| image:: https://github.com/bckohan/django-typer/workflows/lint/badge.svg
+   :target: https://github.com/bckohan/django-typer/actions/workflows/lint.yml
 
 .. |Code Style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
