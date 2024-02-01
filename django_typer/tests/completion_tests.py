@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 import pytest
+from django.core.management import CommandError
 from django.test import TestCase
 from shellingham import detect_shell
 
@@ -48,8 +49,7 @@ def read_all_from_fd_with_timeout(fd, timeout):
     return bytes(all_data).decode()
 
 
-@pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")
-class DefaultCompleteTestCase(TestCase):
+class _DefaultCompleteTestCase(TestCase):
 
     shell = None
     manage_script = "manage.py"
@@ -164,7 +164,7 @@ class DefaultCompleteTestCase(TestCase):
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
-class ZshShellTests(DefaultCompleteTestCase):
+class ZshShellTests(_DefaultCompleteTestCase):
 
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
@@ -181,7 +181,7 @@ class ZshShellTests(DefaultCompleteTestCase):
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashShellTests(DefaultCompleteTestCase):
+class BashShellTests(_DefaultCompleteTestCase):
 
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
@@ -195,3 +195,16 @@ class BashShellTests(DefaultCompleteTestCase):
         if not script:
             script = self.command.manage_script_name
         self.assertFalse((self.directory / f"{script}.sh").exists())
+
+
+@pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")
+class DefaultCompleteTestCase(_DefaultCompleteTestCase):
+    pass
+
+
+@pytest.mark.skipif(default_shell is not None, reason="shellingham detected a shell")
+class DefaultCompleteTestCase(_DefaultCompleteTestCase):
+
+    def test_shell_complete(self):
+        with self.assertRaises(CommandError):
+            return super().test_shell_complete()

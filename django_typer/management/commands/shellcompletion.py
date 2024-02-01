@@ -168,7 +168,7 @@ class Command(TyperCommand):
                 self._shell = detect_shell()[0]
             except (ShellDetectionFailure, RuntimeError) as err:
                 raise CommandError(
-                    _(
+                    gettext(
                         "Please specify the shell to install or remove "
                         "autocompletion for. Unable to detect shell: {err}"
                     ).format(err=str(err))
