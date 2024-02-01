@@ -170,8 +170,8 @@ class Command(TyperCommand):
                 raise CommandError(
                     _(
                         "Please specify the shell to install or remove "
-                        "autocompletion for. Unable to detect shell because: {err}"
-                    )
+                        "autocompletion for. Unable to detect shell: {err}"
+                    ).format(err=str(err))
                 ) from err
         self._shell = shell if isinstance(shell, Shells) else Shells(shell)
 

@@ -16,6 +16,13 @@ from django_typer.management.commands.shellcompletion import Command as ShellCom
 from django_typer.tests.polls.models import Question as Poll
 from django_typer.tests.test_app.models import ShellCompleteTester
 
+default_shell = None
+
+try:
+    default_shell = detect_shell()[0]
+except Exception:
+    pass
+
 
 def read_all_from_fd_with_timeout(fd, timeout):
     all_data = bytearray()
@@ -41,6 +48,7 @@ def read_all_from_fd_with_timeout(fd, timeout):
     return bytes(all_data).decode()
 
 
+@pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")
 class DefaultCompleteTestCase(TestCase):
 
     shell = None
