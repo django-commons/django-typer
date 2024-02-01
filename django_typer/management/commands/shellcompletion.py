@@ -164,12 +164,15 @@ class Command(TyperCommand):
     def shell(self, shell: t.Optional[Shells]):
         """Set the shell to install autocompletion for."""
         if shell is None:
-            raise CommandError(
-                _(
-                    "Unable to detect shell. Please specify the shell to install or remove "
-                    "autocompletion for."
-                )
-            )
+            try:
+                self._shell = detect_shell()[0]
+            except (ShellDetectionFailure, RuntimeError) as err:
+                raise CommandError(
+                    _(
+                        "Please specify the shell to install or remove "
+                        "autocompletion for. Unable to detect shell because: {err}"
+                    )
+                ) from err
         self._shell = shell if isinstance(shell, Shells) else Shells(shell)
 
     @cached_property
