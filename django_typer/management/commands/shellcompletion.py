@@ -386,7 +386,7 @@ class Command(TyperCommand):
             }.get(self.shell, None)
             if rc_file and rc_file.is_file():
                 edited = []
-                with open(rc_file, "rt", encoding='utf-8') as rc:
+                with open(rc_file, "rt", encoding="utf-8") as rc:
                     for line in rc.readlines():
                         if (
                             self.shell is Shells.bash
@@ -399,7 +399,7 @@ class Command(TyperCommand):
                 while edited and not edited[-1].strip():
                     edited.pop()
                 edited.append("")  # add one back on
-                with open(rc_file, "wt", encoding='utf-8') as rc:
+                with open(rc_file, "wt", encoding="utf-8") as rc:
                     rc.writelines(edited)
 
         self.stdout = stdout

@@ -208,21 +208,30 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
         self.assertFalse((self.directory / f"{script}.sh").exists())
 
 
-# @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-# class PowerShellTests(_DefaultCompleteTestCase, TestCase):
+@pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
+class PowerShellTests(_DefaultCompleteTestCase, TestCase):
 
-#     shell = "bash"
-#     directory = Path("~/.bash_completions").expanduser()
+    shell = "pwsh"
+    directory = Path("~/.config/powershell").expanduser()
 
-#     def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
-#         if not script:
-#             script = self.command.manage_script_name
-#         self.assertTrue((self.directory / f"{script}.sh").exists())
+    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
+        if not script:
+            script = self.command.manage_script_name
+        self.assertTrue((self.directory / f"Microsoft.PowerShell_profile.ps1").exists())
+        self.assertTrue(
+            "shellcompletion complete"
+            in (self.directory / f"Microsoft.PowerShell_profile.ps1").read_text()
+        )
 
-#     def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
-#         if not script:
-#             script = self.command.manage_script_name
-#         self.assertFalse((self.directory / f"{script}.sh").exists())
+    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
+        if not script:
+            script = self.command.manage_script_name
+        if (self.directory / f"Microsoft.PowerShell_profile.ps1").exists():
+            contents = (
+                self.directory / f"Microsoft.PowerShell_profile.ps1"
+            ).read_text()
+            self.assertFalse("shellcompletion complete" in contents)
+            self.assertTrue(contents)  # should have been deleted if it were empty
 
 
 @pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")

@@ -153,7 +153,6 @@ jobs:
         touch ~/.bash_profile
         echo "[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
         source ~/.bash_profile
-
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
