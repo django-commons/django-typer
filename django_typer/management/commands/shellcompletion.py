@@ -382,23 +382,26 @@ class Command(TyperCommand):
             installed_path.unlink()
             rc_file = {
                 Shells.bash: Path("~/.bashrc").expanduser(),
-                Shells.zsh: Path("~/.zshrc").expanduser()
+                Shells.zsh: Path("~/.zshrc").expanduser(),
             }.get(self.shell, None)
             if rc_file and rc_file.is_file():
                 edited = []
-                with open(rc_file, "rt") as rc:
+                with open(rc_file, "rt", encoding='utf-8') as rc:
                     for line in rc.readlines():
-                        if self.shell is Shells.bash and line.strip() == f"source {installed_path}":
+                        if (
+                            self.shell is Shells.bash
+                            and line.strip() == f"source {installed_path}"
+                        ):
                             continue
                         edited.append(line)
                 # remove empty lines from the end of the file, the typer install scripts add
                 # extra newlines
                 while edited and not edited[-1].strip():
                     edited.pop()
-                edited.append('')  # add one back on
-                with open(rc_file, "wt") as rc:
+                edited.append("")  # add one back on
+                with open(rc_file, "wt", encoding='utf-8') as rc:
                     rc.writelines(edited)
-                
+
         self.stdout = stdout
         self.stdout.write(
             self.style.WARNING(  # pylint: disable=no-member

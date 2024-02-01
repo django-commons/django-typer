@@ -49,7 +49,7 @@ def read_all_from_fd_with_timeout(fd, timeout):
     return bytes(all_data).decode()
 
 
-class _DefaultCompleteTestCase(TestCase):
+class _DefaultCompleteTestCase:
 
     shell = None
     manage_script = "manage.py"
@@ -160,11 +160,7 @@ class _DefaultCompleteTestCase(TestCase):
         self.assertIn("migrate", completions)
         self.assertIn("dumpdata", completions)
         self.assertIn("completion", completions)
-        # self.assertIn("help_precedence1", completions)
-        # self.assertIn("help_precedence2", completions)
-        # self.assertIn("help_precedence3", completions)
-        # self.assertIn("help_precedence4", completions)
-        # self.assertIn("help_precedence5", completions)
+        self.assertIn("help_precedence", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
@@ -179,7 +175,7 @@ class _DefaultCompleteTestCase(TestCase):
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
-class ZshShellTests(_DefaultCompleteTestCase):
+class ZshShellTests(_DefaultCompleteTestCase, TestCase):
 
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
@@ -196,7 +192,7 @@ class ZshShellTests(_DefaultCompleteTestCase):
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashShellTests(_DefaultCompleteTestCase):
+class BashShellTests(_DefaultCompleteTestCase, TestCase):
 
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
@@ -212,14 +208,31 @@ class BashShellTests(_DefaultCompleteTestCase):
         self.assertFalse((self.directory / f"{script}.sh").exists())
 
 
+# @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
+# class PowerShellTests(_DefaultCompleteTestCase, TestCase):
+
+#     shell = "bash"
+#     directory = Path("~/.bash_completions").expanduser()
+
+#     def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
+#         if not script:
+#             script = self.command.manage_script_name
+#         self.assertTrue((self.directory / f"{script}.sh").exists())
+
+#     def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
+#         if not script:
+#             script = self.command.manage_script_name
+#         self.assertFalse((self.directory / f"{script}.sh").exists())
+
+
 @pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")
-class DefaultCompleteTestCase(_DefaultCompleteTestCase):
+class DefaultCompleteTestCase(_DefaultCompleteTestCase, TestCase):
     pass
 
 
 @pytest.mark.skipif(default_shell is not None, reason="shellingham detected a shell")
-class DefaultCompleteFailTestCase(_DefaultCompleteTestCase):
+class DefaultCompleteFailTestCase(_DefaultCompleteTestCase, TestCase):
 
     def test_shell_complete(self):
         with self.assertRaises(CommandError):
-            return super().test_shell_complete()
+            super().test_shell_complete()
