@@ -152,11 +152,26 @@ class _DefaultCompleteTestCase(TestCase):
         self.assertIn("sessions", completions)
         self.assertIn("staticfiles", completions)
 
+    def run_command_completion(self):
+        completions = self.get_completions(self.launch_script, "complet", "")
+        self.assertIn("completion", completions)
+        completions = self.get_completions(self.launch_script, " ")
+        self.assertIn("makemigrations", completions)
+        self.assertIn("migrate", completions)
+        self.assertIn("dumpdata", completions)
+        self.assertIn("completion", completions)
+        # self.assertIn("help_precedence1", completions)
+        # self.assertIn("help_precedence2", completions)
+        # self.assertIn("help_precedence3", completions)
+        # self.assertIn("help_precedence4", completions)
+        # self.assertIn("help_precedence5", completions)
+
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
             self.run_app_completion()
         self.install()
         self.run_app_completion()
+        self.run_command_completion()
         self.remove()
         with self.assertRaises(AssertionError):
             self.run_app_completion()
@@ -169,12 +184,12 @@ class ZshShellTests(_DefaultCompleteTestCase):
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
 
-    def verify_install(self, script=DefaultCompleteTestCase.manage_script):
+    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
         self.assertTrue((self.directory / f"_{script}").exists())
 
-    def verify_remove(self, script=DefaultCompleteTestCase.manage_script):
+    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
         self.assertFalse((self.directory / f"_{script}").exists())
@@ -186,12 +201,12 @@ class BashShellTests(_DefaultCompleteTestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
 
-    def verify_install(self, script=DefaultCompleteTestCase.manage_script):
+    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
         self.assertTrue((self.directory / f"{script}.sh").exists())
 
-    def verify_remove(self, script=DefaultCompleteTestCase.manage_script):
+    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
         self.assertFalse((self.directory / f"{script}.sh").exists())
@@ -203,7 +218,7 @@ class DefaultCompleteTestCase(_DefaultCompleteTestCase):
 
 
 @pytest.mark.skipif(default_shell is not None, reason="shellingham detected a shell")
-class DefaultCompleteTestCase(_DefaultCompleteTestCase):
+class DefaultCompleteFailTestCase(_DefaultCompleteTestCase):
 
     def test_shell_complete(self):
         with self.assertRaises(CommandError):
