@@ -278,6 +278,12 @@ class DefaultCompleteTestCase(_DefaultCompleteTestCase, TestCase):
 @pytest.mark.skipif(default_shell is not None, reason="shellingham detected a shell")
 class DefaultCompleteFailTestCase(_DefaultCompleteTestCase, TestCase):
 
+    def setUp(self):
+        TestCase.setUp(self)
+
+    def tearDown(self):
+        TestCase.tearDown(self)
+
     def test_shell_complete(self):
         with self.assertRaises(CommandError):
-            super().test_shell_complete()
+            self.install()
