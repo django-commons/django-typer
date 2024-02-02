@@ -211,6 +211,7 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
     def set_environment(self, fd):
         super().set_environment(fd)
         os.write(fd, f"source ~/.bashrc\n".encode())
+        os.write(fd, f"source .venv/bin/activate\n".encode())
 
     def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
