@@ -208,6 +208,10 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
 
+    def set_environment(self, fd):
+        super().set_environment(fd)
+        os.write(fd, f"source ~/.bashrc\n".encode())
+
     def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
         if not script:
             script = self.command.manage_script_name
