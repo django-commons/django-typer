@@ -117,11 +117,11 @@ jobs:
             django-version: '3.2'
 
     steps:
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        detached: true
-      timeout-minutes: 15
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
+    #   with:
+    #     detached: true
+    #   timeout-minutes: 15
         
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -170,7 +170,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        poetry run pytest django_typer/tests/completion_tests.py django_typer/tests/completion_tests.py::ZshShellTests || exit 1
+        poetry run pytest django_typer/tests/completion_tests.py::ZshShellTests || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
