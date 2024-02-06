@@ -209,7 +209,7 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
     directory = Path("~/.bash_completions").expanduser()
 
     def set_environment(self, fd):
-        #super().set_environment(fd)
+        # super().set_environment(fd)
         os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
         os.write(
             fd,
