@@ -185,6 +185,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+        timeout-minutes: 15
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
