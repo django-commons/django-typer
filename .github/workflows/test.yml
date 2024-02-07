@@ -214,7 +214,7 @@ jobs:
           merge-multiple: true
 
       - run: ls -la *.coverage
-      - run: poetry run coverage combine *.coverage
+      - run: poetry run coverage combine --keep *.coverage
       - run: poetry run coverage report
       - run: poetry run coverage xml
 
