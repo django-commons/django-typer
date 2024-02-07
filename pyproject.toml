@@ -126,7 +126,13 @@ branch = true
 source = ["django_typer"]
 concurrency = ["multiprocessing"]
 parallel = true
+relative_files = true
 command_line = "-m pytest --cov=django_typer"
+
+[tool.coverage.paths]
+source = [
+    "django_typer"
+]
 
 
 [tool.black]
