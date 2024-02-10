@@ -1,0 +1,4 @@
+# https://github.com/codecov/codecov-python/issues/136
+coverage:
+  fixes:
+    - "__init__.py::django_typer/__init__.py"
