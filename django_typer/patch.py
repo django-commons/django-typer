@@ -88,7 +88,9 @@ def apply() -> None:
                 # no ansi control characters in the text
                 console._color_system = None
             elif cmd and cmd.force_color:
-                console._color_system = COLOR_SYSTEMS["auto"]
+                console._color_system = getattr(
+                    console, "_detect_color_system", lambda: COLOR_SYSTEMS["standard"]
+                )()
                 console._force_terminal = True
             return console
 

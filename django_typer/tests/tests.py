@@ -832,6 +832,11 @@ class TestGroups(TestCase):
             )
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
+            cmd = get_command(cmds[0], stdout=buffer, force_color=True)
+            cmd.print_help("./manage.py", *cmds)
+            hlp = buffer.getvalue()
+            self.assertTrue("\x1b" in hlp)
+
     @override_settings(
         INSTALLED_APPS=[
             "django_typer.tests.test_app2",
