@@ -492,28 +492,39 @@ class Command(TyperCommand):
             else:
                 fallback()
 
-        if not args:
-            call_fallback(fallback)
-        else:
-            try:
-                os.environ[self.COMPLETE_VAR] = os.environ.get(
-                    self.COMPLETE_VAR, f"complete_{self.shell.value}"
-                )
-                cmd = get_command(args[0])
-            except ModuleNotFoundError:
+        def get_completion() -> None:
+            if not args:
                 call_fallback(fallback)
-                return
+            else:
+                try:
+                    os.environ[self.COMPLETE_VAR] = os.environ.get(
+                        self.COMPLETE_VAR, f"complete_{self.shell.value}"
+                    )
+                    cmd = get_command(args[0])
+                except ModuleNotFoundError:
+                    call_fallback(fallback)
+                    return
 
-            if isinstance(cmd, TyperCommand):
-                cmd.typer_app(
-                    args=args[1:],
-                    standalone_mode=True,
-                    django_command=cmd,
-                    complete_var=self.COMPLETE_VAR,
-                    prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
-                )
-                return
-            call_fallback(fallback)
+                if isinstance(cmd, TyperCommand):
+                    cmd.typer_app(
+                        args=args[1:],
+                        standalone_mode=True,
+                        django_command=cmd,
+                        complete_var=self.COMPLETE_VAR,
+                        prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
+                    )
+                    return
+                call_fallback(fallback)
+
+        if cmd_str:
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                try:
+                    get_completion()
+                except SystemExit:
+                    pass
+            return buffer.getvalue()
+        get_completion()
 
     def django_fallback(self):
         """

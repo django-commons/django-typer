@@ -63,7 +63,6 @@ def apply() -> None:
         # not expose a good way to custom configure the Console objects
         # it uses - revisit this if/when typer exposes control of the
         # console object.
-        from rich.console import COLOR_SYSTEMS
         from typer import rich_utils
 
         console_getter = rich_utils._get_rich_console
@@ -88,9 +87,7 @@ def apply() -> None:
                 # no ansi control characters in the text
                 console._color_system = None
             elif cmd and cmd.force_color:
-                console._color_system = getattr(
-                    console, "_detect_color_system", lambda: COLOR_SYSTEMS["standard"]
-                )()
+                console._color_system = console._detect_color_system()
                 console._force_terminal = True
             return console
 

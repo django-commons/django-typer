@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+from decimal import Decimal
 from io import StringIO
 from pathlib import Path
 from typing import Any
@@ -14,10 +15,13 @@ from click.exceptions import UsageError
 from django.apps import apps
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from django_typer import TyperCommand, get_command, group
+from django_typer.tests.polls.models import Question
+from django_typer.tests.test_app.models import ShellCompleteTester
 from django_typer.tests.utils import read_django_parameters
 
 
@@ -1338,3 +1342,79 @@ def test_get_current_command_returns_none():
     from django_typer.utils import get_current_command
 
     assert get_current_command() is None
+
+
+class TestPollExample(TestCase):
+
+    q1 = None
+    q2 = None
+    q3 = None
+
+    def setUp(self):
+        self.q1 = Question.objects.create(
+            question_text="Is Putin a war criminal?",
+            pub_date=timezone.now(),
+        )
+        self.q2 = Question.objects.create(
+            question_text="Is Bibi a war criminal?",
+            pub_date=timezone.now(),
+        )
+        self.q3 = Question.objects.create(
+            question_text="Is Xi a dictator?",
+            pub_date=timezone.now(),
+        )
+        super().setUp()
+
+    def tearDown(self):
+        Question.objects.all().delete()
+        super().tearDown()
+
+    def test_poll_complete(self):
+        # result = run_command("shellcompletion", "complete", "./manage.py closepoll ")
+        result = call_command("shellcompletion", "complete", cmd_str="closepoll ")
+        for q in [self.q1, self.q2, self.q3]:
+            self.assertTrue(str(q.id) in result)
+            self.assertTrue(q.question_text in result)
+
+
+# class TestShellCompletersAndParsers(TestCase):
+
+#     def setUp(self):
+#         super().setUp()
+#         for field, values in {
+#             'char_field': [
+#                 'brian',
+#                 'emma',
+#                 'louis',
+#                 'anna'
+#             ],
+#             'text_field': [
+#                 'sockeye',
+#                 'chinook',
+#                 'steelhead',
+#                 'coho',
+#                 'atlantic',
+#                 'pink',
+#                 'chum'
+#             ],
+#             'float_field': [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
+#             'decimal_field': [
+#                 Decimal('1.5'), Decimal('1.50'), Decimal('1.51'),
+#                 Decimal('1.52'), Decimal('1.2'), Decimal('1.6')
+#             ],
+#             'uuid_field': [
+#                 '12345678-1234-5678-1234-567812345678',
+#                 '12345678-1234-5678-1234-567812345679',
+#                 '12345678-5678-5678-1234-567812345670',
+#                 '12345678-5678-5678-1234-567812345671',
+#             ]
+#         }:
+#             for value in values:
+#                 ShellCompleteTester.objects.create(**{field: value})
+
+#     def tearDown(self) -> None:
+#         ShellCompleteTester.objects.all().delete()
+#         return super().tearDown()
+
+#     def test_char_field(self):
+#         result = run_command("shell_complete", "django_typer.tests.test_app")
