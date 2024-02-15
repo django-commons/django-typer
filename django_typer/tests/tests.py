@@ -1370,8 +1370,13 @@ class TestPollExample(TestCase):
         super().tearDown()
 
     def test_poll_complete(self):
+        import contextlib
         # result = run_command("shellcompletion", "complete", "./manage.py closepoll ")
-        result = call_command("shellcompletion", "complete", cmd_str="closepoll ")
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", cmd_str="closepoll ")
+        
+        result = result.getvalue()
         for q in [self.q1, self.q2, self.q3]:
             self.assertTrue(str(q.id) in result)
             self.assertTrue(q.question_text in result)

@@ -517,13 +517,11 @@ class Command(TyperCommand):
                 call_fallback(fallback)
 
         if cmd_str:
-            buffer = io.StringIO()
-            with contextlib.redirect_stdout(buffer):
-                try:
-                    get_completion()
-                except SystemExit:
-                    pass
-            return buffer.getvalue()
+            try:
+                get_completion()
+                return
+            except SystemExit:
+                return
         get_completion()
 
     def django_fallback(self):
