@@ -421,6 +421,14 @@ class Command(TyperCommand):
                 help=_("The command string to generate completion suggestions for."),
             ),
         ] = None,
+        shell: t.Annotated[
+            t.Optional[Shells],
+            Argument(
+                help=_(
+                    "Specify the shell to fetch completion for, default will autodetect."
+                )
+            ),
+        ] = None,
         fallback: t.Annotated[
             t.Optional[str],
             Option(
@@ -437,6 +445,13 @@ class Command(TyperCommand):
         Django environment needs to be bootstrapped for it to work. This also allows
         us to test autocompletions in a platform agnostic way.
         """
+        os.environ[self.COMPLETE_VAR] = (
+            f"complete_{shell.value}"
+            if shell
+            else os.environ.get(self.COMPLETE_VAR, f"complete_{self.shell.value}")
+        )
+        self.shell = Shells(os.environ[self.COMPLETE_VAR].partition("_")[2])
+
         completion_init()
         CompletionClass = get_completion_class(  # pylint: disable=C0103
             self.shell.value
@@ -497,9 +512,6 @@ class Command(TyperCommand):
                 call_fallback(fallback)
             else:
                 try:
-                    os.environ[self.COMPLETE_VAR] = os.environ.get(
-                        self.COMPLETE_VAR, f"complete_{self.shell.value}"
-                    )
                     cmd = get_command(args[0])
                 except ModuleNotFoundError:
                     call_fallback(fallback)

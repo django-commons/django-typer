@@ -1363,7 +1363,7 @@ class TestPollExample(TestCase):
             pub_date=timezone.now(),
         )
         self.q3 = Question.objects.create(
-            question_text="Is Xi a dictator?",
+            question_text="Is Xi a Pooh Bear?",
             pub_date=timezone.now(),
         )
         super().setUp()
@@ -1374,14 +1374,24 @@ class TestPollExample(TestCase):
 
     def test_poll_complete(self):
         # result = run_command("shellcompletion", "complete", "./manage.py closepoll ")
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", cmd_str="closepoll ")
 
-        result = result.getvalue()
-        for q in [self.q1, self.q2, self.q3]:
-            self.assertTrue(str(q.id) in result)
-            self.assertTrue(q.question_text in result)
+        for shell, has_help in [
+            (None, False),
+            ("zsh", True),
+            ("bash", False),
+            ("pwsh", True),
+        ]:
+            result = StringIO()
+            with contextlib.redirect_stdout(result):
+                call_command(
+                    "shellcompletion", "complete", shell=shell, cmd_str="closepoll "
+                )
+
+            result = result.getvalue()
+            for q in [self.q1, self.q2, self.q3]:
+                self.assertTrue(str(q.id) in result)
+                if has_help:
+                    self.assertTrue(q.question_text in result)
 
 
 # class TestShellCompletersAndParsers(TestCase):
