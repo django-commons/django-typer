@@ -1,3 +1,4 @@
+import contextlib
 import inspect
 import json
 import os
@@ -13,6 +14,7 @@ import django
 import typer
 from click.exceptions import UsageError
 from django.apps import apps
+from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -52,6 +54,7 @@ def get_named_arguments(function):
 
 
 def run_command(command, *args, parse_json=True):
+    # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
         env = os.environ.copy()
@@ -1370,12 +1373,11 @@ class TestPollExample(TestCase):
         super().tearDown()
 
     def test_poll_complete(self):
-        import contextlib
         # result = run_command("shellcompletion", "complete", "./manage.py closepoll ")
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", cmd_str="closepoll ")
-        
+
         result = result.getvalue()
         for q in [self.q1, self.q2, self.q3]:
             self.assertTrue(str(q.id) in result)
