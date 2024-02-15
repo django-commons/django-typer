@@ -52,6 +52,12 @@ jobs:
       run: |
         poetry run pytest
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+    
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+      timeout-minutes: 15
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -117,12 +123,6 @@ jobs:
             django-version: '3.2'
 
     steps:
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        detached: true
-      timeout-minutes: 15
-        
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
