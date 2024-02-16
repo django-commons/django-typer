@@ -1381,13 +1381,22 @@ class TestPollExample(TestCase):
             ("bash", False),
             ("pwsh", True),
         ]:
-            result = StringIO()
-            with contextlib.redirect_stdout(result):
+            result1 = StringIO()
+            with contextlib.redirect_stdout(result1):
                 call_command(
                     "shellcompletion", "complete", shell=shell, cmd_str="closepoll "
                 )
+            result2 = StringIO()
+            with contextlib.redirect_stdout(result2):
+                call_command(
+                    "shellcompletion",
+                    "complete",
+                    shell=shell,
+                    cmd_str="./manage.py closepoll ",
+                )
 
-            result = result.getvalue()
+            result = result1.getvalue()
+            self.assertEqual(result, result2.getvalue())
             for q in [self.q1, self.q2, self.q3]:
                 self.assertTrue(str(q.id) in result)
                 if has_help:

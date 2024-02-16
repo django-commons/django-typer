@@ -114,14 +114,6 @@ class Command(TyperCommand):
         out which mode we are in.
         """
         cmd_pth = Path(sys.argv[0])
-        if cmd_pth.resolve() == Path(sys.executable).resolve():
-            raise CommandError(
-                _(
-                    "Unable to install shell completion when invoked via python. It is best to "
-                    "install the manage script as a command on your shell's path, but shell "
-                    "completion should also work if you invoke the manage script directly."
-                )
-            )
         if cmd_pth.exists():
             # manage.py might happen to be on the current path, but it might also be installed as
             # a command - we test it here by invoking it to be sure
@@ -469,11 +461,11 @@ class Command(TyperCommand):
                     cwords.append("")
                 # allow users to not specify the manage script, but allow for it
                 # if they do by lopping it off - same behavior as upstream classes
-                try:
-                    if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
-                        cwords = cwords[1:]
-                except (TypeError, ValueError, OSError):
-                    pass
+                # try:
+                #     if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
+                #         cwords = cwords[1:]
+                # except (TypeError, ValueError, OSError):
+                #     pass
                 return (
                     cwords[:-1],
                     cwords[-1] if cwords else "",
@@ -511,30 +503,39 @@ class Command(TyperCommand):
             if not args:
                 call_fallback(fallback)
             else:
+                cmd = None
+                cmd_idx = -1
                 try:
-                    cmd = get_command(args[0])
+                    while cmd is None:
+                        cmd_idx += 1
+                        try:
+                            cmd = get_command(args[cmd_idx])
+                        except KeyError:
+                            pass
                 except ModuleNotFoundError:
                     call_fallback(fallback)
                     return
 
-                if isinstance(cmd, TyperCommand):
+                if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
                     cmd.typer_app(
-                        args=args[1:],
+                        args=args[cmd_idx + 1 :],
                         standalone_mode=True,
                         django_command=cmd,
                         complete_var=self.COMPLETE_VAR,
-                        prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
+                        prog_name=(
+                            f"{' '.join(sys.argv[0:cmd_idx or None])} "
+                            f"{self.typer_app.info.name}",
+                        ),
                     )
                     return
                 call_fallback(fallback)
 
-        if cmd_str:
-            try:
-                get_completion()
+        try:
+            get_completion()
+        except SystemExit:
+            if cmd_str:
                 return
-            except SystemExit:
-                return
-        get_completion()
+            raise
 
     def django_fallback(self):
         """

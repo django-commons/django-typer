@@ -106,7 +106,7 @@ def get_command(
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
-):
+) -> t.Union[BaseCommand, MethodType]:
     """
     Get a django command by its name and instantiate it with the provided options. This
     will work for normal django commands as well as django_typer commands. If subcommands
