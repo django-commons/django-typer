@@ -415,7 +415,7 @@ class Command(TyperCommand):
         ] = None,
         shell: t.Annotated[
             t.Optional[Shells],
-            Argument(
+            Option(
                 help=_(
                     "Specify the shell to fetch completion for, default will autodetect."
                 )

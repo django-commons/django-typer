@@ -249,17 +249,27 @@ class ModelObjectCompleter:
 
 def complete_app_label(ctx: Context, param: Parameter, incomplete: str):
     """
-    A case-insensitive completer for Django app labels.
+    A case-insensitive completer for Django app labels or names. The completer
+    prefers labels but names will also work.
 
     :param ctx: The click context.
     :param param: The click parameter.
     :param incomplete: The incomplete string.
-    :return: A list of matching app labels. Labels already present for the parameter
-        on the command line will be filtered out.
+    :return: A list of matching app labels or names. Labels already present for the
+        parameter on the command line will be filtered out.
     """
     present = [app.label for app in (ctx.params.get(param.name or "") or [])]
-    return [
+    ret = [
         app.label
         for app in apps.get_app_configs()
-        if app.label.lower().startswith(incomplete.lower()) and app.label not in present
+        if app.label.startswith(incomplete) and app.label not in present
     ]
+    if not ret and incomplete:
+        ret = [
+            app.name
+            for app in apps.get_app_configs()
+            if app.name.startswith(incomplete) 
+            and app.name not in present 
+            and app.label not in present
+        ]
+    return ret

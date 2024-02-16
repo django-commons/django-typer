@@ -74,7 +74,7 @@ def parse_app_label(label: t.Union[str, AppConfig]):
     """
     A parser for app labels. If the label is already an AppConfig instance,
     the instance is returned. The label will be tried first, if that fails
-    the label will be treated as the app name. Lookups are case insensitive.
+    the label will be treated as the app name.
 
     :param label: The label to map to an AppConfig instance.
     :raises CommandError: If no matching app can be found.
@@ -84,11 +84,8 @@ def parse_app_label(label: t.Union[str, AppConfig]):
     try:
         return apps.get_app_config(label)
     except LookupError as err:
-        label = label.lower()
         for cfg in apps.get_app_configs():
-            if cfg.label.lower() == label:
-                return cfg
-            if cfg.name.lower() == label:
+            if cfg.name == label:
                 return cfg
 
         raise CommandError(

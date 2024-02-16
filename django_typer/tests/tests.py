@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.core.management import CommandError
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -1347,6 +1348,14 @@ def test_get_current_command_returns_none():
     assert get_current_command() is None
 
 
+SHELLS = [
+    (None, False),
+    ("zsh", True),
+    ("bash", False),
+    ("pwsh", True),
+]
+
+
 class TestPollExample(TestCase):
 
     q1 = None
@@ -1375,12 +1384,7 @@ class TestPollExample(TestCase):
     def test_poll_complete(self):
         # result = run_command("shellcompletion", "complete", "./manage.py closepoll ")
 
-        for shell, has_help in [
-            (None, False),
-            ("zsh", True),
-            ("bash", False),
-            ("pwsh", True),
-        ]:
+        for shell, has_help in SHELLS:
             result1 = StringIO()
             with contextlib.redirect_stdout(result1):
                 call_command(
@@ -1403,44 +1407,78 @@ class TestPollExample(TestCase):
                     self.assertTrue(q.question_text in result)
 
 
-# class TestShellCompletersAndParsers(TestCase):
+class TestShellCompletersAndParsers(TestCase):
 
-#     def setUp(self):
-#         super().setUp()
-#         for field, values in {
-#             'char_field': [
-#                 'brian',
-#                 'emma',
-#                 'louis',
-#                 'anna'
-#             ],
-#             'text_field': [
-#                 'sockeye',
-#                 'chinook',
-#                 'steelhead',
-#                 'coho',
-#                 'atlantic',
-#                 'pink',
-#                 'chum'
-#             ],
-#             'float_field': [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
-#             'decimal_field': [
-#                 Decimal('1.5'), Decimal('1.50'), Decimal('1.51'),
-#                 Decimal('1.52'), Decimal('1.2'), Decimal('1.6')
-#             ],
-#             'uuid_field': [
-#                 '12345678-1234-5678-1234-567812345678',
-#                 '12345678-1234-5678-1234-567812345679',
-#                 '12345678-5678-5678-1234-567812345670',
-#                 '12345678-5678-5678-1234-567812345671',
-#             ]
-#         }:
-#             for value in values:
-#                 ShellCompleteTester.objects.create(**{field: value})
+    def setUp(self):
+        super().setUp()
+        for field, values in {
+            'char_field': [
+                'brian',
+                'emma',
+                'louis',
+                'anna'
+            ],
+            'text_field': [
+                'sockeye',
+                'chinook',
+                'steelhead',
+                'coho',
+                'atlantic',
+                'pink',
+                'chum'
+            ],
+            'float_field': [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
+            'decimal_field': [
+                Decimal('1.5'), Decimal('1.50'), Decimal('1.51'),
+                Decimal('1.52'), Decimal('1.2'), Decimal('1.6')
+            ],
+            'uuid_field': [
+                '12345678-1234-5678-1234-567812345678',
+                '12345678-1234-5678-1234-567812345679',
+                '12345678-5678-5678-1234-567812345670',
+                '12345678-5678-5678-1234-567812345671',
+            ]
+        }.items():
+            for value in values:
+                ShellCompleteTester.objects.create(**{field: value})
 
-#     def tearDown(self) -> None:
-#         ShellCompleteTester.objects.all().delete()
-#         return super().tearDown()
+    def tearDown(self) -> None:
+        ShellCompleteTester.objects.all().delete()
+        return super().tearDown()
 
-#     def test_char_field(self):
-#         result = run_command("shell_complete", "django_typer.tests.test_app")
+    def test_app_label_parser_completers(self):
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "completion django_typer.tests.")
+        result = result.getvalue()
+        self.assertTrue("django_typer.tests.polls" in result)
+        self.assertTrue("django_typer.tests.test_app" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "completion django_typer_tests")
+        result = result.getvalue()
+        self.assertTrue("django_typer_tests_polls" in result)
+        self.assertTrue("django_typer_tests_test_app" in result)
+
+
+        self.assertEqual(
+            json.loads(
+                call_command("completion", "django_typer_tests_polls")
+            ),
+            ['django_typer_tests_polls']
+        )
+        self.assertEqual(
+            json.loads(
+                call_command("completion", "django_typer.tests.polls")
+            ),
+            ['django_typer_tests_polls']
+        )
+
+        with self.assertRaises(CommandError):
+            call_command("completion", "django_typer_tests.polls")
+
+
+    # def test_char_field(self):
+    #     result = run_command("shell_complete", "django_typer.tests.test_app")
