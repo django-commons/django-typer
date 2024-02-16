@@ -15,10 +15,9 @@ import typer
 from click.exceptions import UsageError
 from django.apps import apps
 from django.conf import settings
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.core.management import CommandError
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -1412,32 +1411,31 @@ class TestShellCompletersAndParsers(TestCase):
     def setUp(self):
         super().setUp()
         for field, values in {
-            'char_field': [
-                'brian',
-                'emma',
-                'louis',
-                'anna'
+            "char_field": ["brian", "emma", "louis", "anna"],
+            "text_field": [
+                "sockeye",
+                "chinook",
+                "steelhead",
+                "coho",
+                "atlantic",
+                "pink",
+                "chum",
             ],
-            'text_field': [
-                'sockeye',
-                'chinook',
-                'steelhead',
-                'coho',
-                'atlantic',
-                'pink',
-                'chum'
+            "float_field": [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
+            "decimal_field": [
+                Decimal("1.5"),
+                Decimal("1.50"),
+                Decimal("1.51"),
+                Decimal("1.52"),
+                Decimal("1.2"),
+                Decimal("1.6"),
             ],
-            'float_field': [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
-            'decimal_field': [
-                Decimal('1.5'), Decimal('1.50'), Decimal('1.51'),
-                Decimal('1.52'), Decimal('1.2'), Decimal('1.6')
+            "uuid_field": [
+                "12345678-1234-5678-1234-567812345678",
+                "12345678-1234-5678-1234-567812345679",
+                "12345678-5678-5678-1234-567812345670",
+                "12345678-5678-5678-1234-567812345671",
             ],
-            'uuid_field': [
-                '12345678-1234-5678-1234-567812345678',
-                '12345678-1234-5678-1234-567812345679',
-                '12345678-5678-5678-1234-567812345670',
-                '12345678-5678-5678-1234-567812345671',
-            ]
         }.items():
             for value in values:
                 ShellCompleteTester.objects.create(**{field: value})
@@ -1450,7 +1448,9 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "completion django_typer.tests.")
+            call_command(
+                "shellcompletion", "complete", "completion django_typer.tests."
+            )
         result = result.getvalue()
         self.assertTrue("django_typer.tests.polls" in result)
         self.assertTrue("django_typer.tests.test_app" in result)
@@ -1462,23 +1462,17 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("django_typer_tests_polls" in result)
         self.assertTrue("django_typer_tests_test_app" in result)
 
-
         self.assertEqual(
-            json.loads(
-                call_command("completion", "django_typer_tests_polls")
-            ),
-            ['django_typer_tests_polls']
+            json.loads(call_command("completion", "django_typer_tests_polls")),
+            ["django_typer_tests_polls"],
         )
         self.assertEqual(
-            json.loads(
-                call_command("completion", "django_typer.tests.polls")
-            ),
-            ['django_typer_tests_polls']
+            json.loads(call_command("completion", "django_typer.tests.polls")),
+            ["django_typer_tests_polls"],
         )
 
         with self.assertRaises(CommandError):
             call_command("completion", "django_typer_tests.polls")
-
 
     # def test_char_field(self):
     #     result = run_command("shell_complete", "django_typer.tests.test_app")

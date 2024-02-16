@@ -268,8 +268,8 @@ def complete_app_label(ctx: Context, param: Parameter, incomplete: str):
         ret = [
             app.name
             for app in apps.get_app_configs()
-            if app.name.startswith(incomplete) 
-            and app.name not in present 
+            if app.name.startswith(incomplete)
+            and app.name not in present
             and app.label not in present
         ]
     return ret
