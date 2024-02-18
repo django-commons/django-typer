@@ -1820,3 +1820,13 @@ class TestShellCompletersAndParsers(TestCase):
             call_command(
                 "model_fields", "test", "--uuid", "12345678-5678-5678-f234-a67812345675"
             )
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
+            )
+        result = result.getvalue()
+        self.assertTrue("_files" in result)
