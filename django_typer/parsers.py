@@ -5,11 +5,12 @@ typer.Argument.
 """
 
 import typing as t
+from uuid import UUID
 
 from django.apps import AppConfig, apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import CommandError
-from django.db.models import Model
+from django.db.models import Field, Model, UUIDField
 from django.utils.translation import gettext as _
 
 
@@ -34,6 +35,7 @@ class ModelObjectParser:
     on_error: t.Optional[error_handler] = None
 
     _lookup = ""
+    _field: Field
 
     __name__ = "ModelObjectParser"  # typer internals expect this
 
@@ -48,11 +50,8 @@ class ModelObjectParser:
         self.lookup_field = lookup_field or model_cls._meta.pk.name
         self.on_error = on_error
         self.case_insensitive = case_insensitive
-        if (
-            self.case_insensitive
-            and "iexact"
-            in self.model_cls._meta.get_field(self.lookup_field).get_lookups()
-        ):
+        self._field = self.model_cls._meta.get_field(self.lookup_field)
+        if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
 
     def __call__(self, value: t.Union[str, Model]) -> Model:
@@ -70,10 +69,16 @@ class ModelObjectParser:
         try:
             if isinstance(value, self.model_cls):  # pragma: no cover
                 return value
+            if isinstance(self._field, UUIDField):
+                uuid = ""
+                for char in value:
+                    if char.isalnum():
+                        uuid += char
+                value = UUID(uuid)
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )
-        except self.model_cls.DoesNotExist as err:
+        except (self.model_cls.DoesNotExist, ValueError) as err:
             if self.on_error:
                 return self.on_error(self.model_cls, value, err)
             raise CommandError(

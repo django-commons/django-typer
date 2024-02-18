@@ -65,6 +65,13 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their text fields, case insensitive."),
             ),
         ] = None,
+        uuid: t.Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "uuid_field"),
+                help=_("Fetch objects by their UUID fields."),
+            ),
+        ] = None,
     ):
         assert self.__class__ == Command
         objects = {}
@@ -82,4 +89,7 @@ class Command(TyperCommand):
             for itxt in itext:
                 assert isinstance(itxt, ShellCompleteTester)
             objects["itext"] = [{itxt.id: itxt.text_field} for itxt in itext]
+        if uuid is not None:
+            assert isinstance(uuid, ShellCompleteTester)
+            objects["uuid"] = {uuid.id: str(uuid.uuid_field)}
         return json.dumps(objects)

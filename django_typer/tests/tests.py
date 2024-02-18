@@ -1435,6 +1435,8 @@ class TestShellCompletersAndParsers(TestCase):
                 "12345678-1234-5678-1234-567812345679",
                 "12345678-5678-5678-1234-567812345670",
                 "12345678-5678-5678-1234-567812345671",
+                "12345678-5678-5678-1234-A67812345671",
+                "12345678-5678-5678-f234-A67812345671",
             ],
         }.items():
             for value in values:
@@ -1594,3 +1596,227 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("atlantic" in result)
         self.assertTrue("pink" in result)
         self.assertTrue("chum" in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--text",
+                    "atlantic",
+                    "--text",
+                    "sockeye",
+                    "--text",
+                    "steelhead",
+                )
+            ),
+            {
+                "text": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="atlantic").pk
+                        ): "atlantic"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="sockeye").pk
+                        ): "sockeye"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="steelhead").pk
+                        ): "steelhead"
+                    },
+                ]
+            },
+        )
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--itext",
+                    "ATlanTIC",
+                    "--itext",
+                    "SOCKeye",
+                    "--itext",
+                    "STEELHEAD",
+                )
+            ),
+            {
+                "itext": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="atlantic").pk
+                        ): "atlantic"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="sockeye").pk
+                        ): "sockeye"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="steelhead").pk
+                        ): "steelhead"
+                    },
+                ]
+            },
+        )
+
+    def test_uuid_field(self):
+        from uuid import UUID
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --uuid ")
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+        self.assertFalse("None" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678"
+            )
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678-"
+            )
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678-5"
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 123456785"
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("123456785678-5678-1234-567812345670" in result)
+        self.assertTrue("123456785678-5678-1234-567812345671" in result)
+        self.assertTrue("123456785678-5678-1234-a67812345671" in result)
+        self.assertTrue("123456785678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678-",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("123456&78-^56785678-1234-567812345670" in result)
+        self.assertTrue("123456&78-^56785678-1234-567812345671" in result)
+        self.assertTrue("123456&78-^56785678-1234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678F",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678F234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678f",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678f234---A",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678f234---A67812345671" in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--uuid",
+                    "123456&78-^56785678f234---A67812345671",
+                )
+            ),
+            {
+                "uuid": {
+                    str(
+                        ShellCompleteTester.objects.get(
+                            uuid_field=UUID("12345678-5678-5678-f234-a67812345671")
+                        ).pk
+                    ): "12345678-5678-5678-f234-a67812345671"
+                }
+            },
+        )
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields", "test", "--uuid", "G2345678-5678-5678-f234-a67812345671"
+            )
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields", "test", "--uuid", "12345678-5678-5678-f234-a67812345675"
+            )

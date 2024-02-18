@@ -14,6 +14,7 @@ for various kinds of django objects.
 
 import typing as t
 from types import MethodType
+from uuid import UUID
 
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
@@ -69,6 +70,11 @@ class ModelObjectCompleter:
     limit: t.Optional[int] = 50
     case_insensitive: bool = False
     distinct: bool = True
+
+    # used to adjust the index into the completion strings when we concatenate
+    # the incomplete string with the lookup field value - see UUID which has
+    # to allow for - to be missing
+    _offset: int = 0
 
     def default_query(
         self, context: Context, parameter: Parameter, incomplete: str
@@ -179,14 +185,31 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is too long or contains invalid
             UUID characters. Anything other than (0-9a-fA-F).
         """
+
+        # the offset futzing is to allow users to ignore the - in the UUID
+        # as a convenience of its implementation any non-alpha numeric character
+        # will be ignored, and the completion suggestions and parsing will still work
         uuid = ""
+        self._offset = 0
         for char in incomplete:
             if char.isalnum():
                 uuid += char
+            else:
+                self._offset -= 1
+
+        if len(incomplete) >= 9:
+            self._offset += 1
+        if len(incomplete) >= 14:
+            self._offset += 1
+        if len(incomplete) >= 19:
+            self._offset += 1
+        if len(incomplete) >= 24:
+            self._offset += 1
+
         if len(uuid) > 32:
             raise ValueError(f"Too many UUID characters: {incomplete}")
-        min_uuid = uuid + "0" * (32 - len(uuid))
-        max_uuid = uuid + "f" * (32 - len(uuid))
+        min_uuid = UUID(uuid + "0" * (32 - len(uuid)))
+        max_uuid = UUID(uuid + "f" * (32 - len(uuid)))
         return Q(**{f"{self.lookup_field}__gte": min_uuid}) & Q(
             **{f"{self.lookup_field}__lte": max_uuid}
         )
@@ -244,13 +267,19 @@ class ModelObjectCompleter:
             CompletionItem(
                 # use the incomplete string prefix incase this was a case insensitive match
                 value=incomplete
-                + str(getattr(obj, self.lookup_field))[len(incomplete) :],
+                + str(getattr(obj, self.lookup_field))[
+                    len(incomplete) + self._offset :
+                ],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
             )
             for obj in self.model_cls.objects.filter(completion_qry).distinct()[
                 0 : self.limit
             ]
-            if str(getattr(obj, self.lookup_field)) and obj not in excluded
+            if (
+                getattr(obj, self.lookup_field) is not None
+                and str(getattr(obj, self.lookup_field))
+                and obj not in excluded
+            )
         ]
 
 
