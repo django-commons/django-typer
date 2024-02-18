@@ -1829,7 +1829,7 @@ class TestShellCompletersAndParsers(TestCase):
                 "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
             )
         result = result.getvalue()
-        self.assertTrue("_files" in result)
+        self.assertFalse("12345678" in result)
 
     def test_id_field(self):
         result = StringIO()
