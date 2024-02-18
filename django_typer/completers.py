@@ -238,7 +238,7 @@ class ModelObjectCompleter:
 
         excluded = []
         if self.distinct and parameter.name:
-            excluded = context.params.get(parameter.name, [])
+            excluded = context.params.get(parameter.name, []) or []
 
         return [
             CompletionItem(
