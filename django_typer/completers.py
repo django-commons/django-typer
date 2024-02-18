@@ -236,6 +236,10 @@ class ModelObjectCompleter:
             except (ValueError, TypeError):
                 return []
 
+        excluded = []
+        if self.distinct and parameter.name:
+            excluded = context.params.get(parameter.name, [])
+
         return [
             CompletionItem(
                 # use the incomplete string prefix incase this was a case insensitive match
@@ -246,7 +250,7 @@ class ModelObjectCompleter:
             for obj in self.model_cls.objects.filter(completion_qry).distinct()[
                 0 : self.limit
             ]
-            if str(getattr(obj, self.lookup_field))
+            if str(getattr(obj, self.lookup_field)) and obj not in excluded
         ]
 
 

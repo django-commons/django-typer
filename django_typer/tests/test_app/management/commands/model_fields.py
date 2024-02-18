@@ -46,6 +46,25 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their char fields, case insensitive."),
             ),
         ] = None,
+        text: t.Annotated[
+            t.List[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "text_field"),
+                help=_("Fetch objects by their text fields."),
+            ),
+        ] = None,
+        itext: t.Annotated[
+            t.List[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(
+                    ShellCompleteTester,
+                    "text_field",
+                    case_insensitive=True,
+                    distinct=False,
+                ),
+                help=_("Fetch objects by their text fields, case insensitive."),
+            ),
+        ] = None,
     ):
         assert self.__class__ == Command
         objects = {}
@@ -55,4 +74,12 @@ class Command(TyperCommand):
         if ichar is not None:
             assert isinstance(ichar, ShellCompleteTester)
             objects["ichar"] = {ichar.id: ichar.char_field}
+        if text:
+            for txt in text:
+                assert isinstance(txt, ShellCompleteTester)
+            objects["text"] = [{txt.id: txt.text_field} for txt in text]
+        if itext:
+            for itxt in itext:
+                assert isinstance(itxt, ShellCompleteTester)
+            objects["itext"] = [{itxt.id: itxt.text_field} for itxt in itext]
         return json.dumps(objects)

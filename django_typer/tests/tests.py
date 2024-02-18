@@ -1482,8 +1482,6 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
     def test_char_field(self):
-        from django.apps import apps
-
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --char ja")
@@ -1525,3 +1523,74 @@ class TestShellCompletersAndParsers(TestCase):
 
         with self.assertRaises(RuntimeError):
             call_command("model_fields", "test", "--ichar", "jane")
+
+    def test_text_field(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --text ")
+        result = result.getvalue()
+        self.assertTrue("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertTrue("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertTrue("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --text ch")
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertFalse("pink" in result)
+        self.assertTrue("chum" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --itext S")
+        result = result.getvalue()
+        self.assertTrue("Sockeye" in result)
+        self.assertFalse("chinook" in result)
+        self.assertTrue("Steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertFalse("pink" in result)
+        self.assertFalse("chum" in result)
+
+        # distinct completions by default
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --text atlantic --text sockeye --text steelhead --text ",
+            )
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        # check distinct flag set to False
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --itext atlantic --itext sockeye --itext steelhead --itext ",
+            )
+        result = result.getvalue()
+        self.assertTrue("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertTrue("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertTrue("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
