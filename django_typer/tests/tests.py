@@ -1842,11 +1842,13 @@ class TestShellCompletersAndParsers(TestCase):
         start_chars = set(starts.keys())
 
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --id ")
+            call_command(
+                "shellcompletion", "complete", "model_fields test --id ", shell="zsh"
+            )
 
         result = result.getvalue()
         for id in ids:
-            self.assertTrue(str(id) in result)
+            self.assertTrue(f'"{id}"' in result)
 
         for start_char in start_chars:
             expected = starts[start_char]
@@ -1872,3 +1874,19 @@ class TestShellCompletersAndParsers(TestCase):
                 json.loads(call_command("model_fields", "test", "--id", str(id))),
                 {"id": id},
             )
+
+        # test the limit option
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "--shell",
+                "zsh",
+                "model_fields test --id-limit ",
+            )
+        result = result.getvalue()
+        for id in ids[0:5]:
+            self.assertTrue(f'"{id}"' in result)
+        for id in ids[5:]:
+            self.assertFalse(f'"{id}"' in result)

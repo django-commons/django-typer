@@ -84,6 +84,13 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their int (pk) fields."),
             ),
         ] = None,
+        id_limit: t.Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, limit=5),
+                help=_("Fetch objects by their int (pk) fields."),
+            ),
+        ] = None,
         float: t.Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
