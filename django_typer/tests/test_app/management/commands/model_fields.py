@@ -11,6 +11,7 @@ from django_typer import (
     model_parser_completer,
     types,
 )
+from django_typer.completers import ModelObjectCompleter
 from django_typer.tests.test_app.models import ShellCompleteTester
 
 
@@ -49,7 +50,11 @@ class Command(TyperCommand):
         text: t.Annotated[
             t.List[ShellCompleteTester],
             typer.Option(
-                **model_parser_completer(ShellCompleteTester, "text_field"),
+                **model_parser_completer(
+                    ShellCompleteTester,
+                    "text_field",
+                    query=ModelObjectCompleter.text_query,
+                ),
                 help=_("Fetch objects by their text fields."),
             ),
         ] = None,
@@ -72,6 +77,27 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their UUID fields."),
             ),
         ] = None,
+        id: t.Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester),
+                help=_("Fetch objects by their int (pk) fields."),
+            ),
+        ] = None,
+        float: t.Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "float_field"),
+                help=_("Fetch objects by their float fields."),
+            ),
+        ] = None,
+        decimal: t.Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "decimal_field"),
+                help=_("Fetch objects by their decimal fields."),
+            ),
+        ] = None,
     ):
         assert self.__class__ == Command
         objects = {}
@@ -92,4 +118,13 @@ class Command(TyperCommand):
         if uuid is not None:
             assert isinstance(uuid, ShellCompleteTester)
             objects["uuid"] = {uuid.id: str(uuid.uuid_field)}
+        if id is not None:
+            assert isinstance(id, ShellCompleteTester)
+            objects["id"] = id.pk
+        if float is not None:
+            assert isinstance(float, ShellCompleteTester)
+            objects["float"] = {float.id: str(float.float_field)}
+        if decimal is not None:
+            assert isinstance(decimal, ShellCompleteTester)
+            objects["decimal"] = {decimal.id: str(decimal.float_field)}
         return json.dumps(objects)

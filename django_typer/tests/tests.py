@@ -1830,3 +1830,45 @@ class TestShellCompletersAndParsers(TestCase):
             )
         result = result.getvalue()
         self.assertTrue("_files" in result)
+
+    def test_id_field(self):
+        result = StringIO()
+
+        ids = ShellCompleteTester.objects.values_list("id", flat=True)
+
+        starts = {}
+        for id in ids:
+            starts.setdefault(str(id)[0], []).append(str(id))
+        start_chars = set(starts.keys())
+
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --id ")
+
+        result = result.getvalue()
+        for id in ids:
+            self.assertTrue(str(id) in result)
+
+        for start_char in start_chars:
+            expected = starts[start_char]
+            unexpected = [str(id) for id in ids if str(id) not in expected]
+            result = StringIO()
+            with contextlib.redirect_stdout(result):
+                call_command(
+                    "shellcompletion",
+                    "complete",
+                    "--shell",
+                    "zsh",
+                    f"model_fields test --id {start_char}",
+                )
+
+            result = result.getvalue()
+            for id in expected:
+                self.assertTrue(f'"{id}"' in result)
+            for id in unexpected:
+                self.assertFalse(f'"{id}"' in result)
+
+        for id in ids:
+            self.assertEqual(
+                json.loads(call_command("model_fields", "test", "--id", str(id))),
+                {"id": id},
+            )
