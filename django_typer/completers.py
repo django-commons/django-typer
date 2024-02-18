@@ -22,6 +22,7 @@ from django.apps import apps
 from django.db.models import (
     CharField,
     DecimalField,
+    Field,
     FloatField,
     IntegerField,
     Max,
@@ -66,7 +67,7 @@ class ModelObjectCompleter:
     model_cls: t.Type[Model]
     lookup_field: str
     help_field: t.Optional[str] = None
-    query: MethodType
+    query: t.Callable[[Context, Parameter, str], Q]
     limit: t.Optional[int] = 50
     case_insensitive: bool = False
     distinct: bool = True
@@ -76,35 +77,7 @@ class ModelObjectCompleter:
     # to allow for - to be missing
     _offset: int = 0
 
-    def default_query(
-        self, context: Context, parameter: Parameter, incomplete: str
-    ) -> Q:
-        """
-        The default completion query builder. This method will route to the
-        appropriate query method based on the lookup field class.
-
-        :param context: The click context.
-        :param parameter: The click parameter.
-        :param incomplete: The incomplete string.
-        :return: A Q object to use for filtering the queryset.
-        :raises ValueError: If the lookup field class is not supported or there
-            is a problem using the incomplete string as a lookup given the field
-            class.
-        :raises TypeError: If there is a problem using the incomplete string as a
-            lookup given the field class.
-        """
-        field = self.model_cls._meta.get_field(  # pylint: disable=protected-access
-            self.lookup_field
-        )
-        if issubclass(field.__class__, IntegerField):
-            return self.int_query(context, parameter, incomplete)
-        if issubclass(field.__class__, (CharField, TextField)):
-            return self.text_query(context, parameter, incomplete)
-        if issubclass(field.__class__, UUIDField):
-            return self.uuid_query(context, parameter, incomplete)
-        if issubclass(field.__class__, (FloatField, DecimalField)):
-            return self.float_query(context, parameter, incomplete)
-        raise ValueError(f"Unsupported lookup field class: {field.__class__.__name__}")
+    _field: Field
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
@@ -219,7 +192,7 @@ class ModelObjectCompleter:
         model_cls: t.Type[Model],
         lookup_field: t.Optional[str] = None,
         help_field: t.Optional[str] = help_field,
-        query: QueryBuilder = default_query,
+        query: t.Optional[QueryBuilder] = None,
         limit: t.Optional[int] = limit,
         case_insensitive: bool = case_insensitive,
         distinct: bool = distinct,
@@ -227,10 +200,30 @@ class ModelObjectCompleter:
         self.model_cls = model_cls
         self.lookup_field = lookup_field or model_cls._meta.pk.name
         self.help_field = help_field
-        self.query = MethodType(query, self)
         self.limit = limit
         self.case_insensitive = case_insensitive
         self.distinct = distinct
+
+        self._field = (
+            self.model_cls._meta.get_field(  # pylint: disable=protected-access
+                self.lookup_field
+            )
+        )
+        if query:
+            self.query = MethodType(query, self)
+        else:
+            if isinstance(self._field, IntegerField):
+                self.query = self.int_query
+            elif isinstance(self._field, (CharField, TextField)):
+                self.query = self.text_query
+            elif isinstance(self._field, UUIDField):
+                self.query = self.uuid_query
+            elif isinstance(self._field, (FloatField, DecimalField)):
+                self.query = self.float_query
+            else:
+                raise ValueError(
+                    f"Unsupported lookup field class: {self._field.__class__.__name__}"
+                )
 
     def __call__(
         self, context: Context, parameter: Parameter, incomplete: str

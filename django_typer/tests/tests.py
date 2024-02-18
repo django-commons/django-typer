@@ -1890,3 +1890,24 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertTrue(f'"{id}"' in result)
         for id in ids[5:]:
             self.assertFalse(f'"{id}"' in result)
+
+    def test_float_field(self):
+        result = StringIO()
+
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --uuid ")
+
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+        self.assertFalse("None" in result)
+
+    def test_unsupported_field(self):
+        from django_typer.completers import ModelObjectCompleter
+
+        with self.assertRaises(ValueError):
+            ModelObjectCompleter(ShellCompleteTester, "binary_field")

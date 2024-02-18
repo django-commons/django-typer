@@ -10,3 +10,5 @@ class ShellCompleteTester(models.Model):
         db_index=True, default=None, null=True, max_digits=10, decimal_places=2
     )
     uuid_field = models.UUIDField(null=True, default=None, unique=True)
+
+    binary_field = models.BinaryField(null=True, default=None)

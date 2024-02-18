@@ -107,7 +107,7 @@ def model_parser_completer(
     lookup_field: t.Optional[str] = None,
     case_insensitive: bool = False,
     help_field: t.Optional[str] = ModelObjectCompleter.help_field,
-    query: ModelObjectCompleter.QueryBuilder = ModelObjectCompleter.default_query,
+    query: t.Optional[ModelObjectCompleter.QueryBuilder] = None,
     limit: t.Optional[int] = ModelObjectCompleter.limit,
     distinct: bool = ModelObjectCompleter.distinct,
     on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
