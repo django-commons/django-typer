@@ -41,7 +41,7 @@ class Command(TyperCommand):
                     ShellCompleteTester,
                     "char_field",
                     case_insensitive=True,
-                    on_error=obj_not_found
+                    on_error=obj_not_found,
                 ),
                 help=_("Fetch objects by their char fields, case insensitive."),
             ),
