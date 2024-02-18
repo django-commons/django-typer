@@ -1411,7 +1411,7 @@ class TestShellCompletersAndParsers(TestCase):
     def setUp(self):
         super().setUp()
         for field, values in {
-            "char_field": ["brian", "emma", "louis", "anna"],
+            "char_field": ["jon", "john", "jack", "jason"],
             "text_field": [
                 "sockeye",
                 "chinook",
@@ -1481,5 +1481,41 @@ class TestShellCompletersAndParsers(TestCase):
             ["django_typer_tests_polls"],
         )
 
-    # def test_char_field(self):
-    #     result = run_command("shell_complete", "django_typer.tests.test_app")
+    def test_char_field(self):
+        from django.apps import apps
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --char ja")
+        result = result.getvalue()
+        self.assertTrue("jack" in result)
+        self.assertTrue("jason" in result)
+        self.assertFalse("jon" in result)
+        self.assertFalse("john" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ichar Ja")
+        result = result.getvalue()
+        self.assertTrue("Jack" in result)
+        self.assertTrue("Jason" in result)
+        self.assertFalse("Jon" in result)
+        self.assertFalse("John" in result)
+
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--char", "jack")),
+            {
+                "char": {
+                    str(ShellCompleteTester.objects.get(char_field="jack").pk): "jack"
+                }
+            },
+        )
+
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--ichar", "john")),
+            {
+                "ichar": {
+                    str(ShellCompleteTester.objects.get(char_field="john").pk): "john"
+                }
+            },
+        )

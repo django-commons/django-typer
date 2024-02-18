@@ -461,11 +461,11 @@ class Command(TyperCommand):
                     cwords.append("")
                 # allow users to not specify the manage script, but allow for it
                 # if they do by lopping it off - same behavior as upstream classes
-                # try:
-                #     if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
-                #         cwords = cwords[1:]
-                # except (TypeError, ValueError, OSError):
-                #     pass
+                try:
+                    if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
+                        cwords = cwords[1:]
+                except (TypeError, ValueError, OSError):
+                    pass
                 return (
                     cwords[:-1],
                     cwords[-1] if cwords else "",
@@ -473,17 +473,20 @@ class Command(TyperCommand):
 
             CompletionClass.get_completion_args = get_completion_args  # type: ignore
 
-        _get_completions = CompletionClass.get_completions
+        # guard against double patching
+        if not getattr(CompletionClass, "_dt_patched", False):
+            _get_completions = CompletionClass.get_completions
 
-        def get_completions(self, args, incomplete):
-            """
-            need to remove the django command name from the arg completions
-            """
-            return _get_completions(self, args[1:], incomplete)
+            def get_completions(self, args, incomplete):
+                """
+                need to remove the django command name from the arg completions
+                """
+                return _get_completions(self, args[1:], incomplete)
 
-        CompletionClass.get_completions = get_completions  # type: ignore
+            CompletionClass.get_completions = get_completions  # type: ignore
 
-        add_completion_class(CompletionClass, self.shell.value)
+            add_completion_class(CompletionClass, self.shell.value)
+            CompletionClass._dt_patched = True  # type: ignore
 
         args = CompletionClass(
             cli=self.noop_command.click_command,

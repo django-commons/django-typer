@@ -53,7 +53,7 @@ class ModelObjectCompleter:
         matching items will be returned. When offering completion for large tables
         you'll want to set this to a reasonable limit. Default: 50
     :param case_insensitive: Whether or not to perform case insensitive matching when
-        completing text-based fields. Defaults to True.
+        completing text-based fields. Defaults to False.
     :param distinct: Whether or not to filter out duplicate values. Defaults to True.
         This is not the same as calling distinct() on the queryset - which will happen
         regardless - but rather whether or not to filter out values that are already
@@ -63,11 +63,11 @@ class ModelObjectCompleter:
     QueryBuilder = t.Callable[["ModelObjectCompleter", Context, Parameter, str], Q]
 
     model_cls: t.Type[Model]
-    lookup_field: str = "id"
+    lookup_field: str
     help_field: t.Optional[str] = None
     query: MethodType
     limit: t.Optional[int] = 50
-    case_insensitive: bool = True
+    case_insensitive: bool = False
     distinct: bool = True
 
     def default_query(
@@ -194,7 +194,7 @@ class ModelObjectCompleter:
     def __init__(
         self,
         model_cls: t.Type[Model],
-        lookup_field: str = lookup_field,
+        lookup_field: t.Optional[str] = None,
         help_field: t.Optional[str] = help_field,
         query: QueryBuilder = default_query,
         limit: t.Optional[int] = limit,
@@ -202,7 +202,7 @@ class ModelObjectCompleter:
         distinct: bool = distinct,
     ):
         self.model_cls = model_cls
-        self.lookup_field = lookup_field
+        self.lookup_field = lookup_field or model_cls._meta.pk.name
         self.help_field = help_field
         self.query = MethodType(query, self)
         self.limit = limit
@@ -238,12 +238,15 @@ class ModelObjectCompleter:
 
         return [
             CompletionItem(
-                value=str(getattr(obj, self.lookup_field)),
+                # use the incomplete string prefix incase this was a case insensitive match
+                value=incomplete
+                + str(getattr(obj, self.lookup_field))[len(incomplete) :],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
             )
             for obj in self.model_cls.objects.filter(completion_qry).distinct()[
                 0 : self.limit
             ]
+            if str(getattr(obj, self.lookup_field))
         ]
 
 

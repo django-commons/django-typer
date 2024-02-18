@@ -29,20 +29,31 @@ class ModelObjectParser:
     error_handler = t.Callable[[t.Type[Model], str, ObjectDoesNotExist], None]
 
     model_cls: t.Type[Model]
-    lookup_field: str = "pk"
+    lookup_field: str
+    case_insensitive: bool = False
     on_error: t.Optional[error_handler] = None
+
+    _lookup = ""
 
     __name__ = "ModelObjectParser"  # typer internals expect this
 
     def __init__(
         self,
         model_cls: t.Type[Model],
-        lookup_field: str = lookup_field,
+        lookup_field: t.Optional[str] = None,
+        case_insensitive: bool = case_insensitive,
         on_error: t.Optional[error_handler] = on_error,
     ):
         self.model_cls = model_cls
-        self.lookup_field = lookup_field
+        self.lookup_field = lookup_field or model_cls._meta.pk.name
         self.on_error = on_error
+        self.case_insensitive = case_insensitive
+        if (
+            self.case_insensitive
+            and "iexact"
+            in self.model_cls._meta.get_field(self.lookup_field).get_lookups()
+        ):
+            self._lookup = "__iexact"
 
     def __call__(self, value: t.Union[str, Model]) -> Model:
         """
@@ -59,7 +70,9 @@ class ModelObjectParser:
         try:
             if isinstance(value, self.model_cls):
                 return value
-            return self.model_cls.objects.get(**{self.lookup_field: value})
+            return self.model_cls.objects.get(
+                **{f"{self.lookup_field}{self._lookup}": value}
+            )
         except self.model_cls.DoesNotExist as err:
             if self.on_error:
                 return self.on_error(self.model_cls, value, err)
@@ -79,7 +92,7 @@ def parse_app_label(label: t.Union[str, AppConfig]):
     :param label: The label to map to an AppConfig instance.
     :raises CommandError: If no matching app can be found.
     """
-    if isinstance(label, AppConfig):
+    if isinstance(label, AppConfig):  # pragma: no cover
         return label
     try:
         return apps.get_app_config(label)
