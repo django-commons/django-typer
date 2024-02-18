@@ -236,7 +236,7 @@ class ModelObjectCompleter:
             except (ValueError, TypeError):
                 return []
 
-        excluded = []
+        excluded: t.List[t.Type[Model]] = []
         if self.distinct and parameter.name:
             excluded = context.params.get(parameter.name, []) or []
 
