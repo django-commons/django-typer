@@ -68,7 +68,7 @@ class ModelObjectParser:
             provided.
         """
         try:
-            if isinstance(value, self.model_cls):
+            if isinstance(value, self.model_cls):  # pragma: no cover
                 return value
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}

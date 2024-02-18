@@ -14,6 +14,10 @@ from django_typer import (
 from django_typer.tests.test_app.models import ShellCompleteTester
 
 
+def obj_not_found(model_cls, value, exc):
+    raise RuntimeError(f"Object {model_cls.__name__} with {value} not found.")
+
+
 class Command(TyperCommand):
 
     @initialize()
@@ -34,7 +38,10 @@ class Command(TyperCommand):
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(
-                    ShellCompleteTester, "char_field", case_insensitive=True
+                    ShellCompleteTester,
+                    "char_field",
+                    case_insensitive=True,
+                    on_error=obj_not_found
                 ),
                 help=_("Fetch objects by their char fields, case insensitive."),
             ),

@@ -1519,3 +1519,9 @@ class TestShellCompletersAndParsers(TestCase):
                 }
             },
         )
+
+        with self.assertRaises(CommandError):
+            call_command("model_fields", "test", "--char", "jane")
+
+        with self.assertRaises(RuntimeError):
+            call_command("model_fields", "test", "--ichar", "jane")
