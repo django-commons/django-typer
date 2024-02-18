@@ -133,5 +133,5 @@ class Command(TyperCommand):
             objects["float"] = {float.id: str(float.float_field)}
         if decimal is not None:
             assert isinstance(decimal, ShellCompleteTester)
-            objects["decimal"] = {decimal.id: str(decimal.float_field)}
+            objects["decimal"] = {decimal.id: str(decimal.decimal_field)}
         return json.dumps(objects)

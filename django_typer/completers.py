@@ -95,8 +95,12 @@ class ModelObjectCompleter:
         """
         lower = int(incomplete)
         upper = lower + 1
-        max_val = self.model_cls.objects.aggregate(Max(self.lookup_field))["id__max"]
-        qry = Q(**{f"{self.lookup_field}": lower})
+        max_val = self.model_cls.objects.aggregate(Max(self.lookup_field))[
+            f"{self.lookup_field}__max"
+        ]
+        qry = Q(**{f"{self.lookup_field}__gte": lower}) & Q(
+            **{f"{self.lookup_field}__lt": upper}
+        )
         while (lower := lower * 10) <= max_val:
             upper *= 10
             qry |= Q(**{f"{self.lookup_field}__gte": lower}) & Q(
@@ -118,11 +122,12 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is not a valid float.
         :raises TypeError: If the incomplete string is not a valid float.
         """
-        if "." not in incomplete:
-            return self.int_query(context, parameter, incomplete)
-        incomplete = incomplete.rstrip("0")
+        incomplete = incomplete.rstrip("0").rstrip(".")
         lower = float(incomplete)
-        upper = lower + float(f'0.{"0"*(len(incomplete)-incomplete.index(".")-2)}1')
+        if "." in incomplete:
+            upper = lower + float(f'0.{"0"*(len(incomplete)-incomplete.index(".")-2)}1')
+        else:
+            return self.int_query(context, parameter, incomplete)
         return Q(**{f"{self.lookup_field}__gte": lower}) & Q(
             **{f"{self.lookup_field}__lt": upper}
         )

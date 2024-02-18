@@ -1892,19 +1892,158 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertFalse(f'"{id}"' in result)
 
     def test_float_field(self):
+
+        values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
         result = StringIO()
-
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --uuid ")
-
+            call_command("shellcompletion", "complete", "model_fields test --float ")
         result = result.getvalue()
-        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
-        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
-        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
-        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
-        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
-        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
-        self.assertFalse("None" in result)
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 1")
+        result = result.getvalue()
+        for value in [1.1, 1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.1, 1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 1.1")
+        result = result.getvalue()
+        for value in [1.1, 1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.1, 1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --float 1.12"
+            )
+        result = result.getvalue()
+        for value in [1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2")
+        result = result.getvalue()
+        for value in [2.2, 2.3, 2.4]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.2, 2.3, 2.4]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2.")
+        result = result.getvalue()
+        for value in [2.2, 2.3, 2.4]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.2, 2.3, 2.4]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2.3")
+        result = result.getvalue()
+        for value in [2.3]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.3]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 3")
+        result = result.getvalue()
+        for value in [3.0]:
+            self.assertTrue(str(value) in result)
+        for value in set([3.0]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--float",
+                    "2.3",
+                )
+            ),
+            {
+                "float": {
+                    str(ShellCompleteTester.objects.get(float_field=2.3).pk): "2.3"
+                }
+            },
+        )
+
+    def test_decimal_field(self):
+        values = [
+            Decimal("1.5"),
+            Decimal("1.50"),
+            Decimal("1.51"),
+            Decimal("1.52"),
+            Decimal("1.2"),
+            Decimal("1.6"),
+        ]
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --decimal ")
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1."
+            )
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1."
+            )
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1.5"
+            )
+        result = result.getvalue()
+        for value in set(values) - {Decimal("1.2"), Decimal("1.6")}:
+            self.assertTrue(str(value) in result)
+        for value in {Decimal("1.2"), Decimal("1.6")}:
+            self.assertFalse(str(value) in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--decimal",
+                    "1.6",
+                )
+            ),
+            {
+                "decimal": {
+                    str(
+                        ShellCompleteTester.objects.get(decimal_field=Decimal("1.6")).pk
+                    ): "1.60"
+                }
+            },
+        )
 
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter
