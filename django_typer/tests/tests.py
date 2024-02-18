@@ -1445,6 +1445,7 @@ class TestShellCompletersAndParsers(TestCase):
         return super().tearDown()
 
     def test_app_label_parser_completers(self):
+        from django.apps import apps
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
@@ -1473,6 +1474,12 @@ class TestShellCompletersAndParsers(TestCase):
 
         with self.assertRaises(CommandError):
             call_command("completion", "django_typer_tests.polls")
+
+        poll_app = apps.get_app_config("django_typer_tests_polls")
+        self.assertEqual(
+            json.loads(get_command("completion")([poll_app])),
+            ["django_typer_tests_polls"],
+        )
 
     # def test_char_field(self):
     #     result = run_command("shell_complete", "django_typer.tests.test_app")

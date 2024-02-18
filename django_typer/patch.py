@@ -89,6 +89,8 @@ def apply() -> None:
             elif cmd and cmd.force_color:
                 console._color_system = console._detect_color_system()
                 console._force_terminal = True
+            else:  # pragma: no cover
+                pass
             return console
 
         rich_utils._get_rich_console = get_console
@@ -122,3 +124,5 @@ if (0, 4, 0) <= tuple(int(v) for v in typer_version.split(".")) <= (0, 9, 0):
         return click_param
 
     typer_main.get_click_param = patched_get_click_param
+else:  # pragma: no cover
+    pass
