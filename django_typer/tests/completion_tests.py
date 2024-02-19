@@ -137,6 +137,7 @@ class _DefaultCompleteTestCase:
             stderr=slave_fd,
             text=True,
             env=env,
+            preexec_fn=os.setsid,
         )
         # Wait for the shell to start and get to the prompt
         print(read(master_fd))
@@ -150,6 +151,8 @@ class _DefaultCompleteTestCase:
         time.sleep(0.5)
 
         os.write(master_fd, b"\t\t")
+
+        time.sleep(0.5)
 
         # Read the output
         output = read_all_from_fd_with_timeout(master_fd, 3)
@@ -267,12 +270,13 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashExeShellTests(_InstalledScriptTestCase, TestCase):
-    pass
+class BashExeShellTests(_InstalledScriptTestCase, BashShellTests):
+
+    shell = "bash"
 
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
-class _FishShellTests(_DefaultCompleteTestCase, TestCase):
+class FishShellTests(_DefaultCompleteTestCase):  # , TestCase):
     """
     TODO this test is currently disabled because fish completion installation does
     not seem to work for scripts not on the path.
@@ -288,7 +292,6 @@ class _FishShellTests(_DefaultCompleteTestCase, TestCase):
             fd,
             f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
         )
-        os.write(fd, f"source .venv/bin/activate\n".encode())
 
     def verify_install(self, script=None):
         if not script:
@@ -300,10 +303,20 @@ class _FishShellTests(_DefaultCompleteTestCase, TestCase):
             script = self.manage_script
         self.assertFalse((self.directory / f"{script}.fish").exists())
 
+    def test_shell_complete(self):
+        # just verify that install/remove works. The actual completion is not tested
+        # because there's an issue running fish interactively in a pty:
+        #  warning: No TTY for interactive shell (tcgetpgrp failed)
+        #  setpgid: Inappropriate ioctl for device
+        # TODO - fix this
+        self.install()
+        self.remove()
+
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
-class FishExeShellTests(_InstalledScriptTestCase, TestCase):
-    pass
+class FishExeShellTests(_InstalledScriptTestCase, FishShellTests, TestCase):
+
+    shell = "fish"
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
