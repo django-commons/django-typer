@@ -36,7 +36,7 @@ classifiers = [
 packages = [
     { include = "django_typer" }
 ]
-exclude = ["django_typer/tests"]
+exclude = ["django_typer/tests", "django_typer/locale"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"

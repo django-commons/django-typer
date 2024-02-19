@@ -241,7 +241,9 @@ class Command(TyperCommand):
             assert shell in [
                 Shells.pwsh,
                 Shells.powershell,
-            ], f"Unsupported shell: {shell}"
+            ], gettext(
+                "Unsupported shell: {shell}"
+            ).format(shell=shell.value)
             script = replace(
                 typer_scripts.COMPLETION_SCRIPT_POWER_SHELL,
                 "%(prog_name)s",
