@@ -157,7 +157,7 @@ class Command(TyperCommand):
         """Set the shell to install autocompletion for."""
         if shell is None:
             try:
-                self._shell = detect_shell()[0]
+                self._shell = Shells(detect_shell()[0])
             except (ShellDetectionFailure, RuntimeError) as err:
                 raise CommandError(
                     gettext(
@@ -165,7 +165,8 @@ class Command(TyperCommand):
                         "autocompletion for. Unable to detect shell: {err}"
                     ).format(err=str(err))
                 ) from err
-        self._shell = shell if isinstance(shell, Shells) else Shells(shell)
+        else:
+            self._shell = shell if isinstance(shell, Shells) else Shells(shell)
 
     @cached_property
     def noop_command(self):
