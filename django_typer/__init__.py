@@ -307,7 +307,8 @@ class Context(TyperContext):
             self._supplied_params = supplied_params
         if django_command:
             self.django_command = django_command
-        elif parent:
+        else:
+            assert parent
             self.django_command = parent.django_command
 
         self.params = self.ParamDict(

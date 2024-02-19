@@ -101,6 +101,9 @@ class BasicTests(TestCase):
             {"arg1": "a1", "arg2": "a2", "arg3": 0.75, "arg4": 2},
         )
 
+    def test_cmd_name(self):
+        self.assertEqual(get_command("shellcompletion").name, "shellcompletion")
+
     def test_call_command(self):
         out = StringIO()
         returned_options = json.loads(call_command("basic", ["a1", "a2"], stdout=out))
@@ -2044,6 +2047,21 @@ class TestShellCompletersAndParsers(TestCase):
                 }
             },
         )
+
+    def test_option_complete(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test ")
+        result = result.getvalue()
+        self.assertTrue("--char" in result)
+        self.assertTrue("--ichar" in result)
+        self.assertTrue("--text" in result)
+        self.assertTrue("--itext" in result)
+        self.assertTrue("--id" in result)
+        self.assertTrue("--id-limit" in result)
+        self.assertTrue("--float" in result)
+        self.assertTrue("--decimal" in result)
+        self.assertTrue("--help" in result)
 
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter
