@@ -338,17 +338,12 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         By default if the incomplete string is a space and there are no completions
         the click infrastructure will return _files. We'd rather return parameters
         for the command if there are any available.
-
-        TODO - remove parameters that are already provided and do not allow multiple
-        specifications.
         """
         completions = super().shell_complete(ctx, incomplete)
-        if (
-            not completions
-            and (incomplete.isspace() or not incomplete)
-            and getattr(ctx, "_opt_prefixes", None)
-        ):
-            completions = super().shell_complete(ctx, min(ctx._opt_prefixes))
+        if not completions and (incomplete.isspace() or not incomplete):
+            completions = super().shell_complete(
+                ctx, min(getattr(ctx, "_opt_prefixes", [""]))
+            )
         return completions
 
     def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
