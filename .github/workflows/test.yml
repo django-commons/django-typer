@@ -175,8 +175,9 @@ jobs:
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Run Unit Tests
       shell: zsh {0}
+      # poetry run pytest django_typer/tests/completion_tests.py::ZshShellTests || exit 1
       run: |
-        poetry run pytest django_typer/tests/completion_tests.py::ZshShellTests || exit 1
+        poetry run pytest django_typer/tests/completion_tests.py || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
