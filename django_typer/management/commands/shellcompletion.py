@@ -465,7 +465,7 @@ class Command(TyperCommand):
                 try:
                     if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
                         cwords = cwords[1:]
-                except (TypeError, ValueError, OSError):
+                except (TypeError, ValueError, OSError):  # pragma: no cover
                     pass
                 return (
                     cwords[:-1],

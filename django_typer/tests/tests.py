@@ -2051,21 +2051,16 @@ class TestShellCompletersAndParsers(TestCase):
         with self.assertRaises(ValueError):
             ModelObjectCompleter(ShellCompleteTester, "binary_field")
 
-    def test_shellcompletion_off_nominal(self):
-        from shellingham import detect_shell
-
+    def test_shellcompletion_no_detection(self):
         from django_typer.management.commands import shellcompletion
 
-        shellcompletion = get_command("shellcompletion")
-        try:
-            detect_shell()
-        except Exception as e:
-            with self.assertRaises(CommandError):
-                shellcompletion.shell = None
-                return
+        def raise_error():
+            raise RuntimeError()
 
-        shellcompletion.shell = None
-        self.assertTrue(shellcompletion.shell)
+        shellcompletion.detect_shell = raise_error
+        cmd = get_command("shellcompletion")
+        with self.assertRaises(CommandError):
+            cmd.shell = None
 
     def test_shellcompletion_complete_cmd(self):
         # test that we can leave preceeding script off the complete argument
