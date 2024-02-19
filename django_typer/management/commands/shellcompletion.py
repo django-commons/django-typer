@@ -377,23 +377,25 @@ class Command(TyperCommand):
                 Shells.bash: Path("~/.bashrc").expanduser(),
                 Shells.zsh: Path("~/.zshrc").expanduser(),
             }.get(self.shell, None)
-            if rc_file and rc_file.is_file():
-                edited = []
-                with open(rc_file, "rt", encoding="utf-8") as rc:
-                    for line in rc.readlines():
-                        if (
-                            self.shell is Shells.bash
-                            and line.strip() == f"source {installed_path}"
-                        ):
-                            continue
-                        edited.append(line)
-                # remove empty lines from the end of the file, the typer install scripts add
-                # extra newlines
-                while edited and not edited[-1].strip():
-                    edited.pop()
-                edited.append("")  # add one back on
-                with open(rc_file, "wt", encoding="utf-8") as rc:
-                    rc.writelines(edited)
+            assert (
+                rc_file and rc_file.is_file()
+            ), f"No rc file {rc_file} found for shell {self.shell}"
+            edited = []
+            with open(rc_file, "rt", encoding="utf-8") as rc:
+                for line in rc.readlines():
+                    if (
+                        self.shell is Shells.bash
+                        and line.strip() == f"source {installed_path}"
+                    ):
+                        continue
+                    edited.append(line)
+            # remove empty lines from the end of the file, the typer install scripts add
+            # extra newlines
+            while edited and not edited[-1].strip():
+                edited.pop()
+            edited.append("")  # add one back on
+            with open(rc_file, "wt", encoding="utf-8") as rc:
+                rc.writelines(edited)
 
         self.stdout = stdout
         self.stdout.write(
@@ -566,16 +568,18 @@ class Command(TyperCommand):
             args = ["0", *args]
             if args[-1] != incomplete:
                 args.append(incomplete)
+            else:  # pragma: no cover
+                pass
             os.environ["COMP_WORDS"] = " ".join(args)
             os.environ["COMP_CWORD"] = str(args.index(incomplete))
             os.environ["DJANGO_AUTO_COMPLETE"] = "1"
             dj_manager = ManagementUtility(args)
             capture_completions = io.StringIO()
-            try:
-                with contextlib.redirect_stdout(capture_completions):
+            with contextlib.redirect_stdout(capture_completions):
+                try:
                     dj_manager.autocomplete()
-            except SystemExit:
-                pass
+                except SystemExit:
+                    pass
             return [
                 CompletionItem(item)
                 for item in capture_completions.getvalue().split()
