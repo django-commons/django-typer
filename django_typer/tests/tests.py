@@ -2166,3 +2166,22 @@ class TestShellCompletersAndParsers(TestCase):
         result2 = run_command("shellcompletion", "complete", "completion dj")
         self.assertTrue("django_typer" in result2)
         self.assertEqual(result, result2)
+
+    def test_custom_fallback(self):
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--fallback",
+            "django_typer.tests.fallback.custom_fallback",
+            "shell ",
+        )
+        self.assertTrue("custom_fallback" in result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--fallback",
+            "django_typer.tests.fallback.custom_fallback_cmd_str",
+            "shell ",
+        )
+        self.assertTrue("shell " in result)
