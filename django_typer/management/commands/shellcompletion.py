@@ -498,6 +498,10 @@ class Command(TyperCommand):
             if not args:
                 call_fallback(fallback)
             else:
+                # we first need to figure out which command is being invoked
+                # but we cant be sure which index the command name is at so
+                # we try to fetch each in order and assume the first arg
+                # that resolves to a command is the command
                 cmd = None
                 cmd_idx = -1
                 try:
@@ -519,6 +523,7 @@ class Command(TyperCommand):
                     raise  # otherwise nowhere to go - just error out
 
                 if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
+                    # this will exit out so no return is needed here
                     cmd.typer_app(
                         args=args[cmd_idx + 1 :],
                         standalone_mode=True,

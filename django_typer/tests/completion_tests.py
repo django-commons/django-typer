@@ -318,6 +318,22 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
             self.assertTrue(contents)  # should have been deleted if it were empty
 
 
+class PowerShellInstallRemoveTests(_InstalledScriptTestCase, PowerShellTests):
+
+    def test_shell_complete(self):
+        # the power shell completion script registration is all in one file
+        # so install/remove is more complicated when other scripts are in that
+        # file - this tests that
+        self.install(script="./manage.py")
+        self.verify_install(script="./manage.py")
+        self.install(script=self.manage_script)
+        self.verify_install(script=self.manage_script)
+        self.remove(script=self.manage_script)
+        self.verify_remove(script=self.manage_script)
+        self.remove(script="./manage.py")
+        self.verify_remove(script="./manage.py")
+
+
 @pytest.mark.skipif(default_shell is None, reason="shellingham failed to detect shell")
 class DefaultCompleteTestCase(_DefaultCompleteTestCase, TestCase):
     pass
