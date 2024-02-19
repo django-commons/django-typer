@@ -516,6 +516,8 @@ class Command(TyperCommand):
                             cmd = get_command(args[cmd_idx])
                         except KeyError:
                             pass
+                        except IndexError:
+                            return
                 except ModuleNotFoundError:
                     call_fallback(fallback)
                     return
