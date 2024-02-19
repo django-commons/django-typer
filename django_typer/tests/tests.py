@@ -2131,6 +2131,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue(result)
         self.assertFalse("--" in result)
 
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "noarg cmd -", shell="zsh")
+        result = result.getvalue()
+        self.assertTrue(result)
+        self.assertFalse("--" in result)
+
         # test what happens if we try to complete a non existing command
         with self.assertRaises(CommandError):
             call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
