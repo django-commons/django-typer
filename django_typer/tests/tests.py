@@ -1006,6 +1006,22 @@ class TestOverloaded(TestCase):
         )
 
 
+class TestReturnValues(TestCase):
+    """
+    Tests that overloaded group/command names work as expected.
+    """
+
+    def test_return_direct(self):
+        return_cmd = get_command("return")
+        self.assertEqual(return_cmd(), {"key": "value"})
+
+    def test_return_cli(self):
+        self.assertEqual(run_command("return").strip(), str({"key": "value"}))
+
+    def test_return_call(self):
+        self.assertEqual(call_command("return"), {"key": "value"})
+
+
 class TestGroups(TestCase):
     """
     A collection of tests that test complex grouping commands and also that

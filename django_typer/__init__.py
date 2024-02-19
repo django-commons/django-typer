@@ -66,6 +66,7 @@ import click
 from click.shell_completion import CompletionItem
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand
+from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.db.models import Model
 from django.utils.translation import gettext as _
 
@@ -1338,6 +1339,22 @@ class TyperParser:
         raise NotImplementedError(_("add_argument() is not supported"))
 
 
+class OutputWrapper(BaseOutputWrapper):
+    """
+    Override django's base OutputWrapper to avoid exceptions when strings are
+    returned from command functions.
+    """
+
+    def write(self, msg="", style_func=None, ending=None):
+        """
+        If the message is not a string, first cast it before invoking the base
+        class write method.
+        """
+        if not isinstance(msg, str):
+            msg = str(msg)
+        return super().write(msg=msg, style_func=style_func, ending=ending)
+
+
 class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     """
     A BaseCommand extension class that uses the Typer library to parse
@@ -1374,8 +1391,8 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     """
 
     style: ColorStyle
-    stdout: t.IO[str]
-    stderr: t.IO[str]
+    stdout: BaseOutputWrapper
+    stderr: BaseOutputWrapper
     requires_system_checks: t.Union[t.Sequence[str], str]
 
     # we do not use verbosity because the base command does not do anything with it
@@ -1415,6 +1432,14 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
                 force_color=force_color,
                 **kwargs,
             )
+            # redo output pipes to use our wrappers that avoid
+            # exceptions when strings are returned from command functions
+            stdout_style_func = self.stdout.style_func
+            stderr_style_func = self.stderr.style_func
+            self.stdout = OutputWrapper(stdout or sys.stdout)
+            self.stderr = OutputWrapper(stderr or sys.stderr)
+            self.stdout.style_func = stdout_style_func
+            self.stderr.style_func = stderr_style_func
             self.command_tree = self._build_cmd_tree(get_typer_command(self.typer_app))
 
     def get_subcommand(self, *command_path: str) -> CommandNode:

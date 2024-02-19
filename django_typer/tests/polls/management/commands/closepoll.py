@@ -2,7 +2,7 @@ import typing as t
 
 from typer import Argument, Option
 
-from django_typer import TyperCommand, completers, parsers
+from django_typer import TyperCommand, model_parser_completer
 from django_typer.tests.polls.models import Question as Poll
 
 
@@ -13,12 +13,7 @@ class Command(TyperCommand):
         self,
         polls: t.Annotated[
             t.List[Poll],
-            Argument(
-                parser=parsers.ModelObjectParser(Poll),
-                shell_complete=completers.ModelObjectCompleter(
-                    Poll, help_field="question_text"
-                ),
-            ),
+            Argument(**model_parser_completer(Poll, help_field="question_text")),
         ],
         delete: t.Annotated[
             bool, Option(help="Delete poll instead of closing it.")
