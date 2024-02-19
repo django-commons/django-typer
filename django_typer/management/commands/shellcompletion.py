@@ -516,8 +516,16 @@ class Command(TyperCommand):
                             cmd = get_command(args[cmd_idx])
                         except KeyError:
                             pass
-                        except IndexError:
-                            return
+                except IndexError as err:
+                    if cmd_str:
+                        # if we're here a user is probably trying to debug a completion
+                        # notify them that the command is not recognized
+                        raise CommandError(
+                            gettext('Unrecognized command: "{cmd_str}"').format(
+                                cmd_str=cmd_str
+                            )
+                        ) from err
+                    raise  # otherwise nowhere to go - just error out
                 except ModuleNotFoundError:
                     call_fallback(fallback)
                     return

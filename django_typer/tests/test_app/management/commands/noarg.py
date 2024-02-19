@@ -1,8 +1,7 @@
 from django_typer import TyperCommand, command, initialize
 
 
-# todo add_help_option=False not honored?
-class Command(TyperCommand, add_help_option=False):
+class Command(TyperCommand):
     help = "Takes no arguments"
 
     suppressed_base_arguments = [

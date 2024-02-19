@@ -2097,11 +2097,8 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("--" in result)
 
         # test what happens if we try to complete a non existing command
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
+        with self.assertRaises(CommandError):
             call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
-        result = result.getvalue()
-        self.assertFalse(result)
 
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter

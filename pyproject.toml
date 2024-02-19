@@ -148,6 +148,7 @@ max-args=30
 max-locals=30  # there are lots of options!
 max-module-lines=2000
 max-attributes=20
+max-statements=100
 
 [tool.pylint.'MASTER']
 ignore="tests"
