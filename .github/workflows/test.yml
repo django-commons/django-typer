@@ -204,17 +204,21 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
+    - name: Add to Poetry to PATH
+      run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
+      shell: powershell
     - name: Install Release Dependencies
       run: |
         poetry config virtualenvs.in-project true
         poetry run pip install --upgrade pip
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
+      shell: powershell
     - name: Run Unit Tests
       run: |
         poetry run pytest django_typer/tests/completion_tests.py::PowerShellTests || exit 1
         mv .coverage windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
-
+      shell: powershell
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
