@@ -526,9 +526,6 @@ class Command(TyperCommand):
                             )
                         ) from err
                     raise  # otherwise nowhere to go - just error out
-                except ModuleNotFoundError:
-                    call_fallback(fallback)
-                    return
 
                 if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
                     cmd.typer_app(
@@ -541,7 +538,6 @@ class Command(TyperCommand):
                             f"{self.typer_app.info.name}",
                         ),
                     )
-                    return
                 call_fallback(fallback)
 
         try:
