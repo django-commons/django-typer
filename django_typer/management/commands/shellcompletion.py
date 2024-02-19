@@ -19,7 +19,7 @@ import contextlib
 import inspect
 import io
 import os
-import subprocess
+import shutil
 import sys
 import typing as t
 from pathlib import Path
@@ -112,21 +112,17 @@ class Command(TyperCommand):
         a manage.py script being invoked directly as a script. Completion should work in this case
         as well, but it does complicate the installation for some shell's so we must first figure
         out which mode we are in.
+
+        If this property returns a string the command is available as a command on the path. If it
+        returns a path the command is available as a script but is not generally available on the
+        path.
         """
         cmd_pth = Path(sys.argv[0])
-        if cmd_pth.exists():
-            # manage.py might happen to be on the current path, but it might also be installed as
-            # a command - we test it here by invoking it to be sure
-            try:
-                subprocess.run(
-                    [cmd_pth.name, "--help"],
-                    check=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                return cmd_pth.absolute()
-        return cmd_pth.name
+        # manage.py might happen to be on the current path, but it might also be installed as
+        # a command - we test it here using which to be sure
+        if shutil.which(cmd_pth.name):
+            return cmd_pth.name
+        return cmd_pth.absolute()
 
     @cached_property
     def manage_script_name(self) -> str:
@@ -610,3 +606,6 @@ class Command(TyperCommand):
         has no use other than to avoid any potential attribute access errors when we spoof
         completion logic
         """
+        import ipdb
+
+        ipdb.set_trace()
