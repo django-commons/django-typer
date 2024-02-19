@@ -216,7 +216,7 @@ jobs:
       shell: powershell
     - name: Run Unit Tests
       run: |
-        poetry run pytest django_typer/tests/completion_tests.py::PowerShellTests || exit 1
+        poetry run pytest django_typer/tests/completion_tests.py::PowerShellTests
         mv .coverage windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
       shell: powershell
     - name: Store coverage files
