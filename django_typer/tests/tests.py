@@ -668,6 +668,18 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(stderr.getvalue(), "err\nno_color=True\nforce_color=False\n")
         cmd.print_help("./manage.py", "ctor")
         self.assertTrue("\x1b" not in stdout.getvalue())
+        stdout.truncate(0)
+        stderr.truncate(0)
+
+        stdout.getvalue()
+        stderr.getvalue()
+        cmd.execute(skip_checks=False, no_color=None, force_color=None)
+        self.assertTrue(
+            stdout.getvalue().endswith("out\nno_color=True\nforce_color=False\n")
+        )
+        self.assertTrue(
+            stderr.getvalue().endswith("err\nno_color=True\nforce_color=False\n")
+        )
 
     def test_pythonpath(self):
         added = str(Path(__file__).parent.absolute())
