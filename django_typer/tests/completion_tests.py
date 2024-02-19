@@ -76,13 +76,15 @@ class _DefaultCompleteTestCase:
         self.remove()
         super().tearDown()
 
-    def verify_install(self, script=manage_script):
+    def verify_install(self, script=None):
         pass
 
-    def verify_remove(self, script=manage_script):
+    def verify_remove(self, script=None):
         pass
 
-    def install(self, script=manage_script):
+    def install(self, script=None):
+        if not script:
+            script = self.manage_script
         kwargs = {}
         if self.shell:
             kwargs["shell"] = self.shell
@@ -91,7 +93,9 @@ class _DefaultCompleteTestCase:
         self.command.install(**kwargs)
         self.verify_install(script=script)
 
-    def remove(self, script=manage_script):
+    def remove(self, script=None):
+        if not script:
+            script = self.manage_script
         kwargs = {}
         if self.shell:
             kwargs["shell"] = self.shell
@@ -185,20 +189,49 @@ class _DefaultCompleteTestCase:
         self.install()
 
 
+class _InstalledScriptTestCase(_DefaultCompleteTestCase):
+    """
+    These shell completes use an installed script available on the path
+    instead of a script directly invoked by path. The difference may
+    seem trivial - but it is not given how most shells determine if completion
+    logic should be invoked for a given command.
+    """
+
+    MANAGE_SCRIPT_TMPL = Path(__file__).parent / "django_manage.py"
+    manage_script = "django_manage"
+    launch_script = "django_manage"
+
+    def setUp(self):
+        lines = []
+        with open(self.MANAGE_SCRIPT_TMPL, "r") as f:
+            for line in f.readlines():
+                if line.startswith("#!{{shebang}}"):
+                    line = f"#!{sys.executable}\n"
+                lines.append(line)
+        exe = Path(sys.executable).parent / self.manage_script
+        with open(exe, "w") as f:
+            for line in lines:
+                f.write(line)
+
+        # make the script executable
+        os.chmod(exe, os.stat(exe).st_mode | 0o111)
+        super().setUp()
+
+
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
 class ZshShellTests(_DefaultCompleteTestCase, TestCase):
 
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
 
-    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_install(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         self.assertTrue((self.directory / f"_{script}").exists())
 
-    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_remove(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         self.assertFalse((self.directory / f"_{script}").exists())
 
 
@@ -218,15 +251,20 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
         os.write(fd, f"source ~/.bashrc\n".encode())
         os.write(fd, f"source .venv/bin/activate\n".encode())
 
-    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_install(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         self.assertTrue((self.directory / f"{script}.sh").exists())
 
-    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_remove(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         self.assertFalse((self.directory / f"{script}.sh").exists())
+
+
+@pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
+class BashExeShellTests(_InstalledScriptTestCase, TestCase):
+    pass
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
@@ -257,18 +295,18 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
         self.install()
         self.remove()
 
-    def verify_install(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_install(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         self.assertTrue((self.directory / f"Microsoft.PowerShell_profile.ps1").exists())
         self.assertTrue(
             f"Register-ArgumentCompleter -Native -CommandName {script} -ScriptBlock $scriptblock"
             in (self.directory / f"Microsoft.PowerShell_profile.ps1").read_text()
         )
 
-    def verify_remove(self, script=_DefaultCompleteTestCase.manage_script):
+    def verify_remove(self, script=None):
         if not script:
-            script = self.command.manage_script_name
+            script = self.manage_script
         if (self.directory / f"Microsoft.PowerShell_profile.ps1").exists():
             contents = (
                 self.directory / f"Microsoft.PowerShell_profile.ps1"

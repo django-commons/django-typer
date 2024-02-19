@@ -38,9 +38,6 @@ packages = [
 ]
 exclude = ["django_typer/tests"]
 
-[tool.poetry.scripts]
-django_complete = "django_typer.autocomplete:main"
-
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
