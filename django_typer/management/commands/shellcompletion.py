@@ -97,29 +97,22 @@ class Command(TyperCommand):
     @cached_property
     def manage_script(self) -> t.Union[str, Path]:
         """
-        The name of the django manage command script to install autocompletion for. We do
-        not want to hardcode this as 'manage.py' because users are free to rename and implement
-        their own manage scripts! The safest way to do this is therefore to require this install
-        script to be a management command itself and then fetch the name of the script that invoked
-        it.
-
-        Get the manage script as either the name of it as a command available from the shell's path
-        if it is or as an absolute path to it as a script if it is not a command available on the
-        path. If the script is invoked via python, a CommandError is thrown.
-
-        Most shell's completion infrastructure works best if the commands are available on the
-        path. However, it is common for Django development to be done in a virtual environment with
-        a manage.py script being invoked directly as a script. Completion should work in this case
-        as well, but it does complicate the installation for some shell's so we must first figure
-        out which mode we are in.
-
-        If this property returns a string the command is available as a command on the path. If it
-        returns a path the command is available as a script but is not generally available on the
-        path.
+        Returns the name of the manage command as a string if it is available as a command
+        on the user path. If it is a script that is not available as a command on the path
+        it will return an absolute Path object to the script.
         """
+        # We do not want to hardcode this as 'manage.py' because users are free to rename and
+        # implement their own manage scripts! The safest way to do this is therefore to fetch
+        # the name of the script that invoked the shellcompletion command and determine if that
+        # script is available on the user's path or not.
+
+        # Most shell's completion infrastructure works best if the commands are available on the
+        # path. However, it is common for Django development to be done in a virtual environment
+        # with a manage.py script being invoked directly as a script. Completion should work in
+        # this case as well, but it does complicate the installation for some shell's so we must
+        # first figure out which mode we are in.
+
         cmd_pth = Path(sys.argv[0])
-        # manage.py might happen to be on the current path, but it might also be installed as
-        # a command - we test it here using which to be sure
         if shutil.which(cmd_pth.name):
             return cmd_pth.name
         return cmd_pth.absolute()
@@ -606,6 +599,3 @@ class Command(TyperCommand):
         has no use other than to avoid any potential attribute access errors when we spoof
         completion logic
         """
-        import ipdb
-
-        ipdb.set_trace()
