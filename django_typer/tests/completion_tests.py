@@ -125,8 +125,8 @@ class _DefaultCompleteTestCase:
         win_size = struct.pack("HHHH", 24, 80, 0, 0)  # 24 rows, 80 columns
         fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
 
-        env = os.environ.copy()
-        env["TERM"] = "xterm-256color"
+        # env = os.environ.copy()
+        # env["TERM"] = "xterm-256color"
 
         # Spawn a new shell process
         shell = self.shell or detect_shell()[0]
@@ -136,8 +136,8 @@ class _DefaultCompleteTestCase:
             stdout=slave_fd,
             stderr=slave_fd,
             text=True,
-            env=env,
-            preexec_fn=os.setsid,
+            # env=env,
+            # preexec_fn=os.setsid,
         )
         # Wait for the shell to start and get to the prompt
         print(read(master_fd))
