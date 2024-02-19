@@ -96,6 +96,10 @@ jobs:
         poetry run pip install --upgrade pip
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
+    - name: Install Fish shell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fish
     - name: Run Unit Tests
       run: |
         poetry run pytest django_typer/tests/completion_tests.py
@@ -154,6 +158,9 @@ jobs:
         touch ~/.bashrc
         echo "\n[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
         source ~/.bashrc
+    - name: Install Fish shell
+      run: |
+        brew install fish
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:

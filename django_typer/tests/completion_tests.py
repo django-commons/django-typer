@@ -267,6 +267,41 @@ class BashExeShellTests(_InstalledScriptTestCase, TestCase):
     pass
 
 
+@pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
+class _FishShellTests(_DefaultCompleteTestCase, TestCase):
+    """
+    TODO this test is currently disabled because fish completion installation does
+    not seem to work for scripts not on the path.
+    """
+
+    shell = "fish"
+    directory = Path("~/.config/fish/completions").expanduser()
+
+    def set_environment(self, fd):
+        # super().set_environment(fd)
+        os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
+        os.write(
+            fd,
+            f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
+        )
+        os.write(fd, f"source .venv/bin/activate\n".encode())
+
+    def verify_install(self, script=None):
+        if not script:
+            script = self.manage_script
+        self.assertTrue((self.directory / f"{script}.fish").exists())
+
+    def verify_remove(self, script=None):
+        if not script:
+            script = self.manage_script
+        self.assertFalse((self.directory / f"{script}.fish").exists())
+
+
+@pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
+class FishExeShellTests(_InstalledScriptTestCase, TestCase):
+    pass
+
+
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
 class PowerShellTests(_DefaultCompleteTestCase, TestCase):
 
