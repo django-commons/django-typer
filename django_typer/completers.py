@@ -1,16 +1,15 @@
 """
 A collection of completer classes that can be used to quickly add shell completion
 for various kinds of django objects.
-
-# TODO: - add default query builders for these field types:
-    GenericIPAddressField,
-    TimeField,
-    DateField,
-    DateTimeField,
-    DurationField,
-    FilePathField,
-    FileField
 """
+
+# should add default query builders for these field types:
+#     GenericIPAddressField,
+#     TimeField,
+#     DateField,
+#     DateTimeField,
+#     DurationField,
+#     FileField - ?
 
 import typing as t
 from types import MethodType

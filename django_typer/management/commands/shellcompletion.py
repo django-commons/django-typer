@@ -237,7 +237,11 @@ class Command(TyperCommand):
                 f"{self.manage_script} {DJANGO_COMMAND} complete",
                 [1, 2],
             )
-        elif shell in [Shells.pwsh, Shells.powershell]:
+        else:
+            assert shell in [
+                Shells.pwsh,
+                Shells.powershell,
+            ], f"Unsupported shell: {shell}"
             script = replace(
                 typer_scripts.COMPLETION_SCRIPT_POWER_SHELL,
                 "%(prog_name)s",
