@@ -646,6 +646,29 @@ class TestDjangoParameters(TestCase):
             with self.assertRaises(BaseException):
                 call_command(cmd, args, force_color=True, no_color=True)
 
+    def test_ctor_params(self):
+        stdout = StringIO()
+        stderr = StringIO()
+        cmd = get_command(
+            "ctor", stdout=stdout, stderr=stderr, no_color=None, force_color=None
+        )
+        cmd()
+        self.assertEqual(stdout.getvalue(), "out\nno_color=None\nforce_color=None\n")
+        self.assertEqual(stderr.getvalue(), "err\nno_color=None\nforce_color=None\n")
+        cmd.print_help("./manage.py", "ctor")
+        self.assertTrue("\x1b" in stdout.getvalue())
+
+        stdout = StringIO()
+        stderr = StringIO()
+        cmd = get_command(
+            "ctor", stdout=stdout, stderr=stderr, no_color=True, force_color=False
+        )
+        cmd()
+        self.assertEqual(stdout.getvalue(), "out\nno_color=True\nforce_color=False\n")
+        self.assertEqual(stderr.getvalue(), "err\nno_color=True\nforce_color=False\n")
+        cmd.print_help("./manage.py", "ctor")
+        self.assertTrue("\x1b" not in stdout.getvalue())
+
     def test_pythonpath(self):
         added = str(Path(__file__).parent.absolute())
         self.assertTrue(added not in sys.path)
