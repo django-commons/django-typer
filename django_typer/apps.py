@@ -23,7 +23,7 @@ patch.apply()
 rich: t.Union[ModuleType, None] = None
 
 try:
-    import rich  # type: ignore[no-redef]
+    import rich
 
     tb_config = traceback_config()
     if rich and isinstance(tb_config, dict) and not tb_config.get("no_install", False):
