@@ -1204,11 +1204,14 @@ class CommandNode:
         self.parent = parent
         self.children = {}
 
-    def print_help(self) -> None:
+    def print_help(self) -> t.Optional[str]:
         """
         Prints the help for this command to stdout of the django command.
         """
-        self.click_command.get_help(self.context)
+        # if rich is installed this prints the help, if it is not it
+        # returns the help as a string - we deal with this higher on the
+        # stack
+        return self.click_command.get_help(self.context)
 
     def get_command(self, *command_path: str) -> "CommandNode":
         """
@@ -1295,7 +1298,7 @@ class TyperParser:
 
         populate_params(self.django_command.command_tree)
 
-    def print_help(self, *command_path: str):
+    def print_help(self, *command_path: str) -> t.Optional[str]:
         """
         Print the help for the given command path to stdout of the django command.
         """
@@ -1304,7 +1307,7 @@ class TyperParser:
         )
         command_node = self.django_command.get_subcommand(*command_path)
         with contextlib.redirect_stdout(self.django_command.stdout):
-            command_node.print_help()
+            return command_node.print_help()
 
     def parse_args(self, args=None, namespace=None) -> _ParsedArgs:
         """
@@ -1534,7 +1537,9 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """
         with push_command(self):
             parser = self.create_parser(prog_name, subcommand)
-            parser.print_help(*cmd_path)
+            hlp = parser.print_help(*cmd_path)
+            if hlp:
+                self.stdout.write(hlp)
 
     def __call__(self, *args, **kwargs):
         """

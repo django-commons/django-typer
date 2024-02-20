@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import django
+import pytest
 import typer
 from click.exceptions import UsageError
 from django.apps import apps
@@ -25,6 +26,13 @@ from django_typer import TyperCommand, get_command, group
 from django_typer.tests.polls.models import Question
 from django_typer.tests.test_app.models import ShellCompleteTester
 from django_typer.tests.utils import read_django_parameters
+
+try:
+    import rich
+
+    rich_installed = True
+except ImportError:
+    rich_installed = False
 
 
 def similarity(text1, text2):
@@ -656,7 +664,9 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(stdout.getvalue(), "out\nno_color=None\nforce_color=None\n")
         self.assertEqual(stderr.getvalue(), "err\nno_color=None\nforce_color=None\n")
         cmd.print_help("./manage.py", "ctor")
-        self.assertTrue("\x1b" in stdout.getvalue())
+
+        if rich_installed:
+            self.assertTrue("\x1b" in stdout.getvalue())
 
         stdout = StringIO()
         stderr = StringIO()
@@ -1028,6 +1038,16 @@ class TestGroups(TestCase):
     command inheritance behaves as expected.
     """
 
+    rich_installed: bool
+
+    def setUp(self):
+        try:
+            import rich  # noqa
+
+            self.rich_installed = True
+        except ImportError:
+            self.rich_installed = False
+
     def test_group_call(self):
         with self.assertRaises(NotImplementedError):
             get_command("groups")()
@@ -1070,9 +1090,10 @@ class TestGroups(TestCase):
             cmd = get_command(cmds[0], stdout=buffer, no_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
+            helps_dir = "helps" if self.rich_installed else "helps_no_rich"
             self.assertGreater(
                 sim := similarity(
-                    hlp, (TESTS_DIR / app / "helps" / f"{cmds[-1]}.txt").read_text()
+                    hlp, (TESTS_DIR / app / helps_dir / f"{cmds[-1]}.txt").read_text()
                 ),
                 0.96,  # width inconsistences drive this number < 1
             )
@@ -1081,7 +1102,8 @@ class TestGroups(TestCase):
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
-            self.assertTrue("\x1b" in hlp)
+            if self.rich_installed:
+                self.assertTrue("\x1b" in hlp)
 
     @override_settings(
         INSTALLED_APPS=[
@@ -1429,8 +1451,12 @@ class TestCallCommandArgs(TestCase):
         )
 
 
+@pytest.mark.skipif(not rich_installed, reason="rich not installed")
 class TestTracebackConfig(TestCase):
+
     rich_installed = True
+
+    uninstall = False
 
     def test_default_traceback(self):
         result = run_command("test_command1", "--no-color", "delete", "me", "--throw")
@@ -1555,14 +1581,9 @@ class TestTracebackConfig(TestCase):
         self.assertNotIn("\x1b", result)
 
 
+@pytest.mark.skipif(rich_installed, reason="rich installed")
 class TestTracebackConfigNoRich(TestTracebackConfig):
     rich_installed = False
-
-    def setUp(self):
-        subprocess.run(["pip", "uninstall", "-y", "rich"], check=True)
-
-    def tearDown(self):
-        subprocess.run(["pip", "install", "rich"], check=True)
 
 
 class TestSettingsSystemCheck(TestCase):
@@ -1571,13 +1592,19 @@ class TestSettingsSystemCheck(TestCase):
         result = run_command(
             "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
         )
-        self.assertIn(
-            "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
-            result,
-        )
-        self.assertIn(
-            "HINT: Unexpected parameters encountered: unexpected_setting.", result
-        )
+        if rich_installed:
+            self.assertIn(
+                "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
+                result,
+            )
+            self.assertIn(
+                "HINT: Unexpected parameters encountered: unexpected_setting.", result
+            )
+        else:
+            self.assertNotIn(
+                "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
+                result,
+            )
 
 
 def test_get_current_command_returns_none():

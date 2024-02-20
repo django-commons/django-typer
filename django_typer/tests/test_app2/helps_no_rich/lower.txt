@@ -1,0 +1,9 @@
+Usage: ./manage.py groups string STRING case lower [OPTIONS]
+
+  Convert the given string to upper case.
+
+Options:
+  --begin INTEGER  The starting index of the string to operate on.  [default:
+                   0]
+  --end INTEGER    The ending index of the string to operate on.
+  --help           Show this message and exit.

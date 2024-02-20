@@ -1,0 +1,9 @@
+Usage: ./manage.py groups echo [OPTIONS] MESSAGE
+
+  Echo the given message.
+
+Arguments:
+  MESSAGE  [required]
+
+Options:
+  --help  Show this message and exit.

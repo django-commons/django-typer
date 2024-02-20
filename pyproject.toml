@@ -41,6 +41,7 @@ exclude = ["django_typer/tests", "django_typer/locale"]
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
+click = "^8.0.0"
 typer = "^0.9.0"
 rich = ">=10.11.0,<14.0.0"  # this should track typer's rich dependency
 shellingham = "^1.5.4"

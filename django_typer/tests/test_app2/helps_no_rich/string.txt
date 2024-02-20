@@ -1,0 +1,14 @@
+Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]...
+
+  String operations.
+
+Arguments:
+  STRING  The string to operate on.  [required]
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  case   Case operations.
+  split  Split the given string on the given separator.
+  strip  Strip white space off the ends of the string

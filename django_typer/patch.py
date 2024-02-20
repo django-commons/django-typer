@@ -97,6 +97,15 @@ def apply() -> None:
     except ImportError:
         pass
 
+    # this is a patch to fix lazy translation failure in some circumstances
+    # when Argument helps are gettext_lazy proxies. This is I think actually
+    # a problem with typer that can be fixed in a number of different ways
+    # but this is the easiest
+    from click import _compat
+
+    strip_ansi = _compat.strip_ansi
+    _compat.strip_ansi = lambda value: strip_ansi(str(value))
+
 
 from typer import __version__ as typer_version
 
