@@ -57,7 +57,7 @@ jobs:
       run: |
         poetry run pytest
         pip uninstall -y rich
-        poetry run pytest
+        poetry run pytest --cov-append
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
