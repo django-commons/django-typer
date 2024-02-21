@@ -36,7 +36,7 @@ django-typer
 ############
 
 Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django management commands. 
-Provides a TyperCommand class that inherits from `django.core.management.BaseCommand <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand>`_
+Provides a TyperCommand class that inherits from `BaseCommand <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand>`_
 and allows typer-style annotated parameter types. All of the BaseCommand functionality is
 preserved, so that TyperCommand can be a drop in replacement.
 
@@ -85,7 +85,10 @@ Installation
 Basic Example
 -------------
 
-For example TyperCommands can be a very simple drop in replacement for BaseCommands:
+For example TyperCommands can be a very simple drop in replacement for BaseCommands. All of the
+documented features of
+`BaseCommand <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand>`_
+work!
 
 
 .. code-block:: python

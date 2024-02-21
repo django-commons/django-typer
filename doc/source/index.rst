@@ -4,10 +4,9 @@
 Django Typer
 ============
 
-Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django management commands. 
-Provides a TyperCommand class that inherits from `django.core.management.BaseCommand <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand>`_
-and allows typer-style annotated parameter types. All of the BaseCommand functionality is
-preserved, so that TyperCommand can be a drop in replacement.
+Use Typer_ to define the CLI for your Django management commands. Provides a TyperCommand class
+that inherits from BaseCommand_ and allows typer-style annotated parameter types. All of the
+BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
 
 **django-typer makes it easy to:**
 
@@ -54,7 +53,8 @@ Installation
 Basic Example
 -------------
 
-For example TyperCommands can be a very simple drop in replacement for BaseCommands:
+For example TyperCommands can be a very simple drop in replacement for BaseCommands. All of the
+documented features of BaseCommand_ work!
 
 
 .. literalinclude:: ../../django_typer/examples/basic.py
@@ -115,6 +115,7 @@ Or more complex groups and subcommand hierarchies can be defined:
 
    tutorial
    howto
+   shell_completion
    commands
    reference
    changelog

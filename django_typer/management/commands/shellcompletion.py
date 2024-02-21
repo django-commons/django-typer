@@ -253,7 +253,7 @@ class Command(TyperCommand):
             typer_scripts._completion_scripts[Shells.powershell.value] = script
             typer_scripts._completion_scripts[Shells.pwsh.value] = script
 
-    @command(help=_("Install autocompletion."))
+    @command(help=_("Install autocompletion for the current or given shell."))
     def install(
         self,
         shell: t.Annotated[
@@ -267,7 +267,7 @@ class Command(TyperCommand):
             Option(
                 help=_(
                     "The name of the django manage script to install autocompletion for if "
-                    "different."
+                    "different than the script used to invoke this command."
                 )
             ),
         ] = None,
@@ -306,7 +306,7 @@ class Command(TyperCommand):
             )
         )
 
-    @command(help=_("Remove autocompletion."))
+    @command(help=_("Remove autocompletion for the current or given shell."))
     def remove(
         self,
         shell: t.Annotated[
@@ -320,7 +320,7 @@ class Command(TyperCommand):
             Option(
                 help=_(
                     "The name of the django manage script to remove shell completion for if "
-                    "different."
+                    "different than the script used to invoke this command."
                 )
             ),
         ] = None,
