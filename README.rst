@@ -105,7 +105,7 @@ For example TyperCommands can be a very simple drop in replacement for BaseComma
 
 
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/basic.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/basic.svg
    :width: 100%
    :align: center
 
@@ -152,15 +152,15 @@ Or commands with multiple subcommands can be defined:
          ...
 
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/multi.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi.svg
    :width: 100%
    :align: center
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/multi_create.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi_create.svg
    :width: 100%
    :align: center
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/multi_delete.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi_delete.svg
    :width: 100%
    :align: center
 
@@ -225,19 +225,19 @@ Or more complex groups and subcommand hierarchies can be defined:
          return f"{numerator / denominator:.{self.precision}f}"
 
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/hierarchy.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy.svg
    :width: 100%
    :align: center
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/hierarchy_math.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math.svg
    :width: 100%
    :align: center
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/hierarchy_math_multiply.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math_multiply.svg
    :width: 100%
    :align: center
 
-.. image:: https://raw.githubusercontent.com/bckohan/django-typer/django_typer/examples/helps/hierarchy_math_divide.svg
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math_divide.svg
    :width: 100%
    :align: center
 
