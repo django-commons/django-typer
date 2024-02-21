@@ -58,6 +58,7 @@ preserved, so that TyperCommand can be a drop in replacement.
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.
 
+Please refer to the `full documentation <https://django-typer.readthedocs.io/>`_ for more information.
 
 Installation
 ------------
@@ -211,9 +212,7 @@ Or more complex groups and subcommand hierarchies can be defined:
          ],
       ):
          if numbers:
-               if len(numbers) == 1:
-                  return f"{numbers[0]:.{self.precision}f}"
-               return f"{reduce(lambda x, y: x * y, numbers):.{self.precision}f}"
+            return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
       @math.command()
       def divide(

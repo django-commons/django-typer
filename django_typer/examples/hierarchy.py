@@ -30,9 +30,7 @@ class Command(TyperCommand):
         ],
     ):
         if numbers:
-            if len(numbers) == 1:
-                return f"{numbers[0]:.{self.precision}f}"
-            return f"{reduce(lambda x, y: x * y, numbers):.{self.precision}f}"
+            return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
     @math.command()
     def divide(
