@@ -9,7 +9,7 @@ Provides a TyperCommand class that inherits from `django.core.management.BaseCom
 and allows typer-style annotated parameter types. All of the BaseCommand functionality is
 preserved, so that TyperCommand can be a drop in replacement.
 
-django-typer makes it easy to:
+**django-typer makes it easy to:**
 
    * Define your command CLI interface in as clear, DRY, and safely as possible using type hints
    * Create subcommand and group command hierarchies.
@@ -51,11 +51,8 @@ Installation
         ]
 
 
-Examples
---------
-
-Basic
-~~~~~
+Basic Example
+-------------
 
 For example TyperCommands can be a very simple drop in replacement for BaseCommands:
 
@@ -69,11 +66,12 @@ For example TyperCommands can be a very simple drop in replacement for BaseComma
 .. typer:: django_typer.examples.basic.Command:typer_app
     :prog: basic
     :width: 80
+    :convert-png: latex
 
 |
 
-Multiple Subcommands
-~~~~~~~~~~~~~~~~~~~~
+Multiple Subcommands Example
+----------------------------
 
 Or commands with multiple subcommands can be defined:
 
@@ -87,12 +85,13 @@ Or commands with multiple subcommands can be defined:
     :prog: multi
     :width: 80
     :show-nested:
+    :convert-png: latex
 
 |
 
 
-Grouping and Hierarchies
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Grouping and Hierarchies Example
+--------------------------------
 
 Or more complex groups and subcommand hierarchies can be defined:
 
@@ -106,6 +105,7 @@ Or more complex groups and subcommand hierarchies can be defined:
     :prog: hierarchy
     :width: 80
     :show-nested:
+    :convert-png: latex
 
 |
 
