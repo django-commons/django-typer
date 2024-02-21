@@ -43,7 +43,8 @@ infrastructure are used together. Django should be the central coordinating poin
 this. This is the reason for the pluggable --fallback awkwardness in shellcompletion.
 
 4) Too much of the BaseCommand implementation is built assuming argparse. A more
-generalized abstraction of this interface is in order.
+generalized abstraction of this interface is in order. Right now BaseCommand is doing
+double duty both as a base class and a protocol.
 
 5) There is an awkwardness to how parse_args flattens all the arguments and options
 into a single dictionary. This means that when mapping a library like Typer onto the

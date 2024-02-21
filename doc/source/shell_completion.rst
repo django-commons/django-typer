@@ -1,5 +1,7 @@
 .. include:: ./refs.rst
 
+.. _shellcompletions:
+
 =================
 Shell Completions
 =================
@@ -110,10 +112,10 @@ shell name as an argument. Refer to the :ref:`command help <shellcompletion-comm
 Enabling Completions in Development Environments
 ------------------------------------------------
 
-Most shells work best when the manage script is installed on the system path. This is not always the
-case, especially in development environments. In these scenarios completion installation *should still
-work*, but you may need to always invoke the script from the same path. Fish_ may not work at all in
-this mode.
+Most shells work best when the manage script is installed as an executable on the system path. This
+is not always the case, especially in development environments. In these scenarios completion
+installation *should still work*, but you may need to always invoke the script from the same path.
+Fish_ may not work at all in this mode.
 
 
 Integrating with Other CLI Completion Libraries
@@ -134,6 +136,8 @@ libraries as a fallback out of the box.
 *The long-term solution here should be that Django itself manages completion installation and provides
 hooks for implementing libraries to provide completions for their own commands.*
 
+
+.. _define-shellcompletions:
 
 Defining Custom Completions
 ===========================

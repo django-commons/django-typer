@@ -15,8 +15,8 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
    * Use the full power of Typer's parameter types to validate and parse command line inputs.
    * Create beautiful and information dense help outputs.
    * Configure the rendering of exception stack traces using rich.
-   * Install shell tab-completion support for TyperCommands and normal Django commands for bash,
-     zsh, fish and powershell.
+   * Install shell tab-completion support for TyperCommands and normal Django commands for bash_,
+     zsh_, fish_ and powershell_.
    * Create custom and portable shell tab-completions for your CLI parameters.
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.

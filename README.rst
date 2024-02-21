@@ -31,11 +31,16 @@
 .. |Code Style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
 
+.. _powershell: https://learn.microsoft.com/en-us/powershell/scripting/overview
+.. _fish: https://fishshell.com/
+.. _zsh: https://www.zsh.org/
+.. _bash: https://www.gnu.org/software/bash/
+.. _Django: https://www.djangoproject.com/
 
 django-typer
 ############
 
-Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django management commands. 
+Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django_ management commands. 
 Provides a TyperCommand class that inherits from `BaseCommand <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand>`_
 and allows typer-style annotated parameter types. All of the BaseCommand functionality is
 preserved, so that TyperCommand can be a drop in replacement.
@@ -47,9 +52,9 @@ preserved, so that TyperCommand can be a drop in replacement.
    * Use the full power of Typer's parameter types to validate and parse command line inputs.
    * Create beautiful and information dense help outputs.
    * Configure the rendering of exception stack traces using rich.
-   * Install shell tab-completion support for TyperCommands and normal Django commands for bash,
-     zsh, fish and powershell.
-   * Create custom and portable shell tab-completions for your CLI parameters.
+   * `Install shell tab-completion support <https://django-typer.readthedocs.io/en/latest/shell_completion.html>`_
+     for TyperCommands and normal Django commands for bash_, zsh_, fish_ and powershell_.
+   * `Create custom and portable shell tab-completions for your CLI parameters <https://django-typer.readthedocs.io/en/latest/shell_completion.html#defining-custom-completions>`_.
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.
 
