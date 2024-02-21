@@ -7,3 +7,4 @@ Commands
     :width: 100
     :show-nested:
     :make-sections:
+    :convert-png: latex

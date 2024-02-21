@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.0
+======
+
+* Initial production/stable release.
+
 v0.5.0b
 =======
 

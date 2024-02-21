@@ -4,26 +4,23 @@
 Django Typer
 ============
 
-Use Typer to define the CLI for your Django management commands. Provides a TyperCommand class that
-inherits from django.core.management.BaseCommand and allows typer-style annotated function handlers.
-All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
+Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django management commands. 
+Provides a TyperCommand class that inherits from `django.core.management.BaseCommand <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand>`_
+and allows typer-style annotated parameter types. All of the BaseCommand functionality is
+preserved, so that TyperCommand can be a drop in replacement.
 
-.. warning::
+django-typer makes it easy to:
 
-    This is a late beta release. The interface is mostly stable but there may be lingering issues.
-
-
-.. code-block:: python
-
-    from django_typer import TyperCommand
-
-
-    class Command(TyperCommand):
-        
-        help = 'A command that uses Typer'
-
-        def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
-            ...
+   * Define your command CLI interface in as clear, DRY, and safely as possible using type hints
+   * Create subcommand and group command hierarchies.
+   * Use the full power of Typer's parameter types to validate and parse command line inputs.
+   * Create beautiful and information dense help outputs.
+   * Configure the rendering of exception stack traces using rich.
+   * Install shell tab-completion support for TyperCommands and normal Django commands for bash,
+     zsh, fish and powershell.
+   * Create custom and portable shell tab-completions for your CLI parameters.
+   * Refactor existing management commands into TyperCommands because TyperCommand is interface
+     compatible with BaseCommand.
 
 
 Installation
@@ -31,25 +28,93 @@ Installation
 
 1. Clone django-typer from GitHub_ or install a release off PyPI_ :
 
-.. code:: bash
+    .. code:: bash
 
-       pip install django-typer
+        pip install django-typer
+
+    `rich <https://rich.readthedocs.io/en/latest/>`_ is a powerful library for rich text and
+    beautiful formatting in the terminal. It is not required, but highly recommended for the
+    best experience:
+
+    .. code:: bash
+
+        pip install django-typer[rich]
 
 
 2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
 
-.. code:: python
+    .. code:: python
 
-       INSTALLED_APPS = [
-           ...
-           'django_typer',
-       ]
+        INSTALLED_APPS = [
+            ...
+            'django_typer',
+        ]
 
+
+Examples
+--------
+
+Basic
+~~~~~
+
+For example TyperCommands can be a very simple drop in replacement for BaseCommands:
+
+
+.. literalinclude:: ../../django_typer/examples/basic.py
+   :language: python
+   :caption: A Basic Command
+   :linenos:
+
+
+.. typer:: django_typer.examples.basic.Command:typer_app
+    :prog: basic
+    :width: 80
+
+|
+
+Multiple Subcommands
+~~~~~~~~~~~~~~~~~~~~
+
+Or commands with multiple subcommands can be defined:
+
+.. literalinclude:: ../../django_typer/examples/multi.py
+   :language: python
+   :caption: A Command w/Subcommands
+   :linenos:
+
+
+.. typer:: django_typer.examples.multi.Command:typer_app
+    :prog: multi
+    :width: 80
+    :show-nested:
+
+|
+
+
+Grouping and Hierarchies
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Or more complex groups and subcommand hierarchies can be defined:
+
+.. literalinclude:: ../../django_typer/examples/hierarchy.py
+   :language: python
+   :caption: A Command w/Grouping Hierarchy
+   :linenos:
+
+
+.. typer:: django_typer.examples.hierarchy.Command:typer_app
+    :prog: hierarchy
+    :width: 80
+    :show-nested:
+
+|
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   tutorial
+   howto
    commands
    reference
    changelog

@@ -35,24 +35,210 @@
 django-typer
 ############
 
-Use Typer to define the CLI for your Django management commands. Provides a TyperCommand class that
-inherits from django.core.management.BaseCommand and allows typer-style annotated function handlers.
-All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
+Use `Typer <https://typer.tiangolo.com/>`_ to define the CLI for your Django management commands. 
+Provides a TyperCommand class that inherits from `django.core.management.BaseCommand <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand>`_
+and allows typer-style annotated parameter types. All of the BaseCommand functionality is
+preserved, so that TyperCommand can be a drop in replacement.
 
-.. warning::
+django-typer makes it easy to:
 
-    This is a late beta release. The interface is mostly stable but there may be lingering issues.
+   * Define your command CLI interface in as clear, DRY, and safely as possible using type hints
+   * Create subcommand and group command hierarchies.
+   * Use the full power of Typer's parameter types to validate and parse command line inputs.
+   * Create beautiful and information dense help outputs.
+   * Configure the rendering of exception stack traces using rich.
+   * Install shell tab-completion support for TyperCommands and normal Django commands for bash,
+     zsh, fish and powershell.
+   * Create custom and portable shell tab-completions for your CLI parameters.
+   * Refactor existing management commands into TyperCommands because TyperCommand is interface
+     compatible with BaseCommand.
+
+
+Installation
+------------
+
+1. Clone django-typer from GitHub or install a release off `PyPI <https://pypi.org/project/django-typer/>`_:
+
+    .. code:: bash
+
+        pip install django-typer
+
+    `rich <https://rich.readthedocs.io/en/latest/>`_ is a powerful library for rich text and
+    beautiful formatting in the terminal. It is not required, but highly recommended for the
+    best experience:
+
+    .. code:: bash
+
+        pip install django-typer[rich]
+
+
+2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
+
+    .. code:: python
+
+        INSTALLED_APPS = [
+            ...
+            'django_typer',
+        ]
+
+
+Examples
+--------
+
+Basic
+~~~~~
+
+For example TyperCommands can be a very simple drop in replacement for BaseCommands:
 
 
 .. code-block:: python
 
-    from django_typer import TyperCommand
+   from django_typer import TyperCommand
 
 
-    class Command(TyperCommand):
-        
-        help = 'A command that uses Typer'
+   class Command(TyperCommand):
 
-        def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
-            ...
+      def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
+         """
+         A basic command that uses Typer
+         """
 
+
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/basic.svg
+   :width: 100%
+   :align: center
+
+
+|
+
+Multiple Subcommands
+~~~~~~~~~~~~~~~~~~~~
+
+Or commands with multiple subcommands can be defined:
+
+.. code-block:: python
+
+   import typing as t
+
+   from django.utils.translation import gettext_lazy as _
+   from typer import Argument
+
+   from django_typer import TyperCommand, command
+
+
+   class Command(TyperCommand):
+      """
+      A command that defines subcommands.
+      """
+
+      @command()
+      def create(
+         self,
+         name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
+      ):
+         """
+         Create an object.
+         """
+         ...
+
+      @command()
+      def delete(
+         self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
+      ):
+         """
+         Delete an object.
+         """
+         ...
+
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/multi.svg
+   :width: 100%
+   :align: center
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/multi_create.svg
+   :width: 100%
+   :align: center
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/multi_delete.svg
+   :width: 100%
+   :align: center
+
+|
+
+
+Grouping and Hierarchies
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Or more complex groups and subcommand hierarchies can be defined:
+
+.. code-block:: python
+
+   import typing as t
+   from functools import reduce
+
+   from django.utils.translation import gettext_lazy as _
+   from typer import Argument, Option
+
+   from django_typer import TyperCommand, group
+
+
+   class Command(TyperCommand):
+
+      help = _("A more complex command that defines a hierarchy of subcommands.")
+
+      precision = 2
+
+      @group(help=_("Do some math at the given precision."))
+      def math(
+         self,
+         precision: t.Annotated[
+               int, Option(help=_("The floating point precision to output."))
+         ] = precision,
+      ):
+         self.precision = precision
+
+      @math.command(help=_("Multiply the given numbers."))
+      def multiply(
+         self,
+         numbers: t.Annotated[
+               t.List[float], Argument(help=_("The list of numbers to multiply"))
+         ],
+      ):
+         if numbers:
+               if len(numbers) == 1:
+                  return f"{numbers[0]:.{self.precision}f}"
+               return f"{reduce(lambda x, y: x * y, numbers):.{self.precision}f}"
+
+      @math.command()
+      def divide(
+         self,
+         numerator: t.Annotated[float, Argument(help=_("The numerator"))],
+         denominator: t.Annotated[float, Argument(help=_("The denominator"))],
+         floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
+      ):
+         """
+         Divide the given numbers.
+         """
+         if floor:
+               return str(numerator // denominator)
+         return f"{numerator / denominator:.{self.precision}f}"
+
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/hierarchy.svg
+   :width: 100%
+   :align: center
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/hierarchy_math.svg
+   :width: 100%
+   :align: center
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/hierarchy_math_multiply.svg
+   :width: 100%
+   :align: center
+
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/examples/helps/hierarchy_math_divide.svg
+   :width: 100%
+   :align: center
+
+|

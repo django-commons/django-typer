@@ -8,7 +8,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings')
 django.setup()
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
+sys.path.append(str(Path(__file__).parent / 'django_typer' / 'examples'))
+sys.path.append(str(Path(__file__).parent / 'django_typer' / 'tests'))
 import django_typer
 
 # Configuration file for the Sphinx documentation builder.
