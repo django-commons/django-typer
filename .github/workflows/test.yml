@@ -72,12 +72,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.12']
+        python-version: ['3.8', '3.12']
         django-version:
           - '3.2' # LTS April 2024
           - '5.0' # April 2025
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.8'
             django-version: '5.0'
           - python-version: '3.12'
             django-version: '3.2'
@@ -119,12 +119,12 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.12']
+        python-version: ['3.8', '3.12']
         django-version:
           - '3.2' # LTS April 2024
           - '5.0' # April 2025
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.8'
             django-version: '5.0'
           - python-version: '3.12'
             django-version: '3.2'
@@ -193,12 +193,12 @@ jobs:
   #   runs-on: windows-latest
   #   strategy:
   #     matrix:
-  #       python-version: ['3.9', '3.12']
+  #       python-version: ['3.8', '3.12']
   #       django-version:
   #         - '3.2' # LTS April 2024
   #         - '5.0' # April 2025
   #       exclude:
-  #         - python-version: '3.9'
+  #         - python-version: '3.8'
   #           django-version: '5.0'
   #         - python-version: '3.12'
   #           django-version: '3.2'
