@@ -2,9 +2,16 @@
 Common types for command line argument specification.
 """
 
+# pylint: disable=pointless-string-statement
+
 import sys
 from pathlib import Path
-from typing import Annotated, Any, Callable, Optional
+from typing import Any, Callable, Optional
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 from django.core.management import CommandError
 from django.core.management.color import Style as ColorStyle
@@ -46,7 +53,9 @@ def set_force_color(context, param, value):
     return value
 
 
-# https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
+"""
+https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version
+"""
 Version = Annotated[
     bool,
     Option(

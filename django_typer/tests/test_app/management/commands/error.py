@@ -1,4 +1,9 @@
-import typing as t
+import sys
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 from django.utils.translation import gettext_lazy as _
 from typer import Option
@@ -13,6 +18,6 @@ class Command(TyperCommand):
         self,
         arg1: int,
         flag1: bool = False,
-        opt1: t.Annotated[int, Option(help="An option")] = 5,
+        opt1: Annotated[int, Option(help="An option")] = 5,
     ):
         pass

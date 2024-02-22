@@ -1,5 +1,10 @@
 import json
-import typing as t
+import sys
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
@@ -14,7 +19,7 @@ class Command(TyperCommand):
 
     @group()
     def test(
-        self, precision: int, flag: t.Annotated[bool, Option(help="A flag.")] = False
+        self, precision: int, flag: Annotated[bool, Option(help="A flag.")] = False
     ):
         """
         Do some math at the given precision.
@@ -27,7 +32,7 @@ class Command(TyperCommand):
 
     @test.command()
     def samename(
-        self, precision: int, flag: t.Annotated[bool, Option(help="A flag.")] = False
+        self, precision: int, flag: Annotated[bool, Option(help="A flag.")] = False
     ):
         self.parameters["samename"] = {
             "precision": precision,
@@ -38,8 +43,8 @@ class Command(TyperCommand):
     @test.command()
     def diffname(
         self,
-        precision2: t.Annotated[int, Argument(metavar="precision")],
-        flag2: t.Annotated[bool, Option("--flag/--no-flag", help="A flag.")] = False,
+        precision2: Annotated[int, Argument(metavar="precision")],
+        flag2: Annotated[bool, Option("--flag/--no-flag", help="A flag.")] = False,
     ):
         self.parameters["diffname"] = {
             "precision2": precision2,

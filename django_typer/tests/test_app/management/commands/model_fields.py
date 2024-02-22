@@ -1,5 +1,11 @@
 import json
+import sys
 import typing as t
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 import typer
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +26,6 @@ def obj_not_found(model_cls, value, exc):
 
 
 class Command(TyperCommand):
-
     @initialize()
     def init(self, verbosity: types.Verbosity = 1):
         self.verbosity = verbosity
@@ -28,14 +33,14 @@ class Command(TyperCommand):
     @command()
     def test(
         self,
-        char: t.Annotated[
+        char: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "char_field"),
                 help=_("Fetch objects by their char fields."),
             ),
         ] = None,
-        ichar: t.Annotated[
+        ichar: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(
@@ -47,7 +52,7 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their char fields, case insensitive."),
             ),
         ] = None,
-        text: t.Annotated[
+        text: Annotated[
             t.List[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(
@@ -58,7 +63,7 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their text fields."),
             ),
         ] = None,
-        itext: t.Annotated[
+        itext: Annotated[
             t.List[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(
@@ -70,35 +75,35 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their text fields, case insensitive."),
             ),
         ] = None,
-        uuid: t.Annotated[
+        uuid: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "uuid_field"),
                 help=_("Fetch objects by their UUID fields."),
             ),
         ] = None,
-        id: t.Annotated[
+        id: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester),
                 help=_("Fetch objects by their int (pk) fields."),
             ),
         ] = None,
-        id_limit: t.Annotated[
+        id_limit: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, limit=5),
                 help=_("Fetch objects by their int (pk) fields."),
             ),
         ] = None,
-        float: t.Annotated[
+        float: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "float_field"),
                 help=_("Fetch objects by their float fields."),
             ),
         ] = None,
-        decimal: t.Annotated[
+        decimal: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "decimal_field"),

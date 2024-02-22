@@ -112,7 +112,6 @@ class _DefaultCompleteTestCase:
         )
 
     def get_completions(self, *cmds: str) -> list[str]:
-
         def read(fd):
             """Function to read from a file descriptor."""
             return os.read(fd, 1024 * 1024).decode()
@@ -371,7 +370,6 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
 
 
 class PowerShellInstallRemoveTests(_InstalledScriptTestCase, PowerShellTests):
-
     def test_shell_complete(self):
         # the power shell completion script registration is all in one file
         # so install/remove is more complicated when other scripts are in that
@@ -393,7 +391,6 @@ class DefaultCompleteTestCase(_DefaultCompleteTestCase, TestCase):
 
 @pytest.mark.skipif(default_shell is not None, reason="shellingham detected a shell")
 class DefaultCompleteFailTestCase(_DefaultCompleteTestCase, TestCase):
-
     def setUp(self):
         TestCase.setUp(self)
 

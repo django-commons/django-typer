@@ -92,7 +92,6 @@ def run_command(command, *args, parse_json=True):
 
 
 class BasicTests(TestCase):
-
     def test_common_options_function(self):
         from django_typer import _common_options
 
@@ -613,7 +612,6 @@ class Callback2Tests(CallbackTests):
 
 
 class UsageErrorTests(TestCase):
-
     def test_missing_parameter(self):
         result = run_command("missing")
         self.assertTrue("Test missing parameter." in result)
@@ -828,7 +826,6 @@ class TestDjangoParameters(TestCase):
 
 
 class TestHelpPrecedence(TestCase):
-
     def test_help_precedence1(self):
         buffer = StringIO()
         cmd = get_command("help_precedence1", no_color=True, stdout=buffer)
@@ -1632,7 +1629,6 @@ class TestTracebackConfigNoRich(TestTracebackConfig):
 
 
 class TestSettingsSystemCheck(TestCase):
-
     def test_warning_thrown(self):
         result = run_command(
             "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
@@ -1718,7 +1714,6 @@ class TestPollExample(TestCase):
 
 
 class TestShellCompletersAndParsers(TestCase):
-
     def setUp(self):
         super().setUp()
         for field, values in {

@@ -1,5 +1,11 @@
 import json
+import sys
 import typing as t
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 import typer
 from django.apps import AppConfig, apps
@@ -11,7 +17,7 @@ from django_typer import TyperCommand, completers, parsers
 class Command(TyperCommand):
     def handle(
         self,
-        django_apps: t.Annotated[
+        django_apps: Annotated[
             t.List[AppConfig],
             typer.Argument(
                 parser=parsers.parse_app_label,

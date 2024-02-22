@@ -1,4 +1,9 @@
-from typing import Annotated
+import sys
+
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
 
 from django.core.management import CommandError
 from typer import Option

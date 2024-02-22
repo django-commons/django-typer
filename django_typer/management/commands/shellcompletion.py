@@ -24,6 +24,11 @@ import sys
 import typing as t
 from pathlib import Path
 
+if sys.version_info < (3, 9):
+    from typing_extensions import Annotated
+else:
+    from typing import Annotated
+
 from click.parser import split_arg_string
 from click.shell_completion import (
     CompletionItem,
@@ -190,7 +195,7 @@ class Command(TyperCommand):
 
         fallback = f" --fallback {fallback}" if fallback else ""
 
-        def replace(s: str, old: str, new: str, occurrences: list[int]) -> str:
+        def replace(s: str, old: str, new: str, occurrences: t.List[int]) -> str:
             """
             :param s: The string to modify
             :param old: The string to replace
@@ -256,13 +261,13 @@ class Command(TyperCommand):
     @command(help=_("Install autocompletion for the current or given shell."))
     def install(
         self,
-        shell: t.Annotated[
+        shell: Annotated[
             t.Optional[Shells],
             Argument(
                 help=_("Specify the shell to install or remove autocompletion for.")
             ),
         ] = DETECTED_SHELL,
-        manage_script: t.Annotated[
+        manage_script: Annotated[
             t.Optional[str],
             Option(
                 help=_(
@@ -271,7 +276,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = None,
-        fallback: t.Annotated[
+        fallback: Annotated[
             t.Optional[str],
             Option(
                 help=_(
@@ -309,13 +314,13 @@ class Command(TyperCommand):
     @command(help=_("Remove autocompletion for the current or given shell."))
     def remove(
         self,
-        shell: t.Annotated[
+        shell: Annotated[
             t.Optional[Shells],
             Argument(
                 help=_("Specify the shell to install or remove shell completion for.")
             ),
         ] = DETECTED_SHELL,
-        manage_script: t.Annotated[
+        manage_script: Annotated[
             t.Optional[str],
             Option(
                 help=_(
@@ -402,14 +407,14 @@ class Command(TyperCommand):
     @command(help=_("Generate autocompletion for command string."), hidden=False)
     def complete(
         self,
-        cmd_str: t.Annotated[
+        cmd_str: Annotated[
             t.Optional[str],
             Argument(
                 metavar="command",
                 help=_("The command string to generate completion suggestions for."),
             ),
         ] = None,
-        shell: t.Annotated[
+        shell: Annotated[
             t.Optional[Shells],
             Option(
                 help=_(
@@ -417,7 +422,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = None,
-        fallback: t.Annotated[
+        fallback: Annotated[
             t.Optional[str],
             Option(
                 help=_(

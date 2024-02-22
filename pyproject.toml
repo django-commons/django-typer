@@ -23,6 +23,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -39,30 +40,39 @@ packages = [
 exclude = ["django_typer/tests", "django_typer/examples", "django_typer/locale"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.8,<4.0"
 Django = ">=3.2,<6.0"
 click = "^8.0.0"
-typer = "^0.9.0"
+typer = ">=0.9.0,<1.0"
 rich = ">=10.11.0,<14.0.0"  # this should track typer's rich dependency
-shellingham = "^1.5.4"
+shellingham = ">=1.5.4"
+typing-extensions = { version = ">=3.7.4.3", python = "<3.9" }
+
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
-rich = "^13.7.0"
 pytest-django = "^4.7.0"
 isort = "^5.13.0"
 pytest-cov = "^4.1.0"
-Sphinx = ">=7.2.0"
+Sphinx = ">=7.0.0"
 sphinx-rtd-theme = "^2.0.0"
-mypy = "^1.8"
+mypy = "^1.0"
 pylint = '^3.0'
 black = ">=23.12,<25.0"
 doc8 = "^1.1.1"
 aiohttp = "^3.9.1"
 readme-renderer = {extras = ["md"], version = "^42.0"}
-sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.1.8"}
-scikit-learn = "^1.3.2"
+sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.1.11"}
+scikit-learn = "^1.0.0"
 pytest-env = "^1.1.3"
+numpy = [
+    { version = ">=1.26", markers = "python_version > '3.8'" },
+    { version = "<=1.24", markers = "python_version <= '3.8'" },
+]
+scipy = [
+    { version = ">=1.11", markers = "python_version > '3.8'" },
+    { version = "<=1.10", markers = "python_version <= '3.8'" },
+]
 
 [tool.poetry.extras]
 rich = ["rich"]
@@ -87,7 +97,10 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-exclude = "tests"
+exclude = [
+    "tests",
+    "examples"
+]
 
 
 [tool.doc8]
@@ -135,7 +148,7 @@ source = [
 
 
 [tool.black]
-target-version = ["py39", "py310", "py311", "py312"]
+target-version = ["py38", "py39", "py310", "py311", "py312"]
 include = '\.pyi?$'
 
 [pylint]
