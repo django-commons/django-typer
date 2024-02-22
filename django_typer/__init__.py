@@ -72,7 +72,6 @@ from django.db.models import Model
 from django.utils.translation import gettext as _
 
 from django_typer import patch
-from django_typer.utils import push_command, traceback_config, with_typehint
 
 patch.apply()
 
@@ -91,6 +90,7 @@ from .parsers import ModelObjectParser
 from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
 from .types import Style as ColorStyle
 from .types import Traceback, Verbosity, Version
+from .utils import push_command, traceback_config, with_typehint
 
 VERSION = (1, 0, 0)
 
