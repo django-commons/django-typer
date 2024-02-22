@@ -54,11 +54,14 @@ ipdb = "^0.13.13"
 pytest-django = "^4.7.0"
 isort = "^5.13.0"
 pytest-cov = "^4.1.0"
-Sphinx = ">=7.0.0"
+Sphinx = [
+    { version = "^7.2.0", markers = "python_version > '3.8'" },
+    { version = "^7.0.0", markers = "python_version <= '3.8'" },
+]
 sphinx-rtd-theme = "^2.0.0"
 mypy = "^1.0"
 pylint = '^3.0'
-black = ">=23.12,<25.0"
+black = ">=23.12"
 doc8 = "^1.1.1"
 aiohttp = "^3.9.1"
 readme-renderer = {extras = ["md"], version = "^42.0"}
