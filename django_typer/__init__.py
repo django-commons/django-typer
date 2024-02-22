@@ -66,7 +66,7 @@ from types import MethodType, SimpleNamespace
 import click
 from click.shell_completion import CompletionItem
 from django.core.management import get_commands
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.db.models import Model
 from django.utils.translation import gettext as _
@@ -1285,11 +1285,23 @@ class TyperParser:
     prog_name: str
     subcommand: str
 
-    def __init__(self, django_command: "TyperCommand", prog_name, subcommand):
+    missing_args_message: str = "Missing parameter: {parameter}"
+    called_from_command_line: t.Optional[bool] = None
+
+    def __init__(
+        self,
+        django_command: "TyperCommand",
+        prog_name,
+        subcommand,
+        missing_args_message: str = missing_args_message,
+        called_from_command_line: t.Optional[bool] = None,
+    ):
         self._actions = []
         self.django_command = django_command
         self.prog_name = prog_name
         self.subcommand = subcommand
+        self.missing_args_message = missing_args_message
+        self.called_from_command_line = called_from_command_line
 
         def populate_params(node: CommandNode) -> None:
             for param in node.click_command.params:
@@ -1299,7 +1311,9 @@ class TyperParser:
 
         populate_params(self.django_command.command_tree)
 
-    def print_help(self, *command_path: str) -> t.Optional[str]:
+    def print_help(
+        self, *command_path: str, stream: t.Optional[BaseOutputWrapper] = None
+    ):
         """
         Print the help for the given command path to stdout of the django command.
         """
@@ -1307,8 +1321,12 @@ class TyperParser:
             f"{self.prog_name} {self.subcommand}"
         )
         command_node = self.django_command.get_subcommand(*command_path)
-        with contextlib.redirect_stdout(self.django_command.stdout):
-            return command_node.print_help()
+        with contextlib.redirect_stdout(stream or self.django_command.stdout):
+            hlp = command_node.print_help()
+            if hlp:
+                (stream or self.django_command.stdout).write(
+                    hlp, style_func=lambda msg: msg, ending="\n\n"
+                )
 
     def parse_args(self, args=None, namespace=None) -> _ParsedArgs:
         """
@@ -1334,6 +1352,19 @@ class TyperParser:
                 return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **ctx.params})
         except click.exceptions.Exit:
             sys.exit()
+        except (click.exceptions.UsageError, CommandError) as arg_err:
+            if self.called_from_command_line:
+                err_msg = (
+                    _(self.missing_args_message).format(
+                        parameter=getattr(getattr(arg_err, "param", None), "name", "")
+                    )
+                    if isinstance(arg_err, click.exceptions.MissingParameter)
+                    else str(arg_err)
+                )
+                self.print_help(stream=self.django_command.stderr)
+                self.django_command.stderr.write(err_msg)
+                sys.exit(1)
+            raise CommandError(str(arg_err)) from arg_err
 
     def add_argument(self, *args, **kwargs):
         """
@@ -1524,7 +1555,17 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         :param subcommand: the name of the django command
         """
         with push_command(self):
-            return TyperParser(self, prog_name, subcommand)
+            return TyperParser(
+                self,
+                prog_name,
+                subcommand,
+                missing_args_message=getattr(
+                    self, "missing_args_message", TyperParser.missing_args_message
+                ),
+                called_from_command_line=getattr(
+                    self, "_called_from_command_line", None
+                ),
+            )
 
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
@@ -1538,9 +1579,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """
         with push_command(self):
             parser = self.create_parser(prog_name, subcommand)
-            hlp = parser.print_help(*cmd_path)
-            if hlp:
-                self.stdout.write(hlp)
+            parser.print_help(*cmd_path)
 
     def __call__(self, *args, **kwargs):
         """

@@ -142,3 +142,6 @@ hooks for implementing libraries to provide completions for their own commands.*
 Defining Custom Completions
 ===========================
 
+.. todo::
+
+    Check back soon!

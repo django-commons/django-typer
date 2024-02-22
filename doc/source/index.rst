@@ -4,7 +4,7 @@
 Django Typer
 ============
 
-Use Typer_ to define the CLI for your Django management commands. Provides a TyperCommand class
+Use Typer_ to define the CLI for your Django_ management commands. Provides a TyperCommand class
 that inherits from BaseCommand_ and allows typer-style annotated parameter types. All of the
 BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
 
@@ -15,9 +15,9 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
    * Use the full power of Typer's parameter types to validate and parse command line inputs.
    * Create beautiful and information dense help outputs.
    * Configure the rendering of exception stack traces using rich.
-   * Install shell tab-completion support for TyperCommands and normal Django commands for bash_,
-     zsh_, fish_ and powershell_.
-   * Create custom and portable shell tab-completions for your CLI parameters.
+   * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
+     Django_ commands for bash_, zsh_, fish_ and powershell_.
+   * :ref:`Create custom and portable shell tab-completions for your CLI parameters. <define-shellcompletions>`
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.
 
@@ -31,9 +31,8 @@ Installation
 
         pip install django-typer
 
-    `rich <https://rich.readthedocs.io/en/latest/>`_ is a powerful library for rich text and
-    beautiful formatting in the terminal. It is not required, but highly recommended for the
-    best experience:
+    rich_ is a powerful library for rich text and beautiful formatting in the terminal.
+    It is not required, but highly recommended for the best experience:
 
     .. code:: bash
 

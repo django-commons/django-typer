@@ -4,6 +4,7 @@
 .. _PyPI: https://pypi.python.org/pypi/django-typer
 .. _Typer: https://typer.tiangolo.com/
 .. _click: https://click.palletsprojects.com/
+.. _rich: https://rich.readthedocs.io/
 .. _DRY: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
 .. _BaseCommand: https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#command-objects
 .. _argparse: https://docs.python.org/3/library/argparse.html
