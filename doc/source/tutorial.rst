@@ -39,7 +39,7 @@ from *all three* of these upstream libraries:
     refer to the click_ documentation when you want to implement more complex behaviors like passing
     `context parameters <https://click.palletsprojects.com/api/#context>`_. It is not necessary to
     familiarize yourself with click_ to use django-typer_, but you should know that it exists and is
-    the engine of much of this functionality.
+    the engine behind much of this functionality.
 
 
 Install django-typer_

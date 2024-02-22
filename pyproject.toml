@@ -118,7 +118,8 @@ addopts = [
 
 [tool.coverage.run]
 omit = [
-  "django_typer/tests/**/*py"
+  "django_typer/tests/**/*py",
+  "django_typer/examples/**/*py"
 ]
 branch = true
 source = ["django_typer"]
