@@ -8,6 +8,7 @@ import subprocess
 import sys
 import termios
 import time
+import typing as t
 from pathlib import Path
 
 import pytest
@@ -111,7 +112,7 @@ class _DefaultCompleteTestCase:
             f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
         )
 
-    def get_completions(self, *cmds: str) -> list[str]:
+    def get_completions(self, *cmds: str) -> t.List[str]:
         def read(fd):
             """Function to read from a file descriptor."""
             return os.read(fd, 1024 * 1024).decode()
