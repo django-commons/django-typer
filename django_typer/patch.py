@@ -43,6 +43,20 @@ def apply() -> None:
     if PATCH_APPLIED:
         return
     PATCH_APPLIED = True
+
+    try:
+        # Django as of <=5.0 calls colorama.init() if colorama is installed
+        # this screws up forced terminals on platforms other than windows that
+        # are not attached to ttys. Upstream Django should change the init
+        # call to a just_fix_windows_console - we undo this and redo the right
+        # thing here.
+        import colorama
+
+        colorama.deinit()
+        colorama.just_fix_windows_console()
+    except ImportError:
+        pass
+
     try:
         from rich.console import Console
 
