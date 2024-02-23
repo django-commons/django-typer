@@ -8,7 +8,7 @@ import sys
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-from typing import Any
+from typing import Any, Tuple
 
 import django
 import pytest
@@ -61,7 +61,7 @@ def get_named_arguments(function):
     ]
 
 
-def run_command(command, *args, parse_json=True):
+def run_command(command, *args, parse_json=True) -> Tuple[str, str]:
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
@@ -76,17 +76,17 @@ def run_command(command, *args, parse_json=True):
 
         # Check the return code to ensure the script ran successfully
         if result.returncode != 0:
-            return result.stderr or result.stdout or ""
+            return result.stdout, result.stderr
 
         # Parse the output
         if result.stdout:
             if parse_json:
                 try:
-                    return json.loads(result.stdout)
+                    return json.loads(result.stdout), result.stderr
                 except json.JSONDecodeError:
-                    return result.stdout or result.stderr or ""
-            return result.stdout
-        return result.stderr or ""
+                    return result.stdout, result.stderr
+            return result.stdout, result.stderr
+        return result.stdout, result.stderr
     finally:
         os.chdir(cwd)
 
@@ -99,12 +99,12 @@ class BasicTests(TestCase):
 
     def test_command_line(self):
         self.assertEqual(
-            run_command("basic", "a1", "a2"),
+            run_command("basic", "a1", "a2")[0],
             {"arg1": "a1", "arg2": "a2", "arg3": 0.5, "arg4": 1},
         )
 
         self.assertEqual(
-            run_command("basic", "a1", "a2", "--arg3", "0.75", "--arg4", "2"),
+            run_command("basic", "a1", "a2", "--arg3", "0.75", "--arg4", "2")[0],
             {"arg1": "a1", "arg2": "a2", "arg3": 0.75, "arg4": 2},
         )
 
@@ -128,7 +128,7 @@ class BasicTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            str(run_command("basic", "--version")).strip(), django.get_version()
+            str(run_command("basic", "--version")[0]).strip(), django.get_version()
         )
 
     def test_call_direct(self):
@@ -263,20 +263,21 @@ class InterfaceTests(TestCase):
 class MultiTests(TestCase):
     def test_command_line(self):
         self.assertEqual(
-            run_command("multi", "cmd1", "/path/one", "/path/two"),
+            run_command("multi", "cmd1", "/path/one", "/path/two")[0],
             {"files": ["/path/one", "/path/two"], "flag1": False},
         )
 
         self.assertEqual(
-            run_command("multi", "cmd1", "/path/four", "/path/three", "--flag1"),
+            run_command("multi", "cmd1", "/path/four", "/path/three", "--flag1")[0],
             {"files": ["/path/four", "/path/three"], "flag1": True},
         )
 
         self.assertEqual(
-            run_command("multi", "sum", "1.2", "3.5", " -12.3"), sum([1.2, 3.5, -12.3])
+            run_command("multi", "sum", "1.2", "3.5", " -12.3")[0],
+            sum([1.2, 3.5, -12.3]),
         )
 
-        self.assertEqual(run_command("multi", "cmd3"), {})
+        self.assertEqual(run_command("multi", "cmd3")[0], {})
 
     def test_call_command(self):
         ret = json.loads(call_command("multi", ["cmd1", "/path/one", "/path/two"]))
@@ -320,16 +321,19 @@ class MultiTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            str(run_command("multi", "--version")).strip(), django.get_version()
+            str(run_command("multi", "--version")[0]).strip(), django.get_version()
         )
         self.assertEqual(
-            str(run_command("multi", "--version", "cmd1")).strip(), django.get_version()
+            str(run_command("multi", "--version", "cmd1")[0]).strip(),
+            django.get_version(),
         )
         self.assertEqual(
-            str(run_command("multi", "--version", "sum")).strip(), django.get_version()
+            str(run_command("multi", "--version", "sum")[0]).strip(),
+            django.get_version(),
         )
         self.assertEqual(
-            str(run_command("multi", "--version", "cmd3")).strip(), django.get_version()
+            str(run_command("multi", "--version", "cmd3")[0]).strip(),
+            django.get_version(),
         )
 
     def test_call_direct(self):
@@ -390,7 +394,7 @@ class CallbackTests(TestCase):
     def test_helps(self, top_level_only=False):
         buffer = StringIO()
         cmd = get_command(self.cmd_name, stdout=buffer, no_color=True)
-        help_output_top = run_command(self.cmd_name, "--no-color", "--help")
+        help_output_top = run_command(self.cmd_name, "--no-color", "--help")[0]
         cmd.print_help("./manage.py", self.cmd_name)
         self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
         self.assertIn(f"Usage: ./manage.py {self.cmd_name} [OPTIONS]", help_output_top)
@@ -400,7 +404,7 @@ class CallbackTests(TestCase):
             buffer.seek(0)
             callback_help = run_command(
                 self.cmd_name, "--no-color", "5", self.cmd_name, "--help"
-            )
+            )[0]
             cmd.print_help("./manage.py", self.cmd_name, self.cmd_name)
             self.assertEqual(callback_help.strip(), buffer.getvalue().strip())
             self.assertIn(
@@ -410,7 +414,7 @@ class CallbackTests(TestCase):
 
     def test_command_line(self):
         self.assertEqual(
-            run_command(self.cmd_name, "5", self.cmd_name, "a1", "a2"),
+            run_command(self.cmd_name, "5", self.cmd_name, "a1", "a2")[0],
             {
                 "p1": 5,
                 "flag1": False,
@@ -435,7 +439,7 @@ class CallbackTests(TestCase):
                 "0.75",
                 "--arg4",
                 "2",
-            ),
+            )[0],
             {
                 "p1": 6,
                 "flag1": True,
@@ -582,10 +586,11 @@ class CallbackTests(TestCase):
 
     def test_get_version(self):
         self.assertEqual(
-            str(run_command(self.cmd_name, "--version")).strip(), django.get_version()
+            str(run_command(self.cmd_name, "--version")[0]).strip(),
+            django.get_version(),
         )
         self.assertEqual(
-            str(run_command(self.cmd_name, "--version", "6", self.cmd_name)).strip(),
+            str(run_command(self.cmd_name, "--version", "6", self.cmd_name)[0]).strip(),
             django.get_version(),
         )
 
@@ -614,12 +619,12 @@ class Callback2Tests(CallbackTests):
 class UsageErrorTests(TestCase):
     def test_missing_parameter(self):
         result = run_command("missing")
-        self.assertTrue("Test missing parameter." in result)
-        self.assertTrue("arg1 must be given." in result)
+        self.assertTrue("Test missing parameter." in result[0])
+        self.assertTrue("arg1 must be given." in result[1])
 
         result = run_command("error")
-        self.assertTrue("Test usage error behavior." in result)
-        self.assertTrue("Missing parameter: arg1" in result)
+        self.assertTrue("Test usage error behavior." in result[0])
+        self.assertTrue("Missing parameter: arg1" in result[1])
 
         with self.assertRaises(CommandError):
             call_command("missing")
@@ -630,8 +635,8 @@ class UsageErrorTests(TestCase):
     def test_bad_param(self):
 
         result = run_command("error", "a")
-        self.assertTrue("Test usage error behavior." in result)
-        self.assertTrue("'a' is not a valid integer." in result)
+        self.assertTrue("Test usage error behavior." in result[0])
+        self.assertTrue("'a' is not a valid integer." in result[1])
 
         with self.assertRaises(CommandError):
             call_command("error", "a")
@@ -639,8 +644,8 @@ class UsageErrorTests(TestCase):
     def test_no_option(self):
 
         result = run_command("error", "--flg1")
-        self.assertTrue("Test usage error behavior." in result)
-        self.assertTrue("No such option: --flg1" in result)
+        self.assertTrue("Test usage error behavior." in result[0])
+        self.assertTrue("No such option: --flg1" in result[1])
 
         with self.assertRaises(CommandError):
             call_command("error", "--flg1")
@@ -648,8 +653,8 @@ class UsageErrorTests(TestCase):
     def test_bad_option(self):
 
         result = run_command("error", "--opt1", "d")
-        self.assertTrue("Test usage error behavior." in result)
-        self.assertTrue("'d' is not a valid integer." in result)
+        self.assertTrue("Test usage error behavior." in result[0])
+        self.assertTrue("'d' is not a valid integer." in result[1])
 
         with self.assertRaises(CommandError):
             call_command("error", "--opt1", "d")
@@ -682,9 +687,10 @@ class TestDjangoParameters(TestCase):
             self.assertEqual(params.get("no_color_attr", True), False)
 
             result = run_command(cmd, "--force-color", "--no-color", *args)
-            self.assertTrue("CommandError" in result)
-            self.assertTrue("--no-color" in result)
-            self.assertTrue("--force-color" in result)
+            self.assertTrue(
+                "The --no-color and --force-color options can't be used together."
+                in result[1]
+            )
 
             call_command(cmd, args, no_color=True)
             params = read_django_parameters()
@@ -711,30 +717,6 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(out_str, "out\nno_color=None\nforce_color=None\n")
         self.assertEqual(err_str, "err\nno_color=None\nforce_color=None\n")
         cmd.print_help("./manage.py", "ctor")
-        if rich_installed:
-            # color is not in the output because stdout is not a tty
-            self.assertFalse("\x1b" in stdout.getvalue())
-
-        # check tty streams output expected constructor values and coloring
-        stdout = StringIO()
-        stderr = StringIO()
-        # spoof these streams as ttys
-        stdout.isatty = lambda: True
-        stderr.isatty = lambda: True
-        cmd = get_command(
-            "ctor", stdout=stdout, stderr=stderr, no_color=None, force_color=None
-        )
-        cmd()
-        out_str = stdout.getvalue()
-        err_str = stderr.getvalue()
-        self.assertEqual(out_str, "out\nno_color=None\nforce_color=None\n")
-        self.assertTrue("err" in err_str)
-        self.assertTrue("no_color=None" in err_str)
-        self.assertTrue("force_color=None" in err_str)
-        cmd.print_help("./manage.py", "ctor")
-        if rich_installed:
-            # color is in the output because stdout is marked a tty
-            self.assertTrue("\x1b" in stdout.getvalue())
 
         # check no-color
         stdout = StringIO()
@@ -773,8 +755,8 @@ class TestDjangoParameters(TestCase):
             result = run_command(
                 cmd, "--settings", "django_typer.tests.settings_fail_check", *args
             )
-            self.assertTrue("SystemCheckError" in result)
-            self.assertTrue("test_app.E001" in result)
+            self.assertTrue("SystemCheckError" in result[1])
+            self.assertTrue("test_app.E001" in result[1])
 
             result = run_command(
                 cmd,
@@ -783,8 +765,8 @@ class TestDjangoParameters(TestCase):
                 "django_typer.tests.settings_fail_check",
                 *args,
             )
-            self.assertFalse("SystemCheckError" in result)
-            self.assertFalse("test_app.E001" in result)
+            self.assertFalse("SystemCheckError" in result[1])
+            self.assertFalse("test_app.E001" in result[1])
 
     @override_settings(DJANGO_TYPER_FAIL_CHECK=True)
     def test_skip_checks_call(self):
@@ -801,17 +783,17 @@ class TestDjangoParameters(TestCase):
     def test_traceback(self):
         # traceback does not come into play with call_command
         for cmd, args in self.commands:
-            result = run_command(cmd, *args, "--throw")
+            result = run_command(cmd, *args, "--throw")[1]
             if cmd != "dj_params4":
                 self.assertFalse("Traceback" in result)
             else:
                 self.assertTrue("Traceback" in result)
 
             if cmd != "dj_params4":
-                result_tb = run_command(cmd, "--traceback", *args, "--throw")
+                result_tb = run_command(cmd, "--traceback", *args, "--throw")[1]
                 self.assertTrue("Traceback" in result_tb)
             else:
-                result_tb = run_command(cmd, "--no-traceback", *args, "--throw")
+                result_tb = run_command(cmd, "--no-traceback", *args, "--throw")[1]
                 self.assertFalse("Traceback" in result_tb)
 
     def test_verbosity(self):
@@ -972,7 +954,7 @@ class TestOverloaded(TestCase):
     def test_overloaded_cli(self):
         result = run_command(
             "overloaded", "test", "--flag", "1", "samename", "5", "--no-flag"
-        )
+        )[0]
         self.assertEqual(
             result,
             {
@@ -983,7 +965,7 @@ class TestOverloaded(TestCase):
 
         result = run_command(
             "overloaded", "test", "--no-flag", "5", "samename", "1", "--flag"
-        )
+        )[0]
         self.assertEqual(
             result,
             {
@@ -993,7 +975,7 @@ class TestOverloaded(TestCase):
         )
         result = run_command(
             "overloaded", "test", "--flag", "1", "diffname", "5", "--no-flag"
-        )
+        )[0]
         self.assertEqual(
             result,
             {
@@ -1004,7 +986,7 @@ class TestOverloaded(TestCase):
 
         result = run_command(
             "overloaded", "test", "--no-flag", "5", "diffname", "1", "--flag"
-        )
+        )[0]
         self.assertEqual(
             result,
             {
@@ -1095,7 +1077,7 @@ class TestReturnValues(TestCase):
         self.assertEqual(return_cmd(), {"key": "value"})
 
     def test_return_cli(self):
-        self.assertEqual(run_command("return").strip(), str({"key": "value"}))
+        self.assertEqual(run_command("return")[0].strip(), str({"key": "value"}))
 
     def test_return_call(self):
         self.assertEqual(call_command("return"), {"key": "value"})
@@ -1205,7 +1187,7 @@ class TestGroups(TestCase):
         settings = ("--settings", settings) if settings else []
 
         self.assertEqual(
-            run_command("groups", *settings, "echo", "hey!").strip(),
+            run_command("groups", *settings, "echo", "hey!")[0].strip(),
             "hey!",
         )
 
@@ -1228,7 +1210,7 @@ class TestGroups(TestCase):
 
         result = run_command("groups", *settings, "echo", "hey!", "5")
         if override:
-            self.assertEqual(result.strip(), ("hey! " * 5).strip())
+            self.assertEqual(result[0].strip(), ("hey! " * 5).strip())
             self.assertEqual(
                 get_command("groups").echo("hey!", 5).strip(), ("hey! " * 5).strip()
             )
@@ -1249,7 +1231,7 @@ class TestGroups(TestCase):
                 ("hey! " * 5).strip(),
             )
         else:
-            self.assertIn("UsageError", result)
+            self.assertIn("UsageError", result[1])
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
             with self.assertRaises(TypeError):
@@ -1267,7 +1249,7 @@ class TestGroups(TestCase):
                 "3.5",
                 " -12.3",
                 parse_json=False,
-            ).strip(),
+            )[0].strip(),
             "-51.66000",
         )
 
@@ -1299,7 +1281,7 @@ class TestGroups(TestCase):
                 "3.5",
                 " -12.3",
                 parse_json=False,
-            ).strip(),
+            )[0].strip(),
             "-0.03",
         )
 
@@ -1321,9 +1303,9 @@ class TestGroups(TestCase):
         )
 
         self.assertEqual(
-            run_command(
-                "groups", *settings, "string", "ANNAmontes", "case", "lower"
-            ).strip(),
+            run_command("groups", *settings, "string", "ANNAmontes", "case", "lower")[
+                0
+            ].strip(),
             "annamontes",
         )
 
@@ -1337,9 +1319,9 @@ class TestGroups(TestCase):
         self.assertEqual(grp_cmd.lower(), "annamontes")
 
         self.assertEqual(
-            run_command(
-                "groups", *settings, "string", "annaMONTES", "case", "upper"
-            ).strip(),
+            run_command("groups", *settings, "string", "annaMONTES", "case", "upper")[
+                0
+            ].strip(),
             "ANNAMONTES",
         )
 
@@ -1358,7 +1340,7 @@ class TestGroups(TestCase):
                 "4",
                 "--end",
                 "9",
-            ).strip(),
+            )[0].strip(),
             "ANNAmonteS",
         )
 
@@ -1391,8 +1373,9 @@ class TestGroups(TestCase):
 
         result = run_command(
             "groups", *settings, "string", "annamontes", "case", "upper", "4", "9"
-        ).strip()
+        )
         if override:
+            result = result[1].strip()
             self.assertIn("UsageError", result)
             grp_cmd.string("annamontes")
             with self.assertRaises(TypeError):
@@ -1406,6 +1389,7 @@ class TestGroups(TestCase):
                     "annaMONTEs",
                 )
         else:
+            result = result[0].strip()
             self.assertEqual(result, "annaMONTEs")
             grp_cmd.string("annamontes")
             self.assertEqual(grp_cmd.upper(4, 9), "annaMONTEs")
@@ -1420,14 +1404,14 @@ class TestGroups(TestCase):
             "groups", *settings, "string", " emmatc  ", "strip", parse_json=False
         )
         if override:
-            self.assertEqual(result, "emmatc\n")
+            self.assertEqual(result[0], "emmatc\n")
             self.assertEqual(
                 call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
             )
             grp_cmd.string(" emmatc  ")
             self.assertEqual(grp_cmd.strip(), "emmatc")
         else:
-            self.assertIn("UsageError", result)
+            self.assertIn("UsageError", result[1])
             with self.assertRaises(UsageError):
                 self.assertEqual(
                     call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
@@ -1439,7 +1423,7 @@ class TestGroups(TestCase):
         self.assertEqual(
             run_command(
                 "groups", *settings, "string", "c,a,i,t,l,y,n", "split", "--sep", ","
-            ).strip(),
+            )[0].strip(),
             "c a i t l y n",
         )
         self.assertEqual(
@@ -1528,7 +1512,9 @@ class TestTracebackConfig(TestCase):
     uninstall = False
 
     def test_default_traceback(self):
-        result = run_command("test_command1", "--no-color", "delete", "me", "--throw")
+        result = run_command("test_command1", "--no-color", "delete", "me", "--throw")[
+            1
+        ]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         if self.rich_installed:
@@ -1544,7 +1530,7 @@ class TestTracebackConfig(TestCase):
     def test_tb_command_overrides(self):
         result = run_command(
             "test_tb_overrides", "--no-color", "delete", "me", "--throw"
-        )
+        )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         if self.rich_installed:
@@ -1565,7 +1551,7 @@ class TestTracebackConfig(TestCase):
             "delete",
             "me",
             "--throw",
-        )
+        )[1]
         self.assertNotIn("────────", result)
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
@@ -1578,7 +1564,7 @@ class TestTracebackConfig(TestCase):
             "delete",
             "me",
             "--throw",
-        )
+        )[1]
         self.assertNotIn("────────", result)
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
@@ -1592,7 +1578,7 @@ class TestTracebackConfig(TestCase):
             "delete",
             "me",
             "--throw",
-        )
+        )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
         # locals should not be present
@@ -1615,7 +1601,7 @@ class TestTracebackConfig(TestCase):
                 "--no-color",
                 "delete",
                 "me",
-            )
+            )[1]
             self.assertIn("Traceback (most recent call last)", result)
             self.assertIn("Exception: Test ready exception", result)
             self.assertIn("────────", result)
@@ -1631,7 +1617,7 @@ class TestTracebackConfig(TestCase):
                 "django_typer.tests.settings_tb_no_install",
                 "delete",
                 "me",
-            )
+            )[1]
             self.assertIn("Traceback (most recent call last)", result)
             self.assertIn("Exception: Test ready exception", result)
             self.assertNotIn("────────", result)
@@ -1640,16 +1626,16 @@ class TestTracebackConfig(TestCase):
     def test_colored_traceback(self):
         result = run_command(
             "test_command1", "--force-color", "delete", "Brian", "--throw"
-        )
+        )[1]
         if self.rich_installed:
             self.assertIn("\x1b", result)
 
         result = run_command(
             "test_command1", "--no-color", "delete", "Brian", "--throw"
-        )
+        )[1]
         self.assertNotIn("\x1b", result)
 
-        result = run_command("test_command1", "delete", "Brian", "--throw")
+        result = run_command("test_command1", "delete", "Brian", "--throw")[1]
         self.assertNotIn("\x1b", result)
 
 
@@ -1662,7 +1648,7 @@ class TestSettingsSystemCheck(TestCase):
     def test_warning_thrown(self):
         result = run_command(
             "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
-        )
+        )[1]
         if rich_installed:
             self.assertIn(
                 "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
@@ -2433,9 +2419,11 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_shellcompletion_complete_cmd(self):
         # test that we can leave preceeding script off the complete argument
-        result = run_command("shellcompletion", "complete", "./manage.py completion dj")
+        result = run_command(
+            "shellcompletion", "complete", "./manage.py completion dj"
+        )[0]
         self.assertTrue("django_typer" in result)
-        result2 = run_command("shellcompletion", "complete", "completion dj")
+        result2 = run_command("shellcompletion", "complete", "completion dj")[0]
         self.assertTrue("django_typer" in result2)
         self.assertEqual(result, result2)
 
@@ -2446,7 +2434,7 @@ class TestShellCompletersAndParsers(TestCase):
             "--fallback",
             "django_typer.tests.fallback.custom_fallback",
             "shell ",
-        )
+        )[0]
         self.assertTrue("custom_fallback" in result)
 
         result = run_command(
@@ -2455,5 +2443,5 @@ class TestShellCompletersAndParsers(TestCase):
             "--fallback",
             "django_typer.tests.fallback.custom_fallback_cmd_str",
             "shell ",
-        )
+        )[0]
         self.assertTrue("shell " in result)

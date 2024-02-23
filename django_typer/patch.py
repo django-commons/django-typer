@@ -101,6 +101,8 @@ def apply() -> None:
                 if ctx
                 else (cmd.no_color if cmd else "NO_COLOR" in os.environ)
             )
+            if cmd:
+                console._file = cmd.stderr if stderr else cmd.stdout
             if console.no_color:
                 # also remove highlights so there are
                 # no ansi control characters in the text

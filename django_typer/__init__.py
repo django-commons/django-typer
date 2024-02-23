@@ -55,7 +55,6 @@ option in the command and supplying the desired name in the annotation, but its 
 quirk imposed by the base class for users to be aware of.
 """
 
-import contextlib
 import inspect
 import sys
 import typing as t
@@ -1311,9 +1310,7 @@ class TyperParser:
 
         populate_params(self.django_command.command_tree)
 
-    def print_help(
-        self, *command_path: str, stream: t.Optional[BaseOutputWrapper] = None
-    ):
+    def print_help(self, *command_path: str):
         """
         Print the help for the given command path to stdout of the django command.
         """
@@ -1321,12 +1318,11 @@ class TyperParser:
             f"{self.prog_name} {self.subcommand}"
         )
         command_node = self.django_command.get_subcommand(*command_path)
-        with contextlib.redirect_stdout(stream or self.django_command.stdout):
-            hlp = command_node.print_help()
-            if hlp:
-                (stream or self.django_command.stdout).write(
-                    hlp, style_func=lambda msg: msg, ending="\n\n"
-                )
+        hlp = command_node.print_help()
+        if hlp:
+            self.django_command.stdout.write(
+                hlp, style_func=lambda msg: msg, ending="\n\n"
+            )
 
     def parse_args(self, args=None, namespace=None) -> _ParsedArgs:
         """
@@ -1361,7 +1357,7 @@ class TyperParser:
                     if isinstance(arg_err, click.exceptions.MissingParameter)
                     else str(arg_err)
                 )
-                self.print_help(stream=self.django_command.stderr)
+                self.print_help()
                 self.django_command.stderr.write(err_msg)
                 sys.exit(1)
             raise CommandError(str(arg_err)) from arg_err
