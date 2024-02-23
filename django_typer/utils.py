@@ -5,7 +5,6 @@ command execution.
 """
 
 import typing as t
-from contextlib import contextmanager
 from threading import local
 
 from django.conf import settings
@@ -28,19 +27,7 @@ def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
     return bool(cfg)
 
 
-_local = local()
-
-
-@contextmanager
-def push_command(command: "TyperCommand"):  # type: ignore
-    """
-    Pushes a new command to the current stack.
-    """
-    _local.__dict__.setdefault("stack", []).append(command)
-    try:
-        yield
-    finally:
-        _local.stack.pop()
+_command_context = local()
 
 
 def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
@@ -51,10 +38,12 @@ def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
     monkey patches are required in typer code - namely for enabling/disabling
     color based on configured parameters.
 
+    This function is thread safe.
+
     :return: The current typer command or None if there is no active command.
     """
     try:
-        return t.cast("TyperCommand", _local.stack[-1])  # type: ignore
+        return t.cast("TyperCommand", _command_context.stack[-1])  # type: ignore
     except (AttributeError, IndexError):
         pass
     return None

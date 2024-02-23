@@ -89,7 +89,7 @@ from .parsers import ModelObjectParser
 from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
 from .types import Style as ColorStyle
 from .types import Traceback, Verbosity, Version
-from .utils import push_command, traceback_config, with_typehint
+from .utils import _command_context, traceback_config, with_typehint
 
 VERSION = (1, 0, 0)
 
@@ -1445,6 +1445,13 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         """The name of the django command"""
         return self.typer_app.info.name
 
+    def __enter__(self):
+        _command_context.__dict__.setdefault("stack", []).append(self)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        _command_context.stack.pop()
+
     def __init__(
         self,
         stdout: t.Optional[t.IO[str]] = None,
@@ -1455,7 +1462,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
     ):
         self.force_color = force_color
         self.no_color = no_color
-        with push_command(self):
+        with self:
             super().__init__(
                 stdout=stdout,
                 stderr=stderr,
@@ -1550,7 +1557,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         :param prog_name: the name of the manage script that invoked the command
         :param subcommand: the name of the django command
         """
-        with push_command(self):
+        with self:
             return TyperParser(
                 self,
                 prog_name,
@@ -1573,7 +1580,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             an extension to the pase class print_help() interface, required because
             typer/click have different helps for each subgroup or subcommand.
         """
-        with push_command(self):
+        with self:
             parser = self.create_parser(prog_name, subcommand)
             parser.print_help(*cmd_path)
 
@@ -1607,7 +1614,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
         :param args: the arguments to directly pass to handle()
         :param kwargs: the options to directly pass to handle()
         """
-        with push_command(self):
+        with self:
             if getattr(self, "_handle", None):
                 return self._handle(*args, **kwargs)
             raise NotImplementedError(
@@ -1629,14 +1636,15 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             resolves to.
         :return: Any object returned by the Typer app
         """
-        return self.typer_app(
-            args=args,
-            standalone_mode=False,
-            supplied_params=options,
-            django_command=self,
-            complete_var=None,
-            prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
-        )
+        with self:
+            return self.typer_app(
+                args=args,
+                standalone_mode=False,
+                supplied_params=options,
+                django_command=self,
+                complete_var=None,
+                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
+            )
 
     def run_from_argv(self, argv):
         """
@@ -1646,7 +1654,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
 
         :param argv: the arguments to pass to the command
         """
-        with push_command(self):
+        with self:
             return super().run_from_argv(argv)
 
     def execute(self, *args, **options):
@@ -1670,7 +1678,7 @@ class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
             self.no_color = options["no_color"]
         if options.get("force_color", None) is not None:
             self.force_color = options["force_color"]
-        with push_command(self):
+        with self:
             result = super().execute(*args, **options)
         self.no_color = no_color
         self.force_color = force_color

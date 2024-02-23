@@ -49,7 +49,7 @@ Install django-typer_
 
     .. code:: bash
 
-        pip install django-typer[rich]
+        pip install "django-typer[rich]"
 
     rich_ is a powerful library for rich text and beautiful formatting in the terminal.
     It is not required, but highly recommended for the best experience:
@@ -73,7 +73,7 @@ Install django-typer_
     .. note::
 
         Adding django_typer to INSTALLED_APPS is not strictly necessary if you do not wish to use shell
-        tab completions or configure rich_ traceback rendering.
+        tab completions or configure `rich traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_.
 
 
 Convert the closepoll command to a :class:`~django_typer.TyperCommand`
@@ -83,6 +83,7 @@ Recall our closepoll command from the `polls Tutorial in the Django documentatio
 looks like this:
 
 .. code-block:: python
+    :linenos:
 
     from django.core.management.base import BaseCommand, CommandError
     from polls.models import Question as Poll
@@ -121,11 +122,12 @@ looks like this:
 Inherit from :class:`~django_typer.TyperCommand`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To convert this to a :class:`~django_typer.TyperCommand` we need to inherit from :class:`~django_typer.TyperCommand`
-instead and move the argument and option definitions from add_arguments into the method signature of handle. A minimal
+We first need to change the inheritance to :class:`~django_typer.TyperCommand` and then move the
+argument and option definitions from add_arguments into the method signature of handle. A minimal
 conversion may look like this:
 
 .. code-block:: python
+    :linenos:
 
     import typing as t
 
@@ -150,9 +152,8 @@ conversion may look like this:
                 poll.opened = False
                 poll.save()
 
-                self.console.print(
-                    f"Successfully closed poll {poll_id}",
-                    style="bold green",
+                self.stdout.write(
+                    self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
                 )
 
                 if delete:
@@ -175,7 +176,8 @@ this:
 
 .. note::
 
-    :class:`~django_typer.TyperCommand` adds the standard set of default options to the command line interface.
+    :class:`~django_typer.TyperCommand` adds the standard set of default options to the command line interface,
+    with the exception of verbosity, which can be 
 
 
 Add Helps with Type annotations

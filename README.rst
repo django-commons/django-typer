@@ -75,7 +75,7 @@ Installation
 
     .. code:: bash
 
-        pip install django-typer[rich]
+        pip install "django-typer[rich]"
 
 
 2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
@@ -176,7 +176,20 @@ Or commands with multiple subcommands can be defined:
 Grouping and Hierarchies Example
 --------------------------------
 
-Or more complex groups and subcommand hierarchies can be defined:
+Or more complex groups and subcommand hierarchies can be defined. For example this command
+defines a group of commands called math, with subcommands divide and multiply. The group
+has a common initializer that optionally sets a float precision value. We would invoke this
+command like so:
+
+.. code:: bash
+
+    ./manage.py hierarchy math --precision 5 divide 10 2.1
+    4.76190
+    ./manage.py hierarchy math multiply 10 2
+    20.00
+
+Any number of groups and subcommands and subgroups of other groups can be defined allowing
+for arbitrarily complex command hierarchies.
 
 .. code-block:: python
 

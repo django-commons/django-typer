@@ -33,6 +33,8 @@ from django_typer.utils import get_current_command
 
 PATCH_APPLIED = False
 
+# DO NOT IMPORT ANYTHING FROM TYPER HERE
+
 
 def apply() -> None:
     """

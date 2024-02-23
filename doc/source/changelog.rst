@@ -7,6 +7,12 @@ Change Log
 
 .. * Initial production/stable release.
 
+v0.6.1b
+=======
+
+* Incremental beta release - this is also the second release candidate for version 1.
+* Peg typer version to 0.9.x
+
 v0.6.0b
 =======
 

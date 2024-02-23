@@ -26,6 +26,7 @@ from django_typer import TyperCommand, get_command, group
 from django_typer.tests.polls.models import Question
 from django_typer.tests.test_app.models import ShellCompleteTester
 from django_typer.tests.utils import read_django_parameters
+from django_typer.utils import get_current_command
 
 try:
     import rich
@@ -152,6 +153,20 @@ class BasicTests(TestCase):
         parser = basic_cmd.create_parser("./manage.py", "basic")
         with self.assertRaises(NotImplementedError):
             parser.add_argument()
+
+    def test_command_context(self):
+        basic = get_command("basic")
+        multi = get_command("multi")
+        self.assertIsNone(get_current_command())
+        with basic:
+            self.assertEqual(basic, get_current_command())
+            with basic:
+                self.assertEqual(basic, get_current_command())
+                with multi:
+                    self.assertEqual(multi, get_current_command())
+                self.assertEqual(basic, get_current_command())
+            self.assertEqual(basic, get_current_command())
+        self.assertIsNone(get_current_command())
 
 
 class CommandDefinitionTests(TestCase):
