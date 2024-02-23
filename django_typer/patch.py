@@ -108,8 +108,6 @@ def apply() -> None:
             elif cmd and cmd.force_color:
                 console._force_terminal = True  # set this before detect color!
                 console._color_system = console._detect_color_system()
-            else:  # pragma: no cover
-                pass
             return console
 
         rich_utils._get_rich_console = get_console
