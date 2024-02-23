@@ -698,21 +698,49 @@ class TestDjangoParameters(TestCase):
                 call_command(cmd, args, force_color=True, no_color=True)
 
     def test_ctor_params(self):
+
+        # check non-tty streams output expected constructor values and coloring
         stdout = StringIO()
         stderr = StringIO()
         cmd = get_command(
             "ctor", stdout=stdout, stderr=stderr, no_color=None, force_color=None
         )
         cmd()
-        self.assertEqual(stdout.getvalue(), "out\nno_color=None\nforce_color=None\n")
-        self.assertEqual(stderr.getvalue(), "err\nno_color=None\nforce_color=None\n")
+        out_str = stdout.getvalue()
+        err_str = stderr.getvalue()
+        self.assertEqual(out_str, "out\nno_color=None\nforce_color=None\n")
+        self.assertEqual(err_str, "err\nno_color=None\nforce_color=None\n")
         cmd.print_help("./manage.py", "ctor")
-
         if rich_installed:
-            self.assertTrue("\x1b" in stdout.getvalue())
+            # color is not in the output because stdout is not a tty
+            self.assertFalse("\x1b" in stdout.getvalue())
 
+        # check tty streams output expected constructor values and coloring
         stdout = StringIO()
         stderr = StringIO()
+        # spoof these streams as ttys
+        stdout.isatty = lambda: True
+        stderr.isatty = lambda: True
+        cmd = get_command(
+            "ctor", stdout=stdout, stderr=stderr, no_color=None, force_color=None
+        )
+        cmd()
+        out_str = stdout.getvalue()
+        err_str = stderr.getvalue()
+        self.assertEqual(out_str, "out\nno_color=None\nforce_color=None\n")
+        self.assertTrue("err" in err_str)
+        self.assertTrue("no_color=None" in err_str)
+        self.assertTrue("force_color=None" in err_str)
+        cmd.print_help("./manage.py", "ctor")
+        if rich_installed:
+            # color is in the output because stdout is marked a tty
+            self.assertTrue("\x1b" in stdout.getvalue())
+
+        # check no-color
+        stdout = StringIO()
+        stderr = StringIO()
+        stdout.isatty = lambda: True
+        stderr.isatty = lambda: True
         cmd = get_command(
             "ctor", stdout=stdout, stderr=stderr, no_color=True, force_color=False
         )
@@ -721,18 +749,17 @@ class TestDjangoParameters(TestCase):
         self.assertEqual(stderr.getvalue(), "err\nno_color=True\nforce_color=False\n")
         cmd.print_help("./manage.py", "ctor")
         self.assertTrue("\x1b" not in stdout.getvalue())
+        self.assertTrue("\x1b" not in stderr.getvalue())
         stdout.truncate(0)
         stderr.truncate(0)
 
         stdout.getvalue()
         stderr.getvalue()
         cmd.execute(skip_checks=False, no_color=None, force_color=None)
-        self.assertTrue(
-            stdout.getvalue().endswith("out\nno_color=True\nforce_color=False\n")
-        )
-        self.assertTrue(
-            stderr.getvalue().endswith("err\nno_color=True\nforce_color=False\n")
-        )
+        out_str = stdout.getvalue()
+        err_str = stderr.getvalue()
+        self.assertTrue(out_str.endswith("out\nno_color=True\nforce_color=False\n"))
+        self.assertTrue(err_str.endswith("err\nno_color=True\nforce_color=False\n"))
 
     def test_pythonpath(self):
         added = str(Path(__file__).parent.absolute())
@@ -1577,6 +1604,8 @@ class TestTracebackConfig(TestCase):
         else:
             self.assertNotIn("────────", result)
 
+        self.assertNotIn("\x1b", result)
+
     def test_rich_install(self):
         if self.rich_installed:
             result = run_command(
@@ -1591,6 +1620,7 @@ class TestTracebackConfig(TestCase):
             self.assertIn("Exception: Test ready exception", result)
             self.assertIn("────────", result)
             self.assertIn("── locals ──", result)
+            self.assertNotIn("\x1b", result)
 
     @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
     def test_tb_no_install(self):
@@ -1617,6 +1647,9 @@ class TestTracebackConfig(TestCase):
         result = run_command(
             "test_command1", "--no-color", "delete", "Brian", "--throw"
         )
+        self.assertNotIn("\x1b", result)
+
+        result = run_command("test_command1", "delete", "Brian", "--throw")
         self.assertNotIn("\x1b", result)
 
 

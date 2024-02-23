@@ -106,8 +106,8 @@ def apply() -> None:
                 # no ansi control characters in the text
                 console._color_system = None
             elif cmd and cmd.force_color:
+                console._force_terminal = True  # set this before detect color!
                 console._color_system = console._detect_color_system()
-                console._force_terminal = True
             else:  # pragma: no cover
                 pass
             return console
