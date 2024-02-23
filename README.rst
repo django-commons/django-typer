@@ -199,7 +199,7 @@ Or more complex groups and subcommand hierarchies can be defined:
       def math(
          self,
          precision: t.Annotated[
-               int, Option(help=_("The floating point precision to output."))
+            int, Option(help=_("The number of decimal places to output."))
          ] = precision,
       ):
          self.precision = precision
@@ -208,7 +208,7 @@ Or more complex groups and subcommand hierarchies can be defined:
       def multiply(
          self,
          numbers: t.Annotated[
-               t.List[float], Argument(help=_("The list of numbers to multiply"))
+            t.List[float], Argument(help=_("The numbers to multiply"))
          ],
       ):
          if numbers:

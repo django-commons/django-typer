@@ -17,7 +17,7 @@ class Command(TyperCommand):
     def math(
         self,
         precision: t.Annotated[
-            int, Option(help=_("The floating point precision to output."))
+            int, Option(help=_("The number of decimal places to output."))
         ] = precision,
     ):
         self.precision = precision
@@ -26,7 +26,7 @@ class Command(TyperCommand):
     def multiply(
         self,
         numbers: t.Annotated[
-            t.List[float], Argument(help=_("The list of numbers to multiply"))
+            t.List[float], Argument(help=_("The numbers to multiply"))
         ],
     ):
         if numbers:
