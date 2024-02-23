@@ -60,7 +60,7 @@ jobs:
         poetry run pytest
         poetry run pip uninstall -y rich
         poetry run pytest --cov-append
-        poetry run pip uninstall colorama
+        poetry run pip uninstall -y colorama
         poetry run pytest -k test_ctor_params --cov-append
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
