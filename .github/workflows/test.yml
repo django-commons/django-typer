@@ -50,11 +50,11 @@ jobs:
         poetry run pip install --upgrade pip
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
-    # - name: Setup tmate session
-    #   uses: mxschmitt/action-tmate@v3
-    #   with:
-    #     detached: true
-    #   timeout-minutes: 15
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+      timeout-minutes: 15
     - name: Run Unit Tests
       run: |
         poetry run pytest
