@@ -13,3 +13,6 @@
 .. _fish: https://fishshell.com/
 .. _zsh: https://www.zsh.org/
 .. _bash: https://www.gnu.org/software/bash/
+.. _typing_extensions: https://pypi.org/project/typing-extensions/
+.. _Arguments: https://typer.tiangolo.com/tutorial/arguments/
+.. _Options: https://typer.tiangolo.com/tutorial/options/

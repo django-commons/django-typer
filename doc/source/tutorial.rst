@@ -28,10 +28,8 @@ from *all three* of these upstream libraries:
 
     This tutorial can be completed without working through the `Typer tutorials <https://typer.tiangolo.com/tutorial/>`_,
     but familiarizing yourself with Typer_ will make this easier and will also be helpful when you
-    want to define CLIs outside of Django_! We use the Typer_ interface to define
-    `Arguments <https://typer.tiangolo.com/tutorial/arguments/>`_ and
-    `Options <https://typer.tiangolo.com/tutorial/options/>`_ so please refer to the Typer_
-    documentation for any questions about how to define these.
+    want to define CLIs outside of Django_! We use the Typer_ interface to define Arguments_ and Options_
+    so please refer to the Typer_ documentation for any questions about how to define these.
 
 * click_
 
@@ -176,14 +174,111 @@ this:
 
 .. note::
 
-    :class:`~django_typer.TyperCommand` adds the standard set of default options to the command line interface,
-    with the exception of verbosity, which can be 
+    :class:`~django_typer.TyperCommand` adds the standard set of default options to the command
+    line interface, with the exception of verbosity, which can be 
 
 
 Add Helps with Type annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-lambda
+Typer_ allows us to use `Annotated types <https://docs.python.org/3/library/typing.html#typing.Annotated>`_
+to add additional controls to how the command line interface behaves. The most common use case for
+this is to add help text to the command line interface. We will annotate our parameter type hints
+with one of two Typer_ parameter types, either Argument or Option. Arguments_ are positional
+parameters and Options_ are named parameters (i.e. `--delete`). In our polls example, the poll_ids
+are arguments and the delete flag is an option. Here is what that would look like:
+
+.. code-block:: python
+    :linenos:
+
+    import typing as t
+
+    from django.core.management.base import CommandError
+    from django.utils.translation import gettext_lazy as _
+    from typer import Argument, Option
+
+    from django_typer import TyperCommand
+    from polls.models import Question as Poll
+
+
+    class Command(TyperCommand):
+        help = "Closes the specified poll for voting"
+
+        def handle(
+            self,
+            poll_ids: t.Annotated[
+                t.List[int], Argument(help=_("The database IDs of the poll(s) to close."))
+            ],
+            delete: t.Annotated[
+                bool, Option(help=_("Delete poll instead of closing it."))
+            ] = False,
+        ):
+            # ...
+
+See that our help text now shows up in the command line interface. Also note, that lazy translations
+work for the help strings. Typer_ also allows us to specify our help text in the docstrings of the
+command function or class, in this case either Command or handle() - but docstrings are not available
+to the translation system. If translation is not necessary and your help text is extensive or contains
+markup the docstring may be the more appropriate place to put it.
+
+.. typer:: django_typer.examples.tutorial.step2.closepoll.Command:typer_app
+    :prog: manage.py closepoll
+    :width: 80
+    :show-nested:
+    :convert-png: latex
+    :theme: dark
+
+
+.. note::
+
+    On Python <=3.8 you will need to import Annotated from typing_extensions_ instead of the standard library. 
+
+
+Defining custom and reusable parameter types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We may have other commands that need to operate on Poll objects from given poll ids. We could duplicate our
+for loop that loads Poll objects from ids, but that wouldn't be very DRY. Instead, Typer_ allows us to
+define custom parsers for arbitrary parameter types. Lets see what that would look like if we used the Poll
+class as our type hint:
+
+.. code-block:: python
+    :linenos:
+
+    import typing as t
+
+    # ...
+
+    def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
+        if isinstance(poll, Poll):
+            return poll
+        try:
+            return Poll.objects.get(pk=int(poll))
+        except Poll.DoesNotExist:
+            raise CommandError('Poll "%s" does not exist' % poll)
+
+
+    class Command(TyperCommand):
+        help = "Closes the specified poll for voting"
+
+        def handle(
+            self,
+            polls: t.Annotated[
+                t.List[Poll],
+                Argument(
+                    parser=get_poll_from_id,
+                    help=_("The database IDs of the poll(s) to close."),
+                ),
+            ],
+            delete: t.Annotated[
+                bool,
+                Option(
+                    "--delete",  # we can also get rid of that unnecessary --no-delete flag
+                    help=_("Delete poll instead of closing it."),
+                ),
+            ] = False,
+        ):
+            # ...
 
 
 Add shell tab-completion suggestions for polls

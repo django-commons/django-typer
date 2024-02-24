@@ -1743,6 +1743,36 @@ class TestPollExample(TestCase):
                 if has_help:
                     self.assertTrue(q.question_text in result)
 
+    def test_tutorial1(self):
+        result = run_command("closepoll_t1", str(self.q2.id))
+        self.assertFalse(result[1])
+        self.assertTrue("Successfully closed poll" in result[0])
+
+    def test_tutorial2(self):
+        result = run_command("closepoll_t2", str(self.q2.id))
+        self.assertFalse(result[1])
+        self.assertTrue("Successfully closed poll" in result[0])
+
+    def test_tutorial_parser(self):
+        result = run_command("closepoll_t3", str(self.q1.id))
+        self.assertFalse(result[1])
+
+    def test_tutorial_parser_cmd(self):
+        log = StringIO()
+        call_command("closepoll_t3", str(self.q1.id), stdout=log)
+        cmd = get_command("closepoll_t3", stdout=log)
+        cmd([self.q1])
+        cmd(polls=[self.q1])
+        # these don't work, maybe revisit in future?
+        # cmd([str(self.q1.id)])
+        # cmd([self.q1.id])
+        self.assertTrue(log.getvalue().count("Successfully"), 5)
+
+    def test_poll_ex(self):
+        result = run_command("closepoll", str(self.q2.id))
+        self.assertFalse(result[1])
+        self.assertTrue("Successfully closed poll" in result[0])
+
 
 class TestShellCompletersAndParsers(TestCase):
     def setUp(self):

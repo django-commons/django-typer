@@ -1,6 +1,8 @@
 import typing as t
 
 from django.core.management.base import CommandError
+from django.utils.translation import gettext_lazy as _
+from typer import Argument, Option
 
 from django_typer import TyperCommand
 from django_typer.tests.polls.models import Question as Poll
@@ -11,8 +13,12 @@ class Command(TyperCommand):
 
     def handle(
         self,
-        poll_ids: t.List[int],
-        delete: bool = False,
+        poll_ids: t.Annotated[
+            t.List[int], Argument(help=_("The database IDs of the poll(s) to close."))
+        ],
+        delete: t.Annotated[
+            bool, Option(help=_("Delete poll instead of closing it."))
+        ] = False,
     ):
         for poll_id in poll_ids:
             try:

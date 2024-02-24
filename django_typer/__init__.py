@@ -330,7 +330,18 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     context_class: t.Type[click.Context] = Context
     django_command: "TyperCommand"
     callback_is_method: bool = True
-    param_converters: t.Dict[str, t.Callable[[Context, t.Any], t.Any]] = {}
+    param_map: t.Dict[str, click.Parameter] = {}
+
+    class Converter:
+        """
+        Because of the way the BaseCommand forces parsing to be done in a separate
+        first step, type casting of input strings to the correct types will have
+        sometimes happened already. We use this class to avoid double type casting.
+
+        An alternative approach might be to flag converted values - but there does
+        not seem to be a good approach to do this given how deep in the click
+        infrastructure the conversion happens.
+        """
 
     def shell_complete(
         self, ctx: click.Context, incomplete: str
@@ -375,8 +386,8 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
                     # process supplied parameters incase they need type conversion
                     param: (
                         (
-                            self.param_converters[param](ctx, val)
-                            if param in self.param_converters
+                            self.param_map[param].process_value(ctx, val)
+                            if param in self.param_map
                             else val
                         )
                         if param in ctx.supplied_params
@@ -405,9 +416,7 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             callback=call_with_self,
             **kwargs,
         )
-        self.param_converters = {
-            param.name: param.process_value for param in self.params
-        }
+        self.param_map = {param.name: param for param in self.params}
 
 
 class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
