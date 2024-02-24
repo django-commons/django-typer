@@ -57,7 +57,7 @@ jobs:
     #   timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pip install -y colorama
+        poetry run pip install colorama
         poetry run pytest
         poetry run pip uninstall -y rich
         poetry run pytest --cov-append
