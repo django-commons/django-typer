@@ -1,7 +1,5 @@
 """
-A context manager that can be used to determine if we're executing inside of
-a Typer command. This is analogous to click's get_current_context but for
-command execution.
+A collection of useful utilities.
 """
 
 import typing as t
@@ -39,6 +37,9 @@ def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
     color based on configured parameters.
 
     This function is thread safe.
+
+    This is analogous to click's get_current_context but for
+    command execution.
 
     :return: The current typer command or None if there is no active command.
     """

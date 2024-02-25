@@ -25,18 +25,43 @@ typer.Argument. Parsers are provided for:
 import typing as t
 from uuid import UUID
 
-from click import Parameter, ParamType, Context
+from click import Context, Parameter, ParamType
 from django.apps import AppConfig, apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import CommandError
 from django.db.models import Field, Model, UUIDField
 from django.utils.translation import gettext as _
 
+from django_typer.completers import ModelObjectCompleter
+
 
 class ModelObjectParser(ParamType):
     """
     A parser that will turn strings into model object instances based on the
     configured lookup field and model class.
+
+    .. code-block:: python
+
+        from django_typer.parsers import ModelObjectParser
+
+        class Command(TyperCommand):
+            def handle(
+                self,
+                django_apps: Annotated[
+                    t.List[MyModel],
+                    typer.Argument(
+                        parser=ModelObjectParser(MyModel, lookup_field="name"),
+                        help=_("One or more application labels."),
+                    ),
+                ],
+            ):
+
+    .. note::
+
+        Typer_ does not respect the shell_complete functions on ParamTypes passed as
+        parsers. To add shell_completion see :class:`~django_typer.completers.ModelObjectCompleter`
+        or the :func:`~django_typer.model_parser_completer` convenience
+        function.
 
     :param model_cls: The model class to use for lookup.
     :param lookup_field: The field to use for lookup. Defaults to 'pk'.
@@ -55,6 +80,7 @@ class ModelObjectParser(ParamType):
 
     _lookup = ""
     _field: Field
+    _completer: ModelObjectCompleter
 
     __name__ = "ModelObjectParser"  # typer internals expect this
 

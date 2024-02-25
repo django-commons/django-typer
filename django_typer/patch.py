@@ -1,5 +1,5 @@
 """
-Stuffing the typer interface into the Django BaseCommand interface is an exercise
+Stuffing the typer interface into the Django BaseCommand_ interface is an exercise
 in fitting a square peg into a round hole. A small amount of upstream patching is
 required to make this work. All monkey patching is defined in this module to more
 easily keep track of it.

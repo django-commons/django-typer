@@ -1,7 +1,20 @@
 """
-A collection of completer classes that can be used to quickly add shell completion
-for various kinds of django objects.
+Typer_ and click_ provide tab-completion hooks for individual parameters. As with
+:mod:`~django_typer.parsers` custom completion logic can be implemented for custom
+parameter types and added to the annotation of the parameter. Previous versions of
+Typer_ supporting click_ 7 used the autocompletion argument to provide completion
+logic, Typer_ still supports this, but passing ``shell_complete`` to the annotation is
+the preferred way to do this.
+
+This module provides some completer functions and classes that work with common Django_
+types:
+
+- **Model Objects**: Complete model object field strings using :class:`ModelObjectCompleter`.
+- **App Labels**: Complete app labels or names using :func:`complete_app_label`.
+
 """
+
+# pylint: disable=line-too-long
 
 import typing as t
 from types import MethodType
@@ -27,11 +40,59 @@ from django.db.models import (
 class ModelObjectCompleter:
     """
     A completer for generic Django model objects. This completer will work
-    for any Django core model field where completion makes sense. For example,
-    it will work for IntegerField, CharField, TextField, and UUIDField, but
-    not for ForeignKey, ManyToManyField or BinaryField.
+    for most Django core model field types where completion makes sense.
 
-    The completer query logic is pluggable, but the defaults cover most use cases.
+    This completer currently supports the following field types and their subclasses:
+
+        - `IntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#integerfield>`_
+            - `AutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#autofield>`_
+            - `BigAutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#bigautofield>`_
+            - `BigIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#bigintegerfield>`_
+            - `SmallIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#smallintegerfield>`_
+            - `PositiveIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#positiveintegerfield>`_
+            - `PositiveSmallIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#positivesmallintegerfield>`_
+            - `SmallAutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#smallautofield>`_
+        - `CharField <https://docs.djangoproject.com/en/stable/ref/models/fields/#charfield>`_
+            - `SlugField <https://docs.djangoproject.com/en/stable/ref/models/fields/#slugfield>`_
+            - `URLField <https://docs.djangoproject.com/en/stable/ref/models/fields/#urlfield>`_
+            - `EmailField <https://docs.djangoproject.com/en/stable/ref/models/fields/#emailfield>`_
+        - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
+        - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
+        - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
+        - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
+
+    The completer query logic is pluggable, but the defaults cover most use cases. The
+    limit field is important. It defaults to 50 meaning if more than 50 potential completions
+    are found only the first 50 will be returned and there will be no indication to the user
+    that there are more. This is to prevent the shell from becoming unresponsive when offering
+    completion for large tables.
+
+    To use this completer, pass an instance of this class to the `shell_complete`
+    argument of a typer.Option or typer.Argument:
+
+    .. code-block:: python
+
+        from django_typer.completers import ModelObjectCompleter
+
+        class Command(TyperCommand):
+
+            def handle(
+                self,
+                model_obj: Annotated[
+                    MyModel,
+                    typer.Argument(
+                        shell_complete=ModelObjectCompleter(MyModel, lookup_field="name"),
+                        help=_("The model object to use.")
+                    )
+                ]
+            ):
+                ...
+
+    .. note::
+
+        See also :func:`~django_typer.model_parser_completer` for a convenience
+        function that returns a configured parser and completer for a model object
+        and helps reduce boilerplate.
 
     :param model_cls: The Django model class to query.
     :param lookup_field: The name of the model field to use for lookup.
@@ -274,7 +335,7 @@ class ModelObjectCompleter:
 
 def complete_app_label(ctx: Context, param: Parameter, incomplete: str):
     """
-    A case-insensitive completer for Django app labels or names. The completer
+    A case-sensitive completer for Django app labels or names. The completer
     prefers labels but names will also work.
 
     .. code-block:: python

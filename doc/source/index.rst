@@ -128,6 +128,5 @@ for arbitrarily complex command hierarchies.
    tutorial
    howto
    shell_completion
-   commands
    reference
    changelog

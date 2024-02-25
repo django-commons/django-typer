@@ -1,19 +1,26 @@
 """
-The shellcompletion command is a Django management command that installs and removes
+The shellcompletion command is a Django_ management command that installs and removes
 shellcompletion scripts for supported shells (bash, fish, zsh, powershell). This
 command is also the entry point for running the completion logic and can be used to
 debug completer code.
 
-It invokes typer's shell completion installation logic, but does have to patch the
-installed scripts. This is because there is only one installation for all django
-management commands, not each individual command. The completion logic here will
-failover to django's builtin autocomplete if the command in question is not a
-TyperCommand. To promote compatibility with other management command libraries or
-custom completion logic, a fallback completion function can also be specified. A
-needed refactoring here would be to provide root hooks for completion logic in django
-that base classes can register for. This would provide a coordinated way for libraries
-like django-typer to plug in their own completion logic.
+.. typer:: django_typer.management.commands.shellcompletion.Command:typer_app
+    :prog: manage.py shellcompletion
+    :width: 80
+    :convert-png: latex
+
+:func:`~django_typer.management.commands.shellcompletion.Command.install` invokes typer's shell
+completion installation logic, but does have to patch the installed scripts. This is because
+there is only one installation for all Django_ management commands, not each individual command.
+The completion logic here will failover to Django_'s builtin autocomplete if the command in
+question is not a :class:`~django_typer.TyperCommand`. To promote compatibility with other
+management command libraries or custom completion logic, a fallback completion function can also
+be specified.
 """
+
+# A needed refactoring here would be to provide root hooks for completion logic in Django core that
+# base classes can register for. This would provide a coordinated way for libraries like
+# django-typer to plug in their own completion logic.
 
 import contextlib
 import inspect
@@ -62,9 +69,9 @@ class Command(TyperCommand):
     This command installs autocompletion for the current shell. This command uses the typer/click
     autocompletion scripts to generate the autocompletion items, but monkey patches the scripts
     to invoke our bundled shell complete script which fails over to the django autocomplete
-    function when the command being completed is not a TyperCommand. When the django autocomplete
-    function is used we also wrap it so that it works for any supported click/typer shell, not just
-    bash.
+    function when the command being completed is not a :class:`~django_typer.TyperCommand`. When
+    the django autocomplete function is used we also wrap it so that it works for any supported
+    click/typer shell, not just bash.
 
     We also provide a remove command to easily remove the installed script.
 
@@ -290,7 +297,11 @@ class Command(TyperCommand):
         Install autocompletion for the given shell. If the shell is not specified, it will
         try to detect the shell. If the shell is not detected, it will fail.
 
-        We run the upstream typer installation routines.
+        We run the upstream typer installation routines, with some augmentation.
+
+        .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:install
+            :width: 85
+            :convert-png: latex
         """
         # do not import this private stuff until we need it - avoids tanking the whole
         # library if these imports change
@@ -336,6 +347,12 @@ class Command(TyperCommand):
 
         Since the installation routine is upstream we first run install to determine where the
         completion script is installed and then we remove it.
+
+        .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:remove
+            :prog: shellcompletion
+            :width: 80
+            :convert-png: latex
+
         """
         # do not import this private stuff until we need it - avoids tanking the whole
         # library if these imports change
@@ -436,7 +453,22 @@ class Command(TyperCommand):
         """
         We implement the shell complete generation script as a Django command because the
         Django environment needs to be bootstrapped for it to work. This also allows
-        us to test autocompletions in a platform agnostic way.
+        us to test completion logic in a platform agnostic way.
+
+        .. tip::
+
+            This command is super useful for debugging shell_complete logic. For example to
+            enter into the debugger, we could set a breakpoint in our ``shell_complete`` function
+            for the option parameter and then run the following command:
+
+            .. code-block:: bash
+
+                $ ./manage.py shellcompletion complete "./manage.py your_command --option "
+
+        .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:complete
+            :prog: shellcompletion
+            :width: 80
+            :convert-png: latex
         """
         os.environ[self.COMPLETE_VAR] = (
             f"complete_{shell.value}"

@@ -40,7 +40,7 @@ for django commands we need to register our completion logic for Django manage s
 the shell. This process has two phases:
 
 1. Ensure that your shell is configured to support completions.
-2. Use the :ref:`shellcompletion <shellcompletion-command>` command to install the completion
+2. Use the :mod:`~django_typer.management.commands.shellcompletion` command to install the completion
    hook for your Django manage script.
 
 
@@ -89,7 +89,7 @@ had luck with the following:
 Install the Completion Hook
 ---------------------------
 
-django-typer_ comes with a management command called :ref:`shellcompletion <shellcompletion-command>`.
+django-typer_ comes with a management command called :mod:`~django_typer.management.commands.shellcompletion`.
 To install completions for your Django project simply run the install command:
 
 .. code-block:: bash
@@ -104,7 +104,8 @@ To install completions for your Django project simply run the install command:
 
 The installation script should be able to automatically detect your shell and install the appropriate
 scripts. If it is unable to do so you may force it to install for a specific shell by passing the
-shell name as an argument. Refer to the :ref:`command help <shellcompletion-command>` for details.
+shell name as an argument. Refer to the :mod:`~django_typer.management.commands.shellcompletion`
+for details.
 
 **After installation you will probably need to restart your shell or source the appropriate rc file.**
 
