@@ -172,7 +172,7 @@ def parse_app_label(label: t.Union[str, AppConfig]):
     :param label: The label to map to an AppConfig instance.
     :raises CommandError: If no matching app can be found.
     """
-    if isinstance(label, AppConfig):  # pragma: no cover
+    if isinstance(label, AppConfig):
         return label
     try:
         return apps.get_app_config(label)
