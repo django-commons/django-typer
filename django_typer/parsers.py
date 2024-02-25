@@ -1,12 +1,31 @@
 """
-A collection of parsers that turn strings into useful Django types.
-Pass these parsers to the `parser` argument of typer.Option and
-typer.Argument.
+Typer_ supports custom parsers for options and arguments. If you would
+like to type a parameter with a type that isn't supported by Typer_ you can
+`implement your own parser <https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_
+, or `ParamType <https://click.palletsprojects.com/en/8.1.x/api/#click.ParamType>`_
+in click_ parlance.
+
+This module contains a collection of parsers that turn strings into useful
+Django types. Pass these parsers to the `parser` argument of typer.Option and
+typer.Argument. Parsers are provided for:
+
+- **Model Objects**: Turn a string into a model object instance using :class:`ModelObjectParser`.
+- **App Labels**: Turn a string into an AppConfig instance using :func:`parse_app_label`.
+
+
+.. warning::
+
+    If you implement a custom parser, please take care to ensure that it:
+        - Handles the case where the value is already the expected type.
+        - Returns None if the value is None (already implemented if subclassing ParamType).
+        - Raises a CommandError if the value is invalid.
+        - Handles the case where the param and context are None.
 """
 
 import typing as t
 from uuid import UUID
 
+from click import Parameter, ParamType, Context
 from django.apps import AppConfig, apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import CommandError
@@ -14,7 +33,7 @@ from django.db.models import Field, Model, UUIDField
 from django.utils.translation import gettext as _
 
 
-class ModelObjectParser:
+class ModelObjectParser(ParamType):
     """
     A parser that will turn strings into model object instances based on the
     configured lookup field and model class.
@@ -39,6 +58,11 @@ class ModelObjectParser:
 
     __name__ = "ModelObjectParser"  # typer internals expect this
 
+    @property
+    def name(self):
+        """Descriptive name of the model object."""
+        return self.model_cls._meta.verbose_name
+
     def __init__(
         self,
         model_cls: t.Type[Model],
@@ -54,7 +78,9 @@ class ModelObjectParser:
         if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
 
-    def __call__(self, value: t.Union[str, Model]) -> Model:
+    def convert(
+        self, value: t.Any, param: t.Optional[Parameter], ctx: t.Optional[Context]
+    ):
         """
         Invoke the parsing action on the given string. If the value is
         already a model instance of the expected type the value will
@@ -63,11 +89,13 @@ class ModelObjectParser:
         handler is invoked if one was provided.
 
         :param value: The value to parse.
+        :param param: The parameter that the value is associated with.
+        :param ctx: The context of the command.
         :raises CommandError: If the lookup fails and no error handler is
             provided.
         """
         try:
-            if isinstance(value, self.model_cls):  # pragma: no cover
+            if isinstance(value, self.model_cls):
                 return value
             if isinstance(self._field, UUIDField):
                 uuid = ""
@@ -93,6 +121,27 @@ def parse_app_label(label: t.Union[str, AppConfig]):
     A parser for app labels. If the label is already an AppConfig instance,
     the instance is returned. The label will be tried first, if that fails
     the label will be treated as the app name.
+
+    .. code-block:: python
+
+        import typing as t
+        import typer
+        from django_typer import TyperCommand
+        from django_typer.parsers import parse_app_label
+
+        class Command(TyperCommand):
+
+            def handle(
+                self,
+                django_apps: t.Annotated[
+                    t.List[AppConfig],
+                    typer.Argument(
+                        parser=parse_app_label,
+                        help=_("One or more application labels.")
+                    )
+                ]
+            ):
+                ...
 
     :param label: The label to map to an AppConfig instance.
     :raises CommandError: If no matching app can be found.

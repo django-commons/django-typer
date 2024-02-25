@@ -277,6 +277,29 @@ def complete_app_label(ctx: Context, param: Parameter, incomplete: str):
     A case-insensitive completer for Django app labels or names. The completer
     prefers labels but names will also work.
 
+    .. code-block:: python
+
+        import typing as t
+        import typer
+        from django_typer import TyperCommand
+        from django_typer.parsers import parse_app_label
+        from django_typer.completers import complete_app_label
+
+        class Command(TyperCommand):
+
+            def handle(
+                self,
+                django_apps: t.Annotated[
+                    t.List[AppConfig],
+                    typer.Argument(
+                        parser=parse_app_label,
+                        shell_complete=complete_app_label,
+                        help=_("One or more application labels.")
+                    )
+                ]
+            ):
+                ...
+
     :param ctx: The click context.
     :param param: The click parameter.
     :param incomplete: The incomplete string.

@@ -1768,7 +1768,15 @@ class TestPollExample(SimpleTestCase):
         # these don't work, maybe revisit in future?
         # cmd([str(self.q1.id)])
         # cmd([self.q1.id])
-        self.assertTrue(log.getvalue().count("Successfully"), 5)
+        self.assertEqual(log.getvalue().count("Successfully"), 3)
+
+    def test_tutorial_modelobjparser_cmd(self):
+        log = StringIO()
+        call_command("closepoll_t6", str(self.q1.id), stdout=log)
+        cmd = get_command("closepoll_t6", stdout=log)
+        cmd([self.q1])
+        cmd(polls=[self.q1])
+        self.assertEqual(log.getvalue().count("Successfully"), 3)
 
     def test_poll_ex(self):
         result = run_command("closepoll", str(self.q2.id))
@@ -1847,9 +1855,14 @@ class TestShellCompletersAndParsers(TestCase):
             call_command("completion", "django_typer_tests.polls")
 
         poll_app = apps.get_app_config("django_typer_tests_polls")
+        cmd = get_command("completion")
         self.assertEqual(
-            json.loads(get_command("completion")([poll_app])),
+            json.loads(cmd([poll_app])),
             ["django_typer_tests_polls"],
+        )
+
+        self.assertEqual(
+            json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_polls"]
         )
 
     def test_char_field(self):
