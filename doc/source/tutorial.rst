@@ -228,6 +228,7 @@ markup the docstring may be the more appropriate place to put it.
     :convert-png: latex
     :theme: dark
 
+|
 
 .. note::
 
@@ -237,10 +238,10 @@ markup the docstring may be the more appropriate place to put it.
 Defining custom and reusable parameter types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We may have other commands that need to operate on Poll objects from given poll ids. We could duplicate our
-for loop that loads Poll objects from ids, but that wouldn't be very DRY. Instead, Typer_ allows us to
-define custom parsers for arbitrary parameter types. Lets see what that would look like if we used the Poll
-class as our type hint:
+We may have other commands that need to operate on Poll objects from given poll ids. We could
+duplicate our for loop that loads Poll objects from ids, but that wouldn't be very DRY. Instead,
+Typer_ allows us to define custom parsers for arbitrary parameter types. Lets see what that would
+look like if we used the Poll class as our type hint:
 
 .. code-block:: python
     :linenos:
@@ -250,6 +251,9 @@ class as our type hint:
     # ...
 
     def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
+        # our parser may be passed a Poll object depending on how
+        # users might call our command from code - so we must check
+        # to be sure we have something to parse at all!
         if isinstance(poll, Poll):
             return poll
         try:
@@ -259,14 +263,13 @@ class as our type hint:
 
 
     class Command(TyperCommand):
-        help = "Closes the specified poll for voting"
 
         def handle(
             self,
             polls: t.Annotated[
-                t.List[Poll],
+                t.List[Poll],  # change our type hint to a list of Polls!
                 Argument(
-                    parser=get_poll_from_id,
+                    parser=get_poll_from_id,  # pass our parser to the Argument!
                     help=_("The database IDs of the poll(s) to close."),
                 ),
             ],
@@ -278,8 +281,23 @@ class as our type hint:
                 ),
             ] = False,
         ):
+            """
+            Closes the specified poll for voting.
+            
+            As mentioned in the last section, helps can also
+            be set in the docstring
+            """
             # ...
 
+
+.. typer:: django_typer.examples.tutorial.step3.closepoll.Command:typer_app
+    :prog: manage.py closepoll
+    :width: 80
+    :show-nested:
+    :convert-png: latex
+    :theme: dark
+
+|
 
 Add shell tab-completion suggestions for polls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

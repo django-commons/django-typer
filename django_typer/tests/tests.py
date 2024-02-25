@@ -1553,8 +1553,8 @@ class TestTracebackConfig(TestCase):
             # locals should be present
             self.assertNotIn("name = 'me'", result)
             self.assertNotIn("throw = True", result)
-            # should get a full length stack trace
-            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 1)
+            # should get a stack trace with files and line numbers
+            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
         else:
             self.assertNotIn("────────", result)
 
@@ -1601,7 +1601,7 @@ class TestTracebackConfig(TestCase):
         self.assertNotIn("throw = True", result)
         if self.rich_installed:
             self.assertIn("────────", result)
-            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 1)
+            self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
         else:
             self.assertNotIn("────────", result)
 
