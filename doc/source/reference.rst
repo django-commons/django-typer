@@ -15,8 +15,6 @@ django_typer
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
-
 
 .. _types:
 
@@ -77,4 +75,3 @@ shellcompletion
 
 .. automodule:: django_typer.management.commands.shellcompletion
     :members:
-   

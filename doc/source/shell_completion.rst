@@ -2,9 +2,9 @@
 
 .. _shellcompletions:
 
-=================
-Shell Completions
-=================
+=====================
+Shell Tab-Completions
+=====================
 
 .. image:: /_static/img/closepoll_example.gif
    :align: center

@@ -100,7 +100,15 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2023-2024 Brian Kohan"
 
 
-__all__ = ["TyperCommand", "Context", "initialize", "command", "group", "get_command"]
+__all__ = [
+    "TyperCommand",
+    "Context",
+    "initialize",
+    "command",
+    "group",
+    "get_command",
+    "model_parser_completer",
+]
 
 
 def model_parser_completer(
