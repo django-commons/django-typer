@@ -17,7 +17,7 @@ from click.exceptions import UsageError
 from django.apps import apps
 from django.conf import settings
 from django.core.management import CommandError, call_command
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -1693,11 +1693,13 @@ SHELLS = [
 ]
 
 
-class TestPollExample(TestCase):
+class TestPollExample(SimpleTestCase):
 
     q1 = None
     q2 = None
     q3 = None
+
+    databases = ["default"]
 
     def setUp(self):
         self.q1 = Question.objects.create(
