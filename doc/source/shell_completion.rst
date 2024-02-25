@@ -6,6 +6,11 @@
 Shell Completions
 =================
 
+.. image:: /_static/img/closepoll_example.gif
+   :align: center
+
+|
+
 Shell completions are helpful suggestions that are displayed when you press the
 ``<TAB>`` key while typing a command in a shell.  They are especially useful
 when you are not sure about the exact name of a command, its options, its arguments

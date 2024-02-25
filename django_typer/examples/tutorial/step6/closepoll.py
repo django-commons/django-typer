@@ -6,38 +6,35 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
-from django.core.management.base import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import TyperCommand
+from django_typer import TyperCommand, model_parser_completer
 from django_typer.tests.polls.models import Question as Poll
 
 
 class Command(TyperCommand):
-    help = "Closes the specified poll for voting"
+    help = _("Closes the specified poll for voting.")
 
     def handle(
         self,
-        poll_ids: Annotated[
-            t.List[int], Argument(help=_("The database IDs of the poll(s) to close."))
+        polls: Annotated[
+            t.List[Poll],
+            Argument(
+                **model_parser_completer(Poll, help_field="question_text"),
+                help=_("The database IDs of the poll(s) to close."),
+            ),
         ],
         delete: Annotated[
-            bool, Option(help=_("Delete poll instead of closing it."))
+            bool,
+            Option(help=_("Delete poll instead of closing it.")),
         ] = False,
     ):
-        for poll_id in poll_ids:
-            try:
-                poll = Poll.objects.get(pk=poll_id)
-            except Poll.DoesNotExist:
-                raise CommandError(f'Poll "{poll_id}" does not exist')
-
+        for poll in polls:
             poll.opened = False
             poll.save()
-
             self.stdout.write(
                 self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
             )
-
             if delete:
                 poll.delete()

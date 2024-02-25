@@ -6,21 +6,13 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
-from django.core.management.base import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
 from django_typer import TyperCommand
+from django_typer.completers import ModelObjectCompleter
+from django_typer.parsers import ModelObjectParser
 from django_typer.tests.polls.models import Question as Poll
-
-
-def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
-    if isinstance(poll, Poll):
-        return poll
-    try:
-        return Poll.objects.get(pk=int(poll))
-    except Poll.DoesNotExist:
-        raise CommandError(f'Poll "{poll}" does not exist')
 
 
 class Command(TyperCommand):
@@ -30,7 +22,8 @@ class Command(TyperCommand):
         polls: Annotated[
             t.List[Poll],
             Argument(
-                parser=get_poll_from_id,
+                parser=ModelObjectParser(Poll),
+                shell_complete=ModelObjectCompleter(Poll, help_field="question_text"),
                 help=_("The database IDs of the poll(s) to close."),
             ),
         ],

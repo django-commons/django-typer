@@ -29,7 +29,7 @@ class Command(TyperCommand):
             poll.opened = False
             poll.save()
             self.stdout.write(
-                self.style.SUCCESS(f'Successfully closed poll "{{ poll.id }}"')
+                self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
             )
             if delete:
                 poll.delete()

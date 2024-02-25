@@ -18,13 +18,13 @@ class Command(TyperCommand):
             try:
                 poll = Poll.objects.get(pk=poll_id)
             except Poll.DoesNotExist:
-                raise CommandError('Poll "%s" does not exist' % poll_id)
+                raise CommandError(f'Poll "{poll_id}" does not exist')
 
             poll.opened = False
             poll.save()
 
             self.stdout.write(
-                self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
+                self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
             )
 
             if delete:

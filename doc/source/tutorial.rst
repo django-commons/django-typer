@@ -105,13 +105,13 @@ looks like this:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
-                    raise CommandError('Poll "%s" does not exist' % poll_id)
+                    raise CommandError(f'Poll "{poll_id}" does not exist')
 
                 poll.opened = False
                 poll.save()
 
                 self.stdout.write(
-                    self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
+                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
                 )
 
                 if options["delete"]:
@@ -145,13 +145,13 @@ conversion may look like this:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
-                    raise CommandError('Poll "%s" does not exist' % poll_id)
+                    raise CommandError(f'Poll "{poll_id}" does not exist')
 
                 poll.opened = False
                 poll.save()
 
                 self.stdout.write(
-                    self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
+                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
                 )
 
                 if delete:
@@ -259,7 +259,7 @@ look like if we used the Poll class as our type hint:
         try:
             return Poll.objects.get(pk=int(poll))
         except Poll.DoesNotExist:
-            raise CommandError('Poll "%s" does not exist' % poll)
+            raise CommandError(f'Poll "{poll_id}" does not exist')
 
 
     class Command(TyperCommand):
@@ -287,7 +287,15 @@ look like if we used the Poll class as our type hint:
             As mentioned in the last section, helps can also
             be set in the docstring
             """
-            # ...
+            for poll in polls:
+                poll.opened = False
+                poll.save()
+                self.stdout.write(
+                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
+                )
+                if delete:
+                    poll.delete()
+
 
 
 .. typer:: django_typer.examples.tutorial.step3.closepoll.Command:typer_app
@@ -299,9 +307,106 @@ look like if we used the Poll class as our type hint:
 
 |
 
+django-typer_ offers some built-in :mod:`~django_typer.parsers` that can be used for
+common Django_ types. For example, the :class:`~django_typer.parsers.ModelObjectParser` can
+be used to fetch a model object from a given field. By default it will use the primary key,
+so we could rewrite the relevant lines above like so:
+
+.. code-block:: python
+
+    from django_typer.parsers import ModelObjectParser
+
+    # ...
+
+    t.Annotated[
+        t.List[Poll],
+        Argument(
+            parser=ModelObjectParser(Poll),
+            help=_("The database IDs of the poll(s) to close.")
+        )
+    ]
+
+    # ...
+
 Add shell tab-completion suggestions for polls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's very annoying to have to know the database primary key of the poll to close it. django-typer_ makes it
-easy to add tab completion suggestions! Let's see wha that would look like:
+easy to add tab completion suggestions! You can always
+`implement your own completer functions <https://click.palletsprojects.com/en/8.1.x/shell-completion/#custom-type-completion>`_,
+but as with, :mod:`~django_typer.parsers`, there are some out-of-the-box :mod:`~django_typer.completers` that
+make this easy. Let's see what the relevant updates to our closepoll command would look like:
 
+.. code-block:: python
+
+    from django_typer.parsers import ModelObjectParser
+    from django_typer.completers import ModelObjectCompleter
+
+    # ... 
+
+    t.Annotated[
+        t.List[Poll],
+        Argument(
+            parser=ModelObjectParser(Poll),
+            shell_complete=ModelObjectCompleter(Poll, help_field='question_text'),
+            help=_("The database IDs of the poll(s) to close.")
+        )
+    ]
+
+    # ...
+
+.. note::
+    
+    For tab-completions to work you will need to 
+    :ref:`install the shell completion scripts for your shell <shellcompletions>`.
+
+
+Putting it all together
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When we're using a :class:`~django_typer.parsers.ModelObjectParser` and
+:class:`~django_typer.completers.ModelObjectCompleter` we can use the
+:func:`~django_typer.model_parser_completer` convenience function to reduce the amount
+of boiler plate. Let's put everything together and see what our full-featured refactored
+closepoll command looks like:
+
+.. code-block:: python
+    :linenos:
+
+    import typing as t
+
+    from django.utils.translation import gettext_lazy as _
+    from typer import Argument, Option
+
+    from django_typer import TyperCommand, model_parser_completer
+    from polls.models import Question as Poll
+
+
+    class Command(TyperCommand):
+        help = _("Closes the specified poll for voting.")
+
+        def handle(
+            self,
+            polls: Annotated[
+                t.List[Poll],
+                Argument(
+                    **model_parser_completer(Poll, help_field="question_text"),
+                    help=_("The database IDs of the poll(s) to close."),
+                ),
+            ],
+            delete: Annotated[
+                bool, Option(help=_("Delete poll instead of closing it.")),
+            ] = False,
+        ):
+            for poll in polls:
+                poll.opened = False
+                poll.save()
+                self.stdout.write(
+                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
+                )
+                if delete:
+                    poll.delete()
+
+
+.. image:: /_static/img/closepoll_example.gif
+   :align: center
