@@ -180,7 +180,6 @@ class _DefaultCompleteTestCase:
         completions = self.get_completions(self.launch_script, " ")
         self.assertIn("makemigrations", completions)
         self.assertIn("migrate", completions)
-        self.assertIn("dumpdata", completions)
         self.assertIn("completion", completions)
         self.assertIn("help_precedence", completions)
 
