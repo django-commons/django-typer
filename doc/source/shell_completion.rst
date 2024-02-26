@@ -32,7 +32,7 @@ as well as a way to install them in your shell.
 Installation
 ============
 
-Each shell has its own mechanism for enabling completions and this is further exacerbated
+Each shell has its own mechanism for enabling completions and this is further complicated
 by how different shells are installed and configured on different platforms. All shells
 have the same basic process. Completion logic needs to be registered with the shell that will be
 invoked when tabs are pressed for a specific command or script. To install tab completions
@@ -41,14 +41,15 @@ the shell. This process has two phases:
 
 1. Ensure that your shell is configured to support completions.
 2. Use the :mod:`~django_typer.management.commands.shellcompletion` command to install the completion
-   hook for your Django manage script.
+   hook for your Django manage script. This usually entails adding a specifically named script to
+   a certain directory or adding lines to an existing script. The 
+   :mod:`~django_typer.management.commands.shellcompletion` command will handle this for you.
 
 
-It can be frustrating to debug why completions are not working as expected. The goal of this 
-guide is not to be an exhaustive list of how to enable completions for each supported shell on
-all possible platforms, but rather to provide general guidance on how to enable completions for
-the most common platforms and environments. If you encounter issues or have solutions, please 
-`report them on our issues page <https://github.com/bckohan/django-typer>`_
+The goal of this guide is not to be an exhaustive list of how to enable completions for each
+supported shell on all possible platforms, but rather to provide general guidance on how to
+enable completions for the most common platforms and environments. If you encounter issues
+or have solutions, please `report them on our issues page <https://github.com/bckohan/django-typer>`_
 
 Windows
 -------
@@ -148,6 +149,56 @@ hooks for implementing libraries to provide completions for their own commands.*
 Defining Custom Completions
 ===========================
 
-.. todo::
+To define custom completion logic for your arguments_ and options_ pass the ``shell_completion``
+parameter in your type hint annotations. django-typer_ comes with a 
+:ref:`few provided completers <completers>` for common Django_ types. One of the provided completers
+completes Django_ app labels and names. We might build a similar completer that only works for
+Django_ app labels like this:
 
-    Check back soon!
+.. code-block:: python
+    :linenos:
+
+    import typing as t
+    import typer
+    from click import Context, Parameter
+    from click.shell_completion import CompletionItem
+    from django.apps import apps
+
+    from django_typer import TyperCommand
+
+
+    # the completer function signature must match this exactly
+    def complete_app_label(
+        ctx: Context,
+        param: Parameter,
+        incomplete: str
+    ) -> t.List[CompletionItem]:
+
+        # don't offer apps that are already present as completion suggestions
+        present = [app.label for app in (ctx.params.get(param.name or "") or [])]
+        return [
+            CompletionItem(app.label)
+            for app in apps.get_app_configs()
+            if app.label.startswith(incomplete) and app.label not in present
+        ]
+
+
+    class MyCommand(TyperCommand):
+
+        @command()
+        def handle(
+            self,
+            apps: t.Annotated[
+                t.List[str],
+                typer.Argument(
+                    help="The app label",
+                    shell_complete=complete_app_label  # pass the completer function here
+                )
+            ]
+        ):
+            pass
+
+.. tip::
+
+    See the :class:`~django_typer.completers.ModelObjectCompleter` for a completer that works
+    for many Django_ model field types.

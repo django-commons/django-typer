@@ -49,6 +49,13 @@ completers
 .. automodule:: django_typer.completers
     :members:
 
+
+utils
+-----
+
+.. automodule:: django_typer.utils
+    :members: traceback_config, get_current_command
+
 .. _shellcompletion:
 
 shellcompletion
