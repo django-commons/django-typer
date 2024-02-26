@@ -859,8 +859,8 @@ def initialize(
         setattr(
             func,
             "_typer_callback_",
-            lambda cmd, **extra: cmd.typer_app.callback(
-                name=name or extra.pop("name", None),
+            lambda cmd, _name=None, **extra: cmd.typer_app.callback(
+                name=name or _name,
                 cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
                 invoke_without_command=invoke_without_command,
                 subcommand_metavar=subcommand_metavar,
@@ -962,8 +962,8 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         setattr(
             func,
             "_typer_command_",
-            lambda cmd, **extra: cmd.typer_app.command(
-                name=name or extra.pop("name", None),
+            lambda cmd, _name=None, **extra: cmd.typer_app.command(
+                name=name or _name,
                 *args,
                 cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
                 context_settings=context_settings,
@@ -1290,7 +1290,7 @@ class TyperCommandMeta(type):
                 if cmd_cls._handle:
                     ctor = get_ctor(cmd_cls._handle)
                     if ctor:
-                        ctor(cls, name=cls.typer_app.info.name)
+                        ctor(cls, _name=cls.typer_app.info.name)
                     else:
                         cls._num_commands += 1
                         cls.typer_app.command(

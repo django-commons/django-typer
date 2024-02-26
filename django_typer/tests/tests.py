@@ -168,6 +168,19 @@ class BasicTests(TestCase):
             self.assertEqual(basic, get_current_command())
         self.assertIsNone(get_current_command())
 
+    def test_renaming(self):
+        self.assertEqual(run_command("rename", "default")[0].strip(), "handle")
+        self.assertEqual(run_command("rename", "renamed")[0].strip(), "subcommand1")
+        self.assertEqual(run_command("rename", "renamed2")[0].strip(), "subcommand2")
+
+        self.assertEqual(call_command("rename", "default"), "handle")
+        self.assertEqual(call_command("rename", "renamed"), "subcommand1")
+        self.assertEqual(call_command("rename", "renamed2"), "subcommand2")
+
+        self.assertEqual(get_command("rename")(), "handle")
+        self.assertEqual(get_command("rename").subcommand1(), "subcommand1")
+        self.assertEqual(get_command("rename").subcommand2(), "subcommand2")
+
 
 class CommandDefinitionTests(TestCase):
     def test_group_callback_throws(self):

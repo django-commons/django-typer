@@ -63,7 +63,7 @@ documented features of BaseCommand_ work!
 
 
 .. typer:: django_typer.examples.basic.Command:typer_app
-    :prog: basic
+    :prog: ./manage.py basic
     :width: 80
     :convert-png: latex
 
@@ -81,7 +81,7 @@ Or commands with multiple subcommands can be defined:
 
 
 .. typer:: django_typer.examples.multi.Command:typer_app
-    :prog: multi
+    :prog: ./manage.py multi
     :width: 80
     :show-nested:
     :convert-png: latex
@@ -114,7 +114,7 @@ for arbitrarily complex command hierarchies.
 
 
 .. typer:: django_typer.examples.hierarchy.Command:typer_app
-    :prog: hierarchy
+    :prog: ./manage.py hierarchy
     :width: 80
     :show-nested:
     :convert-png: latex
