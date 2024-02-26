@@ -1241,10 +1241,6 @@ class TestGroups(TestCase):
                 call_command("groups", "echo", "hey!", echoes=5).strip(),
                 ("hey! " * 5).strip(),
             )
-            self.assertEqual(
-                call_command("groups", "echo", "hey!", echoes="5").strip(),
-                ("hey! " * 5).strip(),
-            )
         else:
             self.assertIn("UsageError", result[1])
             with self.assertRaises(TypeError):
@@ -1281,7 +1277,7 @@ class TestGroups(TestCase):
 
         self.assertEqual(
             call_command(
-                "groups", "math", "multiply", "1.2", "3.5", " -12.3", precision="5"
+                "groups", "math", "--precision=5", "multiply", "1.2", "3.5", " -12.3"
             ),
             "-51.66000",
         )
@@ -1877,20 +1873,6 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertEqual(
             json.loads(
                 call_command("completion", "django_typer_tests_polls", option=test_app)
-            ),
-            {
-                "django_apps": ["django_typer_tests_polls"],
-                "option": "django_typer_tests_test_app",
-            },
-        )
-
-        self.assertEqual(
-            json.loads(
-                call_command(
-                    "completion",
-                    "django_typer_tests_polls",
-                    option="django_typer_tests_test_app",
-                )
             ),
             {
                 "django_apps": ["django_typer_tests_polls"],

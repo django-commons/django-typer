@@ -364,7 +364,6 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     context_class: t.Type[click.Context] = Context
     django_command: "TyperCommand"
     callback_is_method: bool = True
-    param_map: t.Dict[str, click.Parameter] = {}
 
     class Converter:
         """
@@ -417,16 +416,14 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             return callback(
                 *args,
                 **{
-                    # process supplied parameters incase they need type conversion
-                    param: (
-                        (
-                            self.param_map[param].process_value(ctx, val)
-                            if param in self.param_map
-                            else val
-                        )
-                        if param in ctx.supplied_params
-                        else val
-                    )
+                    # we could call param.process_value() here to allow named
+                    # parameters to be passed as their unparsed string values,
+                    # we don't because this forces some weird idempotency on custom
+                    # parsers that might make errors more frequent for users and also
+                    # this would be inconsistent with call_command behavior for BaseCommands
+                    # which expect the parsed values to be passed by name. Unparsed values can
+                    # always be passed as argument strings.
+                    param: val
                     for param, val in kwargs.items()
                     if param in expected
                 },
@@ -450,7 +447,6 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             callback=call_with_self,
             **kwargs,
         )
-        self.param_map = {param.name: param for param in self.params}
 
 
 class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
