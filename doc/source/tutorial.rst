@@ -11,8 +11,15 @@ to define the command's command line interface instead of argparse_ as BaseComma
 Upstream Libraries
 ------------------
 
-.. image:: /_static/img/django_typer_upstream.svg
-   :align: right
+.. only:: html
+
+    .. image:: /_static/img/django_typer_upstream.svg
+        :align: right
+
+.. only:: latex
+
+    .. image:: /_static/img/django_typer_upstream.pdf
+        :align: right
 
 django-typer_ merges the Django_ BaseCommand_ interface with the Typer_ interface and Typer_ itself
 is built on top of click_. This means when using django-typer_ you will encounter interfaces and
@@ -410,5 +417,12 @@ closepoll command looks like:
                     poll.delete()
 
 
-.. image:: /_static/img/closepoll_example.gif
-   :align: center
+.. only:: html
+
+    .. image:: /_static/img/closepoll_example.gif
+        :align: center
+
+.. only:: latex
+
+    .. image:: /_static/img/closepoll_example.png
+        :align: center

@@ -78,9 +78,11 @@ html_css_files = [
 
 todo_include_todos = True
 
-def add_page_class(app, pagename, templatename, context, doctree):
-    from sphinx.builders.html._assets import _CascadingStyleSheet
-    context['css_files'] += [_CascadingStyleSheet(f'_static/{pagename}.css')]
+latex_engine = "xelatex"
+
+# def add_page_class(app, pagename, templatename, context, doctree):
+#     from sphinx.builders.html._assets import _CascadingStyleSheet
+#     context['css_files'] += [_CascadingStyleSheet(f'_static/{pagename}.css')]
 
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
@@ -89,5 +91,5 @@ def setup(app):
         'autodoc-process-docstring',
         between('^.*[*]{79}.*$', exclude=True)
     )
-    app.connect('html-page-context', add_page_class)
+    # app.connect('html-page-context', add_page_class)
     return app

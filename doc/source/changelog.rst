@@ -2,10 +2,10 @@
 Change Log
 ==========
 
-.. v1.0.0
-.. ======
+v1.0.0
+======
 
-.. * Initial production/stable release.
+* Initial production/stable release.
 
 v0.6.1b
 =======

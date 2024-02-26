@@ -162,3 +162,4 @@ cython_debug/
 poetry.lock
 .vscode
 django_typer/tests/dj_params.json
+**/.DS_Store

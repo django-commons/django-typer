@@ -1,8 +1,11 @@
 .. include:: ./refs.rst
+.. role:: big
+.. role:: extrabig
 
-============
-Django Typer
-============
+.. we use big role instead of index because a TOC on this page screws up the latex page generation
+
+:extrabig:`Django Typer`
+
 
 Use Typer_ to define the CLI for your Django_ management commands. Provides a TyperCommand class
 that inherits from BaseCommand_ and allows typer-style annotated parameter types. All of the
@@ -22,9 +25,7 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.
 
-
-Installation
-------------
+:big:`Installation`
 
 1. Clone django-typer from GitHub_ or install a release off PyPI_ :
 
@@ -50,8 +51,7 @@ Installation
         ]
 
 
-Basic Example
--------------
+:big:`Basic Example`
 
 For example TyperCommands can be a very simple drop in replacement for BaseCommands. All of the
 documented features of BaseCommand_ work!
@@ -70,8 +70,7 @@ documented features of BaseCommand_ work!
 
 |
 
-Multiple Subcommands Example
-----------------------------
+:big:`Multiple Subcommands Example`
 
 Or commands with multiple subcommands can be defined:
 
@@ -90,8 +89,7 @@ Or commands with multiple subcommands can be defined:
 |
 
 
-Grouping and Hierarchies Example
---------------------------------
+:big:`Grouping and Hierarchies Example`
 
 Or more complex groups and subcommand hierarchies can be defined. For example this command
 defines a group of commands called math, with subcommands divide and multiply. The group

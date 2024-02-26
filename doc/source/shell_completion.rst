@@ -6,8 +6,15 @@
 Shell Tab-Completions
 =====================
 
-.. image:: /_static/img/closepoll_example.gif
-   :align: center
+.. only:: html
+
+    .. image:: /_static/img/closepoll_example.gif
+        :align: center
+
+.. only:: latex
+
+    .. image:: /_static/img/closepoll_example.png
+        :align: center
 
 |
 
