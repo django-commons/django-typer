@@ -20,8 +20,8 @@ django-typer_ also supports shell completion for bash_, zsh_, fish_ and powershe
 extends that support to native Django_ management commands as well.
 
 
-The goal of django-typer_ is to provide full typer style functionality while maintaining
-compatibility with the Django management command system. This means that the BaseCommand
+The goal of django-typer_ is to provide full Typer_ style functionality while maintaining
+compatibility with the Django management command system. This means that the BaseCommand_
 interface is preserved and the Typer_ interface is added on top of it. This means that
 this code base is more robust to changes in the Django management command system - because
 most of the base class functionality is preserved but many Typer_ and click_ internals are
@@ -1544,7 +1544,7 @@ class OutputWrapper(BaseOutputWrapper):
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     """
     An extension of BaseCommand_ that uses the Typer_ library to parse
-    arguments and options. This class adapts BaseCommand_ using a light touch
+    arguments_ and options_. This class adapts BaseCommand_ using a light touch
     that relies on most of the original BaseCommand_ implementation to handle
     default arguments and behaviors.
 
@@ -1626,7 +1626,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         - Using the `rich_markup_mode parameter
           <https://typer.tiangolo.com/tutorial/commands/help/#rich-markdown-and-markup>`_ to enable
           markdown rendering in help output.
-        - Using the chain parameter to enable command chaining.
+        - Using the chain parameter to enable `command chaining
+          <https://click.palletsprojects.com/commands/#multi-command-chaining>`_.
 
 
     We can see that our help renders like so:

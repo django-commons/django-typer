@@ -228,9 +228,9 @@ class InterfaceTests(TestCase):
         self.assertFalse(initialize_params.symmetric_difference(typer_params))
 
     def test_typer_command_interface_matches(self):
-        from django_typer import _TyperCommandMeta
+        from django_typer import TyperCommandMeta
 
-        typer_command_params = set(get_named_arguments(_TyperCommandMeta.__new__))
+        typer_command_params = set(get_named_arguments(TyperCommandMeta.__new__))
         typer_params = set(get_named_arguments(typer.Typer.__init__))
         typer_params.remove("name")
         typer_params.remove("add_completion")
