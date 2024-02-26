@@ -962,12 +962,12 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         setattr(
             func,
             "_typer_command_",
-            lambda cmd, _name=None, **extra: cmd.typer_app.command(
+            lambda cmd, _name=None, _help=None, **extra: cmd.typer_app.command(
                 name=name or _name,
                 *args,
                 cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
                 context_settings=context_settings,
-                help=help,
+                help=help or _help,
                 epilog=epilog,
                 short_help=short_help,
                 options_metavar=options_metavar,
@@ -1290,7 +1290,11 @@ class TyperCommandMeta(type):
                 if cmd_cls._handle:
                     ctor = get_ctor(cmd_cls._handle)
                     if ctor:
-                        ctor(cls, _name=cls.typer_app.info.name)
+                        ctor(
+                            cls,
+                            _name=cls.typer_app.info.name,
+                            _help=getattr(cls, "help", None),
+                        )
                     else:
                         cls._num_commands += 1
                         cls.typer_app.command(

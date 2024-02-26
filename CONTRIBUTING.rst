@@ -7,6 +7,7 @@
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _readthedocs: https://readthedocs.org/
 .. _me: https://github.com/bckohan
+.. _black: https://black.readthedocs.io/en/stable/
 
 Contributing
 ############
@@ -37,11 +38,13 @@ Documentation
 
 `django-typer` documentation is generated using Sphinx_ with the
 readthedocs_ theme. Any new feature PRs must provide updated documentation for
-the features added. To build the docs run:
+the features added. To build the docs run doc8 to check for formatting issues
+then run Sphinx_:
 
-.. code-block::
+.. code-block:: bash
 
     cd ./doc
+    poetry run doc8 --ignore-path build --max-line-length 100
     poetry run make html
 
 
@@ -49,18 +52,17 @@ Static Analysis
 ---------------
 
 `django-typer` uses Pylint_ for python linting and mypy_ for static type
-checking. Header imports are also standardized using isort_. Before any PR is
-accepted the following must be run, and static analysis tools should not
-produce any errors or warnings. Disabling certain errors or warnings where
-justified is acceptable:
+checking. Header imports are also standardized using isort_ and formatting is
+done with black_. Before any PR is accepted the following must be run, and
+static analysis tools should not produce any errors or warnings. Disabling
+certain errors or warnings where justified is acceptable:
 
-.. code-block::
+.. code-block:: bash
 
     poetry run isort django_typer
     poetry run black django_typer
     poetry run pylint django_typer
     poetry run mypy django_typer
-    poetry run doc8 -q doc
     poetry check
     poetry run pip check
     poetry run python -m readme_renderer ./README.rst

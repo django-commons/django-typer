@@ -935,6 +935,22 @@ class TestHelpPrecedence(TestCase):
             "Test minimal TyperCommand subclass - docstring", buffer.getvalue()
         )
 
+    def test_help_precedence7(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence7", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence7")
+        self.assertIn(
+            "Test minimal TyperCommand subclass - class member", buffer.getvalue()
+        )
+
+    def test_help_precedence8(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence8", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence8")
+        self.assertIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+
 
 class TestOverloaded(TestCase):
     """

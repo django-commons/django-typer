@@ -15,21 +15,22 @@ Upstream Libraries
    :align: right
 
 django-typer_ merges the Django_ BaseCommand_ interface with the Typer_ interface and Typer_ itself
-is built on top of click_. This means when using django-typer_ you will encounter interfaces and concepts
-from *all three* of these upstream libraries:
+is built on top of click_. This means when using django-typer_ you will encounter interfaces and
+concepts from *all three* of these upstream libraries:
 
 * BaseCommand_
 
     Django_ has a good tutorial for understanding how commands are organized and built in Django_. If
-    you are unfamiliar with using BaseCommand_ please first work through the 
+    you are unfamiliar with using BaseCommand_ please first work through the
     `polls Tutorial in the Django documentation <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#module-django.core.management>`_.
 
 * Typer_
 
     This tutorial can be completed without working through the `Typer tutorials <https://typer.tiangolo.com/tutorial/>`_,
     but familiarizing yourself with Typer_ will make this easier and will also be helpful when you
-    want to define CLIs outside of Django_! We use the Typer_ interface to define Arguments_ and Options_
-    so please refer to the Typer_ documentation for any questions about how to define these.
+    want to define CLIs outside of Django_! We use the Typer_ interface to define Arguments_ and
+    Options_ so please refer to the Typer_ documentation for any questions about how to define
+    these.
 
 * click_
 
@@ -157,10 +158,10 @@ conversion may look like this:
                 if delete:
                     poll.delete()
 
-You'll note that we've removed add_arguments entirely and specified the arguments and options as parameters
-to the handle method. django-typer_ will interpret the parameters on the handle() method as the command line
-interface for the command. If we have rich_ installed the help for our new closepoll command will look like
-this:
+You'll note that we've removed add_arguments entirely and specified the arguments and options as
+parameters to the handle method. django-typer_ will interpret the parameters on the handle() method
+as the command line interface for the command. If we have rich_ installed the help for our new
+closepoll command will look like this:
 
 
 .. typer:: django_typer.examples.tutorial.step1.closepoll.Command:typer_app
@@ -175,7 +176,7 @@ this:
 .. note::
 
     :class:`~django_typer.TyperCommand` adds the standard set of default options to the command
-    line interface, with the exception of verbosity, which can be 
+    line interface, with the exception of verbosity, which can be
 
 
 Add Helps with Type annotations
@@ -217,9 +218,9 @@ are arguments and the delete flag is an option. Here is what that would look lik
 
 See that our help text now shows up in the command line interface. Also note, that lazy translations
 work for the help strings. Typer_ also allows us to specify our help text in the docstrings of the
-command function or class, in this case either Command or handle() - but docstrings are not available
-to the translation system. If translation is not necessary and your help text is extensive or contains
-markup the docstring may be the more appropriate place to put it.
+command function or class, in this case either Command or handle() - but docstrings are not
+available to the translation system. If translation is not necessary and your help text is extensive
+or contains markup the docstring may be the more appropriate place to put it.
 
 .. typer:: django_typer.examples.tutorial.step2.closepoll.Command:typer_app
     :prog: manage.py closepoll
@@ -232,7 +233,8 @@ markup the docstring may be the more appropriate place to put it.
 
 .. note::
 
-    On Python <=3.8 you will need to import Annotated from typing_extensions_ instead of the standard library. 
+    On Python <=3.8 you will need to import Annotated from typing_extensions_ instead of the standard
+    library.
 
 
 Defining custom and reusable parameter types
@@ -283,7 +285,7 @@ look like if we used the Poll class as our type hint:
         ):
             """
             Closes the specified poll for voting.
-            
+
             As mentioned in the last section, helps can also
             be set in the docstring
             """
@@ -342,7 +344,7 @@ make this easy. Let's see what the relevant updates to our closepoll command wou
     from django_typer.parsers import ModelObjectParser
     from django_typer.completers import ModelObjectCompleter
 
-    # ... 
+    # ...
 
     t.Annotated[
         t.List[Poll],
@@ -356,8 +358,8 @@ make this easy. Let's see what the relevant updates to our closepoll command wou
     # ...
 
 .. note::
-    
-    For tab-completions to work you will need to 
+
+    For tab-completions to work you will need to
     :ref:`install the shell completion scripts for your shell <shellcompletions>`.
 
 

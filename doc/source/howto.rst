@@ -16,7 +16,7 @@ For example to define an integer positional argument we could simply do:
         ...
 
 You will likely want to add additional meta information to your arguments for Typer_ to render
-things like helps and usage strings.  You can do this by annotating the type hint with 
+things like helps and usage strings.  You can do this by annotating the type hint with
 the `typer.Argument` class:
 
 .. code-block::
@@ -25,7 +25,7 @@ the `typer.Argument` class:
     from typer import Argument
 
     # ...
-    
+
     def handle(self, int_arg: t.Annotated[int, Argument(help="An integer argument")]):
         ...
 
@@ -75,12 +75,12 @@ To add meta information, we annotate with the `typer.Option` class:
     from typer import Option
 
     # ...
-    
+
     def handle(self, name: t.Annotated[str, Option(help="The name of the thing")]):
         ...
 
 .. tip::
-    
+
     Refer to the Typer_ docs on options_ for more details.
 
 
@@ -248,11 +248,11 @@ This is like defining a group at the command root and is an extension of the
 Call TyperCommands from Code
 ----------------------------
 
-There are two options for invoking a :class:`~django_typer.TyperCommand` from code without spawning off
-a subprocess. The first is to use Django_'s builtin call_command_ function. This function will work exactly
-as it does for normal BaseCommand_ derived commands. django-typer_ however adds another mechanism that
-can be more efficient, especially if your options and arguments are already of the correct type and require
-no parsing:
+There are two options for invoking a :class:`~django_typer.TyperCommand` from code without spawning
+off a subprocess. The first is to use Django_'s builtin call_command_ function. This function will
+work exactly as it does for normal BaseCommand_ derived commands. django-typer_ however adds
+another mechanism that can be more efficient, especially if your options and arguments are already
+of the correct type and require no parsing:
 
 Say we have this command, called ``mycommand``:
 
@@ -287,8 +287,8 @@ Say we have this command, called ``mycommand``:
 The rule of them is this:
 
     - Use call_command_ if your options and arguments need parsing.
-    - Use :func:`~django_typer.get_command` and invoke the command functions directly if your options
-      and arguments are already of the correct type.
+    - Use :func:`~django_typer.get_command` and invoke the command functions directly if your
+      options and arguments are already of the correct type.
 
 .. tip::
 
@@ -300,13 +300,14 @@ Change Default Django Options
 -----------------------------
 
 :class:`~django_typer.TyperCommand` classes preserve all of the functionality of BaseCommand_ derivatives.
-This means that you can still use class members like `suppressed_base_arguments 
+This means that you can still use class members like `suppressed_base_arguments
 <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand.suppressed_base_arguments>`_
 to suppress default options.
 
-By default :class:`~django_typer.TyperCommand` suppresses ``--verbosity``. You can add it back by setting 
-``suppressed_base_arguments`` to an empty list. If you want to use verbosity you can simply redefine it or
-use one of django-typer_'s :ref:`provided type hints <types>` for the default BaseCommand_ options:
+By default :class:`~django_typer.TyperCommand` suppresses ``--verbosity``. You can add it back by
+setting ``suppressed_base_arguments`` to an empty list. If you want to use verbosity you can
+simply redefine it or use one of django-typer_'s :ref:`provided type hints <types>` for the default
+BaseCommand_ options:
 
 .. code-block:: python
 
@@ -326,7 +327,7 @@ Configure the Typer_ Application
 
 Typer_ apps can be configured using a number of parameters. These parameters are usually passed
 to the Typer class constructor when the application is created. django-typer_ provides a way to
-pass these options upstream to Typer_ by supplying them as keyword arguments to the 
+pass these options upstream to Typer_ by supplying them as keyword arguments to the
 :class:`~django_typer.TyperCommand` class inheritance:
 
 .. code-block:: python
@@ -358,12 +359,12 @@ See the section on :ref:`defining shell completions.<define-shellcompletions>`
 Configure rich_ Stack Traces
 ----------------------------
 
-When rich_ is installed it may be `configured to display rendered stack traces 
+When rich_ is installed it may be `configured to display rendered stack traces
 <https://rich.readthedocs.io/en/stable/traceback.html>`_ for unhandled exceptions.
-These stack traces are information dense and can be very helpful for debugging. By default, if rich_
-is installed django-typer_ will configure it to render stack traces. You can disable this behavior by
-setting the ``DT_RICH_TRACEBACK_CONFIG`` config to ``False``. You may also set 
-``DT_RICH_TRACEBACK_CONFIG`` to a dictionary holding the parameters to pass to
+These stack traces are information dense and can be very helpful for debugging. By default, if
+rich_ is installed django-typer_ will configure it to render stack traces. You can disable
+this behavior by setting the ``DT_RICH_TRACEBACK_CONFIG`` config to ``False``. You may also
+set ``DT_RICH_TRACEBACK_CONFIG`` to a dictionary holding the parameters to pass to
 `rich.traceback.install`.
 
 This provides a common hook for configuring rich_ that you can control on a per-deployment basis:
@@ -396,6 +397,30 @@ This provides a common hook for configuring rich_ that you can control on a per-
     There are traceback configuration options that can be supplied as configuration parameters to
     the Typer_ application. It is best to not set these and allow users to configure tracebacks
     via the ``DT_RICH_TRACEBACK_CONFIG`` setting.
+
+Add Help Text to Commands
+-------------------------
+
+There are multiple places to add help text to your commands. There is however a precedence order,
+and while lazy translation is supported in help texts, if you use docstrings as the helps they will
+not be translated.
+
+The precedence order, for a simple command is as follows:
+
+    .. code-block:: python
+
+        from django_typer import TyperCommand, command
+        from django.utils.translation import gettext_lazy as _
+
+        class Command(TyperCommand, help=_('2')):
+
+            help = _("3")
+
+            @command(help=_("1"))
+            def handle(self):
+                """
+                Docstring is last priority and is not subject to translation.
+                """
 
 
 Document Commands w/Sphinx

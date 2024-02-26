@@ -17,7 +17,8 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
    * Configure the rendering of exception stack traces using rich.
    * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
      Django_ commands for bash_, zsh_, fish_ and powershell_.
-   * :ref:`Create custom and portable shell tab-completions for your CLI parameters. <define-shellcompletions>`
+   * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
+     <define-shellcompletions>`
    * Refactor existing management commands into TyperCommands because TyperCommand is interface
      compatible with BaseCommand.
 

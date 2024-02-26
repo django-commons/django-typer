@@ -40,9 +40,9 @@ for django commands we need to register our completion logic for Django manage s
 the shell. This process has two phases:
 
 1. Ensure that your shell is configured to support completions.
-2. Use the :mod:`~django_typer.management.commands.shellcompletion` command to install the completion
-   hook for your Django manage script. This usually entails adding a specifically named script to
-   a certain directory or adding lines to an existing script. The 
+2. Use the :mod:`~django_typer.management.commands.shellcompletion` command to install the
+   completion hook for your Django manage script. This usually entails adding a specifically
+   named script to a certain directory or adding lines to an existing script. The
    :mod:`~django_typer.management.commands.shellcompletion` command will handle this for you.
 
 
@@ -67,11 +67,11 @@ OSX
 ---
 
 zsh_ is currently the default shell on OSX. Unfortunately completions are not supported out
-of the box. We recommend using 
+of the box. We recommend using
 `homebrew to install the zsh-completions package <https://formulae.brew.sh/formula/zsh-completions>`_.
 
-After installing the package you will need to add some configuration to your ``.zshrc`` file. We have
-had luck with the following:
+After installing the package you will need to add some configuration to your ``.zshrc`` file. We
+have had luck with the following:
 
 .. code-block:: bash
 
@@ -90,8 +90,9 @@ had luck with the following:
 Install the Completion Hook
 ---------------------------
 
-django-typer_ comes with a management command called :mod:`~django_typer.management.commands.shellcompletion`.
-To install completions for your Django project simply run the install command:
+django-typer_ comes with a management command called
+:mod:`~django_typer.management.commands.shellcompletion`. To install completions for your Django_
+project simply run the install command:
 
 .. code-block:: bash
 
@@ -103,12 +104,12 @@ To install completions for your Django project simply run the install command:
     is that you invoke the shellcompletion command in the same way you would invoke any commands you
     would like tab completions to work for.
 
-The installation script should be able to automatically detect your shell and install the appropriate
-scripts. If it is unable to do so you may force it to install for a specific shell by passing the
-shell name as an argument. Refer to the :mod:`~django_typer.management.commands.shellcompletion`
-for details.
+The installation script should be able to automatically detect your shell and install the
+appropriate scripts. If it is unable to do so you may force it to install for a specific shell by
+passing the shell name as an argument. Refer to the
+:mod:`~django_typer.management.commands.shellcompletion` for details.
 
-**After installation you will probably need to restart your shell or source the appropriate rc file.**
+**After installation you will need to restart your shell or source the appropriate rc file.**
 
 .. warning::
 
@@ -130,18 +131,19 @@ Integrating with Other CLI Completion Libraries
 
 When tab completion is requested for a command that is not a TyperCommand, django-typer_ will delegate
 that request to Django's `autocomplete function <https://github.com/django/django/blob/main/django/core/management/__init__.py#L278>`_
-as a fallback. This means that using django-typer_ to install completion scripts will enable completions
-for Django BaseCommands in all supported shells.
+as a fallback. This means that using django-typer_ to install completion scripts will enable
+completions for Django BaseCommands in all supported shells.
 
-However, if you are using a separate package to define custom tab completions for your commands you may
-use the --fallback parameter to supply a separate fallback hook that will invoke the appropriate
-completion function for your commands. If there are other popular completion libraries please consider
-`letting us know or submitting a PR <https://github.com/bckohan/django-typer/issues>`_ to support these
-libraries as a fallback out of the box.
+However, if you are using a separate package to define custom tab completions for your commands
+you may use the --fallback parameter to supply a separate fallback hook that will invoke the
+appropriate completion function for your commands. If there are other popular completion libraries
+please consider `letting us know or submitting a PR
+<https://github.com/bckohan/django-typer/issues>`_ to support these libraries as a fallback out of
+the box.
 
 
-*The long-term solution here should be that Django itself manages completion installation and provides
-hooks for implementing libraries to provide completions for their own commands.*
+*The long-term solution here should be that Django itself manages completion installation and
+provides hooks for implementing libraries to provide completions for their own commands.*
 
 
 .. _define-shellcompletions:
@@ -150,7 +152,7 @@ Defining Custom Completions
 ===========================
 
 To define custom completion logic for your arguments_ and options_ pass the ``shell_completion``
-parameter in your type hint annotations. django-typer_ comes with a 
+parameter in your type hint annotations. django-typer_ comes with a
 :ref:`few provided completers <completers>` for common Django_ types. One of the provided completers
 completes Django_ app labels and names. We might build a similar completer that only works for
 Django_ app labels like this:
