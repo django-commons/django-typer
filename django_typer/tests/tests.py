@@ -1855,6 +1855,7 @@ class TestShellCompletersAndParsers(TestCase):
             call_command("completion", "django_typer_tests.polls")
 
         poll_app = apps.get_app_config("django_typer_tests_polls")
+        test_app = apps.get_app_config("django_typer_tests_test_app")
         cmd = get_command("completion")
         self.assertEqual(
             json.loads(cmd([poll_app])),
@@ -1863,6 +1864,52 @@ class TestShellCompletersAndParsers(TestCase):
 
         self.assertEqual(
             json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_polls"]
+        )
+
+        self.assertEqual(
+            json.loads(cmd(django_apps=[poll_app], option=test_app)),
+            {
+                "django_apps": ["django_typer_tests_polls"],
+                "option": "django_typer_tests_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command("completion", "django_typer_tests_polls", option=test_app)
+            ),
+            {
+                "django_apps": ["django_typer_tests_polls"],
+                "option": "django_typer_tests_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "completion",
+                    "django_typer_tests_polls",
+                    option="django_typer_tests_test_app",
+                )
+            ),
+            {
+                "django_apps": ["django_typer_tests_polls"],
+                "option": "django_typer_tests_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "completion",
+                    "django_typer_tests_polls",
+                    "--option=django_typer_tests_test_app",
+                )
+            ),
+            {
+                "django_apps": ["django_typer_tests_polls"],
+                "option": "django_typer_tests_test_app",
+            },
         )
 
     def test_char_field(self):
