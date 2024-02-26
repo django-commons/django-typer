@@ -2460,6 +2460,13 @@ class TestShellCompletersAndParsers(TestCase):
         with self.assertRaises(CommandError):
             call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
 
+    def test_model_parser_name(self):
+        from django_typer.parsers import ModelObjectParser
+        from django_typer.tests.polls.models import Question
+
+        parser = ModelObjectParser(Question)
+        self.assertEqual(parser.name, "Poll")
+
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter
 
