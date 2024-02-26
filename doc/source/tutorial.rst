@@ -8,6 +8,18 @@ Using the :class:`~django_typer.TyperCommand` class is very similar to using the
 class. The main difference is that we use Typer_'s decorators, classes and type annotations
 to define the command's command line interface instead of argparse_ as BaseCommand_ expects.
 
+    * Define your command CLI interface in a clear, DRY and safe way using type hints
+    * Create subcommand and group command hierarchies.
+    * Use the full power of Typer's parameter types to validate and parse command line inputs.
+    * Create beautiful and information dense help outputs.
+    * Configure the rendering of exception stack traces using rich.
+    * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
+      Django_ commands for bash_, zsh_, fish_ and powershell_.
+    * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
+      <define-shellcompletions>`
+    * Refactor existing management commands into TyperCommands because TyperCommand is interface
+      compatible with BaseCommand.
+
 Upstream Libraries
 ------------------
 

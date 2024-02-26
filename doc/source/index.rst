@@ -1,11 +1,9 @@
 .. include:: ./refs.rst
 .. role:: big
-.. role:: extrabig
 
-.. we use big role instead of index because a TOC on this page screws up the latex page generation
-
-:extrabig:`Django Typer`
-
+============
+Django Typer
+============
 
 Use Typer_ to define the CLI for your Django_ management commands. Provides a TyperCommand class
 that inherits from BaseCommand_ and allows typer-style annotated parameter types. All of the
@@ -13,17 +11,18 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
 
 **django-typer makes it easy to:**
 
-   * Define your command CLI interface in a clear, DRY and safe way using type hints
-   * Create subcommand and group command hierarchies.
-   * Use the full power of Typer's parameter types to validate and parse command line inputs.
-   * Create beautiful and information dense help outputs.
-   * Configure the rendering of exception stack traces using rich.
-   * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
-     Django_ commands for bash_, zsh_, fish_ and powershell_.
-   * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
-     <define-shellcompletions>`
-   * Refactor existing management commands into TyperCommands because TyperCommand is interface
-     compatible with BaseCommand.
+    * Define your command CLI interface in a clear, DRY and safe way using type hints
+    * Create subcommand and group command hierarchies.
+    * Use the full power of Typer's parameter types to validate and parse command line inputs.
+    * Create beautiful and information dense help outputs.
+    * Configure the rendering of exception stack traces using rich.
+    * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
+      Django_ commands for bash_, zsh_, fish_ and powershell_.
+    * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
+      <define-shellcompletions>`
+    * Refactor existing management commands into TyperCommands because TyperCommand is interface
+      compatible with BaseCommand.
+
 
 :big:`Installation`
 

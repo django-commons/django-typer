@@ -80,10 +80,6 @@ todo_include_todos = True
 
 latex_engine = "xelatex"
 
-# def add_page_class(app, pagename, templatename, context, doctree):
-#     from sphinx.builders.html._assets import _CascadingStyleSheet
-#     context['css_files'] += [_CascadingStyleSheet(f'_static/{pagename}.css')]
-
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
