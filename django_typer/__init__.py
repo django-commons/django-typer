@@ -9,51 +9,52 @@ r"""
        |__/             |___/               |___/|_|              
 
 
-django-typer provides an extension to the base django management command class that
-melds the typer/click infrastructure with the django infrastructure. The result is
-all the ease of specifying commands, groups and options and arguments using typer and
-click in a way that feels like and is interface compatible with django's BaseCommand_
-This should enable a smooth transition for existing django commands and an intuitive
-feel for implementing new commands.
+django-typer_ provides an extension class, :class:`~django_typer.TyperCommand`, to the 
+BaseCommand_ class that melds the Typer_/click_ infrastructure with
+the Django_ infrastructure. The result is all the ease of specifying commands, groups
+and options and arguments using Typer_ and click_ in a way that feels like and is
+interface compatible with Django_'s BaseCommand_ This should enable a smooth transition
+for existing Django_ commands and an intuitive feel for implementing new commands.
 
-django-typer also supports shell completion for bash, zsh, fish and powershell and
-extends that support to native django management commands as well.
-
-During development of django-typer I've wrestled with a number of encumbrances in the
-aging django management command design. I detail them here mostly to keep track of them
-for possible future refactors of core Django.
-
-1) BaseCommand::execute() prints results to stdout without attempting to convert them
-to strings. This means you've gotta do weird stuff to get a return object out of
-call_command()
-
-2) call_command() converts arguments to strings. There is no official way to pass
-previously parsed arguments through call_command(). This makes it a bit awkward to
-use management commands as callable functions in django code which you should be able
-to easily do. django-typer allows you to invoke the command and group functions
-directly so you can work around this, but it would be nice if call_command() supported
-a general interface that all command libraries could easily implement to.
-
-3) terminal autocompletion is not pluggable. As of this writing (Django<=5)
-autocomplete is implemented for bash only and has no mechanism for passing the buck
-down to command implementations. The result of this in django-typer is that we wrap
-django's autocomplete and pass the buck to it instead of the other way around. This is
-fine but it will be awkward if two django command line apps with their own autocomplete
-infrastructure are used together. Django should be the central coordinating point for
-this. This is the reason for the pluggable --fallback awkwardness in shellcompletion.
-
-4) Too much of the BaseCommand implementation is built assuming argparse. A more
-generalized abstraction of this interface is in order. Right now BaseCommand is doing
-double duty both as a base class and a protocol.
-
-5) There is an awkwardness to how parse_args flattens all the arguments and options
-into a single dictionary. This means that when mapping a library like Typer onto the
-BaseCommand interface you cannot allow arguments at different levels
-(e.g. in initialize()) or group() functions above the command to have the same names as
-the command's options. You can work around this by using a different name for the
-option in the command and supplying the desired name in the annotation, but its an odd
-quirk imposed by the base class for users to be aware of.
+django-typer_ also supports shell completion for bash_, zsh_, fish_ and powershell_ and
+extends that support to native Django_ management commands as well.
 """
+
+# During development of django-typer_ I've wrestled with a number of encumbrances in the
+# aging django management command design. I detail them here mostly to keep track of them
+# for possible future refactors of core Django.
+
+# 1) BaseCommand::execute() prints results to stdout without attempting to convert them
+# to strings. This means you've gotta do weird stuff to get a return object out of
+# call_command()
+
+# 2) call_command() converts arguments to strings. There is no official way to pass
+# previously parsed arguments through call_command(). This makes it a bit awkward to
+# use management commands as callable functions in django code which you should be able
+# to easily do. django-typer allows you to invoke the command and group functions
+# directly so you can work around this, but it would be nice if call_command() supported
+# a general interface that all command libraries could easily implement to.
+
+# 3) terminal autocompletion is not pluggable. As of this writing (Django<=5)
+# autocomplete is implemented for bash only and has no mechanism for passing the buck
+# down to command implementations. The result of this in django-typer is that we wrap
+# django's autocomplete and pass the buck to it instead of the other way around. This is
+# fine but it will be awkward if two django command line apps with their own autocomplete
+# infrastructure are used together. Django should be the central coordinating point for
+# this. This is the reason for the pluggable --fallback awkwardness in shellcompletion.
+
+# 4) Too much of the BaseCommand implementation is built assuming argparse. A more
+# generalized abstraction of this interface is in order. Right now BaseCommand is doing
+# double duty both as a base class and a protocol.
+
+# 5) There is an awkwardness to how parse_args flattens all the arguments and options
+# into a single dictionary. This means that when mapping a library like Typer onto the
+# BaseCommand interface you cannot allow arguments at different levels
+# (e.g. in initialize()) or group() functions above the command to have the same names as
+# the command's options. You can work around this by using a different name for the
+# option in the command and supplying the desired name in the annotation, but its an odd
+# quirk imposed by the base class for users to be aware of.
+
 
 import inspect
 import sys
@@ -184,11 +185,36 @@ def get_command(
     force_color: bool = False,
 ) -> t.Union[BaseCommand, MethodType]:
     """
-    Get a django command by its name and instantiate it with the provided options. This
-    will work for normal django commands as well as django_typer commands. If subcommands
-    are listed for a typer command, the method that corresponds to the command name will
-    be returned. This method may then be invoked directly. If no subcommands are listed
-    the command instance will be returned.
+    Get a Django_ command by its name and instantiate it with the provided options. This
+    will work for subclasses of BaseCommand_ as well as for :class:`~django_typer.TyperCommand`
+    subclasses. If subcommands are listed for a :class:`~django_typer.TyperCommand`, the
+    method that corresponds to the command name will be returned. This method may then be
+    invoked directly. If no subcommands are listed the command instance will be returned.
+
+    Using ``get_command`` to fetch a command instance and then invoking the instance as
+    a callable is the preferred way to execute :class:`~django_typer.TyperCommand` commands
+    from code. The arguments and options passed to the __call__ method of the command should
+    be fully resolved to their expected parameter types before being passed to the command.
+    The call_command_ interface also works, but arguments must be unparsed strings
+    and options may be either strings or resolved parameter types. The following is more
+    efficient than call_command_.
+
+    .. code-block:: python
+
+        basic = get_command('basic')
+        result = basic(
+            arg1,
+            arg2,
+            arg3=0.5,
+            arg4=1
+        )
+
+    Subcommands may be retrieved by passing the subcommand names as additional arguments:
+
+    .. code-block:: python
+
+        divide = get_command('hierarchy', 'math', 'divide')
+        result = divide(10, 2)
 
     :param command_name: the name of the command to get
     :param subcommand: the subcommand to get if any
@@ -208,6 +234,7 @@ def get_command(
     if subcommand:
         method = cmd.get_subcommand(*subcommand).click_command._callback.__wrapped__
         return MethodType(method, cmd)  # return the bound method
+
     return cmd
 
 
@@ -263,11 +290,10 @@ class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
 
 class Context(TyperContext):
     """
-    An extension of the click.Context class that adds a reference to
-    the TyperCommand instance so that the Django command can be accessed
-    from within click/typer callbacks that take a context. This context
-    also keeps track of parameters that were supplied to the call_command()
-    interface.
+    An extension of the `click.Context <https://click.palletsprojects.com/api/#context>`_
+    class that adds a reference to the :class:`~django_typer.TyperCommand` instance so that
+    the Django_ command can be accessed from within click_ and Typer_ callbacks that take a
+    context. This context also keeps track of parameters that were supplied to call_command_.
     """
 
     django_command: "TyperCommand"
@@ -279,8 +305,8 @@ class Context(TyperContext):
     class ParamDict(dict):
         """
         An extension of dict we use to block updates to parameters that were supplied
-        when the command was invoked via call_command. This complexity is introduced
-        by the hybrid parsing and option passing inherent to call_command.
+        when the command was invoked via call_command_. This complexity is introduced
+        by the hybrid parsing and option passing inherent to call_command_.
         """
 
         supplied: t.Sequence[str]
@@ -297,7 +323,7 @@ class Context(TyperContext):
     def supplied_params(self) -> t.Dict[str, t.Any]:
         """
         Get the parameters that were supplied when the command was invoked via
-        call_command, only the root context has these.
+        call_command_, only the root context has these.
         """
         if self.parent:
             return self.parent.supplied_params
@@ -484,8 +510,8 @@ class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
 
 class GroupFunction(Typer):
     """
-    Typer adds additional groups of commands by adding Typer apps to parent
-    Typer apps. This class extends the Typer app class so that we can add
+    Typer_ adds additional groups of commands by adding Typer_ apps to parent
+    Typer_ apps. This class extends the ``typer.Typer`` class so that we can add
     the additional information necessary to attach this app to the root app
     and other groups specified on the django command.
     """
@@ -730,18 +756,70 @@ def initialize(
     **kwargs,
 ):
     """
-    A function decorator that creates a typer 'callback'. This decorator wraps
-    the Typer.callback() functionality. We've renamed it to initialize() because
-    callback() is to general and not intuitive. Callbacks in Typer are general
-    functions that can be invoked before a command is invoked and that can accept
-    their own arguments. When an initialize() function is supplied to a django
-    TyperCommand the default django options will be added as parameters. You can
-    specify these parameters (see django_typer.types) as arguments on the wrapped
-    function if you wish to receive them - otherwise they will be intercepted by
-    the base class infrastructure and used to their purpose.
+    A function decorator that creates a Typer_
+    `callback <https://typer.tiangolo.com/tutorial/commands/callback/>`_. This
+    decorator wraps the
+    `Typer.callback() <https://typer.tiangolo.com/tutorial/commands/callback/>`_
+    functionality. We've renamed it to ``initialize()`` because ``callback()`` is
+    to general and not intuitive. Callbacks in Typer_ are functions that are invoked
+    before a command is invoked and that can accept their own arguments. When an
+    ``initialize()`` function is supplied to a django :class:`~django_typer.TyperCommand`
+    the default Django_ options will be added as parameters. You can specify these
+    parameters (see :mod:`django_typer.types`) as arguments on the wrapped function
+    if you wish to receive them - otherwise they will be intercepted by the base class
+    infrastructure and used to their purpose.
 
     The parameters are passed through to
     `Typer.callback() <https://typer.tiangolo.com/tutorial/commands/callback/>`_
+
+    For example the below command defines two subcommands that both have a common
+    initializer that accepts a --precision parameter option:
+
+    .. code-block:: python
+        :linenos:
+        :caption: management/commands/math.py
+
+        import typing as t
+        from typer import Argument, Option
+        from django_typer import TyperCommand, initialize, command
+
+
+        class Command(TyperCommand):
+
+            precision = 2
+
+            @initialize(help="Do some math at the given precision.")
+            def init(
+                self,
+                precision: t.Annotated[
+                    int, Option(help="The number of decimal places to output.")
+                ] = precision,
+            ):
+                self.precision = precision
+
+            @command(help="Multiply the given numbers.")
+            def multiply(
+                self,
+                numbers: t.Annotated[
+                    t.List[float], Argument(help="The numbers to multiply")
+                ],
+            ):
+                ...
+
+            @command()
+            def divide(
+                self,
+                numerator: t.Annotated[float, Argument(help="The numerator")],
+                denominator: t.Annotated[float, Argument(help="The denominator")]
+            ):
+                ...
+
+    When we run, the command we should provide the --precision option before the subcommand:
+
+        .. code-block:: bash
+
+            $ ./manage.py math --precision 5 multiply 2 2.333
+            4.66600
 
     :param name: the name of the callback (defaults to the name of the decorated
         function)
@@ -818,17 +896,36 @@ def command(  # pylint: disable=keyword-arg-before-vararg
 ):
     """
     A function decorator that creates a new command and attaches it to the root
-    command group. This is a passthrough to Typer.command() and the options are
-    the same, except we swap the default command class for our wrapper.
+    command group. This is a passthrough to
+    `Typer.command() <https://typer.tiangolo.com/tutorial/commands/>`_ and the
+    options are the same, except we swap the default command class for our wrapper.
 
-    The decorated function is the command function. It may also be invoked directly
-    as a method from an instance of the django command class.
+    We do not need to decorate handle() functions with this decorator, but if we
+    want to pass options upstream to typer we can:
+
+    .. code-block:: python
+
+        @command(epilog="This is the epilog for the command.")
+        def handle():
+            ...
+
+    We can also use the command decorator to define multiple subcommands:
 
     .. code-block:: python
 
         @command()
         def command1():
-            # do stuff here
+            # execute command1 logic here
+
+        @command(name='command2')
+        def other_command():
+              # arguments passed to the decorator are passed to typer and control
+              # various aspects of the command, for instance here we've changed the
+              # name of the command to 'command2' from 'other_command'
+
+    The decorated function is the command function. It may also be invoked directly
+    as a method from an instance of the :class:`~django_typer.TyperCommand` class,
+    see :func:`~django_typer.get_command`.
 
     :param name: the name of the command (defaults to the name of the decorated
         function)
@@ -900,14 +997,32 @@ def group(
 ):
     """
     A function decorator that creates a new subgroup and attaches it to the root
-    command group. This is like creating a new Typer app and adding it to a parent
-    Typer app. The kwargs are passed through to the Typer() constructor.
+    command group. This is like creating a new Typer_ app and adding it to a parent
+    Typer app. The kwargs are passed through to the Typer() constructor. The group()
+    functions work like :func:`~django_typer.initialize` functions for their command
+    groups.
 
     .. code-block:: python
+        :caption: management/commands/example.py
 
         @group()
-        def group1():
+        def group1(flag: bool = False):
             # do group init stuff here
+
+        # to attach a command to the group, use the command() decorator
+        # on the group function
+        @group1.command()
+        def command1():
+            # this would be invoked like: ./manage.py example group1 --flag command1
+
+        # you can also attach subgroups to groups!
+        @group1.group()
+        def subgroup():
+            # do subgroup init stuff here
+
+        @subgroup.command()
+        def subcommand():
+            # this would be invoked like: ./manage.py example group1 --flag subgroup subcommand
 
     :param name: the name of the group (defaults to the name of the decorated function)
     :param cls: the group class to use
