@@ -1681,6 +1681,34 @@ def test_get_current_command_returns_none():
     assert get_current_command() is None
 
 
+class TestChaining(TestCase):
+
+    def test_command_chaining(self):
+        from django_typer import OutputWrapper
+
+        result = run_command(
+            "chain", "command1", "--option=one", "command2", "--option=two"
+        )[0]
+        self.assertEqual(result, "command1\ncommand2\n['one', 'two']\n")
+
+        result = run_command(
+            "chain", "command2", "--option=two", "command1", "--option=one"
+        )[0]
+        self.assertEqual(result, "command2\ncommand1\n['two', 'one']\n")
+
+        stdout = StringIO()
+        with contextlib.redirect_stdout(stdout):
+            result = call_command(
+                "chain", "command2", "--option=two", "command1", "--option=one"
+            )
+        self.assertEqual(stdout.getvalue(), "command2\ncommand1\n['two', 'one']\n")
+        self.assertEqual(result, ["two", "one"])
+
+        chain = get_command("chain")
+        self.assertEqual(chain.command1(option="one"), "one")
+        self.assertEqual(chain.command2(option="two"), "two")
+
+
 SHELLS = [
     (None, False),
     ("zsh", True),

@@ -18,6 +18,8 @@ django_typer
 
 .. autoclass:: django_typer.TyperCommand
 
+.. autoclass:: django_typer.TyperCommandMeta
+
 .. autoclass:: django_typer.GroupFunction
     :members: group, command
 

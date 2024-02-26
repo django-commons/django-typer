@@ -18,6 +18,14 @@ for existing Django_ commands and an intuitive feel for implementing new command
 
 django-typer_ also supports shell completion for bash_, zsh_, fish_ and powershell_ and
 extends that support to native Django_ management commands as well.
+
+
+The goal of django-typer_ is to provide full typer style functionality while maintaining
+compatibility with the Django management command system. This means that the BaseCommand
+interface is preserved and the Typer_ interface is added on top of it. This means that
+this code base is more robust to changes in the Django management command system - because
+most of the base class functionality is preserved but many Typer_ and click_ internals are
+used directly to achieve this. We rely on robust CI to catch breaking changes upstream.
 """
 
 # During development of django-typer_ I've wrestled with a number of encumbrances in the
@@ -586,13 +594,15 @@ class GroupFunction(Typer):
 
         .. code-block:: python
 
-            @group()
-            def group1():
-                pass
+            class Command(TyperCommand):
 
-            @group1.command()
-            def command1():
-                # do stuff here
+                @group()
+                def group1(self):
+                    pass
+
+                @group1.command()
+                def command1(self):
+                    # do stuff here
 
         .. note::
 
@@ -664,17 +674,19 @@ class GroupFunction(Typer):
 
         .. code-block:: python
 
-            @group()
-            def group1():
-                pass
+            class Command(TyperCommand):
 
-            @group1.group()
-            def subgroup():
-                # do common group init stuff here
+                @group()
+                def group1(self):
+                    pass
 
-            @subgroup.command(help=_('My command does good stuff!'))
-            def subcommand():
-                # do command stuff here
+                @group1.group()
+                def subgroup(self):
+                    # do common group init stuff here
+
+                @subgroup.command(help=_('My command does good stuff!'))
+                def subcommand(self):
+                    # do command stuff here
 
 
         :param name: the name of the group
@@ -901,23 +913,27 @@ def command(  # pylint: disable=keyword-arg-before-vararg
 
     .. code-block:: python
 
-        @command(epilog="This is the epilog for the command.")
-        def handle():
-            ...
+        class Command(TyperCommand):
+
+            @command(epilog="This is the epilog for the command.")
+            def handle(self):
+                ...
 
     We can also use the command decorator to define multiple subcommands:
 
     .. code-block:: python
 
-        @command()
-        def command1():
-            # execute command1 logic here
+        class Command(TyperCommand):
 
-        @command(name='command2')
-        def other_command():
-              # arguments passed to the decorator are passed to typer and control
-              # various aspects of the command, for instance here we've changed the
-              # name of the command to 'command2' from 'other_command'
+            @command()
+            def command1(self):
+                # execute command1 logic here
+
+            @command(name='command2')
+            def other_command(self):
+                # arguments passed to the decorator are passed to typer and control
+                # various aspects of the command, for instance here we've changed the
+                # name of the command to 'command2' from 'other_command'
 
     The decorated function is the command function. It may also be invoked directly
     as a method from an instance of the :class:`~django_typer.TyperCommand` class,
@@ -1001,24 +1017,35 @@ def group(
     .. code-block:: python
         :caption: management/commands/example.py
 
-        @group()
-        def group1(flag: bool = False):
-            # do group init stuff here
+        from django_typer import TyperCommand, group
 
-        # to attach a command to the group, use the command() decorator
-        # on the group function
-        @group1.command()
-        def command1():
-            # this would be invoked like: ./manage.py example group1 --flag command1
+        class Command(TyperCommand):
 
-        # you can also attach subgroups to groups!
-        @group1.group()
-        def subgroup():
-            # do subgroup init stuff here
+            @group()
+            def group1(self, flag: bool = False):
+                # do group init stuff here
 
-        @subgroup.command()
-        def subcommand():
-            # this would be invoked like: ./manage.py example group1 --flag subgroup subcommand
+            # to attach a command to the group, use the command() decorator
+            # on the group function
+            @group1.command()
+            def command1(self):
+                ...
+
+            # you can also attach subgroups to groups!
+            @group1.group()
+            def subgroup(self):
+                # do subgroup init stuff here
+
+            @subgroup.command()
+            def subcommand(self):
+                ...
+
+    These groups and subcommands can be invoked from the command line like so:
+
+    .. code-block:: bash
+
+        $ ./manage.py example group1 --flag command1
+        $ ./manage.py example group1 --flag subgroup subcommand
 
     :param name: the name of the group (defaults to the name of the decorated function)
     :param cls: the group class to use
@@ -1070,7 +1097,7 @@ def group(
     return create_app
 
 
-class _TyperCommandMeta(type):
+class TyperCommandMeta(type):
     """
     The metaclass used to build the TyperCommand class. This metaclass is responsible
     for building Typer app using the arguments supplied to the TyperCommand constructor.
@@ -1514,40 +1541,127 @@ class OutputWrapper(BaseOutputWrapper):
         return super().write(msg=msg, style_func=style_func, ending=ending)
 
 
-class TyperCommand(BaseCommand, metaclass=_TyperCommandMeta):
+class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     """
-    A BaseCommand extension class that uses the Typer library to parse
-    arguments and options. This class adapts BaseCommand using a light touch
-    that relies on most of the original BaseCommand implementation to handle
+    An extension of BaseCommand_ that uses the Typer_ library to parse
+    arguments and options. This class adapts BaseCommand_ using a light touch
+    that relies on most of the original BaseCommand_ implementation to handle
     default arguments and behaviors.
 
-    The goal of django-typer is to provide full typer style functionality
-    while maintaining compatibility with the Django management command system.
-    This means that the BaseCommand interface is preserved and the Typer
-    interface is added on top of it. This means that this code base is more
-    robust to changes in the Django management command system - because most
-    of the base class functionality is preserved but many typer and click
-    internals are used directly to achieve this. We rely on robust CI to
-    catch breaking changes upstream.
-
-    TyperCommands are built in stages. The metaclass is responsible for finding
-    all the commands and callbacks and building the Typer app. This happens at
-    class definition time (i.e. on module load). When the TyperCommand is instantiated
-    the command tree is built thats used for subcommand resolution in django-typer's
-    get_command method and for help output.
-
-    All of the documented BaseCommand_ functionality works as expected. call_command()
+    All of the documented BaseCommand_ functionality works as expected. call_command_
     also works as expected. TyperCommands however add a few extra features:
 
-    - Simple TyperCommands implemented only using handle() can be invoked directly
-      as a function.
-    - Subcommands can be fetched and invoked directly as functions using get_command()
+        - We define arguments_ and options_ using concise and optionally annotated type hints.
+        - Simple TyperCommands implemented only using handle() can be called directly
+          by invoking the command as a callable.
+        - We can define arbitrarily complex subcommand group hierarchies using the
+          :func:`~django_typer.group` and :func:`~django_typer.command` decorators.
+        - Commands and subcommands can be fetched and invoked directly as functions using
+          :func:`~django_typer.get_command`
+        - We can define common initialization logic for groups of commands using
+          :func:`~django_typer.initialize`
+        - TyperCommands may safely return non-string values from handle()
+
+    Defining a typer command is a lot like defining a BaseCommand_ except that we do not
+    have an add_arguments() method. Instead we define the parameters using type hints
+    directly on handle():
+
+    .. code-block:: python
+
+        import typing as t
+        from django_typer import TyperCommand
+
+        class Command(TyperCommand):
+
+            def handle(
+                self,
+                arg: str,
+                option: t.Optional[str] = None
+            ):
+                # do command logic here
+
+    TyperCommands can be extremely simple like above, or we can create really complex
+    command group hierarchies with subcommands and subgroups (see :func:`~django_typer.group`
+    and :func:`~django_typer.command`).
+
+    Typer_ apps can be configured with a number of parameters to control behavior such as
+    exception behavior, help output, help markup interpretation, result processing and
+    execution flow. These parameters can be passed to typer as keyword arguments in your
+    Command class inheritance:
+
+    .. code-block:: python
+        :caption: management/commands/chain.py
+        :linenos:
+
+        import typing as t
+        from django_typer import TyperCommand, command
+
+
+        class Command(TyperCommand, rich_markup_mode='markdown', chain=True):
+
+            suppressed_base_arguments = [
+                '--verbosity', '--traceback', '--no-color', '--force-color',
+                '--skip_checks', '--settings', '--pythonpath', '--version'
+            ]
+
+            @command()
+            def command1(self, option: t.Optional[str] = None):
+                \"""This is a *markdown* help string\"""
+                print('command1')
+                return option
+
+            @command()
+            def command2(self, option: t.Optional[str] = None):
+                \"""This is a *markdown* help string\"""
+                print('command2')
+                return option
+
+
+    We're doing a number of things here:
+
+        - Using the :func:`~django_typer.command` decorator to define multiple subcommands.
+        - Using the `suppressed_base_arguments attribute
+          <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.suppressed_base_arguments>`_
+          to suppress the default options Django adds to the command interface.
+        - Using the `rich_markup_mode parameter
+          <https://typer.tiangolo.com/tutorial/commands/help/#rich-markdown-and-markup>`_ to enable
+          markdown rendering in help output.
+        - Using the chain parameter to enable command chaining.
+
+
+    We can see that our help renders like so:
+
+    .. typer:: django_typer.tests.test_app.management.commands.chain.Command:typer_app
+        :prog: ./manage.py chain
+        :width: 80
+        :convert-png: latex
+
+
+    And we can see the chain behavior by calling our command(s) like so:
+
+    .. code-block:: bash
+
+        $ ./manage.py chain command1 --option one command2 --option two
+        command1
+        command2
+        ['one', 'two']
+
+    See :class:`~django_typer.TyperCommandMeta` for the list of accepted parameters. Also
+    refer to the Typer_ docs for more information on the behaviors expected for
+    those parameters - they are passed through to the Typer class constructor. Not all
+    parameters may make sense in the context of a django command.
 
     :param stdout: the stdout stream to use
     :param stderr: the stderr stream to use
     :param no_color: whether to disable color output
     :param force_color: whether to force color output even if the stream is not a tty
     """
+
+    # TyperCommands are built in stages. The metaclass is responsible for finding
+    # all the commands and callbacks and building the Typer_ app. This happens at
+    # class definition time (i.e. on module load). When the TyperCommand is instantiated
+    # the command tree is built thats used for subcommand resolution in django-typer's
+    # get_command method and for help output.
 
     style: ColorStyle
     stdout: BaseOutputWrapper
