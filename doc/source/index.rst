@@ -10,7 +10,7 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
 
 **django-typer makes it easy to:**
 
-   * Define your command CLI interface in as clear, DRY, and safely as possible using type hints
+   * Define your command CLI interface in a clear, DRY and safe way using type hints
    * Create subcommand and group command hierarchies.
    * Use the full power of Typer's parameter types to validate and parse command line inputs.
    * Create beautiful and information dense help outputs.

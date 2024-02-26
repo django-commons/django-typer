@@ -1783,6 +1783,10 @@ class TestPollExample(SimpleTestCase):
 class TestShellCompletersAndParsers(TestCase):
     def setUp(self):
         super().setUp()
+        self.q1 = Question.objects.create(
+            question_text="Is Putin a war criminal?",
+            pub_date=timezone.now(),
+        )
         for field, values in {
             "char_field": ["jon", "john", "jack", "jason"],
             "text_field": [
@@ -1818,6 +1822,19 @@ class TestShellCompletersAndParsers(TestCase):
     def tearDown(self) -> None:
         ShellCompleteTester.objects.all().delete()
         return super().tearDown()
+
+    def test_model_object_parser_idempotency(self):
+        from django_typer.parsers import ModelObjectParser
+        from django_typer.tests.polls.models import Question
+
+        parser = ModelObjectParser(Question)
+        self.assertEqual(parser.convert(self.q1, None, None), self.q1)
+
+    def test_app_label_parser_idempotency(self):
+        from django_typer.parsers import parse_app_label
+
+        poll_app = apps.get_app_config("django_typer_tests_polls")
+        self.assertEqual(parse_app_label(poll_app), poll_app)
 
     def test_app_label_parser_completers(self):
         from django.apps import apps
