@@ -183,7 +183,7 @@ closepoll command will look like this:
 .. note::
 
     :class:`~django_typer.TyperCommand` adds the standard set of default options to the command
-    line interface, with the exception of verbosity, which can be
+    line interface, with the exception of verbosity.
 
 
 Add Helps with Type annotations
