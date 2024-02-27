@@ -454,7 +454,7 @@ You'll also need to make sure that Django is bootstrapped in your conf.py file:
 
 .. code-block:: python
     :caption: conf.py
-    
+
     import django
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'path.to.your.settings')
