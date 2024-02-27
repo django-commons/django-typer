@@ -449,3 +449,13 @@ Or we could render the helps for individual subcommands as well:
     .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:install
         :prog: ./manage.py shellcompletion
         :width: 80
+
+You'll also need to make sure that Django is bootstrapped in your conf.py file:
+
+.. code-block:: python
+    :caption: conf.py
+    
+    import django
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'path.to.your.settings')
+    django.setup()
