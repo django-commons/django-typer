@@ -348,10 +348,25 @@ pass these options upstream to Typer_ by supplying them as keyword arguments to 
     is undefined.
 
 
-Define Shell Completions for Parameter values
-----------------------------------------------
+Define Shell Tab Completions for Parameters
+-------------------------------------------
 
 See the section on :ref:`defining shell completions.<define-shellcompletions>`
+
+
+Debug Shell Tab Completers
+--------------------------
+
+See the section on :ref:`debugging shell completers.<debug-shellcompletions>`
+
+
+Extend/Override TyperCommands
+-----------------------------
+
+You can extend typer commands simply by subclassing them. All of the normal inheritance rules
+apply. You can either subclass an existing command from an upstream app and leave its module the
+same name to extend and override the command or you can subclass and rename the module to provide
+an adapted version of the upstream command with a different name.
 
 
 .. _configure-rich-exception-tracebacks:

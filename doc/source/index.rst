@@ -49,6 +49,10 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
             'django_typer',
         ]
 
+   *You only need to install django_typer as an app if you want to use the shellcompletion command
+   to enable tab-completion or if you would like django-typer to install*
+   :ref:`rich traceback rendering <configure-rich-exception-tracebacks>` *for you - which it does by
+   default if rich is also installed.*
 
 :big:`Basic Example`
 
