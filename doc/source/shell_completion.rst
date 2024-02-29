@@ -211,3 +211,23 @@ Django_ app labels like this:
 
     See the :class:`~django_typer.completers.ModelObjectCompleter` for a completer that works
     for many Django_ model field types.
+
+
+.. _debug-shellcompletions:
+
+Debugging Tab Completers
+========================
+
+Debugging tab completion code can be tricky because when invoked in situ in the shell the completer
+code is run as a subprocess and it's output is captured by the shell. This means you can't set a
+breakpoint and enter into the debugger easily.
+
+To help with this django-typer_ provides a debug mode that will enter into the tab-completion logic
+flow. Use the :class:`shellcompletion <django_typer.management.commands.shellcompletion.Command>`
+:func:`~django_typer.management.commands.shellcompletion.Command.complete` command, to pass the
+command line string that you would like to debug. For example:
+
+.. code-block:: bash
+
+    ./manage.py shellcompletion complete "mycommand --"
+

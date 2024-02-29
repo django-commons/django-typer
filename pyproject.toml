@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-typer"
-version = "1.0.0"
+version = "1.0.1"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
@@ -42,7 +42,7 @@ exclude = ["django_typer/tests", "django_typer/examples", "django_typer/locale"]
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
 Django = ">=3.2,<6.0"
-click = "^8.0.0"
+click = "^8.1.0"
 
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer

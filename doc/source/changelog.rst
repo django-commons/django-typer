@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.1
+======
+
+* Fixed `shell_completion broken for click < 8.1 <https://github.com/bckohan/django-typer/issues/21>`_
+
 v1.0.0
 ======
 
