@@ -60,7 +60,7 @@ preserved, so that TyperCommand can be a drop in replacement.
 
 Please refer to the `full documentation <https://django-typer.readthedocs.io/>`_ for more information.
 
-.. image:: https://github.com/bckohan/django-typer/blob/181b7c7d26cdd2f009b89ddc509c84c279473461/doc/source/_static/img/closepoll_example.gif
+.. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/doc/source/_static/img/closepoll_example.gif
    :width: 100%
    :align: center
 
