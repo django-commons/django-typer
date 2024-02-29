@@ -100,7 +100,7 @@ from .types import Style as ColorStyle
 from .types import Traceback, Verbosity, Version
 from .utils import _command_context, traceback_config, with_typehint
 
-VERSION = (1, 0, 0)
+VERSION = (1, 0, 1)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
