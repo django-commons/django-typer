@@ -29,8 +29,7 @@ class Command(TyperCommand):
             t.List[float], Argument(help=_("The numbers to multiply"))
         ],
     ):
-        if numbers:
-            return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+        return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
     @math.command()
     def divide(

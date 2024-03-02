@@ -154,7 +154,6 @@ Or commands with multiple subcommands can be defined:
          """
          Create an object.
          """
-         ...
 
       @command()
       def delete(
@@ -163,7 +162,6 @@ Or commands with multiple subcommands can be defined:
          """
          Delete an object.
          """
-         ...
 
 
 .. image:: https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi.svg
@@ -232,8 +230,7 @@ for arbitrarily complex command hierarchies.
             t.List[float], Argument(help=_("The numbers to multiply"))
          ],
       ):
-         if numbers:
-            return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+         return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
       @math.command()
       def divide(

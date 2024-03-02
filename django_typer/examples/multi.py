@@ -19,7 +19,6 @@ class Command(TyperCommand):
         """
         Create an object.
         """
-        ...
 
     @command()
     def delete(
@@ -28,4 +27,3 @@ class Command(TyperCommand):
         """
         Delete an object.
         """
-        ...
