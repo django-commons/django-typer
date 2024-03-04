@@ -188,3 +188,9 @@ disable = [
     'C0411', # wrong import order. I put them where they need to be!
     'W0603', # Using the global statement
 ]
+
+[tool.pyright]
+exclude = [
+    "django_typer/tests/**/*",
+    "django_typer/examples/**/*"
+]

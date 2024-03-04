@@ -89,7 +89,6 @@ from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
 from typer.main import get_command as get_typer_command
 from typer.main import get_params_convertors_ctx_param_name_from_function
-from typer.models import CommandFunctionType
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
 
@@ -713,7 +712,7 @@ class GroupFunction(Typer):
             this can be used to group commands into panels in the help output.
         """
 
-        def create_app(func: CommandFunctionType):
+        def create_app(func: t.Callable[..., t.Any]):
             grp = GroupFunction(  # type: ignore
                 name=name,
                 cls=cls,
@@ -855,7 +854,7 @@ def initialize(
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: CommandFunctionType):
+    def decorator(func: t.Callable[..., t.Any]):
         setattr(
             func,
             "_typer_callback_",
@@ -958,7 +957,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: CommandFunctionType):
+    def decorator(func: t.Callable[..., t.Any]):
         setattr(
             func,
             "_typer_command_",
@@ -1071,7 +1070,7 @@ def group(
         this can be used to group commands into panels in the help output.
     """
 
-    def create_app(func: CommandFunctionType):
+    def create_app(func: t.Callable[..., t.Any]):
         grp = GroupFunction(  # type: ignore
             name=name,
             cls=cls,
@@ -1199,8 +1198,9 @@ class TyperCommandMeta(type):
         This method is called when a new class is created.
         """
         try:
-            TyperCommand  # pylint: disable=pointless-statement
-            is_base_init = False
+            # avoid unnecessary work creating the TyperCommand class
+            # is there a less weird way to do this?
+            is_base_init = not TyperCommand
         except NameError:
             is_base_init = True
         typer_app = None
@@ -1267,7 +1267,7 @@ class TyperCommandMeta(type):
                 for arg in cls.suppressed_base_arguments or []
             }  # per django docs - allow these to be specified by either the option or param name
 
-            def get_ctor(attr: str) -> t.Optional[t.Callable[..., t.Any]]:
+            def get_ctor(attr: t.Any) -> t.Optional[t.Callable[..., t.Any]]:
                 return getattr(
                     attr, "_typer_command_", getattr(attr, "_typer_callback_", None)
                 )
