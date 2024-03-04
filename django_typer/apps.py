@@ -24,13 +24,14 @@ rich: t.Union[ModuleType, None] = None
 
 try:
     import rich
+    from rich import traceback
 
     tb_config = traceback_config()
     if rich and isinstance(tb_config, dict) and not tb_config.get("no_install", False):
         # install rich tracebacks if we've been configured to do so (default)
         no_color = "NO_COLOR" in os.environ
         force_color = "FORCE_COLOR" in os.environ
-        rich.traceback.install(
+        traceback.install(
             console=tb_config.pop(
                 "console",
                 (
@@ -48,8 +49,7 @@ try:
             **{
                 param: value
                 for param, value in tb_config.items()
-                if param
-                in set(inspect.signature(rich.traceback.install).parameters.keys())
+                if param in set(inspect.signature(traceback.install).parameters.keys())
             },
         )
 except ImportError:
@@ -62,7 +62,7 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
     A system check that validates that the traceback config is valid and
     contains only the expected parameters.
     """
-    warnings = []
+    warnings: t.List[CheckMessage] = []
     tb_cfg = traceback_config()
     if isinstance(tb_cfg, dict):
         if rich:

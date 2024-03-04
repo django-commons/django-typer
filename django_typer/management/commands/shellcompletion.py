@@ -36,6 +36,8 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
+from functools import cached_property
+
 from click.parser import split_arg_string
 from click.shell_completion import (
     CompletionItem,
@@ -43,7 +45,6 @@ from click.shell_completion import (
     get_completion_class,
 )
 from django.core.management import CommandError, ManagementUtility
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -87,7 +88,7 @@ class Command(TyperCommand):
     cases users should refer to the online documentation for their specific shell to troubleshoot.
     """
 
-    help = _("Install autocompletion for the current shell.")
+    help = t.cast(str, _("Install autocompletion for the current shell."))
 
     # disable the system checks - no reason to run these for this one-off command
     requires_system_checks = []
@@ -134,7 +135,7 @@ class Command(TyperCommand):
         """
         Get the name of the manage script as a command available from the shell's path.
         """
-        return getattr(self.manage_script, "name", self.manage_script)
+        return str(getattr(self.manage_script, "name", self.manage_script))
 
     @property
     def shell(self) -> Shells:
@@ -265,30 +266,40 @@ class Command(TyperCommand):
             typer_scripts._completion_scripts[Shells.powershell.value] = script
             typer_scripts._completion_scripts[Shells.pwsh.value] = script
 
-    @command(help=_("Install autocompletion for the current or given shell."))
+    @command(
+        help=t.cast(str, _("Install autocompletion for the current or given shell."))
+    )
     def install(
         self,
         shell: Annotated[
             t.Optional[Shells],
             Argument(
-                help=_("Specify the shell to install or remove autocompletion for.")
+                help=t.cast(
+                    str, _("Specify the shell to install or remove autocompletion for.")
+                )
             ),
         ] = DETECTED_SHELL,
         manage_script: Annotated[
             t.Optional[str],
             Option(
-                help=_(
-                    "The name of the django manage script to install autocompletion for if "
-                    "different than the script used to invoke this command."
+                help=t.cast(
+                    str,
+                    _(
+                        "The name of the django manage script to install autocompletion for if "
+                        "different than the script used to invoke this command."
+                    ),
                 )
             ),
         ] = None,
         fallback: Annotated[
             t.Optional[str],
             Option(
-                help=_(
-                    "The python import path to a fallback complete function to use when "
-                    "the completion command is not a TyperCommand."
+                help=t.cast(
+                    str,
+                    _(
+                        "The python import path to a fallback complete function to use when "
+                        "the completion command is not a TyperCommand."
+                    ),
                 )
             ),
         ] = None,
@@ -311,7 +322,7 @@ class Command(TyperCommand):
         self.patch_script(fallback=fallback)
         install_path = install(
             shell=self.shell.value,
-            prog_name=manage_script or self.manage_script_name,
+            prog_name=str(manage_script or self.manage_script_name),
             complete_var=self.COMPLETE_VAR,
         )[1]
         self.stdout.write(
@@ -322,21 +333,29 @@ class Command(TyperCommand):
             )
         )
 
-    @command(help=_("Remove autocompletion for the current or given shell."))
+    @command(
+        help=t.cast(str, _("Remove autocompletion for the current or given shell."))
+    )
     def remove(
         self,
         shell: Annotated[
             t.Optional[Shells],
             Argument(
-                help=_("Specify the shell to install or remove shell completion for.")
+                help=t.cast(
+                    str,
+                    _("Specify the shell to install or remove shell completion for."),
+                )
             ),
         ] = DETECTED_SHELL,
         manage_script: Annotated[
             t.Optional[str],
             Option(
-                help=_(
-                    "The name of the django manage script to remove shell completion for if "
-                    "different than the script used to invoke this command."
+                help=t.cast(
+                    str,
+                    _(
+                        "The name of the django manage script to remove shell completion for if "
+                        "different than the script used to invoke this command."
+                    ),
                 )
             ),
         ] = None,
@@ -360,9 +379,7 @@ class Command(TyperCommand):
 
         # its less brittle to install and use the returned path to uninstall
         self.shell = shell  # type: ignore
-        stdout = self.stdout
-        self.stdout = io.StringIO()
-        prog_name = manage_script or self.manage_script_name
+        prog_name = str(manage_script or self.manage_script_name)
         installed_path = install(shell=self.shell.value, prog_name=prog_name)[1]
         if self.shell in [Shells.pwsh, Shells.powershell]:
             # annoyingly, powershell has one profile script for all completion commands
@@ -412,7 +429,6 @@ class Command(TyperCommand):
                 with open(rc_file, "wt", encoding="utf-8") as rc:
                     rc.writelines(edited)
 
-        self.stdout = stdout
         self.stdout.write(
             self.style.WARNING(  # pylint: disable=no-member
                 gettext("Removed autocompletion for {shell}.").format(
@@ -421,31 +437,41 @@ class Command(TyperCommand):
             )
         )
 
-    @command(help=_("Generate autocompletion for command string."), hidden=False)
+    @command(
+        help=t.cast(str, _("Generate autocompletion for command string.")), hidden=False
+    )
     def complete(
         self,
         cmd_str: Annotated[
             t.Optional[str],
             Argument(
                 metavar="command",
-                help=_("The command string to generate completion suggestions for."),
+                help=t.cast(
+                    str, _("The command string to generate completion suggestions for.")
+                ),
             ),
         ] = None,
         shell: Annotated[
             t.Optional[Shells],
             Option(
-                help=_(
-                    "Specify the shell to fetch completion for, default will autodetect."
+                help=t.cast(
+                    str,
+                    _(
+                        "Specify the shell to fetch completion for, default will autodetect."
+                    ),
                 )
             ),
         ] = None,
         fallback: Annotated[
             t.Optional[str],
             Option(
-                help=_(
-                    "The python import path to a fallback complete function to use when "
-                    "the completion command is not a TyperCommand. By default, the builtin "
-                    "django autocomplete function is used."
+                help=t.cast(
+                    str,
+                    _(
+                        "The python import path to a fallback complete function to use when "
+                        "the completion command is not a TyperCommand. By default, the builtin "
+                        "django autocomplete function is used."
+                    ),
                 )
             ),
         ] = None,
@@ -531,7 +557,7 @@ class Command(TyperCommand):
         def call_fallback(fb: t.Optional[str]) -> None:
             fallback = import_string(fb) if fb else self.django_fallback
             if cmd_str and inspect.signature(fallback).parameters:
-                fallback(cmd_str)
+                fallback(cmd_str)  # pyright: ignore[reportCallIssue]
             else:
                 fallback()
 

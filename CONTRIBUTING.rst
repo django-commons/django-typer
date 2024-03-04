@@ -8,6 +8,7 @@
 .. _readthedocs: https://readthedocs.org/
 .. _me: https://github.com/bckohan
 .. _black: https://black.readthedocs.io/en/stable/
+.. _pyright: https://github.com/microsoft/pyright
 
 Contributing
 ############
@@ -51,7 +52,7 @@ then run Sphinx_:
 Static Analysis
 ---------------
 
-`django-typer` uses Pylint_ for python linting and mypy_ for static type
+`django-typer` uses Pylint_ for python linting and mypy_ and pyright_ for static type
 checking. Header imports are also standardized using isort_ and formatting is
 done with black_. Before any PR is accepted the following must be run, and
 static analysis tools should not produce any errors or warnings. Disabling
@@ -63,6 +64,7 @@ certain errors or warnings where justified is acceptable:
     poetry run black django_typer
     poetry run pylint django_typer
     poetry run mypy django_typer
+    pyright
     poetry check
     poetry run pip check
     poetry run python -m readme_renderer ./README.rst

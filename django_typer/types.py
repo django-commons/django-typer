@@ -6,7 +6,7 @@ Common types for command line argument specification.
 
 import sys
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Optional, cast
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
@@ -14,7 +14,6 @@ else:
     from typing import Annotated
 
 from django.core.management import CommandError
-from django.core.management.color import Style as ColorStyle
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -57,7 +56,7 @@ Version = Annotated[
     bool,
     Option(
         "--version",
-        help=_("Show program's version number and exit."),
+        help=cast(str, _("Show program's version number and exit.")),
         callback=print_version,
         is_eager=True,
         rich_help_panel=COMMON_PANEL,
@@ -74,9 +73,12 @@ The --version option is included by default and behaves the same as on BaseComma
 Verbosity = Annotated[
     int,
     Option(
-        help=_(
-            "Verbosity level; 0=minimal output, 1=normal output, "
-            "2=verbose output, 3=very verbose output"
+        help=cast(
+            str,
+            _(
+                "Verbosity level; 0=minimal output, 1=normal output, "
+                "2=verbose output, 3=very verbose output"
+            ),
         ),
         show_choices=True,
         min=0,
@@ -101,10 +103,13 @@ added to the command like so if needed.
 Settings = Annotated[
     str,
     Option(
-        help=_(
-            "The Python path to a settings module, e.g. "
-            '"myproject.settings.main". If this isn\'t provided, the '
-            "DJANGO_SETTINGS_MODULE environment variable will be used."
+        help=cast(
+            str,
+            _(
+                "The Python path to a settings module, e.g. "
+                '"myproject.settings.main". If this isn\'t provided, the '
+                "DJANGO_SETTINGS_MODULE environment variable will be used."
+            ),
         ),
         rich_help_panel=COMMON_PANEL,
     ),
@@ -121,9 +126,12 @@ specify or override the settings module to use.
 PythonPath = Annotated[
     Optional[Path],
     Option(
-        help=_(
-            "A directory to add to the Python path, e.g. "
-            '"/home/djangoprojects/myproject".'
+        help=cast(
+            str,
+            _(
+                "A directory to add to the Python path, e.g. "
+                '"/home/djangoprojects/myproject".'
+            ),
         ),
         rich_help_panel=COMMON_PANEL,
     ),
@@ -141,7 +149,7 @@ Traceback = Annotated[
     bool,
     Option(
         "--traceback",
-        help=_("Raise on CommandError exceptions"),
+        help=cast(str, _("Raise on CommandError exceptions")),
         rich_help_panel=COMMON_PANEL,
     ),
 ]
@@ -158,7 +166,7 @@ NoColor = Annotated[
     bool,
     Option(
         "--no-color",
-        help=_("Don't colorize the command output."),
+        help=cast(str, _("Don't colorize the command output.")),
         is_eager=True,
         callback=set_no_color,
         rich_help_panel=COMMON_PANEL,
@@ -177,7 +185,7 @@ ForceColor = Annotated[
     bool,
     Option(
         "--force-color",
-        help=_("Force colorization of the command output."),
+        help=cast(str, _("Force colorization of the command output.")),
         is_eager=True,
         callback=set_force_color,
         rich_help_panel=COMMON_PANEL,
@@ -195,7 +203,9 @@ the force_color attribute of the command instance.
 SkipChecks = Annotated[
     bool,
     Option(
-        "--skip-checks", help=_("Skip system checks."), rich_help_panel=COMMON_PANEL
+        "--skip-checks",
+        help=cast(str, _("Skip system checks.")),
+        rich_help_panel=COMMON_PANEL,
     ),
 ]
 """
@@ -205,28 +215,3 @@ The type hint for the
 The --skip-checks option is included by default and behaves the same as on BaseCommand_ use it to
 skip system checks.
 """
-
-
-class Style(ColorStyle):
-    """
-    For type hinting.
-    """
-
-    ERROR: Callable[[Any], str]
-    ERROR_OUTPUT: Callable[[Any], str]
-    HTTP_BAD_REQUEST: Callable[[Any], str]
-    HTTP_INFO: Callable[[Any], str]
-    HTTP_NOT_FOUND: Callable[[Any], str]
-    HTTP_NOT_MODIFIED: Callable[[Any], str]
-    HTTP_REDIRECT: Callable[[Any], str]
-    HTTP_SERVER_ERROR: Callable[[Any], str]
-    HTTP_SUCCESS: Callable[[Any], str]
-    MIGRATE_HEADING: Callable[[Any], str]
-    MIGRATE_LABEL: Callable[[Any], str]
-    NOTICE: Callable[[Any], str]
-    SQL_COLTYPE: Callable[[Any], str]
-    SQL_FIELD: Callable[[Any], str]
-    SQL_KEYWORD: Callable[[Any], str]
-    SQL_TABLE: Callable[[Any], str]
-    SUCCESS: Callable[[Any], str]
-    WARNING: Callable[[Any], str]

@@ -9,15 +9,24 @@ jobs:
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
-        python-version: [ '3.8', '3.12' ]
+        python-version: [ '3.8', '3.10', '3.12' ]
         django-version:
-          - 'Django~=3.2.0' # LTS April 2024
-          - 'Django~=4.2.0' # LTS April 2026
+          - '3.2' # LTS April 2024
+          - '4.2' # LTS April 2026
+          - '5.0' # April 2025
         exclude:
           - python-version: '3.8'
-            django-version: 'Django~=4.2.0'
+            django-version: '4.2'
           - python-version: '3.12'
-            django-version: 'Django~=3.2.0'
+            django-version: '4.2'
+          - python-version: '3.12'
+            django-version: '3.2'
+          - python-version: '3.10'
+            django-version: '3.2'
+          - python-version: '3.8'
+            django-version: '5.0'
+          - python-version: '3.10'
+            django-version: '5.0'
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +34,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
@@ -36,15 +44,20 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry run pip install --upgrade pip
           poetry install
-          poetry run pip install -U "${{ matrix.django-version }}"
+          poetry run pip install -U "django~=${{ matrix.django-version }}"
       - name: Run Static Analysis
         run: |
-          poetry run isort django_typer --check
-          poetry run black django_typer --check
-          poetry run pylint django_typer
-          poetry run mypy django_typer
+          source .venv/bin/activate
+          isort django_typer --check
+          black django_typer --check
+          pylint django_typer
+          mypy django_typer
           poetry check
-          poetry run pip check
-          poetry run python -m readme_renderer ./README.rst -o /tmp/README.html
+          pip check
+          python -m readme_renderer ./README.rst -o /tmp/README.html
           cd ./doc
-          poetry run doc8 --ignore-path build --max-line-length 100
+          doc8 --ignore-path build --max-line-length 100
+          echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
+
+      - name: Run pyright
+        uses: jakebailey/pyright-action@v2
