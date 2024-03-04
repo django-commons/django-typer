@@ -379,8 +379,6 @@ class Command(TyperCommand):
 
         # its less brittle to install and use the returned path to uninstall
         self.shell = shell  # type: ignore
-        stdout = self.stdout
-        self.stdout = io.StringIO()
         prog_name = str(manage_script or self.manage_script_name)
         installed_path = install(shell=self.shell.value, prog_name=prog_name)[1]
         if self.shell in [Shells.pwsh, Shells.powershell]:
@@ -431,7 +429,6 @@ class Command(TyperCommand):
                 with open(rc_file, "wt", encoding="utf-8") as rc:
                     rc.writelines(edited)
 
-        self.stdout = stdout
         self.stdout.write(
             self.style.WARNING(  # pylint: disable=no-member
                 gettext("Removed autocompletion for {shell}.").format(
@@ -560,7 +557,7 @@ class Command(TyperCommand):
         def call_fallback(fb: t.Optional[str]) -> None:
             fallback = import_string(fb) if fb else self.django_fallback
             if cmd_str and inspect.signature(fallback).parameters:
-                fallback(cmd_str)
+                fallback(cmd_str)  # pyright: ignore[reportCallIssue]
             else:
                 fallback()
 
