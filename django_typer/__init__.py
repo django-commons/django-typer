@@ -76,6 +76,7 @@ from click.shell_completion import CompletionItem
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
+from django.core.management.color import Style as ColorStyle
 from django.db.models import Model
 from django.utils.translation import gettext as _
 
@@ -94,9 +95,16 @@ from typer.models import Default, DefaultPlaceholder
 
 from .completers import ModelObjectCompleter
 from .parsers import ModelObjectParser
-from .types import ForceColor, NoColor, PythonPath, Settings, SkipChecks
-from .types import Style as ColorStyle
-from .types import Traceback, Verbosity, Version
+from .types import (
+    ForceColor,
+    NoColor,
+    PythonPath,
+    Settings,
+    SkipChecks,
+    Traceback,
+    Verbosity,
+    Version,
+)
 from .utils import _command_context, traceback_config, with_typehint
 
 VERSION = (1, 0, 1)
@@ -1671,12 +1679,12 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     style: ColorStyle
     stdout: BaseOutputWrapper
     stderr: BaseOutputWrapper
-    requires_system_checks: t.Union[t.Sequence[str], str]
+    # requires_system_checks: t.Union[t.List[str], t.Tuple[str, ...], t.Literal['__all__']]
 
     # we do not use verbosity because the base command does not do anything with it
     # if users want to use a verbosity flag like the base django command adds
     # they can use the type from django_typer.types.Verbosity
-    suppressed_base_arguments: t.Optional[t.Iterable[str]] = {"verbosity"}
+    suppressed_base_arguments = {"verbosity"}
 
     typer_app: Typer
     no_color: bool = False
@@ -1684,6 +1692,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     _num_commands: int = 0
     _has_callback: bool = False
     _root_groups: int = 0
+    _handle: t.Callable[..., t.Any]
 
     command_tree: CommandNode
 
@@ -1701,8 +1710,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __init__(
         self,
-        stdout: t.Optional[t.IO[str]] = None,
-        stderr: t.Optional[t.IO[str]] = None,
+        stdout: t.Optional[t.TextIO] = None,
+        stderr: t.Optional[t.TextIO] = None,
         no_color: bool = no_color,
         force_color: bool = force_color,
         **kwargs,
@@ -1795,7 +1804,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """Avoid passing typer arguments up the subclass init chain"""
         return super().__init_subclass__()
 
-    def create_parser(self, prog_name: str, subcommand: str, **_):
+    def create_parser(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, prog_name: str, subcommand: str, **_
+    ):
         """
         Create a parser for this command. This also sets the command
         context, so any functions below this call on the stack may
@@ -1862,7 +1873,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param kwargs: the options to directly pass to handle()
         """
         with self:
-            if getattr(self, "_handle", None):
+            if getattr(self, "_handle", None) and callable(self._handle):
                 return self._handle(*args, **kwargs)
             raise NotImplementedError(
                 _(

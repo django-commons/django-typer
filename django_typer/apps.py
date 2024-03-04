@@ -62,7 +62,7 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
     A system check that validates that the traceback config is valid and
     contains only the expected parameters.
     """
-    warnings = []
+    warnings: t.List[CheckMessage] = []
     tb_cfg = traceback_config()
     if isinstance(tb_cfg, dict):
         if rich:

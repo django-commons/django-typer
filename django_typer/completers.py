@@ -255,7 +255,9 @@ class ModelObjectCompleter:
         distinct: bool = distinct,
     ):
         self.model_cls = model_cls
-        self.lookup_field = lookup_field or model_cls._meta.pk.name
+        self.lookup_field = str(
+            lookup_field or getattr(self.model_cls._meta.pk, "name", "id")
+        )
         self.help_field = help_field
         self.limit = limit
         self.case_insensitive = case_insensitive
@@ -322,9 +324,9 @@ class ModelObjectCompleter:
                 ],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
             )
-            for obj in self.model_cls.objects.filter(completion_qry).distinct()[
-                0 : self.limit
-            ]
+            for obj in getattr(self.model_cls, "objects")
+            .filter(completion_qry)
+            .distinct()[0 : self.limit]
             if (
                 getattr(obj, self.lookup_field) is not None
                 and str(getattr(obj, self.lookup_field))

@@ -86,6 +86,7 @@ scipy = [
     { version = ">=1.11", markers = "python_version > '3.8'" },
     { version = "<=1.10", markers = "python_version <= '3.8'" },
 ]
+django-stubs = "^4.2.7"
 
 [tool.poetry.extras]
 rich = ["rich"]

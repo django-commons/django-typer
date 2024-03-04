@@ -27,9 +27,9 @@ from uuid import UUID
 
 from click import Context, Parameter, ParamType
 from django.apps import AppConfig, apps
-from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.management import CommandError
-from django.db.models import Field, Model, UUIDField
+from django.db.models import Field, ForeignObjectRel, Model, UUIDField
 from django.utils.translation import gettext as _
 
 from django_typer.completers import ModelObjectCompleter
@@ -71,7 +71,7 @@ class ModelObjectParser(ParamType):
         If not provided, a CommandError will be raised.
     """
 
-    error_handler = t.Callable[[t.Type[Model], str, ObjectDoesNotExist], None]
+    error_handler = t.Callable[[t.Type[Model], str, Exception], None]
 
     model_cls: t.Type[Model]
     lookup_field: str
@@ -84,11 +84,6 @@ class ModelObjectParser(ParamType):
 
     __name__ = "ModelObjectParser"  # typer internals expect this
 
-    @property
-    def name(self):
-        """Descriptive name of the model object."""
-        return self.model_cls._meta.verbose_name
-
     def __init__(
         self,
         model_cls: t.Type[Model],
@@ -97,12 +92,23 @@ class ModelObjectParser(ParamType):
         on_error: t.Optional[error_handler] = on_error,
     ):
         self.model_cls = model_cls
-        self.lookup_field = lookup_field or model_cls._meta.pk.name
+        self.lookup_field = str(
+            lookup_field or getattr(self.model_cls._meta.pk, "name", "id")
+        )
         self.on_error = on_error
         self.case_insensitive = case_insensitive
-        self._field = self.model_cls._meta.get_field(self.lookup_field)
+        field = self.model_cls._meta.get_field(self.lookup_field)
+        assert not isinstance(field, (ForeignObjectRel, GenericForeignKey)), _(
+            "{cls} is not a supported lookup field."
+        ).format(cls=self._field.__class__.__name__)
+        self._field = field
         if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
+        self.name = (
+            str(self.model_cls._meta.verbose_name)
+            if self.model_cls._meta.verbose_name
+            else self.model_cls.__name__
+        )
 
     def convert(
         self, value: t.Any, param: t.Optional[Parameter], ctx: t.Optional[Context]
@@ -134,7 +140,7 @@ class ModelObjectParser(ParamType):
             )
         except (self.model_cls.DoesNotExist, ValueError) as err:
             if self.on_error:
-                return self.on_error(self.model_cls, value, err)
+                return self.on_error(self.model_cls, str(value), err)
             raise CommandError(
                 _('{model} "{value}" does not exist!').format(
                     model=self.model_cls.__name__, value=value

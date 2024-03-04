@@ -6,7 +6,7 @@ Common types for command line argument specification.
 
 import sys
 from pathlib import Path
-from typing import Any, Callable, Optional, cast
+from typing import Optional, cast
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
@@ -14,7 +14,6 @@ else:
     from typing import Annotated
 
 from django.core.management import CommandError
-from django.core.management.color import Style as ColorStyle
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
@@ -216,28 +215,3 @@ The type hint for the
 The --skip-checks option is included by default and behaves the same as on BaseCommand_ use it to
 skip system checks.
 """
-
-
-class Style(ColorStyle):
-    """
-    For type hinting.
-    """
-
-    ERROR: Callable[[Any], str]
-    ERROR_OUTPUT: Callable[[Any], str]
-    HTTP_BAD_REQUEST: Callable[[Any], str]
-    HTTP_INFO: Callable[[Any], str]
-    HTTP_NOT_FOUND: Callable[[Any], str]
-    HTTP_NOT_MODIFIED: Callable[[Any], str]
-    HTTP_REDIRECT: Callable[[Any], str]
-    HTTP_SERVER_ERROR: Callable[[Any], str]
-    HTTP_SUCCESS: Callable[[Any], str]
-    MIGRATE_HEADING: Callable[[Any], str]
-    MIGRATE_LABEL: Callable[[Any], str]
-    NOTICE: Callable[[Any], str]
-    SQL_COLTYPE: Callable[[Any], str]
-    SQL_FIELD: Callable[[Any], str]
-    SQL_KEYWORD: Callable[[Any], str]
-    SQL_TABLE: Callable[[Any], str]
-    SUCCESS: Callable[[Any], str]
-    WARNING: Callable[[Any], str]
