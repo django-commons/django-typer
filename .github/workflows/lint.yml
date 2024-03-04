@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
@@ -57,6 +58,7 @@ jobs:
           python -m readme_renderer ./README.rst -o /tmp/README.html
           cd ./doc
           doc8 --ignore-path build --max-line-length 100
+          echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
 
       - name: Run pyright
         uses: jakebailey/pyright-action@v2
