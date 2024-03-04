@@ -47,15 +47,16 @@ jobs:
           poetry run pip install -U "django~=${{ matrix.django-version }}"
       - name: Run Static Analysis
         run: |
-          poetry run isort django_typer --check
-          poetry run black django_typer --check
-          poetry run pylint django_typer
-          poetry run mypy django_typer
+          source .venv/bin/activate
+          isort django_typer --check
+          black django_typer --check
+          pylint django_typer
+          mypy django_typer
           poetry check
-          poetry run pip check
-          poetry run python -m readme_renderer ./README.rst -o /tmp/README.html
+          pip check
+          python -m readme_renderer ./README.rst -o /tmp/README.html
           cd ./doc
-          poetry run doc8 --ignore-path build --max-line-length 100
+          doc8 --ignore-path build --max-line-length 100
 
       - name: Run pyright
         uses: jakebailey/pyright-action@v2
