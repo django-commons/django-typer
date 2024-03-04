@@ -64,7 +64,7 @@ certain errors or warnings where justified is acceptable:
     poetry run black django_typer
     poetry run pylint django_typer
     poetry run mypy django_typer
-    pyright django_typer
+    pyright
     poetry check
     poetry run pip check
     poetry run python -m readme_renderer ./README.rst

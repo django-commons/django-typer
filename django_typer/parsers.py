@@ -27,7 +27,6 @@ from uuid import UUID
 
 from click import Context, Parameter, ParamType
 from django.apps import AppConfig, apps
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.management import CommandError
 from django.db.models import Field, ForeignObjectRel, Model, UUIDField
 from django.utils.translation import gettext as _
@@ -91,6 +90,8 @@ class ModelObjectParser(ParamType):
         case_insensitive: bool = case_insensitive,
         on_error: t.Optional[error_handler] = on_error,
     ):
+        from django.contrib.contenttypes.fields import GenericForeignKey
+
         self.model_cls = model_cls
         self.lookup_field = str(
             lookup_field or getattr(self.model_cls._meta.pk, "name", "id")

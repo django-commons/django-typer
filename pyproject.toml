@@ -195,3 +195,6 @@ exclude = [
     "django_typer/tests/**/*",
     "django_typer/examples/**/*"
 ]
+include = [
+    "django_typer"
+]
