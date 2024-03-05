@@ -77,17 +77,17 @@ def run_command(command, *args, parse_json=True) -> Tuple[str, str]:
 
         # Check the return code to ensure the script ran successfully
         if result.returncode != 0:
-            return result.stdout, result.stderr
+            return result.stdout, result.stderr, result.returncode
 
         # Parse the output
         if result.stdout:
             if parse_json:
                 try:
-                    return json.loads(result.stdout), result.stderr
+                    return json.loads(result.stdout), result.stderr, result.returncode
                 except json.JSONDecodeError:
-                    return result.stdout, result.stderr
-            return result.stdout, result.stderr
-        return result.stdout, result.stderr
+                    return result.stdout, result.stderr, result.returncode
+            return result.stdout, result.stderr, result.returncode
+        return result.stdout, result.stderr, result.returncode
     finally:
         os.chdir(cwd)
 
@@ -1271,7 +1271,8 @@ class TestGroups(TestCase):
                 ("hey! " * 5).strip(),
             )
         else:
-            self.assertIn("UsageError", result[1])
+            self.assertIn("Usage: ./manage.py groups echo [OPTIONS] MESSAGE", result[0])
+            self.assertIn("Got unexpected extra argument (5)", result[1])
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
             with self.assertRaises(TypeError):
@@ -1415,13 +1416,16 @@ class TestGroups(TestCase):
             "groups", *settings, "string", "annamontes", "case", "upper", "4", "9"
         )
         if override:
-            result = result[1].strip()
-            self.assertIn("UsageError", result)
+            self.assertIn(
+                "Usage: ./manage.py groups string STRING case upper [OPTIONS]",
+                result[0],
+            )
+            self.assertIn("Got unexpected extra arguments (4 9)", result[1].strip())
             grp_cmd.string("annamontes")
             with self.assertRaises(TypeError):
                 self.assertEqual(grp_cmd.upper(4, 9), "annaMONTEs")
 
-            with self.assertRaises(UsageError):
+            with self.assertRaises(CommandError):
                 self.assertEqual(
                     call_command(
                         "groups", "string", "annamontes", "case", "upper", "4", "9"
@@ -1451,8 +1455,12 @@ class TestGroups(TestCase):
             grp_cmd.string(" emmatc  ")
             self.assertEqual(grp_cmd.strip(), "emmatc")
         else:
-            self.assertIn("UsageError", result[1])
-            with self.assertRaises(UsageError):
+            self.assertIn(
+                "Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]",
+                result[0],
+            )
+            self.assertIn("No such command 'strip'.", result[1])
+            with self.assertRaises(CommandError):
                 self.assertEqual(
                     call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
                 )
@@ -2615,3 +2623,85 @@ class TestShellCompletersAndParsers(TestCase):
             "shell ",
         )[0]
         self.assertTrue("shell " in result)
+
+
+class TracebackTests(TestCase):
+    """
+    Tests that show CommandErrors and UsageErrors do not result in tracebacks unless --traceback is set.
+
+    Also make sure that sys.exit is not called when not run from the terminal
+    (i.e. in get_command invocation or call_command).
+    """
+
+    def test_usage_error_no_tb(self):
+        stdout, stderr, retcode = run_command("tb", "wrong")
+        self.assertTrue("Usage: ./manage.py tb [OPTIONS] COMMAND [ARGS]" in stdout)
+        self.assertTrue("No such command" in stderr)
+        self.assertTrue(retcode > 0)
+
+        stdout, stderr, retcode = run_command("tb", "error", "wrong")
+        self.assertTrue("Usage: ./manage.py tb error [OPTIONS]" in stdout)
+        self.assertTrue("Got unexpected extra argument" in stderr)
+        self.assertTrue(retcode > 0)
+
+        with self.assertRaises(CommandError):
+            call_command("tb", "wrong")
+
+        with self.assertRaises(CommandError):
+            call_command("tb", "error", "wrong")
+
+    def test_usage_error_with_tb_if_requested(self):
+
+        stdout, stderr, retcode = run_command("tb", "--traceback", "wrong")
+        self.assertFalse(stdout.strip())
+        self.assertTrue("Traceback" in stderr)
+        if rich_installed:
+            self.assertTrue("───── locals ─────" in stderr)
+        else:
+            self.assertFalse("───── locals ─────" in stderr)
+        self.assertTrue("No such command 'wrong'" in stderr)
+        self.assertTrue(retcode > 0)
+
+        stdout, stderr, retcode = run_command("tb", "--traceback", "error", "wrong")
+        self.assertFalse(stdout.strip())
+        self.assertTrue("Traceback" in stderr)
+        if rich_installed:
+            self.assertTrue("───── locals ─────" in stderr)
+        else:
+            self.assertFalse("───── locals ─────" in stderr)
+        self.assertFalse(stdout.strip())
+        self.assertTrue("Got unexpected extra argument" in stderr)
+        self.assertTrue(retcode > 0)
+
+        with self.assertRaises(CommandError):
+            call_command("tb", "--traceback", "wrong")
+
+        with self.assertRaises(CommandError):
+            call_command("tb", "--traceback", "error", "wrong")
+
+    def test_click_exception_retcodes_honored(self):
+
+        self.assertEqual(run_command("vanilla")[2], 0)
+        self.assertEqual(run_command("vanilla", "--exit-code=2")[2], 2)
+
+        self.assertEqual(run_command("tb", "exit")[2], 0)
+        self.assertEqual(run_command("tb", "exit", "--code=2")[2], 2)
+
+    def test_exit_on_call(self):
+        with self.assertRaises(SystemExit):
+            call_command("vanilla", "--help")
+
+        with self.assertRaises(SystemExit):
+            call_command("vanilla", "--exit-code", "0")
+
+        with self.assertRaises(SystemExit):
+            call_command("vanilla", "--exit-code", "1")
+
+        with self.assertRaises(SystemExit):
+            call_command("tb", "--help")
+
+        with self.assertRaises(SystemExit):
+            call_command("tb", "exit")
+
+        with self.assertRaises(SystemExit):
+            call_command("tb", "exit", "--code=1")

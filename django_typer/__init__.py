@@ -107,7 +107,7 @@ from .types import (
 )
 from .utils import _command_context, traceback_config, with_typehint
 
-VERSION = (1, 0, 1)
+VERSION = (1, 0, 2)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -298,6 +298,7 @@ class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
     def __init__(self, args: t.Sequence[t.Any], **kwargs):
         super().__init__(**kwargs)
         self.args = args
+        self.traceback = kwargs.get("traceback", TyperCommand._traceback)
 
     def _get_kwargs(self):
         return {"args": self.args, **COMMON_DEFAULTS}
@@ -1451,23 +1452,11 @@ class TyperParser:
     prog_name: str
     subcommand: str
 
-    missing_args_message: str = "Missing parameter: {parameter}"
-    called_from_command_line: t.Optional[bool] = None
-
-    def __init__(
-        self,
-        django_command: "TyperCommand",
-        prog_name,
-        subcommand,
-        missing_args_message: str = missing_args_message,
-        called_from_command_line: t.Optional[bool] = None,
-    ):
+    def __init__(self, django_command: "TyperCommand", prog_name, subcommand):
         self._actions = []
         self.django_command = django_command
         self.prog_name = prog_name
         self.subcommand = subcommand
-        self.missing_args_message = missing_args_message
-        self.called_from_command_line = called_from_command_line
 
         def populate_params(node: CommandNode) -> None:
             for param in node.click_command.params:
@@ -1505,29 +1494,18 @@ class TyperParser:
             (this is ignored for TyperCommands but is required by the django
             base class)
         """
-        try:
+        with self.django_command:
             cmd = get_typer_command(self.django_command.typer_app)
             with cmd.make_context(
                 info_name=f"{self.prog_name} {self.subcommand}",
                 django_command=self.django_command,
                 args=list(args or []),
             ) as ctx:
-                return _ParsedArgs(args=args or [], **{**COMMON_DEFAULTS, **ctx.params})
-        except click.exceptions.Exit:
-            sys.exit()
-        except (click.exceptions.UsageError, CommandError) as arg_err:
-            if self.called_from_command_line:
-                err_msg = (
-                    _(self.missing_args_message).format(
-                        parameter=getattr(getattr(arg_err, "param", None), "name", "")
-                    )
-                    if isinstance(arg_err, click.exceptions.MissingParameter)
-                    else str(arg_err)
+                common = {**COMMON_DEFAULTS, **ctx.params}
+                self.django_command._traceback = common.get(
+                    "traceback", self.django_command._traceback
                 )
-                self.print_help()
-                self.django_command.stderr.write(err_msg)
-                sys.exit(1)
-            raise CommandError(str(arg_err)) from arg_err
+                return _ParsedArgs(args=args or [], **common)
 
     def add_argument(self, *args, **kwargs):
         """
@@ -1686,6 +1664,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     # they can use the type from django_typer.types.Verbosity
     suppressed_base_arguments = {"verbosity"}
 
+    missing_args_message = "Missing parameter: {parameter}"
+
     typer_app: Typer
     no_color: bool = False
     force_color: bool = False
@@ -1693,13 +1673,14 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     _has_callback: bool = False
     _root_groups: int = 0
     _handle: t.Callable[..., t.Any]
+    _traceback: bool = False
 
     command_tree: CommandNode
 
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the django command"""
-        return self.typer_app.info.name
+        return self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
 
     def __enter__(self):
         _command_context.__dict__.setdefault("stack", []).append(self)
@@ -1707,6 +1688,33 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         _command_context.stack.pop()
+        if isinstance(exc_val, click.exceptions.Exit):
+            sys.exit(exc_val.exit_code)
+        if isinstance(exc_val, click.exceptions.UsageError):
+            err_msg = (
+                _(self.missing_args_message).format(
+                    parameter=getattr(getattr(exc_val, "param", None), "name", "")
+                )
+                if isinstance(exc_val, click.exceptions.MissingParameter)
+                else str(exc_val)
+            )
+
+            # we might be in a subcommand - so make sure we pull that help out
+            # by walking up the context tree until we're at root
+            cmd_pth: t.List[str] = []
+            ctx = exc_val.ctx
+            while ctx and ctx.parent:
+                if ctx.info_name:
+                    cmd_pth.insert(0, ctx.info_name)
+                ctx = ctx.parent
+            if (
+                getattr(self, "_called_from_command_line", False)
+                and not self._traceback
+            ):
+                self.print_help(sys.argv[0], self.name, *cmd_pth)
+                self.stderr.write(err_msg)
+                sys.exit(1)
+            raise CommandError(str(exc_val)) from exc_val
 
     def __init__(
         self,
@@ -1816,17 +1824,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param subcommand: the name of the django command
         """
         with self:
-            return TyperParser(
-                self,
-                prog_name,
-                subcommand,
-                missing_args_message=getattr(
-                    self, "missing_args_message", TyperParser.missing_args_message
-                ),
-                called_from_command_line=getattr(
-                    self, "_called_from_command_line", None
-                ),
-            )
+            return TyperParser(self, prog_name, subcommand)
 
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
@@ -1936,8 +1934,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.no_color = options["no_color"]
         if options.get("force_color", None) is not None:
             self.force_color = options["force_color"]
-        with self:
-            result = super().execute(*args, **options)
-        self.no_color = no_color
-        self.force_color = force_color
-        return result
+        try:
+            with self:
+                return super().execute(*args, **options)
+        finally:
+            self.no_color = no_color
+            self.force_color = force_color

@@ -23,8 +23,11 @@ patch.apply()
 rich: t.Union[ModuleType, None] = None
 
 try:
+    import sys
+
     import rich
     from rich import traceback
+    from typer import main as typer_main
 
     tb_config = traceback_config()
     if rich and isinstance(tb_config, dict) and not tb_config.get("no_install", False):
@@ -52,6 +55,10 @@ try:
                 if param in set(inspect.signature(traceback.install).parameters.keys())
             },
         )
+        # typer installs its own exception hook and it falls back to the sys hook - depending
+        # on when typer was imported it may have the original fallback system hook or our
+        # installed rich one - we patch it here to make sure!
+        typer_main._original_except_hook = sys.excepthook
 except ImportError:
     pass
 
