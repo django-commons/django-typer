@@ -1682,7 +1682,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     command_tree: CommandNode
 
     @property
-    def name(self) -> str:
+    def _name(self) -> str:
         """The name of the django command"""
         return self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
 
@@ -1715,7 +1715,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 getattr(self, "_called_from_command_line", False)
                 and not self._traceback
             ):
-                self.print_help(sys.argv[0], self.name, *cmd_pth)
+                self.print_help(sys.argv[0], self._name, *cmd_pth)
                 self.stderr.write(err_msg)
                 sys.exit(1)
             raise CommandError(str(exc_val)) from exc_val

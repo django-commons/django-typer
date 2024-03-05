@@ -110,7 +110,7 @@ class BasicTests(TestCase):
         )
 
     def test_cmd_name(self):
-        self.assertEqual(get_command("shellcompletion").name, "shellcompletion")
+        self.assertEqual(get_command("shellcompletion")._name, "shellcompletion")
 
     def test_call_command(self):
         out = StringIO()

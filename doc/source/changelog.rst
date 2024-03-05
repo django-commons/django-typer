@@ -5,6 +5,7 @@ Change Log
 v1.0.2
 ======
 
+* Fixed `name property on TyperCommand is too generic and should be private. <https://github.com/bckohan/django-typer/issues/37>`_
 * Fixed `When usage errors are thrown the help output should be that of the subcommand invoked not the parent group. <https://github.com/bckohan/django-typer/issues/36>`_
 * Fixed `typer installs its own system exception hook when commands are run and this may step on the installed rich hook <https://github.com/bckohan/django-typer/issues/35>`_
 * Fixed `Add py.typed stub <https://github.com/bckohan/django-typer/issues/31>`_
