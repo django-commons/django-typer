@@ -7,7 +7,6 @@ v1.0.2
 
 * Fixed `When usage errors are thrown the help output should be that of the subcommand invoked not the parent group. <https://github.com/bckohan/django-typer/issues/36>`_
 * Fixed `typer installs its own system exception hook when commands are run and this may step on the installed rich hook <https://github.com/bckohan/django-typer/issues/35>`_
-* Fixed `Incomplete typing info for @command decorator <https://github.com/bckohan/django-typer/issues/33>`_
 * Fixed `Add py.typed stub <https://github.com/bckohan/django-typer/issues/31>`_
 * Fixed `Run type checking with django-stubs installed. <https://github.com/bckohan/django-typer/issues/30>`_
 * Fixed `Add pyright to linting and resolve any pyright errors. <https://github.com/bckohan/django-typer/issues/29>`_

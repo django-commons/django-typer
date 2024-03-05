@@ -126,8 +126,6 @@ __all__ = [
     "model_parser_completer",
 ]
 
-# F = t.TypeVar('F', bound=t.Callable[..., t.Any])
-
 
 def model_parser_completer(
     model_cls: t.Type[Model],
