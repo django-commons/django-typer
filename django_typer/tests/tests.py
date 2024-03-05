@@ -1252,7 +1252,7 @@ class TestGroups(TestCase):
 
         self.assertEqual(get_command("groups").echo(message="hey!").strip(), "hey!")
 
-        result = run_command("groups", *settings, "echo", "hey!", "5")
+        result = run_command("groups", "--no-color", *settings, "echo", "hey!", "5")
         if override:
             self.assertEqual(result[0].strip(), ("hey! " * 5).strip())
             self.assertEqual(
@@ -1413,7 +1413,15 @@ class TestGroups(TestCase):
         self.assertEqual(grp_cmd.lower(4, 9), "ANNAmonteS")
 
         result = run_command(
-            "groups", *settings, "string", "annamontes", "case", "upper", "4", "9"
+            "groups",
+            "--no-color",
+            *settings,
+            "string",
+            "annamontes",
+            "case",
+            "upper",
+            "4",
+            "9",
         )
         if override:
             self.assertIn(
@@ -2634,12 +2642,12 @@ class TracebackTests(TestCase):
     """
 
     def test_usage_error_no_tb(self):
-        stdout, stderr, retcode = run_command("tb", "wrong")
+        stdout, stderr, retcode = run_command("tb", "--no-color", "wrong")
         self.assertTrue("Usage: ./manage.py tb [OPTIONS] COMMAND [ARGS]" in stdout)
         self.assertTrue("No such command" in stderr)
         self.assertTrue(retcode > 0)
 
-        stdout, stderr, retcode = run_command("tb", "error", "wrong")
+        stdout, stderr, retcode = run_command("tb", "--no-color", "error", "wrong")
         self.assertTrue("Usage: ./manage.py tb error [OPTIONS]" in stdout)
         self.assertTrue("Got unexpected extra argument" in stderr)
         self.assertTrue(retcode > 0)
@@ -2652,7 +2660,9 @@ class TracebackTests(TestCase):
 
     def test_usage_error_with_tb_if_requested(self):
 
-        stdout, stderr, retcode = run_command("tb", "--traceback", "wrong")
+        stdout, stderr, retcode = run_command(
+            "tb", "--no-color", "--traceback", "wrong"
+        )
         self.assertFalse(stdout.strip())
         self.assertTrue("Traceback" in stderr)
         if rich_installed:
@@ -2662,7 +2672,9 @@ class TracebackTests(TestCase):
         self.assertTrue("No such command 'wrong'" in stderr)
         self.assertTrue(retcode > 0)
 
-        stdout, stderr, retcode = run_command("tb", "--traceback", "error", "wrong")
+        stdout, stderr, retcode = run_command(
+            "tb", "--no-color", "--traceback", "error", "wrong"
+        )
         self.assertFalse(stdout.strip())
         self.assertTrue("Traceback" in stderr)
         if rich_installed:
@@ -2705,3 +2717,31 @@ class TracebackTests(TestCase):
 
         with self.assertRaises(SystemExit):
             call_command("tb", "exit", "--code=1")
+
+
+class TestHandleAsInit(TestCase):
+
+    def test_handle_as_init_run(self):
+
+        stdout, stderr, retcode = run_command("handle_as_init")
+        self.assertTrue("handle" in stdout)
+        self.assertFalse(stderr.strip())
+        self.assertEqual(retcode, 0)
+
+        stdout, stderr, retcode = run_command("handle_as_init", "subcommand")
+        self.assertTrue("subcommand" in stdout)
+        self.assertFalse(stderr.strip())
+        self.assertEqual(retcode, 0)
+
+    def test_handle_as_init_call(self):
+
+        self.assertEqual(call_command("handle_as_init").strip(), "handle")
+        self.assertEqual(
+            call_command("handle_as_init", "subcommand").strip(), "subcommand"
+        )
+
+    def test_handle_as_init_direct(self):
+
+        self.assertEqual(get_command("handle_as_init")(), "handle")
+        self.assertEqual(get_command("handle_as_init", "subcommand")(), "subcommand")
+        self.assertEqual(get_command("handle_as_init").subcommand(), "subcommand")

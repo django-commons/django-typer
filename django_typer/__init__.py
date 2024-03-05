@@ -867,7 +867,9 @@ def initialize(
         setattr(
             func,
             "_typer_callback_",
-            lambda cmd, _name=None, **extra: cmd.typer_app.callback(
+            lambda cmd, _name=None, _help=Default(
+                None
+            ), **extra: cmd.typer_app.callback(
                 name=name or _name,
                 cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
                 invoke_without_command=invoke_without_command,
@@ -875,7 +877,7 @@ def initialize(
                 chain=chain,
                 result_callback=result_callback,
                 context_settings=context_settings,
-                help=cmd.typer_app.info.help or help,
+                help=cmd.typer_app.info.help or help or _help,
                 epilog=epilog,
                 short_help=short_help,
                 options_metavar=options_metavar,
@@ -886,7 +888,9 @@ def initialize(
                 rich_help_panel=rich_help_panel,
                 **kwargs,
                 **extra,
-            )(func),
+            )(
+                func
+            ),
         )
         return func
 
