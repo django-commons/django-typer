@@ -11,7 +11,7 @@ v1.0.2
 * Fixed `Add py.typed stub <https://github.com/bckohan/django-typer/issues/31>`_
 * Fixed `Run type checking with django-stubs installed. <https://github.com/bckohan/django-typer/issues/30>`_
 * Fixed `Add pyright to linting and resolve any pyright errors. <https://github.com/bckohan/django-typer/issues/29>`_
-* Fixed `Missing subcommand produces stack trace without --traceback. <https://github.com/bckohan/django-typer/issues/27>`
+* Fixed `Missing subcommand produces stack trace without --traceback. <https://github.com/bckohan/django-typer/issues/27>`_
 * Fixed `Allow handle() to be an initializer. <https://github.com/bckohan/django-typer/issues/24>`_
 
 v1.0.1
