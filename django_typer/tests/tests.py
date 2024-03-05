@@ -1453,7 +1453,13 @@ class TestGroups(TestCase):
             )
 
         result = run_command(
-            "groups", *settings, "string", " emmatc  ", "strip", parse_json=False
+            "groups",
+            "--no-color",
+            *settings,
+            "string",
+            " emmatc  ",
+            "strip",
+            parse_json=False,
         )
         if override:
             self.assertEqual(result[0], "emmatc\n")
