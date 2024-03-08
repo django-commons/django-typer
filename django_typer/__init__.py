@@ -1726,8 +1726,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             cmd_pth: t.List[str] = []
             ctx = exc_val.ctx
             while ctx and ctx.parent:
-                if ctx.info_name:
-                    cmd_pth.insert(0, ctx.info_name)
+                assert ctx.info_name
+                cmd_pth.insert(0, ctx.info_name)
                 ctx = ctx.parent
             if (
                 getattr(self, "_called_from_command_line", False)
