@@ -72,11 +72,11 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
     warnings: t.List[CheckMessage] = []
     tb_cfg = traceback_config()
     if isinstance(tb_cfg, dict):
-        if rich:
+        if rich and traceback:
             expected = {
                 "no_install",
                 "short",
-                *inspect.signature(rich.traceback.install).parameters.keys(),
+                *inspect.signature(traceback.install).parameters.keys(),
             }
             unexpected = set(tb_cfg.keys()) - expected
             if unexpected:
