@@ -1744,7 +1744,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         stderr: t.Optional[t.TextIO] = None,
         no_color: bool = no_color,
         force_color: bool = force_color,
-        **kwargs,
+        **kwargs: t.Dict[str, t.Any],
     ):
         self.force_color = force_color
         self.no_color = no_color
