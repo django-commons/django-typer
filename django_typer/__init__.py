@@ -107,6 +107,12 @@ from .types import (
 )
 from .utils import _command_context, traceback_config, with_typehint
 
+if sys.version_info < (3, 9):
+    from typing_extensions import ParamSpec
+else:
+    from typing import ParamSpec
+
+
 VERSION = (1, 0, 2)
 
 __title__ = "Django Typer"
@@ -125,6 +131,9 @@ __all__ = [
     "get_command",
     "model_parser_completer",
 ]
+
+P = ParamSpec("P")
+R = t.TypeVar("R")
 
 
 def model_parser_completer(
@@ -532,7 +541,9 @@ class GroupFunction(Typer):
     django_command_cls: t.Type["TyperCommand"]
     _callback: t.Callable[..., t.Any]
 
-    def __get__(self, obj, obj_type=None):
+    def __get__(
+        self, obj: t.Optional["TyperCommand"], _=None
+    ) -> t.Union["GroupFunction", MethodType]:
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
@@ -590,8 +601,8 @@ class GroupFunction(Typer):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
-    ):
+        **kwargs: t.Dict[str, t.Any],
+    ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
         A function decorator that creates a new command and attaches it to this group.
         This is a passthrough to Typer.command() and the options are the same, except
@@ -637,21 +648,29 @@ class GroupFunction(Typer):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        return super().command(
-            name=name,
-            cls=cls,
-            context_settings=context_settings,
-            help=help,
-            epilog=epilog,
-            short_help=short_help,
-            options_metavar=options_metavar,
-            add_help_option=add_help_option,
-            no_args_is_help=no_args_is_help,
-            hidden=hidden,
-            deprecated=deprecated,
-            rich_help_panel=rich_help_panel,
-            **kwargs,
-        )
+
+        def decorator(f: t.Callable[P, R]) -> t.Callable[P, R]:
+            return super(  # pylint: disable=super-with-arguments
+                GroupFunction, self
+            ).command(
+                name=name,
+                cls=cls,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )(
+                f
+            )
+
+        return decorator
 
     def group(
         self,
@@ -673,8 +692,8 @@ class GroupFunction(Typer):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
-    ):
+        **kwargs: t.Dict[str, t.Any],
+    ) -> t.Callable[[t.Callable[..., t.Any]], "GroupFunction"]:
         """
         Create a new subgroup and attach it to this group. This is like creating a new
         Typer app and adding it to a parent Typer app. The kwargs are passed through
@@ -721,7 +740,7 @@ class GroupFunction(Typer):
             this can be used to group commands into panels in the help output.
         """
 
-        def create_app(func: t.Callable[..., t.Any]):
+        def create_app(func: t.Callable[..., t.Any]) -> GroupFunction:
             grp = GroupFunction(  # type: ignore
                 name=name,
                 cls=cls,
@@ -769,8 +788,8 @@ def initialize(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
-):
+    **kwargs: t.Dict[str, t.Any],
+) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
     A function decorator that creates a Typer_
     `callback <https://typer.tiangolo.com/tutorial/commands/callback/>`_. This
@@ -863,7 +882,7 @@ def initialize(
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: t.Callable[..., t.Any]):
+    def decorator(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
             "_typer_callback_",
@@ -899,7 +918,7 @@ def initialize(
 
 def command(  # pylint: disable=keyword-arg-before-vararg
     name: t.Optional[str] = None,
-    *args,
+    *,
     cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
     help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
@@ -912,8 +931,8 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     deprecated: bool = False,
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
-):
+    **kwargs: t.Dict[str, t.Any],
+) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
     A function decorator that creates a new command and attaches it to the root
     command group. This is a passthrough to
@@ -970,13 +989,12 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: t.Callable[..., t.Any]):
+    def decorator(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
             "_typer_command_",
             lambda cmd, _name=None, _help=None, **extra: cmd.typer_app.command(
                 name=name or _name,
-                *args,
                 cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
                 context_settings=context_settings,
                 help=help or _help,
@@ -1017,8 +1035,8 @@ def group(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
-):
+    **kwargs: t.Dict[str, t.Any],
+) -> t.Callable[[t.Callable[..., t.Any]], GroupFunction]:
     """
     A function decorator that creates a new subgroup and attaches it to the root
     command group. This is like creating a new Typer_ app and adding it to a parent
@@ -1083,7 +1101,7 @@ def group(
         this can be used to group commands into panels in the help output.
     """
 
-    def create_app(func: t.Callable[..., t.Any]):
+    def create_app(func: t.Callable[..., t.Any]) -> GroupFunction:
         grp = GroupFunction(  # type: ignore
             name=name,
             cls=cls,

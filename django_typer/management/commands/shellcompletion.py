@@ -380,7 +380,9 @@ class Command(TyperCommand):
         # its less brittle to install and use the returned path to uninstall
         self.shell = shell  # type: ignore
         prog_name = str(manage_script or self.manage_script_name)
-        installed_path = install(shell=self.shell.value, prog_name=prog_name)[1]
+        installed_path = install(
+            shell=self.shell.value if self.shell else None, prog_name=prog_name
+        )[1]
         if self.shell in [Shells.pwsh, Shells.powershell]:
             # annoyingly, powershell has one profile script for all completion commands
             # so we have to find our entry and remove it
@@ -408,11 +410,12 @@ class Command(TyperCommand):
         else:
             installed_path.unlink()
             rc_file = {
+                None: None,
                 Shells.bash: Path("~/.bashrc").expanduser(),
                 Shells.zsh: Path("~/.zshrc").expanduser(),
             }.get(self.shell, None)
             if rc_file and rc_file.is_file():
-                edited = []
+                edited: t.List[str] = []
                 with open(rc_file, "rt", encoding="utf-8") as rc:
                     for line in rc.readlines():
                         if (
@@ -432,7 +435,7 @@ class Command(TyperCommand):
         self.stdout.write(
             self.style.WARNING(  # pylint: disable=no-member
                 gettext("Removed autocompletion for {shell}.").format(
-                    shell=self.shell.value
+                    shell=self.shell.value if self.shell else ""
                 )
             )
         )

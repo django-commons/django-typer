@@ -13,13 +13,14 @@ from django_typer import TyperCommand, command, group
 
 
 class Command(TyperCommand):
+
     help = _("Test multiple groups commands and callbacks")
 
     precision = 2
     verbosity = 1
 
     @command()
-    def echo(self, message: str):
+    def echo(self, message: str) -> str:
         """
         Echo the given message.
         """
@@ -75,7 +76,7 @@ class Command(TyperCommand):
                 help=_("Additional denominators: n1/n2/n3/.../nN."), show_default=False
             ),
         ],
-    ):
+    ) -> str:
         """
         Divide the given numbers.
         """
@@ -146,3 +147,19 @@ class Command(TyperCommand):
         """
         assert issubclass(self.__class__, Command)
         return " ".join(self.op_string.split(sep))
+
+    def test(self, a: int, b: int) -> int:
+        return a + b
+
+
+# cmd = Command()
+# echoed = cmd.echo("hello")
+# cmd.math(3)
+# dividend = cmd.divide(10, 2, [2, 5])
+
+# reveal_type(Command.echo)
+# reveal_type(cmd.echo)
+# reveal_type(cmd.math)
+# reveal_type(Command.test)
+# reveal_type(cmd.test)
+# reveal_type(cmd.divide)
