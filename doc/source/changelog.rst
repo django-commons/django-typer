@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.3
+======
+
+* Fixed `Incomplete typing info for @command decorator <https://github.com/bckohan/django-typer/issues/33>`_
+
 v1.0.2
 ======
 
