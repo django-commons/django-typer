@@ -2,9 +2,9 @@
 A collection of useful utilities.
 """
 
+import os
 import shutil
 import sys
-import os
 import typing as t
 from pathlib import Path
 from threading import local
