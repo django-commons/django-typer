@@ -1902,6 +1902,15 @@ class TestShellCompletersAndParsers(TestCase):
         ShellCompleteTester.objects.all().delete()
         return super().tearDown()
 
+    def test_model_object_parser_metavar(self):
+        result = run_command("poll_as_option", "--help")
+        found = False
+        for line in result[0].splitlines():
+            if "--polls" in line:
+                self.assertTrue("POLL" in line)
+                found = True
+        self.assertTrue(found)
+
     def test_model_object_parser_idempotency(self):
         from django_typer.parsers import ModelObjectParser
         from django_typer.tests.polls.models import Question
@@ -2584,13 +2593,6 @@ class TestShellCompletersAndParsers(TestCase):
         # test what happens if we try to complete a non existing command
         with self.assertRaises(CommandError):
             call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
-
-    def test_model_parser_name(self):
-        from django_typer.parsers import ModelObjectParser
-        from django_typer.tests.polls.models import Question
-
-        parser = ModelObjectParser(Question)
-        self.assertEqual(parser.name, "Poll")
 
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter

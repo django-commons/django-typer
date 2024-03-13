@@ -77,11 +77,11 @@ class ModelObjectParser(ParamType):
     case_insensitive: bool = False
     on_error: t.Optional[error_handler] = None
 
-    _lookup = ""
+    _lookup: str = ""
     _field: Field
     _completer: ModelObjectCompleter
 
-    __name__ = "ModelObjectParser"  # typer internals expect this
+    __name__: str = "MODEL"  # typer internals expect this
 
     def __init__(
         self,
@@ -105,7 +105,7 @@ class ModelObjectParser(ParamType):
         self._field = field
         if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
-        self.name = (
+        self.__name__ = (
             str(self.model_cls._meta.verbose_name)
             if self.model_cls._meta.verbose_name
             else self.model_cls.__name__
@@ -191,3 +191,6 @@ def parse_app_label(label: t.Union[str, AppConfig]):
         raise CommandError(
             _("{label} does not match any installed app label.").format(label=label)
         ) from err
+
+
+parse_app_label.__name__ = "APP_LABEL"

@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.4
+======
+
+* Fixed `METAVAR when ModelObjectParser supplied should default to model name <https://github.com/bckohan/django-typer/issues/39>`_
+
 v1.0.3
 ======
 
