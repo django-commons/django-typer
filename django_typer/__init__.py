@@ -69,6 +69,7 @@ import sys
 import typing as t
 from copy import deepcopy
 from importlib import import_module
+from pathlib import Path
 from types import MethodType, SimpleNamespace
 
 import click
@@ -1846,7 +1847,16 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param subcommand: the name of the django command
         """
         with self:
-            return TyperParser(self, get_usage_script(prog_name), subcommand)
+            if getattr(self, "_called_from_command_line", False):
+                script = get_usage_script(prog_name)
+                if isinstance(script, Path):
+                    prog_name = str(script)
+                    if not str(prog_name).startswith(("..", "/", ".")):
+                        prog_name = f"./{prog_name}"
+                else:
+                    prog_name = str(script)
+
+            return TyperParser(self, prog_name, subcommand)
 
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
@@ -1859,7 +1869,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             typer/click have different helps for each subgroup or subcommand.
         """
         with self:
-            TyperParser(self, prog_name, subcommand).print_help(*cmd_path)
+            self.create_parser(prog_name, subcommand).print_help(*cmd_path)
 
     def __call__(self, *args, **kwargs):
         """

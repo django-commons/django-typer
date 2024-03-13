@@ -423,9 +423,9 @@ class CallbackTests(TestCase):
         buffer = StringIO()
         cmd = get_command(self.cmd_name, stdout=buffer, no_color=True)
         help_output_top = run_command(self.cmd_name, "--no-color", "--help")[0]
-        cmd.print_help("manage.py", self.cmd_name)
+        cmd.print_help("./manage.py", self.cmd_name)
         self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
-        self.assertIn(f"Usage: manage.py {self.cmd_name} [OPTIONS]", help_output_top)
+        self.assertIn(f"Usage: ./manage.py {self.cmd_name} [OPTIONS]", help_output_top)
 
         if not top_level_only:
             buffer.truncate(0)
