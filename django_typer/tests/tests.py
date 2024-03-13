@@ -1903,7 +1903,7 @@ class TestShellCompletersAndParsers(TestCase):
         return super().tearDown()
 
     def test_model_object_parser_metavar(self):
-        result = run_command("poll_as_option", "--help")
+        result = run_command("poll_as_option", "--help", "--no-color")
         found = False
         for line in result[0].splitlines():
             if "--polls" in line:
