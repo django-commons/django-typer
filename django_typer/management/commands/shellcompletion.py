@@ -26,7 +26,6 @@ import contextlib
 import inspect
 import io
 import os
-import shutil
 import sys
 import typing as t
 from pathlib import Path
@@ -54,6 +53,7 @@ from typer.completion import Shells  # type: ignore
 from typer.completion import completion_init
 
 from django_typer import TyperCommand, command, get_command
+from django_typer.utils import get_usage_script
 
 DETECTED_SHELL = None
 
@@ -124,11 +124,10 @@ class Command(TyperCommand):
         # with a manage.py script being invoked directly as a script. Completion should work in
         # this case as well, but it does complicate the installation for some shell's so we must
         # first figure out which mode we are in.
-
-        cmd_pth = Path(sys.argv[0])
-        if shutil.which(cmd_pth.name):
-            return cmd_pth.name
-        return cmd_pth.absolute()
+        script = get_usage_script()
+        if isinstance(script, Path):
+            return script.absolute()
+        return script
 
     @cached_property
     def manage_script_name(self) -> str:

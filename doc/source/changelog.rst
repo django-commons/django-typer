@@ -5,6 +5,7 @@ Change Log
 v1.0.4
 ======
 
+* Fixed `Help sometimes shows full script path in Usage: when it shouldnt. <https://github.com/bckohan/django-typer/issues/40>`_
 * Fixed `METAVAR when ModelObjectParser supplied should default to model name <https://github.com/bckohan/django-typer/issues/39>`_
 
 v1.0.3

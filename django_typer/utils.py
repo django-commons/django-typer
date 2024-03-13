@@ -2,12 +2,30 @@
 A collection of useful utilities.
 """
 
+import shutil
+import sys
+import os
 import typing as t
+from pathlib import Path
 from threading import local
 
 from django.conf import settings
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
+
+
+def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
+    """
+    Return the script name if it is on the path or the absolute path to the script
+    if it is not.
+
+    :param script: The script name to check. If None the current script is used.
+    :return: The script name or the relative path to the script from cwd.
+    """
+    cmd_pth = Path(script or sys.argv[0])
+    if shutil.which(cmd_pth.name):
+        return cmd_pth.name
+    return cmd_pth.absolute().relative_to(Path(os.getcwd()))
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:

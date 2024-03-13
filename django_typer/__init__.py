@@ -105,7 +105,7 @@ from .types import (
     Verbosity,
     Version,
 )
-from .utils import _command_context, traceback_config, with_typehint
+from .utils import _command_context, get_usage_script, traceback_config, with_typehint
 
 if sys.version_info < (3, 10):
     from typing_extensions import ParamSpec
@@ -1846,7 +1846,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param subcommand: the name of the django command
         """
         with self:
-            return TyperParser(self, prog_name, subcommand)
+            return TyperParser(self, get_usage_script(prog_name), subcommand)
 
     def print_help(self, prog_name: str, subcommand: str, *cmd_path: str):
         """
@@ -1859,8 +1859,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             typer/click have different helps for each subgroup or subcommand.
         """
         with self:
-            parser = self.create_parser(prog_name, subcommand)
-            parser.print_help(*cmd_path)
+            TyperParser(self, prog_name, subcommand).print_help(*cmd_path)
 
     def __call__(self, *args, **kwargs):
         """
