@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.0.5
+======
+
+* Fixed `Options with prompt=True are prompted twice <https://github.com/bckohan/django-typer/issues/42>`_
+
+
 v1.0.4
 ======
 

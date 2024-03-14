@@ -114,7 +114,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (1, 0, 4)
+VERSION = (1, 0, 5)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -401,6 +401,27 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         not seem to be a good approach to do this given how deep in the click
         infrastructure the conversion happens.
         """
+
+    def get_params(self, ctx: click.Context) -> t.List[click.Parameter]:
+        """
+        We override get_params to check to make sure that prompt_required is not set for parameters
+        that have already been prompted for during the initial parse phase. We have to do this
+        because of we're stuffing the click infrastructure into the django infrastructure and the
+        django infrastructure forces a two step parse process whereas click does not easily support
+        separating these.
+
+        There may be a more sound approach than this?
+        """
+        modified = []
+        params = super().get_params(ctx)
+        for param in params:
+            if getattr(param, "prompt_required", None) and getattr(
+                ctx, "supplied_params", {}
+            ).get(param.name, None):
+                param = deepcopy(param)
+                setattr(param, "prompt_required", False)
+            modified.append(param)
+        return modified
 
     def shell_complete(
         self, ctx: click.Context, incomplete: str

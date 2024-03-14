@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import typing as t
+
 import typer
 
 app = typer.Typer(name="test")
@@ -6,13 +8,19 @@ state = {"verbose": False}
 
 
 @app.command()
-def create(username: str, flag: bool = False):
+def create(
+    username: str,
+    password: t.Annotated[
+        t.Optional[str],
+        typer.Option("--password", hide_input=True, prompt=True),
+    ] = None,
+):
     if state["verbose"]:
         print("About to create a user")
     print(f"Creating user: {username}")
     if state["verbose"]:
         print("Just created a user")
-    print(f"flag: {flag}")
+    print(f"password: {password}")
 
 
 @app.command(epilog="Delete Epilog")
@@ -25,7 +33,7 @@ def delete(username: str):
 
 
 @app.callback(epilog="Main Epilog")
-def main(arg: int, verbose: bool = False):
+def main(verbose: bool = False):
     """
     Manage users in the awesome CLI app.
     """

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-typer"
-version = "1.0.4"
+version = "1.0.5"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
@@ -87,6 +87,7 @@ scipy = [
     { version = "<=1.10", markers = "python_version <= '3.8'" },
 ]
 django-stubs = "^4.2.7"
+pexpect = "^4.9.0"
 
 [tool.poetry.extras]
 rich = ["rich"]
