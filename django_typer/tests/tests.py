@@ -2853,8 +2853,20 @@ class TestPromptOptions(TestCase):
             "test_flag bckohan test_password4",
         )
 
-        # this doesn't work!
-        # self.assertEqual(
-        #     call_command('prompt', '--no-color', 'group1', 'cmd4', 'bckohan', flag='test_flag', password='test_password4'),
-        #     'test_flag bckohan test_password4'
-        # )
+    @pytest.mark.skip()
+    def test_call_group_with_prompt_value(self):
+        """
+        This is a bug!
+        """
+        self.assertEqual(
+            call_command(
+                "prompt",
+                "--no-color",
+                "group1",
+                "cmd4",
+                "bckohan",
+                flag="test_flag",
+                password="test_password4",
+            ),
+            "test_flag bckohan test_password4",
+        )
