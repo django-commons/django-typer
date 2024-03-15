@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.0.6
+======
+
+* Fixed `prompt options on groups still prompt when given as named parameters on call_command <https://github.com/bckohan/django-typer/issues/43>`_
+
+
 v1.0.5
 ======
 
