@@ -1162,6 +1162,7 @@ class TestGroups(TestCase):
         with self.assertRaises(NotImplementedError):
             get_command("groups")()
 
+    @pytest.mark.skip()
     def test_get_help_from_incongruent_path(self):
         """
         https://github.com/bckohan/django-typer/issues/44

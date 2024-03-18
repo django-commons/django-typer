@@ -70,7 +70,7 @@ Sphinx = [
 ]
 sphinx-rtd-theme = "^2.0.0"
 mypy = "^1.0"
-pylint = '^3.0'
+pylint = "^3.0"
 black = ">=23.12"
 doc8 = "^1.1.1"
 aiohttp = "^3.9.1"
@@ -146,8 +146,8 @@ addopts = [
 
 [tool.coverage.run]
 omit = [
-  "django_typer/tests/**/*py",
-  "django_typer/examples/**/*py"
+  "django_typer/tests/**/*.py",
+  "django_typer/examples/**/*.py"
 ]
 branch = true
 source = ["django_typer"]
