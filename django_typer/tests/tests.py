@@ -1162,6 +1162,40 @@ class TestGroups(TestCase):
         with self.assertRaises(NotImplementedError):
             get_command("groups")()
 
+    def test_get_help_from_incongruent_path(self):
+        """
+        https://github.com/bckohan/django-typer/issues/44
+        """
+        # change dir to the first dir that is not a parent
+        cwd = Path(os.getcwd())
+        try:
+            for directory in os.listdir("/"):
+                top_dir = Path(f"/{directory}")
+                try:
+                    cwd.relative_to(top_dir)
+                except ValueError:
+                    # change cwd to the first directory that is not a parent and try
+                    # to invoke help from there
+                    os.chdir(top_dir)
+                    result = subprocess.run(
+                        [sys.executable, manage_py.absolute(), "groups", "--help"],
+                        capture_output=True,
+                        text=True,
+                        env=os.environ,
+                    )
+                    self.assertGreater(
+                        sim := similarity(
+                            result.stdout,
+                            (
+                                TESTS_DIR / "test_app" / "helps" / f"groups.txt"
+                            ).read_text(),
+                        ),
+                        0.96,  # width inconsistences drive this number < 1
+                    )
+                    return
+        finally:
+            os.chdir(cwd)
+
     @override_settings(
         INSTALLED_APPS=[
             "django_typer.tests.test_app",

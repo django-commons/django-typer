@@ -25,7 +25,10 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     cmd_pth = Path(script or sys.argv[0])
     if shutil.which(cmd_pth.name):
         return cmd_pth.name
-    return cmd_pth.absolute().relative_to(Path(os.getcwd()))
+    try:
+        return cmd_pth.absolute().relative_to(Path(os.getcwd()))
+    except ValueError:
+        return cmd_pth.absolute()
 
 
 def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
