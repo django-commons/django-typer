@@ -1165,6 +1165,10 @@ class TestGroups(TestCase):
     @pytest.mark.skip()
     def test_get_help_from_incongruent_path(self):
         """
+        The directory change screws up the code coverage - it makes the omitted
+        directories get included because their relative paths dont resolve in the
+        coverage output for this test. VERY ANNOYING - not sure how to fix?
+
         https://github.com/bckohan/django-typer/issues/44
         """
         # change dir to the first dir that is not a parent
