@@ -1178,7 +1178,13 @@ class TestGroups(TestCase):
                     # to invoke help from there
                     os.chdir(top_dir)
                     result = subprocess.run(
-                        [sys.executable, manage_py.absolute(), "groups", "--help"],
+                        [
+                            sys.executable,
+                            manage_py.absolute(),
+                            "groups",
+                            "--no-color",
+                            "--help",
+                        ],
                         capture_output=True,
                         text=True,
                         env=os.environ,
