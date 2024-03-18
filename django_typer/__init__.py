@@ -67,7 +67,7 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 import inspect
 import sys
 import typing as t
-from copy import deepcopy
+from copy import copy, deepcopy
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -114,7 +114,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (1, 0, 5)
+VERSION = (1, 0, 6)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -415,11 +415,14 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         modified = []
         params = super().get_params(ctx)
         for param in params:
-            if getattr(param, "prompt_required", None) and getattr(
-                ctx, "supplied_params", {}
-            ).get(param.name, None):
-                param = deepcopy(param)
+            if (
+                getattr(param, "prompt", None)
+                and getattr(param, "prompt_required", False)
+                and getattr(ctx, "supplied_params", {}).get(param.name, None)
+            ):
+                param = copy(param)
                 setattr(param, "prompt_required", False)
+                param.required = False
             modified.append(param)
         return modified
 

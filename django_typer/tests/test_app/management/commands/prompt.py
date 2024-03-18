@@ -60,8 +60,6 @@ class Command(TyperCommand):
     def cmd4(
         self,
         username: str,
-        password: Annotated[
-            t.Optional[str], Option("-p", hide_input=True, prompt=True)
-        ] = None,
+        password: Annotated[str, Option("-p", hide_input=True, prompt=True)],
     ):
         return f"{self.flag} {username} {password}"

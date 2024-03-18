@@ -2887,7 +2887,6 @@ class TestPromptOptions(TestCase):
             "test_flag bckohan test_password4",
         )
 
-    @pytest.mark.skip()
     def test_call_group_with_prompt_value(self):
         """
         This is a bug!
