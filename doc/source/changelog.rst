@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.7
+======
+
+* Fixed `Helps throw an exception when invoked from an absolute path that is not relative to the getcwd() <https://github.com/bckohan/django-typer/issues/44>`_
+
 v1.0.6
 ======
 
