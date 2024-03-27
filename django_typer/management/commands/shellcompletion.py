@@ -48,9 +48,10 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure, detect_shell
-from typer import Argument, Option, echo
+from typer import Argument, Option
+from typer import echo
 from typer.completion import Shells  # type: ignore
-from typer.completion import completion_init
+from typer.completion import completion_init  # type: ignore
 
 from django_typer import TyperCommand, command, get_command
 from django_typer.utils import get_usage_script
