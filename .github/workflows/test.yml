@@ -167,7 +167,7 @@ jobs:
         source ~/.bashrc
     - name: Install Fish shell
       run: |
-        brew install sbtn
+        brew install sbt
         brew install fish
     - name: Install Poetry
       uses: snok/install-poetry@v1
