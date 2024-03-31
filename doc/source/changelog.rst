@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.0.9
+======
+
+* Fixed `Support typer 0.12.0 <https://github.com/bckohan/django-typer/issues/46>`_
+
 v1.0.8
 ======
 
