@@ -69,7 +69,7 @@ Installation
 
 1. Clone django-typer from GitHub or install a release off `PyPI <https://pypi.org/project/django-typer/>`_:
 
-    .. code:: bash
+    .. code-block:: bash
 
         pip install django-typer
 
@@ -77,14 +77,14 @@ Installation
     beautiful formatting in the terminal. It is not required, but highly recommended for the
     best experience:
 
-    .. code:: bash
+    .. code-block:: bash
 
         pip install "django-typer[rich]"
 
 
 2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
 
-    .. code:: python
+    .. code-block:: python
 
         INSTALLED_APPS = [
             ...
