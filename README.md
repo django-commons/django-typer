@@ -77,23 +77,36 @@ class Command(TyperCommand):
 Commands with multiple subcommands can be defined:
 
 ```python
-import typing as t
-from django.utils.translation import gettext_lazy as _
-from typer import Argument
-from django_typer import TyperCommand, command
+   import typing as t
 
-class Command(TyperCommand):
-    @command()
-    def create(self, name: t.Annotated[str, Argument(help=_("The name of the object to create."))]):
-        """
-        Create an object.
-        """
+   from django.utils.translation import gettext_lazy as _
+   from typer import Argument
 
-    @command()
-    def delete(self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]):
-        """
-        Delete an object.
-        """
+   from django_typer import TyperCommand, command
+
+
+   class Command(TyperCommand):
+      """
+      A command that defines subcommands.
+      """
+
+      @command()
+      def create(
+         self,
+         name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
+      ):
+         """
+         Create an object.
+         """
+
+      @command()
+      def delete(
+         self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
+      ):
+         """
+         Delete an object.
+         """
+
 ```
 
 ![Multiple Subcommands Example](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi.svg)
@@ -110,29 +123,53 @@ More complex groups and subcommand hierarchies can be defined. For example, this
 ```
 
 ```python
-import typing as t
-from functools import reduce
-from django.utils.translation import gettext_lazy as _
-from typer import Argument, Option
-from django_typer import TyperCommand, group
+   import typing as t
+   from functools import reduce
 
-class Command(TyperCommand):
-    @group(help=_("Do some math at the given precision."))
-    def math(self, precision: t.Annotated[int, Option(help=_("The number of decimal places to output."))] = 2):
-        self.precision = precision
+   from django.utils.translation import gettext_lazy as _
+   from typer import Argument, Option
 
-    @math.command(help=_("Multiply the given numbers."))
-    def multiply(self, numbers: t.Annotated[t.List[float], Argument(help=_("The numbers to multiply"))]):
-        return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+   from django_typer import TyperCommand, group
 
-    @math.command()
-    def divide(self, numerator: float, denominator: float, floor: bool = False):
-        """
-        Divide the given numbers.
-        """
-        if floor:
-            return str(numerator // denominator)
-        return f"{numerator / denominator:.{self.precision}f}"
+
+   class Command(TyperCommand):
+
+      help = _("A more complex command that defines a hierarchy of subcommands.")
+
+      precision = 2
+
+      @group(help=_("Do some math at the given precision."))
+      def math(
+         self,
+         precision: t.Annotated[
+            int, Option(help=_("The number of decimal places to output."))
+         ] = precision,
+      ):
+         self.precision = precision
+
+      @math.command(help=_("Multiply the given numbers."))
+      def multiply(
+         self,
+         numbers: t.Annotated[
+            t.List[float], Argument(help=_("The numbers to multiply"))
+         ],
+      ):
+         return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+
+      @math.command()
+      def divide(
+         self,
+         numerator: t.Annotated[float, Argument(help=_("The numerator"))],
+         denominator: t.Annotated[float, Argument(help=_("The denominator"))],
+         floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
+      ):
+         """
+         Divide the given numbers.
+         """
+         if floor:
+               return str(numerator // denominator)
+         return f"{numerator / denominator:.{self.precision}f}"
+
 ```
 
 ![Grouping and Hierarchies Example](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy.svg)
