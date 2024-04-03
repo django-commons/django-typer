@@ -5,6 +5,7 @@ Change Log
 v1.1.0
 ======
 
+* Implemented `Convert readme to markdown. <https://github.com/bckohan/django-typer/issues/48>`_
 * Fixed `typer 0.12.0 breaks django_typer 1.0.9 <https://github.com/bckohan/django-typer/issues/47>`_
 
 
