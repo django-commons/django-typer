@@ -67,7 +67,7 @@ certain errors or warnings where justified is acceptable:
     pyright
     poetry check
     poetry run pip check
-    poetry run python -m readme_renderer ./README.rst
+    poetry run python -m readme_renderer ./README.md
 
 
 Running Tests
