@@ -2,8 +2,14 @@
 Change Log
 ==========
 
-v1.0.9
+v1.1.0
 ======
+
+* Fixed `typer 0.12.0 breaks django_typer 1.0.9 <https://github.com/bckohan/django-typer/issues/47>`_
+
+
+v1.0.9 (yanked)
+===============
 
 * Fixed `Support typer 0.12.0 <https://github.com/bckohan/django-typer/issues/46>`_
 
