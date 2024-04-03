@@ -54,7 +54,7 @@ jobs:
           mypy django_typer
           poetry check
           pip check
-          python -m readme_renderer ./README.rst -o /tmp/README.html
+          python -m readme_renderer ./README.md -o /tmp/README.html
           cd ./doc
           doc8 --ignore-path build --max-line-length 100
           echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
