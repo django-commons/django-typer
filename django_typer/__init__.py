@@ -114,7 +114,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (1, 1, 0)
+VERSION = (1, 1, 1)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)

@@ -31,11 +31,15 @@ try:
     from typer import main as typer_main
 
     tb_config = traceback_config()
-    if rich and isinstance(tb_config, dict) and not tb_config.get("no_install", False):
+    if (
+        rich
+        and traceback
+        and isinstance(tb_config, dict)
+        and not tb_config.get("no_install", False)
+    ):
         # install rich tracebacks if we've been configured to do so (default)
         no_color = "NO_COLOR" in os.environ
         force_color = "FORCE_COLOR" in os.environ
-        traceback = t.cast(ModuleType, traceback)
         traceback.install(
             console=tb_config.pop(
                 "console",
