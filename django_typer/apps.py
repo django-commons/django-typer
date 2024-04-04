@@ -21,6 +21,7 @@ from django_typer.utils import traceback_config
 patch.apply()
 
 rich: t.Union[ModuleType, None] = None
+traceback: t.Union[ModuleType, None] = None
 
 try:
     import sys
@@ -34,6 +35,7 @@ try:
         # install rich tracebacks if we've been configured to do so (default)
         no_color = "NO_COLOR" in os.environ
         force_color = "FORCE_COLOR" in os.environ
+        traceback = t.cast(ModuleType, traceback)
         traceback.install(
             console=tb_config.pop(
                 "console",

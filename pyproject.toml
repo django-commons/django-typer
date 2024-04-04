@@ -88,6 +88,7 @@ scipy = [
 ]
 django-stubs = "^4.2.7"
 pexpect = "^4.9.0"
+pyright = "^1.1.357"
 
 [tool.poetry.extras]
 rich = ["rich"]

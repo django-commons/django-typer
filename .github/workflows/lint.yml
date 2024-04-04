@@ -52,12 +52,10 @@ jobs:
           black django_typer --check
           pylint django_typer
           mypy django_typer
+          pyright
           poetry check
           pip check
           python -m readme_renderer ./README.md -o /tmp/README.html
           cd ./doc
           doc8 --ignore-path build --max-line-length 100
           echo "$(poetry env info --path)/bin" >> $GITHUB_PATH
-
-      # - name: Run pyright
-      #   uses: jakebailey/pyright-action@v2
