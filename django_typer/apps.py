@@ -20,8 +20,8 @@ from django_typer.utils import traceback_config
 
 patch.apply()
 
-rich: t.Union[ModuleType, None]
-traceback: t.Union[ModuleType, None]
+rich: t.Optional[ModuleType]
+traceback: t.Optional[ModuleType]
 
 try:
     import sys
