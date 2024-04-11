@@ -20,8 +20,8 @@ from django_typer.utils import traceback_config
 
 patch.apply()
 
-rich: t.Union[ModuleType, None] = None
-traceback: t.Union[ModuleType, None] = None
+rich: t.Union[ModuleType, None]
+traceback: t.Union[ModuleType, None]
 
 try:
     import sys
@@ -66,7 +66,8 @@ try:
         # installed rich one - we patch it here to make sure!
         typer_main._original_except_hook = sys.excepthook
 except ImportError:
-    pass
+    rich = None
+    traceback = None
 
 
 @register("settings")
