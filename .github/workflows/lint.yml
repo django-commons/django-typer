@@ -43,13 +43,13 @@ jobs:
         run: |
           poetry config virtualenvs.in-project true
           poetry run pip install --upgrade pip
-          poetry install
+          poetry install -E rich
           poetry run pip install -U "django~=${{ matrix.django-version }}"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
-        timeout-minutes: 60
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     detached: true
+      #   timeout-minutes: 60
       - name: Run Static Analysis
         run: |
           source .venv/bin/activate
