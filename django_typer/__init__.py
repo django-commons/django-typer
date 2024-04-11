@@ -114,7 +114,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (1, 1, 0)
+VERSION = (1, 1, 1)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -1210,8 +1210,8 @@ class TyperCommandMeta(type):
     """
 
     style: ColorStyle
-    stdout: t.IO[str]
-    stderr: t.IO[str]
+    stdout: BaseOutputWrapper
+    stderr: BaseOutputWrapper
     requires_system_checks: t.Union[t.Sequence[str], str]
     suppressed_base_arguments: t.Optional[t.Iterable[str]]
     typer_app: Typer

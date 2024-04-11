@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.1.1
+======
+
+* Implemented `Fix pyright type checking and add to CI <https://github.com/bckohan/django-typer/issues/51>`_
+* Implemented `Convert CONTRIBUTING.rst to markdown <https://github.com/bckohan/django-typer/issues/50>`_
+
 v1.1.0
 ======
 

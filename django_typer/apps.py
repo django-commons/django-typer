@@ -20,7 +20,8 @@ from django_typer.utils import traceback_config
 
 patch.apply()
 
-rich: t.Union[ModuleType, None] = None
+rich: t.Optional[ModuleType]
+traceback: t.Optional[ModuleType]
 
 try:
     import sys
@@ -30,7 +31,12 @@ try:
     from typer import main as typer_main
 
     tb_config = traceback_config()
-    if rich and isinstance(tb_config, dict) and not tb_config.get("no_install", False):
+    if (
+        rich
+        and traceback
+        and isinstance(tb_config, dict)
+        and not tb_config.get("no_install", False)
+    ):
         # install rich tracebacks if we've been configured to do so (default)
         no_color = "NO_COLOR" in os.environ
         force_color = "FORCE_COLOR" in os.environ
@@ -60,7 +66,8 @@ try:
         # installed rich one - we patch it here to make sure!
         typer_main._original_except_hook = sys.excepthook
 except ImportError:
-    pass
+    rich = None
+    traceback = None
 
 
 @register("settings")
