@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.1.2
+======
+
+* Fixed `Overridden common Django arguments fail to pass through when passed through call_command <https://github.com/bckohan/django-typer/issues/54>`_
+
 v1.1.1
 ======
 

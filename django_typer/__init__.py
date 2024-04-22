@@ -114,7 +114,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (1, 1, 1)
+VERSION = (1, 1, 2)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -311,7 +311,7 @@ class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
         self.traceback = kwargs.get("traceback", TyperCommand._traceback)
 
     def _get_kwargs(self):
-        return {"args": self.args, **COMMON_DEFAULTS}
+        return {**COMMON_DEFAULTS, **vars(self)}
 
 
 class Context(TyperContext):

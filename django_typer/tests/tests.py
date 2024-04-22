@@ -2914,3 +2914,45 @@ class TestPromptOptions(TestCase):
             ),
             "test_flag bckohan test_password4",
         )
+
+
+class TestDefaultParamOverrides(TestCase):
+    """
+    Tests that overloaded group/command names work as expected.
+    """
+
+    def test_override_direct(self):
+        from django_typer.tests.test_app.management.commands.override import VersionEnum
+
+        override = get_command("override")
+        self.assertDictEqual(
+            override("path/to/settings", version="1.1"),
+            {"settings": "path/to/settings", "version": "1.1"},
+        )
+
+    def test_override_cli(self):
+        from django_typer.tests.test_app.management.commands.override import VersionEnum
+
+        result = run_command("override", "path/to/settings", "--version", "1.1")[0]
+        self.assertEqual(
+            result.strip(),
+            str(
+                {
+                    "settings": Path("path/to/settings"),
+                    "version": VersionEnum.VERSION1_1,
+                }
+            ).strip(),
+        )
+
+    def test_override_call_command(self):
+        from django_typer.tests.test_app.management.commands.override import VersionEnum
+
+        call_command("override", "path/to/settings", 1, version="1.1")
+        self.assertDictEqual(
+            call_command("override", "path/to/settings", 1, version="1.1"),
+            {
+                "settings": Path("path/to/settings"),
+                "version": VersionEnum.VERSION1_1,
+                "optional_arg": 1,
+            },
+        )
