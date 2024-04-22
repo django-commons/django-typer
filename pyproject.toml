@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-typer"
-version = "1.1.2"
+version = "1.2.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"

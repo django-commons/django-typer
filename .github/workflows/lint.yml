@@ -1,6 +1,14 @@
 name: lint
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Set to on, to open ssh debug session.'
+        required: true
+        default: 'off'
 
 jobs:
 
@@ -45,11 +53,16 @@ jobs:
           poetry run pip install --upgrade pip
           poetry install -E rich
           poetry run pip install -U "django~=${{ matrix.django-version }}"
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      #   with:
-      #     detached: true
-      #   timeout-minutes: 60
+      - name: Install Emacs
+        if: ${{ github.event.inputs.debug == 'on' }}
+        run: |
+          sudo apt install emacs
+      - name: Setup tmate session
+        if: ${{ github.event.inputs.debug == 'on' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+        timeout-minutes: 60
       - name: Run Static Analysis
         run: |
           source .venv/bin/activate
