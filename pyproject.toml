@@ -127,8 +127,8 @@ sphinx = true
 [tool.pytest.ini_options]
 # py.test options:
 DJANGO_SETTINGS_MODULE = "django_typer.tests.settings.base"
-python_files = "tests.py"
-norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
+python_files = "test_*.py"
+norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__ shellcompletion"
 env = [
     "TERMINAL_WIDTH=80",
 ]

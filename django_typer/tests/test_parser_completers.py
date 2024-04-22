@@ -1,0 +1,797 @@
+import contextlib
+import json
+from decimal import Decimal
+from io import StringIO
+
+from django.apps import apps
+from django.core.management import CommandError, call_command
+from django.test import TestCase
+from django.utils import timezone
+
+from django_typer import get_command
+from django_typer.tests.apps.polls.models import Question
+from django_typer.tests.apps.test_app.models import ShellCompleteTester
+from django_typer.tests.utils import run_command
+
+
+class TestShellCompletersAndParsers(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.q1 = Question.objects.create(
+            question_text="Is Putin a war criminal?",
+            pub_date=timezone.now(),
+        )
+        for field, values in {
+            "char_field": ["jon", "john", "jack", "jason"],
+            "text_field": [
+                "sockeye",
+                "chinook",
+                "steelhead",
+                "coho",
+                "atlantic",
+                "pink",
+                "chum",
+            ],
+            "float_field": [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
+            "decimal_field": [
+                Decimal("1.5"),
+                Decimal("1.50"),
+                Decimal("1.51"),
+                Decimal("1.52"),
+                Decimal("1.2"),
+                Decimal("1.6"),
+            ],
+            "uuid_field": [
+                "12345678-1234-5678-1234-567812345678",
+                "12345678-1234-5678-1234-567812345679",
+                "12345678-5678-5678-1234-567812345670",
+                "12345678-5678-5678-1234-567812345671",
+                "12345678-5678-5678-1234-A67812345671",
+                "12345678-5678-5678-f234-A67812345671",
+            ],
+        }.items():
+            for value in values:
+                ShellCompleteTester.objects.create(**{field: value})
+
+    def tearDown(self) -> None:
+        ShellCompleteTester.objects.all().delete()
+        return super().tearDown()
+
+    def test_model_object_parser_metavar(self):
+        result = run_command("poll_as_option", "--help", "--no-color")
+        found = False
+        for line in result[0].splitlines():
+            if "--polls" in line:
+                self.assertTrue("POLL" in line)
+                found = True
+        self.assertTrue(found)
+
+    def test_model_object_parser_idempotency(self):
+        from django_typer.parsers import ModelObjectParser
+        from django_typer.tests.apps.polls.models import Question
+
+        parser = ModelObjectParser(Question)
+        self.assertEqual(parser.convert(self.q1, None, None), self.q1)
+
+    def test_app_label_parser_idempotency(self):
+        from django_typer.parsers import parse_app_label
+
+        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
+        self.assertEqual(parse_app_label(poll_app), poll_app)
+
+    def test_app_label_parser_completers(self):
+        from django.apps import apps
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "completion django_typer.tests."
+            )
+        result = result.getvalue()
+        self.assertTrue("django_typer.tests.apps.polls" in result)
+        self.assertTrue("django_typer.tests.apps.test_app" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "completion django_typer_tests")
+        result = result.getvalue()
+        self.assertTrue("django_typer_tests_apps_polls" in result)
+        self.assertTrue("django_typer_tests_apps_test_app" in result)
+
+        self.assertEqual(
+            json.loads(call_command("completion", "django_typer_tests_apps_polls")),
+            ["django_typer_tests_apps_polls"],
+        )
+        self.assertEqual(
+            json.loads(call_command("completion", "django_typer.tests.apps.polls")),
+            ["django_typer_tests_apps_polls"],
+        )
+
+        with self.assertRaises(CommandError):
+            call_command("completion", "django_typer_tests.polls")
+
+        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
+        test_app = apps.get_app_config("django_typer_tests_apps_test_app")
+        cmd = get_command("completion")
+        self.assertEqual(
+            json.loads(cmd([poll_app])),
+            ["django_typer_tests_apps_polls"],
+        )
+
+        self.assertEqual(
+            json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_apps_polls"]
+        )
+
+        self.assertEqual(
+            json.loads(cmd(django_apps=[poll_app], option=test_app)),
+            {
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "completion", "django_typer_tests_apps_polls", option=test_app
+                )
+            ),
+            {
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "completion",
+                    "django_typer_tests_apps_polls",
+                    "--option=django_typer_tests_apps_test_app",
+                )
+            ),
+            {
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
+            },
+        )
+
+    def test_char_field(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --char ja")
+        result = result.getvalue()
+        self.assertTrue("jack" in result)
+        self.assertTrue("jason" in result)
+        self.assertFalse("jon" in result)
+        self.assertFalse("john" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ichar Ja")
+        result = result.getvalue()
+        self.assertTrue("Jack" in result)
+        self.assertTrue("Jason" in result)
+        self.assertFalse("Jon" in result)
+        self.assertFalse("John" in result)
+
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--char", "jack")),
+            {
+                "char": {
+                    str(ShellCompleteTester.objects.get(char_field="jack").pk): "jack"
+                }
+            },
+        )
+
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--ichar", "john")),
+            {
+                "ichar": {
+                    str(ShellCompleteTester.objects.get(char_field="john").pk): "john"
+                }
+            },
+        )
+
+        with self.assertRaises(CommandError):
+            call_command("model_fields", "test", "--char", "jane")
+
+        with self.assertRaises(RuntimeError):
+            call_command("model_fields", "test", "--ichar", "jane")
+
+    def test_text_field(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --text ")
+        result = result.getvalue()
+        self.assertTrue("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertTrue("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertTrue("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --text ch")
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertFalse("pink" in result)
+        self.assertTrue("chum" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --itext S")
+        result = result.getvalue()
+        self.assertTrue("Sockeye" in result)
+        self.assertFalse("chinook" in result)
+        self.assertTrue("Steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertFalse("pink" in result)
+        self.assertFalse("chum" in result)
+
+        # distinct completions by default
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --text atlantic --text sockeye --text steelhead --text ",
+            )
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        # check distinct flag set to False
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --itext atlantic --itext sockeye --itext steelhead --itext ",
+            )
+        result = result.getvalue()
+        self.assertTrue("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertTrue("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertTrue("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--text",
+                    "atlantic",
+                    "--text",
+                    "sockeye",
+                    "--text",
+                    "steelhead",
+                )
+            ),
+            {
+                "text": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="atlantic").pk
+                        ): "atlantic"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="sockeye").pk
+                        ): "sockeye"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="steelhead").pk
+                        ): "steelhead"
+                    },
+                ]
+            },
+        )
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--itext",
+                    "ATlanTIC",
+                    "--itext",
+                    "SOCKeye",
+                    "--itext",
+                    "STEELHEAD",
+                )
+            ),
+            {
+                "itext": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="atlantic").pk
+                        ): "atlantic"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="sockeye").pk
+                        ): "sockeye"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="steelhead").pk
+                        ): "steelhead"
+                    },
+                ]
+            },
+        )
+
+    def test_uuid_field(self):
+        from uuid import UUID
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --uuid ")
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+        self.assertFalse("None" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678"
+            )
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678-"
+            )
+        result = result.getvalue()
+        self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
+        self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 12345678-5"
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
+        self.assertTrue("12345678-5678-5678-1234-567812345671" in result)
+        self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
+        self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --uuid 123456785"
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("123456785678-5678-1234-567812345670" in result)
+        self.assertTrue("123456785678-5678-1234-567812345671" in result)
+        self.assertTrue("123456785678-5678-1234-a67812345671" in result)
+        self.assertTrue("123456785678-5678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678-",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertTrue("123456&78-^56785678-1234-567812345670" in result)
+        self.assertTrue("123456&78-^56785678-1234-567812345671" in result)
+        self.assertTrue("123456&78-^56785678-1234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678-f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678F",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678F234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678f",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678f234-a67812345671" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 123456&78-^56785678f234---A",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
+        self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
+        self.assertFalse("123456&78-^567856781234-567812345670" in result)
+        self.assertFalse("123456&78-^567856781234-567812345671" in result)
+        self.assertFalse("123456&78-^567856781234-a67812345671" in result)
+        self.assertTrue("123456&78-^56785678f234---A67812345671" in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--uuid",
+                    "123456&78-^56785678f234---A67812345671",
+                )
+            ),
+            {
+                "uuid": {
+                    str(
+                        ShellCompleteTester.objects.get(
+                            uuid_field=UUID("12345678-5678-5678-f234-a67812345671")
+                        ).pk
+                    ): "12345678-5678-5678-f234-a67812345671"
+                }
+            },
+        )
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields", "test", "--uuid", "G2345678-5678-5678-f234-a67812345671"
+            )
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields", "test", "--uuid", "12345678-5678-5678-f234-a67812345675"
+            )
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
+            )
+        result = result.getvalue()
+        self.assertFalse("12345678" in result)
+
+    def test_id_field(self):
+        result = StringIO()
+
+        ids = ShellCompleteTester.objects.values_list("id", flat=True)
+
+        starts = {}
+        for id in ids:
+            starts.setdefault(str(id)[0], []).append(str(id))
+        start_chars = set(starts.keys())
+
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --id ", shell="zsh"
+            )
+
+        result = result.getvalue()
+        for id in ids:
+            self.assertTrue(f'"{id}"' in result)
+
+        for start_char in start_chars:
+            expected = starts[start_char]
+            unexpected = [str(id) for id in ids if str(id) not in expected]
+            result = StringIO()
+            with contextlib.redirect_stdout(result):
+                call_command(
+                    "shellcompletion",
+                    "complete",
+                    "--shell",
+                    "zsh",
+                    f"model_fields test --id {start_char}",
+                )
+
+            result = result.getvalue()
+            for id in expected:
+                self.assertTrue(f'"{id}"' in result)
+            for id in unexpected:
+                self.assertFalse(f'"{id}"' in result)
+
+        for id in ids:
+            self.assertEqual(
+                json.loads(call_command("model_fields", "test", "--id", str(id))),
+                {"id": id},
+            )
+
+        # test the limit option
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "--shell",
+                "zsh",
+                "model_fields test --id-limit ",
+            )
+        result = result.getvalue()
+        for id in ids[0:5]:
+            self.assertTrue(f'"{id}"' in result)
+        for id in ids[5:]:
+            self.assertFalse(f'"{id}"' in result)
+
+    def test_float_field(self):
+        values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float ")
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 1")
+        result = result.getvalue()
+        for value in [1.1, 1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.1, 1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 1.1")
+        result = result.getvalue()
+        for value in [1.1, 1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.1, 1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --float 1.12"
+            )
+        result = result.getvalue()
+        for value in [1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2")
+        result = result.getvalue()
+        for value in [2.2, 2.3, 2.4]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.2, 2.3, 2.4]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2.")
+        result = result.getvalue()
+        for value in [2.2, 2.3, 2.4]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.2, 2.3, 2.4]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 2.3")
+        result = result.getvalue()
+        for value in [2.3]:
+            self.assertTrue(str(value) in result)
+        for value in set([2.3]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --float 3")
+        result = result.getvalue()
+        for value in [3.0]:
+            self.assertTrue(str(value) in result)
+        for value in set([3.0]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--float",
+                    "2.3",
+                )
+            ),
+            {
+                "float": {
+                    str(ShellCompleteTester.objects.get(float_field=2.3).pk): "2.3"
+                }
+            },
+        )
+
+    def test_decimal_field(self):
+        values = [
+            Decimal("1.5"),
+            Decimal("1.50"),
+            Decimal("1.51"),
+            Decimal("1.52"),
+            Decimal("1.2"),
+            Decimal("1.6"),
+        ]
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --decimal ")
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1."
+            )
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1."
+            )
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --decimal 1.5"
+            )
+        result = result.getvalue()
+        for value in set(values) - {Decimal("1.2"), Decimal("1.6")}:
+            self.assertTrue(str(value) in result)
+        for value in {Decimal("1.2"), Decimal("1.6")}:
+            self.assertFalse(str(value) in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--decimal",
+                    "1.6",
+                )
+            ),
+            {
+                "decimal": {
+                    str(
+                        ShellCompleteTester.objects.get(decimal_field=Decimal("1.6")).pk
+                    ): "1.60"
+                }
+            },
+        )
+
+    def test_option_complete(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test ")
+        result = result.getvalue()
+        self.assertTrue("--char" in result)
+        self.assertTrue("--ichar" in result)
+        self.assertTrue("--text" in result)
+        self.assertTrue("--itext" in result)
+        self.assertTrue("--id" in result)
+        self.assertTrue("--id-limit" in result)
+        self.assertTrue("--float" in result)
+        self.assertTrue("--decimal" in result)
+        self.assertTrue("--help" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "noarg cmd ", shell="zsh")
+        result = result.getvalue()
+        self.assertTrue(result)
+        self.assertFalse("--" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "noarg cmd -", shell="zsh")
+        result = result.getvalue()
+        self.assertTrue(result)
+        self.assertFalse("--" in result)
+
+        # test what happens if we try to complete a non existing command
+        with self.assertRaises(CommandError):
+            call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
+
+    def test_unsupported_field(self):
+        from django_typer.completers import ModelObjectCompleter
+
+        with self.assertRaises(ValueError):
+            ModelObjectCompleter(ShellCompleteTester, "binary_field")
+
+    def test_shellcompletion_no_detection(self):
+        from django_typer.management.commands import shellcompletion
+
+        def raise_error():
+            raise RuntimeError()
+
+        shellcompletion.detect_shell = raise_error
+        cmd = get_command("shellcompletion")
+        with self.assertRaises(CommandError):
+            cmd.shell = None
+
+    def test_shellcompletion_complete_cmd(self):
+        # test that we can leave preceeding script off the complete argument
+        result = run_command(
+            "shellcompletion", "complete", "./manage.py completion dj"
+        )[0]
+        self.assertTrue("django_typer" in result)
+        result2 = run_command("shellcompletion", "complete", "completion dj")[0]
+        self.assertTrue("django_typer" in result2)
+        self.assertEqual(result, result2)
+
+    def test_custom_fallback(self):
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--fallback",
+            "django_typer.tests.fallback.custom_fallback",
+            "shell ",
+        )[0]
+        self.assertTrue("custom_fallback" in result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--fallback",
+            "django_typer.tests.fallback.custom_fallback_cmd_str",
+            "shell ",
+        )[0]
+        self.assertTrue("shell " in result)
