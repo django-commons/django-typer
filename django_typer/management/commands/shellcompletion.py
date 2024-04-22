@@ -51,7 +51,7 @@ from shellingham import ShellDetectionFailure, detect_shell
 from typer import Argument, Option, echo
 from typer.completion import (  # type: ignore
     Shells,  # pyright: ignore[reportPrivateImportUsage]
-    completion_init, # pyright: ignore[reportPrivateImportUsage]
+    completion_init,  # pyright: ignore[reportPrivateImportUsage]
 )
 
 from django_typer import TyperCommand, command, get_command
