@@ -49,7 +49,7 @@ def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
 _command_context = local()
 
 
-def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
+def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore  # noqa: F821
     """
     Returns the current typer command. This can be used as a way to
     access the current command object from anywhere if we are executing
@@ -65,7 +65,7 @@ def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore
     :return: The current typer command or None if there is no active command.
     """
     try:
-        return t.cast("TyperCommand", _command_context.stack[-1])  # type: ignore
+        return t.cast("TyperCommand", _command_context.stack[-1])  # type: ignore  # noqa: F821
     except (AttributeError, IndexError):
         pass
     return None

@@ -263,10 +263,8 @@ class ModelObjectCompleter:
         self.case_insensitive = case_insensitive
         self.distinct = distinct
 
-        self._field = (
-            self.model_cls._meta.get_field(  # pylint: disable=protected-access
-                self.lookup_field
-            )
+        self._field = self.model_cls._meta.get_field(  # pylint: disable=protected-access
+            self.lookup_field
         )
         if query:
             self.query = MethodType(query, self)

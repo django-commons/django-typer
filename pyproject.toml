@@ -62,7 +62,6 @@ typing-extensions = { version = ">=3.7.4.3", markers = "python_version < '3.10'"
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 pytest-django = "^4.7.0"
-isort = "^5.13.0"
 pytest-cov = "^4.1.0"
 Sphinx = [
     { version = "^7.2.0", markers = "python_version > '3.8'" },
@@ -71,7 +70,6 @@ Sphinx = [
 sphinx-rtd-theme = "^2.0.0"
 mypy = "^1.0"
 pylint = "^3.0"
-black = ">=23.12"
 doc8 = "^1.1.1"
 aiohttp = "^3.9.1"
 readme-renderer = {extras = ["md"], version = ">=42,<44"}
@@ -89,6 +87,7 @@ scipy = [
 django-stubs = "^4.2.7"
 pexpect = "^4.9.0"
 pyright = "^1.1.357"
+ruff = "^0.4.1"
 
 [tool.poetry.extras]
 rich = ["rich"]
@@ -125,10 +124,6 @@ exclude = [
 max-line-length = 100
 sphinx = true
 
-[tool.isort]
-profile = "black"
-
-
 [tool.pytest.ini_options]
 # py.test options:
 DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
@@ -162,11 +157,6 @@ source = [
     "django_typer"
 ]
 
-
-[tool.black]
-target-version = ["py38", "py39", "py310", "py311", "py312"]
-include = '\.pyi?$'
-
 [pylint]
 output-format = "colorized"
 max-line-length = 88
@@ -199,4 +189,16 @@ exclude = [
 ]
 include = [
     "django_typer"
+]
+
+[tool.ruff]
+line-length = 88
+exclude = [
+    "doc",
+    "dist"
+]
+
+[tool.ruff.lint]
+exclude = [
+    "django_typer/tests/**/*"
 ]

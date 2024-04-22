@@ -15,7 +15,6 @@ from typer import Argument, Option
 
 
 class VersionEnum(str, Enum):
-
     VERSION1 = "1"
     VERSION1_1 = "1.1"
     VERSION2 = "2"

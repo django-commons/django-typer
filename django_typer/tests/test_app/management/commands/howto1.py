@@ -6,7 +6,6 @@ from django_typer import TyperCommand, command
 
 
 class Command(TyperCommand):
-
     @command()
     def option1(self, flag: bool = False):
         pass

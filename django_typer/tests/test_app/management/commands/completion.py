@@ -8,7 +8,7 @@ else:
     from typing import Annotated
 
 import typer
-from django.apps import AppConfig, apps
+from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 
 from django_typer import TyperCommand, completers, parsers

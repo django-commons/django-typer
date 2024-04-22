@@ -10,9 +10,8 @@ from types import ModuleType
 
 from django.apps import AppConfig
 from django.conf import settings
-from django.core.checks import CheckMessage
+from django.core.checks import CheckMessage, register
 from django.core.checks import Warning as CheckWarning
-from django.core.checks import register
 from django.utils.translation import gettext as _
 
 from django_typer import patch

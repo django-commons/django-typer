@@ -18,8 +18,6 @@ from shellingham import detect_shell
 
 from django_typer import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
-from django_typer.tests.polls.models import Question as Poll
-from django_typer.tests.test_app.models import ShellCompleteTester
 
 default_shell = None
 
@@ -54,7 +52,6 @@ def read_all_from_fd_with_timeout(fd, timeout):
 
 
 class _DefaultCompleteTestCase:
-
     shell = None
     manage_script = "manage.py"
     launch_script = "./manage.py"
@@ -226,7 +223,6 @@ class _InstalledScriptTestCase(_DefaultCompleteTestCase):
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
 class ZshShellTests(_DefaultCompleteTestCase, TestCase):
-
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
 
@@ -243,7 +239,6 @@ class ZshShellTests(_DefaultCompleteTestCase, TestCase):
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashShellTests(_DefaultCompleteTestCase, TestCase):
-
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
 
@@ -254,8 +249,8 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
             fd,
             f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
         )
-        os.write(fd, f"source ~/.bashrc\n".encode())
-        os.write(fd, f"source .venv/bin/activate\n".encode())
+        os.write(fd, "source ~/.bashrc\n".encode())
+        os.write(fd, "source .venv/bin/activate\n".encode())
 
     def verify_install(self, script=None):
         if not script:
@@ -270,7 +265,6 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashExeShellTests(_InstalledScriptTestCase, BashShellTests):
-
     shell = "bash"
 
 
@@ -314,13 +308,11 @@ class FishShellTests(_DefaultCompleteTestCase):  # , TestCase):
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
 class FishExeShellTests(_InstalledScriptTestCase, FishShellTests, TestCase):
-
     shell = "fish"
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
 class PowerShellTests(_DefaultCompleteTestCase, TestCase):
-
     shell = "pwsh"
     directory = Path("~/.config/powershell").expanduser()
 
@@ -349,19 +341,17 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
     def verify_install(self, script=None):
         if not script:
             script = self.manage_script
-        self.assertTrue((self.directory / f"Microsoft.PowerShell_profile.ps1").exists())
+        self.assertTrue((self.directory / "Microsoft.PowerShell_profile.ps1").exists())
         self.assertTrue(
             f"Register-ArgumentCompleter -Native -CommandName {script} -ScriptBlock $scriptblock"
-            in (self.directory / f"Microsoft.PowerShell_profile.ps1").read_text()
+            in (self.directory / "Microsoft.PowerShell_profile.ps1").read_text()
         )
 
     def verify_remove(self, script=None):
         if not script:
             script = self.manage_script
-        if (self.directory / f"Microsoft.PowerShell_profile.ps1").exists():
-            contents = (
-                self.directory / f"Microsoft.PowerShell_profile.ps1"
-            ).read_text()
+        if (self.directory / "Microsoft.PowerShell_profile.ps1").exists():
+            contents = (self.directory / "Microsoft.PowerShell_profile.ps1").read_text()
             self.assertFalse(
                 f"Register-ArgumentCompleter -Native -CommandName {script} -ScriptBlock $scriptblock"
                 in contents

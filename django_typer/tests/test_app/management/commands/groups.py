@@ -13,7 +13,6 @@ from django_typer import TyperCommand, command, group
 
 
 class Command(TyperCommand):
-
     help = _("Test multiple groups commands and callbacks")
 
     precision = 2

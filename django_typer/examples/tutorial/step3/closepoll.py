@@ -24,7 +24,6 @@ def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
 
 
 class Command(TyperCommand):
-
     def handle(
         self,
         polls: Annotated[

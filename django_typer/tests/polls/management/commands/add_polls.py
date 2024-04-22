@@ -1,5 +1,3 @@
-import typing as t
-
 from django.utils import timezone
 
 from django_typer import TyperCommand

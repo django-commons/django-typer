@@ -66,9 +66,9 @@ jobs:
       - name: Run Static Analysis
         run: |
           source .venv/bin/activate
-          isort django_typer --check
-          black django_typer --check
-          pylint django_typer
+          ruff format --check django_typer
+          ruff check --no-fix --select I django_typer
+          ruff check django_typer
           mypy django_typer
           pyright
           poetry check

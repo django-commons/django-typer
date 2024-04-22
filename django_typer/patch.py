@@ -11,7 +11,7 @@ creates we need to do some monkey patching to get the desired behavior when
 apply() needs to be called before any imports from Typer
 
 .. todo::
-    
+
     Revisit this if Typer exposes control of the console objects.
 
 To achieve expected --force-color and --no-color behavior there are 3 different
@@ -129,7 +129,7 @@ def apply() -> None:
     _compat.strip_ansi = lambda value: strip_ansi(str(value))
 
 
-from typer import __version__ as typer_version
+from typer import __version__ as typer_version  # noqa: E402
 
 if (0, 4, 0) <= tuple(int(v) for v in typer_version.split(".")) < (0, 13, 0):
     from typer import main as typer_main

@@ -4,7 +4,6 @@ from django_typer import TyperCommand, command, initialize
 
 
 class Command(TyperCommand):
-
     help = "Test handle as initializer."
 
     @initialize(invoke_without_command=True)

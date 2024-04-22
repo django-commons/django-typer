@@ -3,7 +3,6 @@ from django_typer import initialize as root
 
 
 class Command(TyperCommand):
-
     @root(invoke_without_command=True)
     def handle(self, flag: bool = False):
         # This is the root command, it runs when we run our command without

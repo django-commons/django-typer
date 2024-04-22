@@ -2,7 +2,6 @@ from django.db import models
 
 
 class ShellCompleteTester(models.Model):
-
     char_field = models.CharField(max_length=15, db_index=True, default="")
     text_field = models.TextField(default="")
     float_field = models.FloatField(db_index=True, default=None, null=True)

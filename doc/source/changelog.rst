@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.2.0
+======
+
+* Implemented `Switch to ruff for linting and formatting. <https://github.com/bckohan/django-typer/issues/56>`_
+
 v1.1.2
 ======
 

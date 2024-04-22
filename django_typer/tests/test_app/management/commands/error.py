@@ -5,7 +5,6 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
-from django.utils.translation import gettext_lazy as _
 from typer import Option
 
 from django_typer import TyperCommand

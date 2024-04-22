@@ -53,9 +53,9 @@ static analysis tools should not produce any errors or warnings. Disabling
 certain errors or warnings where justified is acceptable:
 
 ```bash
-poetry run isort django_typer
-poetry run black django_typer
-poetry run pylint django_typer
+poetry run ruff format django_typer
+poetry run ruff check --fix --select I django_typer
+poetry run ruff check django_typer
 poetry run mypy django_typer
 pyright
 poetry check

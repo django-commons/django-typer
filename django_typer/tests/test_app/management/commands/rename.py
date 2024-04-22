@@ -2,7 +2,6 @@ from django_typer import TyperCommand, command
 
 
 class Command(TyperCommand):
-
     @command(name="default")
     def handle(self):
         return "handle"

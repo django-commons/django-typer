@@ -13,7 +13,6 @@ from django_typer import TyperCommand, command, group
 
 
 class Command(TyperCommand):
-
     help = _("Test password prompt")
 
     @command()

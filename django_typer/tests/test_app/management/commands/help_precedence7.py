@@ -6,7 +6,6 @@ from django_typer import TyperCommand, command
 
 
 class Command(TyperCommand):
-
     help = _("Test minimal TyperCommand subclass - class member")
 
     @command()

@@ -2,11 +2,10 @@ import json
 
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, command
+from django_typer import TyperCommand
 
 
 class Command(TyperCommand, help=_("Test minimal TyperCommand subclass - typer param")):
-
     help = _("Test minimal TyperCommand subclass - class member")
 
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):

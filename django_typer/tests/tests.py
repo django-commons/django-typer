@@ -8,15 +8,13 @@ import sys
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Tuple
 
 import django
 import pexpect
 import pytest
 import typer
-from click.exceptions import UsageError
 from django.apps import apps
-from django.conf import settings
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
@@ -676,7 +674,6 @@ class UsageErrorTests(TestCase):
             call_command("error")
 
     def test_bad_param(self):
-
         result = run_command("error", "a")
         self.assertTrue("Test usage error behavior." in result[0])
         self.assertTrue("'a' is not a valid integer." in result[1])
@@ -685,7 +682,6 @@ class UsageErrorTests(TestCase):
             call_command("error", "a")
 
     def test_no_option(self):
-
         result = run_command("error", "--flg1")
         self.assertTrue("Test usage error behavior." in result[0])
         self.assertTrue("No such option: --flg1" in result[1])
@@ -694,7 +690,6 @@ class UsageErrorTests(TestCase):
             call_command("error", "--flg1")
 
     def test_bad_option(self):
-
         result = run_command("error", "--opt1", "d")
         self.assertTrue("Test usage error behavior." in result[0])
         self.assertTrue("'d' is not a valid integer." in result[1])
@@ -747,7 +742,6 @@ class TestDjangoParameters(TestCase):
                 call_command(cmd, args, force_color=True, no_color=True)
 
     def test_ctor_params(self):
-
         # check non-tty streams output expected constructor values and coloring
         stdout = StringIO()
         stderr = StringIO()
@@ -1198,7 +1192,7 @@ class TestGroups(TestCase):
                         sim := similarity(
                             result.stdout,
                             (
-                                TESTS_DIR / "test_app" / "helps" / f"groups.txt"
+                                TESTS_DIR / "test_app" / "helps" / "groups.txt"
                             ).read_text(),
                         ),
                         0.96,  # width inconsistences drive this number < 1
@@ -1628,7 +1622,6 @@ class TestCallCommandArgs(TestCase):
 
 @pytest.mark.skipif(not rich_installed, reason="rich not installed")
 class TestTracebackConfig(TestCase):
-
     rich_installed = True
 
     uninstall = False
@@ -1793,10 +1786,7 @@ def test_get_current_command_returns_none():
 
 
 class TestChaining(TestCase):
-
     def test_command_chaining(self):
-        from django_typer import OutputWrapper
-
         result = run_command(
             "chain", "command1", "--option=one", "command2", "--option=two"
         )[0]
@@ -1829,7 +1819,6 @@ SHELLS = [
 
 
 class TestPollExample(SimpleTestCase):
-
     q1 = None
     q2 = None
     q3 = None
@@ -2468,7 +2457,6 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertFalse(f'"{id}"' in result)
 
     def test_float_field(self):
-
         values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
         result = StringIO()
         with contextlib.redirect_stdout(result):
@@ -2727,7 +2715,6 @@ class TracebackTests(TestCase):
             call_command("tb", "error", "wrong")
 
     def test_usage_error_with_tb_if_requested(self):
-
         stdout, stderr, retcode = run_command(
             "tb", "--no-color", "--traceback", "wrong"
         )
@@ -2760,7 +2747,6 @@ class TracebackTests(TestCase):
             call_command("tb", "--traceback", "error", "wrong")
 
     def test_click_exception_retcodes_honored(self):
-
         self.assertEqual(run_command("vanilla")[2], 0)
         self.assertEqual(run_command("vanilla", "--exit-code=2")[2], 2)
 
@@ -2788,9 +2774,7 @@ class TracebackTests(TestCase):
 
 
 class TestHandleAsInit(TestCase):
-
     def test_handle_as_init_run(self):
-
         stdout, stderr, retcode = run_command("handle_as_init")
         self.assertTrue("handle" in stdout)
         self.assertFalse(stderr.strip())
@@ -2802,23 +2786,19 @@ class TestHandleAsInit(TestCase):
         self.assertEqual(retcode, 0)
 
     def test_handle_as_init_call(self):
-
         self.assertEqual(call_command("handle_as_init").strip(), "handle")
         self.assertEqual(
             call_command("handle_as_init", "subcommand").strip(), "subcommand"
         )
 
     def test_handle_as_init_direct(self):
-
         self.assertEqual(get_command("handle_as_init")(), "handle")
         self.assertEqual(get_command("handle_as_init", "subcommand")(), "subcommand")
         self.assertEqual(get_command("handle_as_init").subcommand(), "subcommand")
 
 
 class TestPromptOptions(TestCase):
-
     def test_run_with_option_prompt(self):
-
         cmd = interact("prompt", "--no-color", "cmd1", "bckohan")
         cmd.expect("Password: ")
         cmd.sendline("test_password")
@@ -2922,8 +2902,6 @@ class TestDefaultParamOverrides(TestCase):
     """
 
     def test_override_direct(self):
-        from django_typer.tests.test_app.management.commands.override import VersionEnum
-
         override = get_command("override")
         self.assertDictEqual(
             override("path/to/settings", version="1.1"),

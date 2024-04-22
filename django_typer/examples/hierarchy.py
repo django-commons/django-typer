@@ -8,7 +8,6 @@ from django_typer import TyperCommand, group
 
 
 class Command(TyperCommand):
-
     help = _("A more complex command that defines a hierarchy of subcommands.")
 
     precision = 2

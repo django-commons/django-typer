@@ -1,15 +1,15 @@
 r"""
 ::
 
-      ___ _                           _____                       
-     /   (_) __ _ _ __   __ _  ___   /__   \_   _ _ __   ___ _ __ 
+      ___ _                           _____
+     /   (_) __ _ _ __   __ _  ___   /__   \_   _ _ __   ___ _ __
     / /\ / |/ _` | '_ \ / _` |/ _ \    / /\/ | | | '_ \ / _ \ '__|
-   / /_//| | (_| | | | | (_| | (_) |  / /  | |_| | |_) |  __/ |   
-  /___,'_/ |\__,_|_| |_|\__, |\___/   \/    \__, | .__/ \___|_|   
-       |__/             |___/               |___/|_|              
+   / /_//| | (_| | | | | (_| | (_) |  / /  | |_| | |_) |  __/ |
+  /___,'_/ |\__,_|_| |_|\__, |\___/   \/    \__, | .__/ \___|_|
+       |__/             |___/               |___/|_|
 
 
-django-typer_ provides an extension class, :class:`~django_typer.TyperCommand`, to the 
+django-typer_ provides an extension class, :class:`~django_typer.TyperCommand`, to the
 BaseCommand_ class that melds the Typer_/click_ infrastructure with
 the Django_ infrastructure. The result is all the ease of specifying commands, groups
 and options and arguments using Typer_ and click_ in a way that feels like and is
@@ -62,7 +62,7 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 # the command's options. You can work around this by using a different name for the
 # option in the command and supplying the desired name in the annotation, but its an odd
 # quirk imposed by the base class for users to be aware of.
-
+# ruff: noqa: E402
 
 import inspect
 import sys
@@ -691,9 +691,7 @@ class GroupFunction(Typer):
                 deprecated=deprecated,
                 rich_help_panel=rich_help_panel,
                 **kwargs,
-            )(
-                f
-            )
+            )(f)
 
         return decorator
 
@@ -911,9 +909,10 @@ def initialize(
         setattr(
             func,
             "_typer_callback_",
-            lambda cmd, _name=None, _help=Default(
-                None
-            ), **extra: cmd.typer_app.callback(
+            lambda cmd,
+            _name=None,
+            _help=Default(None),
+            **extra: cmd.typer_app.callback(
                 name=name or _name,
                 cls=type("_AdaptedCallback", (cls,), {"django_command": cmd}),
                 invoke_without_command=invoke_without_command,
@@ -932,9 +931,7 @@ def initialize(
                 rich_help_panel=rich_help_panel,
                 **kwargs,
                 **extra,
-            )(
-                func
-            ),
+            )(func),
         )
         return func
 

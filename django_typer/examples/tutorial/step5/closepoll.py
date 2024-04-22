@@ -16,7 +16,6 @@ from django_typer.tests.polls.models import Question as Poll
 
 
 class Command(TyperCommand):
-
     def handle(
         self,
         polls: Annotated[
