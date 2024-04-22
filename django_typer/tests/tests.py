@@ -710,7 +710,9 @@ class TestDjangoParameters(TestCase):
 
     def test_settings(self):
         for cmd, args in self.commands:
-            run_command(cmd, "--settings", "django_typer.tests.settings.settings2", *args)
+            run_command(
+                cmd, "--settings", "django_typer.tests.settings.settings2", *args
+            )
             self.assertEqual(read_django_parameters().get("settings", None), 2)
 
     def test_color_params(self):
@@ -790,7 +792,10 @@ class TestDjangoParameters(TestCase):
     def test_skip_checks(self):
         for cmd, args in self.commands:
             result = run_command(
-                cmd, "--settings", "django_typer.tests.settings.settings_fail_check", *args
+                cmd,
+                "--settings",
+                "django_typer.tests.settings.settings_fail_check",
+                *args,
             )
             self.assertTrue("SystemCheckError" in result[1])
             self.assertTrue("test_app.E001" in result[1])
@@ -1242,7 +1247,10 @@ class TestGroups(TestCase):
             helps_dir = "helps" if self.rich_installed else "helps_no_rich"
             self.assertGreater(
                 sim := similarity(
-                    hlp, (TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt").read_text()
+                    hlp,
+                    (
+                        TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
+                    ).read_text(),
                 ),
                 0.96,  # width inconsistences drive this number < 1
             )
@@ -1570,7 +1578,9 @@ class TestGroups(TestCase):
         ],
     )
     def test_command_line_override(self):
-        self.test_command_line.__wrapped__(self, settings="django_typer.tests.settings.override")
+        self.test_command_line.__wrapped__(
+            self, settings="django_typer.tests.settings.override"
+        )
 
 
 class TestCallCommandArgs(TestCase):
@@ -2026,7 +2036,9 @@ class TestShellCompletersAndParsers(TestCase):
 
         self.assertEqual(
             json.loads(
-                call_command("completion", "django_typer_tests_apps_polls", option=test_app)
+                call_command(
+                    "completion", "django_typer_tests_apps_polls", option=test_app
+                )
             ),
             {
                 "django_apps": ["django_typer_tests_apps_polls"],
@@ -2909,7 +2921,9 @@ class TestDefaultParamOverrides(TestCase):
         )
 
     def test_override_cli(self):
-        from django_typer.tests.apps.test_app.management.commands.override import VersionEnum
+        from django_typer.tests.apps.test_app.management.commands.override import (
+            VersionEnum,
+        )
 
         result = run_command("override", "path/to/settings", "--version", "1.1")[0]
         self.assertEqual(
@@ -2923,7 +2937,9 @@ class TestDefaultParamOverrides(TestCase):
         )
 
     def test_override_call_command(self):
-        from django_typer.tests.apps.test_app.management.commands.override import VersionEnum
+        from django_typer.tests.apps.test_app.management.commands.override import (
+            VersionEnum,
+        )
 
         call_command("override", "path/to/settings", 1, version="1.1")
         self.assertDictEqual(

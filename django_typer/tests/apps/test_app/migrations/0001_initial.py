@@ -4,23 +4,44 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ShellCompleteTester',
+            name="ShellCompleteTester",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('char_field', models.CharField(db_index=True, default='', max_length=15)),
-                ('text_field', models.TextField(default='')),
-                ('float_field', models.FloatField(db_index=True, default=None, null=True)),
-                ('decimal_field', models.DecimalField(db_index=True, decimal_places=2, default=None, max_digits=10, null=True)),
-                ('uuid_field', models.UUIDField(default=None, null=True, unique=True)),
-                ('binary_field', models.BinaryField(default=None, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "char_field",
+                    models.CharField(db_index=True, default="", max_length=15),
+                ),
+                ("text_field", models.TextField(default="")),
+                (
+                    "float_field",
+                    models.FloatField(db_index=True, default=None, null=True),
+                ),
+                (
+                    "decimal_field",
+                    models.DecimalField(
+                        db_index=True,
+                        decimal_places=2,
+                        default=None,
+                        max_digits=10,
+                        null=True,
+                    ),
+                ),
+                ("uuid_field", models.UUIDField(default=None, null=True, unique=True)),
+                ("binary_field", models.BinaryField(default=None, null=True)),
             ],
         ),
     ]
