@@ -123,7 +123,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pytest django_typer/tests/completion_tests.py
+        poetry run pytest django_typer/tests/shellcompletion/*
         mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -207,7 +207,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        poetry run pytest django_typer/tests/completion_tests.py::ZshShellTests || exit 1
+        poetry run pytest django_typer/tests/shellcompletion/test_zsh.py || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
