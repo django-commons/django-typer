@@ -126,7 +126,7 @@ sphinx = true
 
 [tool.pytest.ini_options]
 # py.test options:
-DJANGO_SETTINGS_MODULE = "django_typer.tests.settings"
+DJANGO_SETTINGS_MODULE = "django_typer.tests.settings.base"
 python_files = "tests.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 env = [

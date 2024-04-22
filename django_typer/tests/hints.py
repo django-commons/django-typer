@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_typer.tests.settings")
 django.setup()
 
 
-from django_typer.tests.test_app.management.commands.groups import (
+from django_typer.tests.apps.test_app.management.commands.groups import (
     Command as GroupCommand,
 )
 

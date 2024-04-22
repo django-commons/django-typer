@@ -1,1 +1,0 @@
-../../../../examples/tutorial/step6/closepoll.py

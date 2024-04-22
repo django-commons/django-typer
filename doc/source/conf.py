@@ -5,7 +5,7 @@ from pathlib import Path
 from sphinx.ext.autodoc import between
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings.base')
 django.setup()
 
 sys.path.append(str(Path(__file__).parent / 'django_typer' / 'examples'))

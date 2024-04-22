@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
 from django_typer import TyperCommand
-from django_typer.tests.polls.models import Question as Poll
+from django_typer.tests.apps.polls.models import Question as Poll
 
 
 def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:

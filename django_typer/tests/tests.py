@@ -22,8 +22,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from django_typer import TyperCommand, get_command, group
-from django_typer.tests.polls.models import Question
-from django_typer.tests.test_app.models import ShellCompleteTester
+from django_typer.tests.apps.polls.models import Question
+from django_typer.tests.apps.test_app.models import ShellCompleteTester
 from django_typer.tests.utils import read_django_parameters
 from django_typer.utils import get_current_command
 
@@ -152,7 +152,7 @@ class BasicTests(TestCase):
             {"arg1": "a1", "arg2": "a2", "arg3": 0.5, "arg4": 1},
         )
 
-        from django_typer.tests.test_app.management.commands.basic import (
+        from django_typer.tests.apps.test_app.management.commands.basic import (
             Command as Basic,
         )
 
@@ -397,14 +397,14 @@ class MultiTests(TestCase):
 
 class TestGetCommand(TestCase):
     def test_get_command(self):
-        from django_typer.tests.test_app.management.commands.basic import (
+        from django_typer.tests.apps.test_app.management.commands.basic import (
             Command as Basic,
         )
 
         basic = get_command("basic")
         assert basic.__class__ == Basic
 
-        from django_typer.tests.test_app.management.commands.multi import (
+        from django_typer.tests.apps.test_app.management.commands.multi import (
             Command as Multi,
         )
 
@@ -417,7 +417,7 @@ class TestGetCommand(TestCase):
         cmd3 = get_command("multi", "cmd3")
         assert cmd3.__func__ is multi.cmd3.__func__
 
-        from django_typer.tests.test_app.management.commands.callback1 import (
+        from django_typer.tests.apps.test_app.management.commands.callback1 import (
             Command as Callback1,
         )
 
@@ -710,7 +710,7 @@ class TestDjangoParameters(TestCase):
 
     def test_settings(self):
         for cmd, args in self.commands:
-            run_command(cmd, "--settings", "django_typer.tests.settings2", *args)
+            run_command(cmd, "--settings", "django_typer.tests.settings.settings2", *args)
             self.assertEqual(read_django_parameters().get("settings", None), 2)
 
     def test_color_params(self):
@@ -790,7 +790,7 @@ class TestDjangoParameters(TestCase):
     def test_skip_checks(self):
         for cmd, args in self.commands:
             result = run_command(
-                cmd, "--settings", "django_typer.tests.settings_fail_check", *args
+                cmd, "--settings", "django_typer.tests.settings.settings_fail_check", *args
             )
             self.assertTrue("SystemCheckError" in result[1])
             self.assertTrue("test_app.E001" in result[1])
@@ -799,7 +799,7 @@ class TestDjangoParameters(TestCase):
                 cmd,
                 "--skip-checks",
                 "--settings",
-                "django_typer.tests.settings_fail_check",
+                "django_typer.tests.settings.settings_fail_check",
                 *args,
             )
             self.assertFalse("SystemCheckError" in result[1])
@@ -1192,7 +1192,7 @@ class TestGroups(TestCase):
                         sim := similarity(
                             result.stdout,
                             (
-                                TESTS_DIR / "test_app" / "helps" / "groups.txt"
+                                TESTS_DIR / "apps" / "test_app" / "helps" / "groups.txt"
                             ).read_text(),
                         ),
                         0.96,  # width inconsistences drive this number < 1
@@ -1203,7 +1203,7 @@ class TestGroups(TestCase):
 
     @override_settings(
         INSTALLED_APPS=[
-            "django_typer.tests.test_app",
+            "django_typer.tests.apps.test_app",
             "django.contrib.admin",
             "django.contrib.auth",
             "django.contrib.contenttypes",
@@ -1242,7 +1242,7 @@ class TestGroups(TestCase):
             helps_dir = "helps" if self.rich_installed else "helps_no_rich"
             self.assertGreater(
                 sim := similarity(
-                    hlp, (TESTS_DIR / app / helps_dir / f"{cmds[-1]}.txt").read_text()
+                    hlp, (TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt").read_text()
                 ),
                 0.96,  # width inconsistences drive this number < 1
             )
@@ -1256,8 +1256,8 @@ class TestGroups(TestCase):
 
     @override_settings(
         INSTALLED_APPS=[
-            "django_typer.tests.test_app2",
-            "django_typer.tests.test_app",
+            "django_typer.tests.apps.test_app2",
+            "django_typer.tests.apps.test_app",
             "django.contrib.admin",
             "django.contrib.auth",
             "django.contrib.contenttypes",
@@ -1271,7 +1271,7 @@ class TestGroups(TestCase):
 
     @override_settings(
         INSTALLED_APPS=[
-            "django_typer.tests.test_app",
+            "django_typer.tests.apps.test_app",
             "django.contrib.admin",
             "django.contrib.auth",
             "django.contrib.contenttypes",
@@ -1559,8 +1559,8 @@ class TestGroups(TestCase):
 
     @override_settings(
         INSTALLED_APPS=[
-            "django_typer.tests.test_app2",
-            "django_typer.tests.test_app",
+            "django_typer.tests.apps.test_app2",
+            "django_typer.tests.apps.test_app",
             "django.contrib.admin",
             "django.contrib.auth",
             "django.contrib.contenttypes",
@@ -1570,14 +1570,14 @@ class TestGroups(TestCase):
         ],
     )
     def test_command_line_override(self):
-        self.test_command_line.__wrapped__(self, settings="django_typer.tests.override")
+        self.test_command_line.__wrapped__(self, settings="django_typer.tests.settings.override")
 
 
 class TestCallCommandArgs(TestCase):
     @override_settings(
         INSTALLED_APPS=[
-            "django_typer.tests.test_app2",
-            "django_typer.tests.test_app",
+            "django_typer.tests.apps.test_app2",
+            "django_typer.tests.apps.test_app",
             "django.contrib.admin",
             "django.contrib.auth",
             "django.contrib.contenttypes",
@@ -1597,26 +1597,26 @@ class TestCallCommandArgs(TestCase):
         # turns out call_command will also turn options values into strings you've flagged them as required
         # and they're passed in as named parameters
 
-        test_app = apps.get_app_config("django_typer_tests_test_app")
-        test_app2 = apps.get_app_config("django_typer_tests_test_app2")
+        test_app = apps.get_app_config("django_typer_tests_apps_test_app")
+        test_app2 = apps.get_app_config("django_typer_tests_apps_test_app2")
 
         out = StringIO()
         call_command(
             "completion",
-            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
             stdout=out,
         )
         printed_options = json.loads(out.getvalue())
         self.assertEqual(
             printed_options,
-            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
         )
 
         out = StringIO()
         printed_options = json.loads(get_command("completion")([test_app, test_app2]))
         self.assertEqual(
             printed_options,
-            ["django_typer_tests_test_app", "django_typer_tests_test_app2"],
+            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
         )
 
 
@@ -1662,7 +1662,7 @@ class TestTracebackConfig(TestCase):
         result = run_command(
             "test_command1",
             "--settings",
-            "django_typer.tests.settings_tb_false",
+            "django_typer.tests.settings.settings_tb_false",
             "delete",
             "me",
             "--throw",
@@ -1675,7 +1675,7 @@ class TestTracebackConfig(TestCase):
         result = run_command(
             "test_command1",
             "--settings",
-            "django_typer.tests.settings_tb_none",
+            "django_typer.tests.settings.settings_tb_none",
             "delete",
             "me",
             "--throw",
@@ -1689,7 +1689,7 @@ class TestTracebackConfig(TestCase):
             "test_command1",
             "--no-color",
             "--settings",
-            "django_typer.tests.settings_tb_change_defaults",
+            "django_typer.tests.settings.settings_tb_change_defaults",
             "delete",
             "me",
             "--throw",
@@ -1712,7 +1712,7 @@ class TestTracebackConfig(TestCase):
             result = run_command(
                 "test_command1",
                 "--settings",
-                "django_typer.tests.settings_throw_init_exception",
+                "django_typer.tests.settings.settings_throw_init_exception",
                 "--no-color",
                 "delete",
                 "me",
@@ -1729,7 +1729,7 @@ class TestTracebackConfig(TestCase):
             result = run_command(
                 "test_command1",
                 "--settings",
-                "django_typer.tests.settings_tb_no_install",
+                "django_typer.tests.settings.settings_tb_no_install",
                 "delete",
                 "me",
             )[1]
@@ -1762,11 +1762,11 @@ class TestTracebackConfigNoRich(TestTracebackConfig):
 class TestSettingsSystemCheck(TestCase):
     def test_warning_thrown(self):
         result = run_command(
-            "noop", "--settings", "django_typer.tests.settings_tb_bad_config"
+            "noop", "--settings", "django_typer.tests.settings.settings_tb_bad_config"
         )[1]
         if rich_installed:
             self.assertIn(
-                "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
+                "django_typer.tests.settings.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
                 result,
             )
             self.assertIn(
@@ -1774,7 +1774,7 @@ class TestSettingsSystemCheck(TestCase):
             )
         else:
             self.assertNotIn(
-                "django_typer.tests.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
+                "django_typer.tests.settings.settings_tb_bad_config: (django_typer.W001) DT_RICH_TRACEBACK_CONFIG",
                 result,
             )
 
@@ -1962,7 +1962,7 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_model_object_parser_idempotency(self):
         from django_typer.parsers import ModelObjectParser
-        from django_typer.tests.polls.models import Question
+        from django_typer.tests.apps.polls.models import Question
 
         parser = ModelObjectParser(Question)
         self.assertEqual(parser.convert(self.q1, None, None), self.q1)
@@ -1970,7 +1970,7 @@ class TestShellCompletersAndParsers(TestCase):
     def test_app_label_parser_idempotency(self):
         from django_typer.parsers import parse_app_label
 
-        poll_app = apps.get_app_config("django_typer_tests_polls")
+        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
         self.assertEqual(parse_app_label(poll_app), poll_app)
 
     def test_app_label_parser_completers(self):
@@ -1982,55 +1982,55 @@ class TestShellCompletersAndParsers(TestCase):
                 "shellcompletion", "complete", "completion django_typer.tests."
             )
         result = result.getvalue()
-        self.assertTrue("django_typer.tests.polls" in result)
-        self.assertTrue("django_typer.tests.test_app" in result)
+        self.assertTrue("django_typer.tests.apps.polls" in result)
+        self.assertTrue("django_typer.tests.apps.test_app" in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "completion django_typer_tests")
         result = result.getvalue()
-        self.assertTrue("django_typer_tests_polls" in result)
-        self.assertTrue("django_typer_tests_test_app" in result)
+        self.assertTrue("django_typer_tests_apps_polls" in result)
+        self.assertTrue("django_typer_tests_apps_test_app" in result)
 
         self.assertEqual(
-            json.loads(call_command("completion", "django_typer_tests_polls")),
-            ["django_typer_tests_polls"],
+            json.loads(call_command("completion", "django_typer_tests_apps_polls")),
+            ["django_typer_tests_apps_polls"],
         )
         self.assertEqual(
-            json.loads(call_command("completion", "django_typer.tests.polls")),
-            ["django_typer_tests_polls"],
+            json.loads(call_command("completion", "django_typer.tests.apps.polls")),
+            ["django_typer_tests_apps_polls"],
         )
 
         with self.assertRaises(CommandError):
             call_command("completion", "django_typer_tests.polls")
 
-        poll_app = apps.get_app_config("django_typer_tests_polls")
-        test_app = apps.get_app_config("django_typer_tests_test_app")
+        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
+        test_app = apps.get_app_config("django_typer_tests_apps_test_app")
         cmd = get_command("completion")
         self.assertEqual(
             json.loads(cmd([poll_app])),
-            ["django_typer_tests_polls"],
+            ["django_typer_tests_apps_polls"],
         )
 
         self.assertEqual(
-            json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_polls"]
+            json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_apps_polls"]
         )
 
         self.assertEqual(
             json.loads(cmd(django_apps=[poll_app], option=test_app)),
             {
-                "django_apps": ["django_typer_tests_polls"],
-                "option": "django_typer_tests_test_app",
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
             },
         )
 
         self.assertEqual(
             json.loads(
-                call_command("completion", "django_typer_tests_polls", option=test_app)
+                call_command("completion", "django_typer_tests_apps_polls", option=test_app)
             ),
             {
-                "django_apps": ["django_typer_tests_polls"],
-                "option": "django_typer_tests_test_app",
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
             },
         )
 
@@ -2038,13 +2038,13 @@ class TestShellCompletersAndParsers(TestCase):
             json.loads(
                 call_command(
                     "completion",
-                    "django_typer_tests_polls",
-                    "--option=django_typer_tests_test_app",
+                    "django_typer_tests_apps_polls",
+                    "--option=django_typer_tests_apps_test_app",
                 )
             ),
             {
-                "django_apps": ["django_typer_tests_polls"],
-                "option": "django_typer_tests_test_app",
+                "django_apps": ["django_typer_tests_apps_polls"],
+                "option": "django_typer_tests_apps_test_app",
             },
         )
 
@@ -2909,7 +2909,7 @@ class TestDefaultParamOverrides(TestCase):
         )
 
     def test_override_cli(self):
-        from django_typer.tests.test_app.management.commands.override import VersionEnum
+        from django_typer.tests.apps.test_app.management.commands.override import VersionEnum
 
         result = run_command("override", "path/to/settings", "--version", "1.1")[0]
         self.assertEqual(
@@ -2923,7 +2923,7 @@ class TestDefaultParamOverrides(TestCase):
         )
 
     def test_override_call_command(self):
-        from django_typer.tests.test_app.management.commands.override import VersionEnum
+        from django_typer.tests.apps.test_app.management.commands.override import VersionEnum
 
         call_command("override", "path/to/settings", 1, version="1.1")
         self.assertDictEqual(
