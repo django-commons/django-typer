@@ -1,4 +1,3 @@
-
 import pytest
 import shutil
 from django_typer.tests.shellcompletion import _DefaultCompleteTestCase

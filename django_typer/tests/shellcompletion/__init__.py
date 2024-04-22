@@ -215,4 +215,3 @@ class _InstalledScriptTestCase(_DefaultCompleteTestCase):
         # make the script executable
         os.chmod(exe, os.stat(exe).st_mode | 0o111)
         super().setUp()
-

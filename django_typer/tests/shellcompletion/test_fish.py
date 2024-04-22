@@ -1,6 +1,9 @@
 import pytest
 import shutil
-from django_typer.tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTestCase
+from django_typer.tests.shellcompletion import (
+    _DefaultCompleteTestCase,
+    _InstalledScriptTestCase,
+)
 from django.test import TestCase
 import os
 import sys

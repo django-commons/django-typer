@@ -1,6 +1,9 @@
 import pytest
 import shutil
-from django_typer.tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTestCase
+from django_typer.tests.shellcompletion import (
+    _DefaultCompleteTestCase,
+    _InstalledScriptTestCase,
+)
 from django.test import TestCase
 import os
 import sys
@@ -36,4 +39,3 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashExeShellTests(_InstalledScriptTestCase, BashShellTests):
     shell = "bash"
-
