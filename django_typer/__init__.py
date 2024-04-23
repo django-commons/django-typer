@@ -86,6 +86,8 @@ from django_typer import patch
 patch.apply()
 
 from typer import Typer
+from typer import echo as typer_echo
+from typer import secho as typer_secho
 from typer.core import MarkupMode
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
@@ -1992,3 +1994,48 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         finally:
             self.no_color = no_color
             self.force_color = force_color
+
+    def echo(
+        self, message: t.Optional[t.Any] = None, nl: bool = True, err: bool = False
+    ):
+        """
+        A wrapper for `typer.echo() <https://typer.tiangolo.com/tutorial/printing/#typer-echo>`_
+        that response --no-color and --force-color flags, and writes to the command's stdout.
+
+        :param message: The string or bytes to output. Other objects are
+            converted to strings.
+        :param err: Write to ``stderr`` instead of ``stdout``.
+        :param nl: Print a newline after the message. Enabled by default.
+        """
+
+        return typer_echo(
+            message=message,
+            file=t.cast(t.IO[str], self.stderr._out if err else self.stdout._out),
+            nl=nl,
+            color=False if self.no_color else True if self.force_color else None,
+        )
+
+    def secho(
+        self,
+        message: t.Optional[t.Any] = None,
+        nl: bool = True,
+        err: bool = False,
+        **styles: t.Any,
+    ):
+        """
+        A wrapper for `typer.secho() <https://typer.tiangolo.com/tutorial/printing/#typersecho-style-and-print>`_
+        that response --no-color and --force-color flags, and writes to the command's stdout.
+
+        :param message: The string or bytes to output. Other objects are
+            converted to strings.
+        :param err: Write to ``stderr`` instead of ``stdout``.
+        :param nl: Print a newline after the message. Enabled by default.
+        :param styles: Styles to apply to the output
+        """
+        return typer_secho(
+            message=message,
+            file=t.cast(t.IO[str], self.stderr._out if err else self.stdout._out),
+            nl=nl,
+            color=False if self.no_color else True if self.force_color else None,
+            **styles,
+        )

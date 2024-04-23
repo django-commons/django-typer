@@ -6,6 +6,7 @@ v1.2.0
 ======
 
 * Implemented `Switch to ruff for linting and formatting. <https://github.com/bckohan/django-typer/issues/56>`_
+* Implemented `Add a wrapper for typer's echo/secho <https://github.com/bckohan/django-typer/issues/55>`_
 * Implemented `Better test organization. <https://github.com/bckohan/django-typer/issues/34>`_
 
 

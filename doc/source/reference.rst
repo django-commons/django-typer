@@ -17,6 +17,7 @@ django_typer
    :show-inheritance:
 
 .. autoclass:: django_typer.TyperCommand
+    :members:
 
 .. autoclass:: django_typer.TyperCommandMeta
 

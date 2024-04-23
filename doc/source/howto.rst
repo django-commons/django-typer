@@ -171,7 +171,7 @@ default we can do this:
 
 Lets look at the help output:
 
-.. typer:: django_typer.tests.test_app.management.commands.howto2.Command:typer_app
+.. typer:: django_typer.tests.apps.test_app.management.commands.howto2.Command:typer_app
     :width: 80
 
 
@@ -474,3 +474,34 @@ You'll also need to make sure that Django is bootstrapped in your conf.py file:
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'path.to.your.settings')
     django.setup()
+
+
+print, self.stdout and typer.echo
+---------------------------------
+
+There are no unbreakable rules about how you should print output from your commands.
+You could use loggers, normal print statements or the BaseCommand_ stdout and
+stderr output wrappers. Django advises the use of ``self.stdout.write`` because the
+stdout and stderr streams can be configured by calls to call_command_ or
+:func:`~django_tyoer.get_command` which allows you to easily grab output from your
+commands for testing. Using the command's configured stdout and stderr
+output wrappers also means output will respect the ``--force-color`` and ``--no-color``
+parameters.
+
+Typer_ and click_ provide `echo and secho <https://typer.tiangolo.com/tutorial/printing/>`_
+functions that automatically handle byte to string conversions and offer simple styling
+support. :class:`~django_typer.TyperCommand` provides :func:`~django_typer.TyperCommand.echo` and
+:func:`~django_typer.TyperCommand.secho` wrapper functions for the Typer_ echo/secho
+functions. If you wish to use Typer_'s echo you should use these wrapper functions because
+they honor the command's ``--force-color`` and ``--no-color`` flags and the configured stdout/stderr
+streams:
+
+.. code-block:: python
+
+    import typer
+    from django_typer import TyperCommand
+
+    class Command(TyperCommand):
+
+        def handle(self):
+            self.secho('Success!', fg=typer.colors.GREEN)
