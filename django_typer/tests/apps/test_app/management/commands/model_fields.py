@@ -110,6 +110,13 @@ class Command(TyperCommand):
                 help=_("Fetch objects by their decimal fields."),
             ),
         ] = None,
+        ip: Annotated[
+            t.List[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "ip_field"),
+                help=_("Fetch objects by their IP address fields."),
+            ),
+        ] = None,
     ):
         assert self.__class__ == Command
         objects = {}
@@ -139,4 +146,8 @@ class Command(TyperCommand):
         if decimal is not None:
             assert isinstance(decimal, ShellCompleteTester)
             objects["decimal"] = {decimal.id: str(decimal.decimal_field)}
+        if ip is not None:
+            for addr in ip:
+                assert isinstance(addr, ShellCompleteTester)
+            objects["ip"] = [{addr.id: addr.ip_field} for addr in ip]
         return json.dumps(objects)

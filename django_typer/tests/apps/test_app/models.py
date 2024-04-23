@@ -11,3 +11,5 @@ class ShellCompleteTester(models.Model):
     uuid_field = models.UUIDField(null=True, default=None, unique=True)
 
     binary_field = models.BinaryField(null=True, default=None)
+
+    ip_field = models.GenericIPAddressField(null=True, default=None, db_index=True)

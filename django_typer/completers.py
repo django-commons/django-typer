@@ -28,6 +28,7 @@ from django.db.models import (
     DecimalField,
     Field,
     FloatField,
+    GenericIPAddressField,
     IntegerField,
     Max,
     Model,
@@ -60,6 +61,7 @@ class ModelObjectCompleter:
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
+        - `GenericIPAddressField <https://docs.djangoproject.com/en/stable/ref/models/fields/#genericipaddressfield>`_
 
     The completer query logic is pluggable, but the defaults cover most use cases. The
     limit field is important. It defaults to 50 meaning if more than 50 potential completions
@@ -271,7 +273,7 @@ class ModelObjectCompleter:
         else:
             if isinstance(self._field, IntegerField):
                 self.query = self.int_query
-            elif isinstance(self._field, (CharField, TextField)):
+            elif isinstance(self._field, (CharField, TextField, GenericIPAddressField)):
                 self.query = self.text_query
             elif isinstance(self._field, UUIDField):
                 self.query = self.uuid_query

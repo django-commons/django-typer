@@ -15,41 +15,53 @@ from django_typer.tests.utils import run_command
 
 
 class TestShellCompletersAndParsers(TestCase):
+    field_values = {
+        "char_field": ["jon", "john", "jack", "jason"],
+        "text_field": [
+            "sockeye",
+            "chinook",
+            "steelhead",
+            "coho",
+            "atlantic",
+            "pink",
+            "chum",
+        ],
+        "float_field": [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
+        "decimal_field": [
+            Decimal("1.5"),
+            Decimal("1.50"),
+            Decimal("1.51"),
+            Decimal("1.52"),
+            Decimal("1.2"),
+            Decimal("1.6"),
+        ],
+        "uuid_field": [
+            "12345678-1234-5678-1234-567812345678",
+            "12345678-1234-5678-1234-567812345679",
+            "12345678-5678-5678-1234-567812345670",
+            "12345678-5678-5678-1234-567812345671",
+            "12345678-5678-5678-1234-A67812345671",
+            "12345678-5678-5678-f234-A67812345671",
+        ],
+        "ip_field": [
+            "192.168.1.1",
+            "192.0.2.30",
+            "10.0.0.1",
+            "2a02:42fe::4",
+            "2a02:42ae::4",
+            #'2001:0::0:01', this gets normalized to the one below
+            "2001::1",
+            "::ffff:10.10.10.10",
+        ],
+    }
+
     def setUp(self):
         super().setUp()
         self.q1 = Question.objects.create(
             question_text="Is Putin a war criminal?",
             pub_date=timezone.now(),
         )
-        for field, values in {
-            "char_field": ["jon", "john", "jack", "jason"],
-            "text_field": [
-                "sockeye",
-                "chinook",
-                "steelhead",
-                "coho",
-                "atlantic",
-                "pink",
-                "chum",
-            ],
-            "float_field": [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0],
-            "decimal_field": [
-                Decimal("1.5"),
-                Decimal("1.50"),
-                Decimal("1.51"),
-                Decimal("1.52"),
-                Decimal("1.2"),
-                Decimal("1.6"),
-            ],
-            "uuid_field": [
-                "12345678-1234-5678-1234-567812345678",
-                "12345678-1234-5678-1234-567812345679",
-                "12345678-5678-5678-1234-567812345670",
-                "12345678-5678-5678-1234-567812345671",
-                "12345678-5678-5678-1234-A67812345671",
-                "12345678-5678-5678-f234-A67812345671",
-            ],
-        }.items():
+        for field, values in self.field_values.items():
             for value in values:
                 ShellCompleteTester.objects.create(**{field: value})
 
@@ -198,6 +210,89 @@ class TestShellCompletersAndParsers(TestCase):
 
         with self.assertRaises(RuntimeError):
             call_command("model_fields", "test", "--ichar", "jane")
+
+    def test_ip_field(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ip ")
+        result = result.getvalue()
+        for ip in self.field_values["ip_field"]:
+            self.assertTrue(ip in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ip 2001:")
+        result = result.getvalue()
+        for ip in ["2001::1"]:
+            self.assertTrue(ip in result)
+
+        # IP normalization complexity is unhandled
+        # result = StringIO()
+        # with contextlib.redirect_stdout(result):
+        #     call_command("shellcompletion", "complete", "model_fields test --ip 2001:0")
+        # result = result.getvalue()
+        # self.assertFalse(result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --ip 2a02:42"
+            )
+        result = result.getvalue()
+        for ip in ["2a02:42fe::4", "2a02:42ae::4"]:
+            self.assertTrue(ip in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --ip 2a02:42f"
+            )
+        result = result.getvalue()
+        for ip in ["2a02:42fe::4"]:
+            self.assertTrue(ip in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ip 192.")
+        result = result.getvalue()
+        for ip in ["192.168.1.1", "192.0.2.30"]:
+            self.assertTrue(ip in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ip 192.1")
+        result = result.getvalue()
+        for ip in ["192.168.1.1"]:
+            self.assertTrue(ip in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --ip :")
+        result = result.getvalue()
+        for ip in ["::ffff:10.10.10.10"]:
+            self.assertTrue(ip in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields", "test", "--ip", "2001:0::0:01", "--ip", "192.0.2.30"
+                )
+            ),
+            {
+                "ip": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(ip_field="2001:0::0:01").pk
+                        ): "2001::1"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(ip_field="192.0.2.30").pk
+                        ): "192.0.2.30"
+                    },
+                ]
+            },
+        )
 
     def test_text_field(self):
         result = StringIO()
