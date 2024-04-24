@@ -71,7 +71,7 @@ class TestShellCompletersAndParsers(TestCase):
         return super().tearDown()
 
     def test_model_object_parser_metavar(self):
-        result = run_command("model_fields", "test", "--help", "--no-color")[0]
+        result = run_command("model_fields", "--no-color", "test", "--help")[0]
         self.assertTrue(re.search(r"--char\s+TXT", result))
         self.assertTrue(re.search(r"--ichar\s+TXT", result))
         self.assertTrue(re.search(r"--text\s+TXT", result))
