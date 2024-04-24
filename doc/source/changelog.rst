@@ -5,6 +5,7 @@ Change Log
 v1.2.0
 ======
 
+* Fixed `ModelObjectParser should use a metavar appropriate to the field type. <https://github.com/bckohan/django-typer/issues/60>`_
 * Implemented `Switch to ruff for linting and formatting. <https://github.com/bckohan/django-typer/issues/56>`_
 * Implemented `Add a wrapper for typer's echo/secho <https://github.com/bckohan/django-typer/issues/55>`_
 * Implemented `Better test organization. <https://github.com/bckohan/django-typer/issues/34>`_

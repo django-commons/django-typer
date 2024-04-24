@@ -2,6 +2,7 @@ import contextlib
 import json
 from decimal import Decimal
 from io import StringIO
+import re
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -70,13 +71,23 @@ class TestShellCompletersAndParsers(TestCase):
         return super().tearDown()
 
     def test_model_object_parser_metavar(self):
-        result = run_command("poll_as_option", "--help", "--no-color")
-        found = False
-        for line in result[0].splitlines():
-            if "--polls" in line:
-                self.assertTrue("POLL" in line)
-                found = True
-        self.assertTrue(found)
+        result = run_command("model_fields", "test", "--help", "--no-color")[0]
+        self.assertTrue(re.search(r"--char\s+TXT", result))
+        self.assertTrue(re.search(r"--ichar\s+TXT", result))
+        self.assertTrue(re.search(r"--text\s+TXT", result))
+        self.assertTrue(re.search(r"--itext\s+TXT", result))
+        self.assertTrue(re.search(r"--uuid\s+UUID", result))
+        self.assertTrue(re.search(r"--id\s+INT", result))
+        self.assertTrue(re.search(r"--id-limit\s+INT", result))
+        self.assertTrue(re.search(r"--float\s+FLOAT", result))
+        self.assertTrue(re.search(r"--decimal\s+FLOAT", result))
+        self.assertTrue(re.search(r"--ip\s+\[IPV4\|IPV6\]", result))
+        self.assertTrue(re.search(r"--email\s+EMAIL", result))
+        self.assertTrue(re.search(r"--url\s+URL", result))
+
+    def test_model_object_parser_metavar_override(self):
+        result = run_command("poll_as_option", "--help", "--no-color")[0]
+        self.assertTrue(re.search(r"--polls\s+POLL", result))
 
     def test_model_object_parser_idempotency(self):
         from django_typer.parsers import ModelObjectParser

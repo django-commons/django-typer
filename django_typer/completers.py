@@ -133,6 +133,9 @@ class ModelObjectCompleter:
 
     _field: Field
 
+    def to_str(self, obj: t.Any) -> str:
+        return str(obj)
+
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
         The default completion query builder for integer fields. This method will
@@ -319,7 +322,7 @@ class ModelObjectCompleter:
             CompletionItem(
                 # use the incomplete string prefix incase this was a case insensitive match
                 value=incomplete
-                + str(getattr(obj, self.lookup_field))[
+                + self.to_str(getattr(obj, self.lookup_field))[
                     len(incomplete) + self._offset :
                 ],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
@@ -329,7 +332,7 @@ class ModelObjectCompleter:
             .distinct()[0 : self.limit]
             if (
                 getattr(obj, self.lookup_field) is not None
-                and str(getattr(obj, self.lookup_field))
+                and self.to_str(getattr(obj, self.lookup_field))
                 and obj not in excluded
             )
         ]

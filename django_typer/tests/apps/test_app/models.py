@@ -13,3 +13,7 @@ class ShellCompleteTester(models.Model):
     binary_field = models.BinaryField(null=True, default=None)
 
     ip_field = models.GenericIPAddressField(null=True, default=None, db_index=True)
+
+    email_field = models.EmailField(null=True, default=None, db_index=True)
+
+    url_field = models.URLField(null=True, default=None, db_index=True)

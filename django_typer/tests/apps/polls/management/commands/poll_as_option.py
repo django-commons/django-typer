@@ -19,7 +19,10 @@ class Command(TyperCommand):
         self,
         polls: Annotated[
             t.List[Poll],
-            Option(**model_parser_completer(Poll, help_field="question_text")),
+            Option(
+                **model_parser_completer(Poll, help_field="question_text"),
+                metavar="POLL",
+            ),
         ],
         delete: Annotated[
             bool, Option(help="Delete poll instead of closing it.")

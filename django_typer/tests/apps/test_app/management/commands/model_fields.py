@@ -1,6 +1,7 @@
 import json
 import sys
 import typing as t
+import datetime
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
@@ -17,6 +18,7 @@ from django_typer import (
     model_parser_completer,
     types,
 )
+from decimal import Decimal
 from django_typer.completers import ModelObjectCompleter
 from django_typer.tests.apps.test_app.models import ShellCompleteTester
 
@@ -115,6 +117,20 @@ class Command(TyperCommand):
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "ip_field"),
                 help=_("Fetch objects by their IP address fields."),
+            ),
+        ] = None,
+        email: Annotated[
+            t.List[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "email_field"),
+                help=_("Fetch objects by their email fields."),
+            ),
+        ] = None,
+        url: Annotated[
+            t.List[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "url_field"),
+                help=_("Fetch objects by their url fields."),
             ),
         ] = None,
     ):
