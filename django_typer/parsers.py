@@ -83,7 +83,7 @@ class ModelObjectParser(ParamType):
 
     __name__: str = "MODEL"  # typer internals expect this
 
-    def _get_metavar(self) -> t.Optional[str]:
+    def _get_metavar(self) -> str:
         if isinstance(self._field, models.IntegerField):
             return "INT"
         elif isinstance(self._field, models.EmailField):
