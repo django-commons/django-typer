@@ -455,6 +455,10 @@ class TestGroups(TestCase):
             self, settings="django_typer.tests.settings.override"
         )
 
+    def test_no_subgroup_leaks(self):
+        with self.assertRaises(CommandError):
+            call_command("groups", "case", "--help")
+
 
 class TestCallCommandArgs(TestCase):
     @override_settings(

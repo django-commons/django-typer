@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django_typer.utils import register_command_extensions
 
 
 class Adapter1Config(AppConfig):
@@ -7,4 +8,6 @@ class Adapter1Config(AppConfig):
     verbose_name = "Adapter 1"
 
     def ready(self):
-        print(self.label)
+        from .management import adapters
+
+        register_command_extensions(adapters)

@@ -85,6 +85,8 @@ from django_typer import patch
 
 patch.apply()
 
+from typing import Generic
+
 from typer import Typer
 from typer import echo as typer_echo
 from typer import secho as typer_secho
@@ -108,7 +110,14 @@ from .types import (
     Verbosity,
     Version,
 )
-from .utils import _command_context, get_usage_script, traceback_config, with_typehint
+from .utils import (
+    _command_context,
+    called_from_module,
+    get_usage_script,
+    load_command_extensions,
+    traceback_config,
+    with_typehint,
+)
 
 if sys.version_info < (3, 10):
     from typing_extensions import ParamSpec
@@ -210,6 +219,7 @@ def get_command(
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
+    **kwargs: t.Dict[str, t.Any],
 ) -> t.Union[BaseCommand, MethodType]:
     """
     Get a Django_ command by its name and instantiate it with the provided options. This
@@ -249,6 +259,7 @@ def get_command(
     :param stderr: the stderr stream to use
     :param no_color: whether to disable color
     :param force_color: whether to force color
+    :param kwargs: Any other parameters to pass through to the command constructor
     :raises ModuleNotFoundError: if the command is not found
     :raises LookupError: if the subcommand is not found
     """
@@ -256,7 +267,11 @@ def get_command(
         f"{get_commands()[command_name]}.management.commands.{command_name}"
     )
     cmd = module.Command(
-        stdout=stdout, stderr=stderr, no_color=no_color, force_color=force_color
+        stdout=stdout,
+        stderr=stderr,
+        no_color=no_color,
+        force_color=force_color,
+        **kwargs,
     )
     if subcommand:
         method = cmd.get_subcommand(*subcommand).click_command._callback.__wrapped__
@@ -454,37 +469,44 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     def __init__(
         self,
         *args,
-        callback: t.Callable[..., t.Any],
+        callback: t.Optional[t.Callable[..., t.Any]],
         params: t.Optional[t.List[click.Parameter]] = None,
         **kwargs,
     ):
         params = params or []
         self._callback = callback
-        expected = [param.name for param in params[1:] if param.name]
-        self_arg = params[0].name if params and params[0].name else "self"
+        self.callback_is_method = bool(
+            self.callback_is_method and params and params[0].name == "self"
+        )
+        expected = [
+            param.name
+            for param in params[1 if self.callback_is_method else 0 :]
+            if param.name
+        ]
 
         def call_with_self(*args, **kwargs):
-            ctx = t.cast(Context, click.get_current_context())
-            return callback(
-                *args,
-                **{
-                    # we could call param.process_value() here to allow named
-                    # parameters to be passed as their unparsed string values,
-                    # we don't because this forces some weird idempotency on custom
-                    # parsers that might make errors more frequent for users and also
-                    # this would be inconsistent with call_command behavior for BaseCommands
-                    # which expect the parsed values to be passed by name. Unparsed values can
-                    # always be passed as argument strings.
-                    param: val
-                    for param, val in kwargs.items()
-                    if param in expected
-                },
-                **(
-                    {self_arg: getattr(ctx, "django_command", None)}
-                    if self.callback_is_method
-                    else {}
-                ),
-            )
+            if callback:
+                ctx = t.cast(Context, click.get_current_context())
+                return callback(
+                    *args,
+                    **{
+                        # we could call param.process_value() here to allow named
+                        # parameters to be passed as their unparsed string values,
+                        # we don't because this forces some weird idempotency on custom
+                        # parsers that might make errors more frequent for users and also
+                        # this would be inconsistent with call_command behavior for BaseCommands
+                        # which expect the parsed values to be passed by name. Unparsed values can
+                        # always be passed as argument strings.
+                        param: val
+                        for param, val in kwargs.items()
+                        if param in expected
+                    },
+                    **(
+                        {"self": getattr(ctx, "django_command", None)}
+                        if self.callback_is_method
+                        else {}
+                    ),
+                )
 
         super().__init__(
             *args,
@@ -556,7 +578,7 @@ class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
         return super().common_params()
 
 
-class GroupFunction(Typer):
+class GroupFunction(Generic[P, R], Typer):
     """
     Typer_ adds additional groups of commands by adding Typer_ apps to parent
     Typer_ apps. This class extends the ``typer.Typer`` class so that we can add
@@ -564,13 +586,50 @@ class GroupFunction(Typer):
     and other groups specified on the django command.
     """
 
-    bound: bool = False
-    django_command_cls: t.Type["TyperCommand"]
+    parent: t.Optional["GroupFunction"] = None
+    groups: t.List["GroupFunction"]
     _callback: t.Callable[..., t.Any]
+    _bindings: t.Dict[t.Type["TyperCommand"], "GroupFunction[P, R]"]
+    _owner: t.Any = None
+
+    _callback_is_method: bool = False
+
+    @property
+    def is_child_group(self):
+        return bool(self.parent)
+
+    @property
+    def owner(self):
+        """
+        If this function or its root ancestor was accessed as a member of a TyperCommand class,
+        return that class, if it was accessed in any other way - return None.
+
+        This is deep descriptor voodoo. We use this to determine which bound copy extended
+        commands and groups should be added to. Its only important that this works during module
+        import and since imports are atomic thread safety is not an issue here.
+        """
+        assert self.parent is None or isinstance(self.parent, GroupFunction)
+        owner = self._owner or (self.parent.owner if self.parent else None)
+        return (
+            owner
+            if inspect.isclass(owner) and issubclass(owner, TyperCommand)
+            else None
+        )
+
+    @property
+    def bound(self) -> bool:
+        return bool(len(self._bindings))
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:  # type: ignore
+        # This is a bit of a trick, we don't actually implement this
+        # because the descriptor below returns the callback as a bound
+        # method to the command instance - we stub the call out here
+        # though to make the type hinting
+        return self._callback(*args, **kwargs)
 
     def __get__(
-        self, obj: t.Optional["TyperCommand"], _=None
-    ) -> t.Union["GroupFunction", MethodType]:
+        self, obj: t.Any, owner: t.Any = None
+    ) -> t.Union["GroupFunction[P, R]", MethodType, t.Callable[..., t.Any]]:
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
@@ -578,26 +637,42 @@ class GroupFunction(Typer):
         the app itself is returned so it can modified by other decorators
         on the class and subclasses.
         """
-        if obj is None:
+        self._owner = owner or None
+        if obj is None or not isinstance(obj, TyperCommand):
             return self
-        return MethodType(self._callback, obj)
+        if self._callback_is_method:
+            return MethodType(self._callback, obj)
+        return self._callback
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, parent: t.Optional["GroupFunction"] = None, **kwargs):
+        self.groups = []
+        self._bindings = {}
+        self.parent = parent
         self._callback = kwargs["callback"]
+        params = list(inspect.signature(self._callback).parameters)
+        if params:
+            self._callback_is_method = params[0] == "self"
         super().__init__(*args, **kwargs)
 
-    def bind(self, django_command_cls: t.Type["TyperCommand"]):
+    def bind(
+        self, django_command: t.Type["TyperCommand"], parent: t.Optional[Typer] = None
+    ) -> "GroupFunction[P, R]":
         """
-        Bind this typer app to the given django command class. Only groups at
-        root need to be bound - and will be done so by the meta class, this will
-        happen automatically (See group()) when groups are added to other groups.
+        Bind this typer app to the given parent django command class and parent typer app.
+        The typer app may be the root django_command typer app or a parent GroupFunction.
         """
-        self.django_command_cls = django_command_cls
         # the deepcopy is necessary for instances where classes derive
         # from Command classes and replace/extend commands on groups
         # defined in the base class - this avoids the extending class
         # polluting the base class's command tree
-        self.django_command_cls.typer_app.add_typer(deepcopy(self))
+        if not parent:
+            parent = django_command.typer_app
+        cpy = deepcopy(self)
+        parent.add_typer(cpy)
+        self._bindings[django_command] = cpy
+        for grp in self.groups:
+            grp.bind(django_command=django_command, parent=cpy)
+        return self
 
     def callback(self, *args, **kwargs):
         """
@@ -628,7 +703,7 @@ class GroupFunction(Typer):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs: t.Dict[str, t.Any],
+        **kwargs,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
         A function decorator that creates a new command and attaches it to this group.
@@ -675,8 +750,36 @@ class GroupFunction(Typer):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
+        if self.bound and called_from_module():
+            # if this group was already bound to one or more classes and this function
+            # was called at module scope it means we're adding onto an existing command
+            # so we find which command and re-call on the copied and bound group instance.
+            assert self.owner and self.owner in self._bindings, _(
+                "When adding onto an existing command, command() must be called from the "
+                "command class to extend. (e.g. @CommandClass.group.command())"
+            )
+            return self._bindings[self.owner].command(
+                name=name,
+                cls=cls,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                _owner=self.owner,
+                **kwargs,
+            )
 
-        def decorator(f: t.Callable[P, R]) -> t.Callable[P, R]:
+        def make_command(f: t.Callable[P, R]) -> t.Callable[P, R]:
+            owner = kwargs.pop("_owner", None)
+            if owner:
+                # attach this function to the adapted Command class
+                setattr(owner, f.__name__, f)
             return super(  # pylint: disable=super-with-arguments
                 GroupFunction, self
             ).command(
@@ -695,7 +798,7 @@ class GroupFunction(Typer):
                 **kwargs,
             )(f)
 
-        return decorator
+        return make_command
 
     def group(
         self,
@@ -717,8 +820,8 @@ class GroupFunction(Typer):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs: t.Dict[str, t.Any],
-    ) -> t.Callable[[t.Callable[..., t.Any]], "GroupFunction"]:
+        **kwargs,
+    ) -> t.Callable[[t.Callable[P, R]], "GroupFunction[P, R]"]:
         """
         Create a new subgroup and attach it to this group. This is like creating a new
         Typer app and adding it to a parent Typer app. The kwargs are passed through
@@ -764,9 +867,15 @@ class GroupFunction(Typer):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-
-        def create_app(func: t.Callable[..., t.Any]) -> GroupFunction:
-            grp = GroupFunction(  # type: ignore
+        if self.bound and called_from_module():
+            # if this group was already bound to one or more classes and this function
+            # was called at module scope it means we're adding onto an existing command
+            # so we find which command and re-call on the copied and bound group instance.
+            assert self.owner and self.owner in self._bindings, _(
+                "When adding onto an existing command, group() must be called from the "
+                "command class to extend. (e.g. @CommandClass.parent_group.group())"
+            )
+            grp = self._bindings[self.owner].group(
                 name=name,
                 cls=cls,
                 invoke_without_command=invoke_without_command,
@@ -774,7 +883,6 @@ class GroupFunction(Typer):
                 subcommand_metavar=subcommand_metavar,
                 chain=chain,
                 result_callback=result_callback,
-                callback=func,
                 context_settings=context_settings,
                 help=help,
                 epilog=epilog,
@@ -784,11 +892,43 @@ class GroupFunction(Typer):
                 hidden=hidden,
                 deprecated=deprecated,
                 rich_help_panel=rich_help_panel,
+                _owner=self.owner,
                 **kwargs,
             )
-            self.add_typer(grp)
-            grp.bound = True
             return grp
+
+        def create_app(func: t.Callable[P, R]) -> GroupFunction[P, R]:
+            owner = t.cast(t.Optional[t.Type[TyperCommand]], kwargs.pop("_owner", None))
+            self.groups.append(
+                GroupFunction(
+                    name=name,
+                    cls=cls,
+                    invoke_without_command=invoke_without_command,
+                    no_args_is_help=no_args_is_help,
+                    subcommand_metavar=subcommand_metavar,
+                    chain=chain,
+                    result_callback=result_callback,
+                    callback=func,
+                    context_settings=context_settings,
+                    help=help,
+                    epilog=epilog,
+                    short_help=short_help,
+                    options_metavar=options_metavar,
+                    add_help_option=add_help_option,
+                    hidden=hidden,
+                    deprecated=deprecated,
+                    rich_help_panel=rich_help_panel,
+                    parent=self,
+                    **kwargs,
+                )
+            )
+            if owner:
+                new_grp = self.groups[-1]
+                cpy = deepcopy(new_grp)
+                new_grp._bindings[owner] = cpy
+                self.add_typer(cpy)
+                setattr(owner, func.__name__, new_grp)
+            return self.groups[-1]
 
         return create_app
 
@@ -907,7 +1047,7 @@ def initialize(
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: t.Callable[P, R]) -> t.Callable[P, R]:
+    def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
             "_typer_callback_",
@@ -937,7 +1077,7 @@ def initialize(
         )
         return func
 
-    return decorator
+    return make_initializer
 
 
 def command(  # pylint: disable=keyword-arg-before-vararg
@@ -1013,7 +1153,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         this can be used to group commands into panels in the help output.
     """
 
-    def decorator(func: t.Callable[P, R]) -> t.Callable[P, R]:
+    def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
             "_typer_command_",
@@ -1037,7 +1177,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
         )
         return func
 
-    return decorator
+    return make_command
 
 
 def group(
@@ -1060,7 +1200,7 @@ def group(
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
     **kwargs: t.Dict[str, t.Any],
-) -> t.Callable[[t.Callable[..., t.Any]], GroupFunction]:
+) -> t.Callable[[t.Callable[P, R]], GroupFunction[P, R]]:
     """
     A function decorator that creates a new subgroup and attaches it to the root
     command group. This is like creating a new Typer_ app and adding it to a parent
@@ -1125,7 +1265,7 @@ def group(
         this can be used to group commands into panels in the help output.
     """
 
-    def create_app(func: t.Callable[..., t.Any]) -> GroupFunction:
+    def create_app(func: t.Callable[P, R]) -> GroupFunction[P, R]:
         grp = GroupFunction(  # type: ignore
             name=name,
             cls=cls,
@@ -1144,6 +1284,7 @@ def group(
             hidden=hidden,
             deprecated=deprecated,
             rich_help_panel=rich_help_panel,
+            parent=None,
             **kwargs,
         )
         return grp
@@ -1277,7 +1418,7 @@ class TyperCommandMeta(type):
                 )
 
             typer_app = Typer(
-                name=mcs.__module__.rsplit(".", maxsplit=1)[-1],
+                name=attrs["__module__"].rsplit(".", maxsplit=1)[-1],
                 cls=cls,
                 help=help or attrs.get("help", Default(None)),
                 invoke_without_command=invoke_without_command,
@@ -1335,10 +1476,10 @@ class TyperCommandMeta(type):
             ]:
                 if not issubclass(cmd_cls, TyperCommand) or cmd_cls is TyperCommand:
                     continue
-                for attr in [*cls_attrs.values(), cls._handle]:
+                for name, attr in [*cls_attrs.items(), ("_handle", cls._handle)]:
                     cls._num_commands += hasattr(attr, "_typer_command_")
                     cls._has_callback |= hasattr(attr, "_typer_callback_")
-                    if isinstance(attr, GroupFunction) and not attr.bound:
+                    if isinstance(attr, GroupFunction) and not attr.is_child_group:
                         attr.bind(cls)  # type: ignore
                         cls._root_groups += 1
 
@@ -1723,6 +1864,214 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     command_tree: CommandNode
 
+    @classmethod
+    def command(
+        cmd,  # pyright: ignore[reportSelfClsParameterName]
+        name: t.Optional[str] = None,
+        *,
+        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
+        epilog: t.Optional[str] = None,
+        short_help: t.Optional[str] = None,
+        options_metavar: str = "[OPTIONS]",
+        add_help_option: bool = True,
+        no_args_is_help: bool = False,
+        hidden: bool = False,
+        deprecated: bool = False,
+        # Rich settings
+        rich_help_panel: t.Union[str, None] = Default(None),
+        **kwargs: t.Dict[str, t.Any],
+    ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
+        """
+        Add a command to this command class after it has been defined. You can
+        use this decorator to add commands to a root command from other Django apps.
+
+        .. todo::
+            See link_ for details on when you might want to use this adaptor pattern.
+
+        .. warning::
+            Do not use this classmethod when
+
+        .. code-block:: python
+
+            from your_app.management.commands.your_command import Command as YourCommand
+
+            @YourCommand.command()
+            def new_command(self, ...):
+                # implement your command additional command here
+
+        :param name: the name of the command (defaults to the name of the decorated
+            function)
+        :param cls: the command class to use
+        :param context_settings: the context settings to use - see
+            `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :param help: the help string to use, defaults to the function docstring, if
+            you need the help to be translated you should use the help kwarg instead
+            because docstrings will not be translated.
+        :param epilog: the epilog to use in the help output
+        :param short_help: the short help to use in the help output
+        :param options_metavar: the metavar to use for options in the help output
+        :param add_help_option: whether to add the help option to the command
+        :param no_args_is_help: whether to show the help if no arguments are provided
+        :param hidden: whether to hide the command from help output
+        :param deprecated: show a deprecation warning
+        :param rich_help_panel: the rich help panel to use - if rich is installed
+            this can be used to group commands into panels in the help output.
+        """
+        if not called_from_module():
+            return command(
+                name=name,
+                cls=cls,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                # Rich settings
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )
+
+        def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            cmd.typer_app.command(
+                name=name,
+                cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                no_args_is_help=no_args_is_help,
+                hidden=hidden,
+                deprecated=deprecated,
+                # Rich settings
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )(func)
+            setattr(cmd, func.__name__, func)
+            return func
+
+        return make_command
+
+    @classmethod
+    def group(
+        cmd,  # pyright: ignore[reportSelfClsParameterName]
+        name: t.Optional[str] = Default(None),
+        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        invoke_without_command: bool = Default(False),
+        no_args_is_help: bool = Default(False),
+        subcommand_metavar: t.Optional[str] = Default(None),
+        chain: bool = Default(False),
+        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        # Command
+        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
+        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        epilog: t.Optional[str] = Default(None),
+        short_help: t.Optional[str] = Default(None),
+        options_metavar: str = Default("[OPTIONS]"),
+        add_help_option: bool = Default(True),
+        hidden: bool = Default(False),
+        deprecated: bool = Default(False),
+        # Rich settings
+        rich_help_panel: t.Union[str, None] = Default(None),
+        **kwargs: t.Dict[str, t.Any],
+    ) -> t.Callable[[t.Callable[P, R]], GroupFunction[P, R]]:
+        """
+        Add a group to this command class after it has been defined. You can
+        use this decorator to add groups to a root command from other Django apps.
+
+        .. todo::
+            See link_ for details on when you might want to use this adaptor pattern.
+
+        .. code-block:: python
+
+            from your_app.management.commands.your_command import Command as YourCommand
+
+            @YourCommand.group()
+            def new_group(self, ...):
+                # implement your group initializer here
+
+            @new_group.command()
+            def grp_command(self, ...):
+                # implement group subcommand here
+
+        :param name: the name of the group (defaults to the name of the decorated function)
+        :param cls: the group class to use
+        :param invoke_without_command: whether to invoke the group callback if no command
+            was specified.
+        :param no_args_is_help: whether to show the help if no arguments are provided
+        :param subcommand_metavar: the metavar to use for subcommands in the help output
+        :param chain: whether to chain commands, this allows multiple commands from the group
+            to be specified and run in order sequentially in one call from the command line.
+        :param result_callback: a callback to invoke with the result of the command
+        :param context_settings: the click context settings to use - see
+            `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :param help: the help string to use, defaults to the function docstring, if you need
+            to translate the help you should use the help kwarg instead because docstrings
+            will not be translated.
+        :param epilog: the epilog to use in the help output
+        :param short_help: the short help to use in the help output
+        :param options_metavar: the metavar to use for options in the help output
+        :param add_help_option: whether to add the help option to the command
+        :param hidden: whether to hide this group from the help output
+        :param deprecated: show a deprecation warning
+        :param rich_help_panel: the rich help panel to use - if rich is installed
+            this can be used to group commands into panels in the help output.
+        """
+        if not called_from_module():
+            return group(
+                name=name,
+                cls=cls,
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )
+
+        def create_app(func: t.Callable[P, R]) -> GroupFunction[P, R]:
+            grp_func = GroupFunction(  # type: ignore
+                name=name,
+                cls=cls,
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                callback=func,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                hidden=hidden,
+                deprecated=deprecated,
+                rich_help_panel=rich_help_panel,
+                parent=None,
+                **kwargs,
+            ).bind(cmd)
+            setattr(cmd, func.__name__, grp_func)
+            return grp_func
+
+        return create_app
+
     @property
     def _name(self) -> str:
         """The name of the django command"""
@@ -1770,6 +2119,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         force_color: bool = force_color,
         **kwargs: t.Dict[str, t.Any],
     ):
+        assert self.typer_app.info.name
+        load_command_extensions(self.typer_app.info.name)
         self.force_color = force_color
         self.no_color = no_color
         with self:

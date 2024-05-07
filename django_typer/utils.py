@@ -2,16 +2,30 @@
 A collection of useful utilities.
 """
 
+import importlib
+import inspect
 import os
+import pkgutil
 import shutil
 import sys
 import typing as t
 from pathlib import Path
 from threading import local
+from types import ModuleType
 
 from django.conf import settings
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
+
+__all__ = [
+    "get_usage_script",
+    "traceback_config",
+    "get_current_command",
+    "with_typehint",
+    "register_command_extensions",
+    "load_command_extensions",
+    "called_from_module",
+]
 
 
 def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
@@ -85,3 +99,63 @@ def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
     if t.TYPE_CHECKING:
         return baseclass  # pragma: no cover
     return object  # type: ignore
+
+
+_command_extensions: t.Dict[str, t.List[ModuleType]] = {}
+
+
+def register_command_extensions(
+    package: ModuleType, commands: t.Optional[t.List[str]] = None
+):
+    """
+    Register a command extension for the given command within the given package.
+
+    :param package: The package the command extension module resides in
+    :param commands: The names of the commands/modules, if not provided, all modules
+        in the package will be registered as extensions
+    """
+    commands = commands or [
+        module[1].split(".")[-1]
+        for module in pkgutil.iter_modules(package.__path__, f"{package.__name__}.")
+    ]
+    for command in commands:
+        _command_extensions.setdefault(command, [])
+        if package not in _command_extensions[command]:
+            _command_extensions[command].append(package)
+
+
+def load_command_extensions(command: str) -> int:
+    """
+    Load any extensions for the given command by loading the registered
+    modules in registration order.
+
+    :param command: The name of the command
+    :return: The number of extensions loaded.
+    """
+    extensions = _command_extensions.get(command, [])
+    if extensions:
+        for ext_pkg in reversed(extensions):
+            try:
+                importlib.import_module(f"{ext_pkg.__name__}.{command}")
+            except (ImportError, ModuleNotFoundError) as err:
+                raise ValueError(
+                    f"No extension module was found for command {command} in {ext_pkg.__path__}."
+                ) from err
+        # we only want to do this once
+        del _command_extensions[command]
+    return len(extensions)
+
+
+def called_from_module() -> bool:
+    """
+    Returns True if the stack frame one frame above where this function is called was at module
+    scope. Regrettable interface simplifying voodoo. This is, at least, reliable.
+    """
+    frame = inspect.currentframe()
+    for _ in range(0, 2):
+        if not frame:
+            break
+        frame = frame.f_back
+    if frame:
+        return frame.f_code.co_name == "<module>"
+    return False

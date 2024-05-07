@@ -56,6 +56,22 @@ class InterfaceTests(TestCase):
         typer_params = set(get_named_arguments(typer.Typer.command))
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
+    def test_base_class_command_interface_matches(self):
+        from django_typer import TyperCommand
+
+        command_params = set(get_named_arguments(TyperCommand.command))
+        typer_params = set(get_named_arguments(typer.Typer.command))
+
+        self.assertFalse(command_params.symmetric_difference(typer_params))
+
+    def test_base_class_group_interface_matches(self):
+        from django_typer import TyperCommand
+
+        command_params = set(get_named_arguments(TyperCommand.group))
+        typer_params = set(get_named_arguments(typer.Typer.add_typer))
+        typer_params.remove("callback")
+        self.assertFalse(command_params.symmetric_difference(typer_params))
+
     def test_action_nargs(self):
         # unclear if nargs is even necessary - no other test seems to exercise it, leaving in for
         # base class compat reasons

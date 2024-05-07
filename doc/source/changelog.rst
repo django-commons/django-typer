@@ -5,9 +5,11 @@ Change Log
 v1.2.0
 ======
 
+* Implemented `Adapter pattern that allows commands and groups to be added without extension by apps further up the app stack. <https://github.com/bckohan/django-typer/issues/61>`_
 * Fixed `ModelObjectParser should use a metavar appropriate to the field type. <https://github.com/bckohan/django-typer/issues/60>`_
 * Implemented `Switch to ruff for linting and formatting. <https://github.com/bckohan/django-typer/issues/56>`_
 * Implemented `Add a wrapper for typer's echo/secho <https://github.com/bckohan/django-typer/issues/55>`_
+* Fixed `@group type hint does not carry over the parameter spec of the wrapped function <https://github.com/bckohan/django-typer/issues/38>`_
 * Implemented `Better test organization. <https://github.com/bckohan/django-typer/issues/34>`_
 * Implemented `Add completer/parser for GenericIPAddressField. <https://github.com/bckohan/django-typer/issues/12>`_
 

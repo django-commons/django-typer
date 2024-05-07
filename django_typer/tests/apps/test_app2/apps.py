@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django_typer.utils import register_command_extensions
 
 
 class TestApp2Config(AppConfig):
@@ -6,5 +7,7 @@ class TestApp2Config(AppConfig):
     label = name.replace(".", "_")
     verbose_name = "Test App2"
 
-    # def ready(self):
-    #     print(self.label)
+    def ready(self):
+        from .management import adapters
+
+        register_command_extensions(adapters)
