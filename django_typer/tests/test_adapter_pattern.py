@@ -180,13 +180,22 @@ class ResetAppsMixin:
 
         utils._command_extensions = {}
         for mod in list(sys.modules.keys()):
-            if mod.startswith("django_typer.tests.apps") and "polls" not in mod:
+            if any(
+                [
+                    mod.startswith(path)
+                    for path in [
+                        "django_typer.tests.apps.adapter1",
+                        "django_typer.tests.apps.adapter2",
+                        "django_typer.tests.apps.test_app2.management.adapters",
+                    ]
+                ]
+            ):
                 sys.modules[mod]
                 del sys.modules[mod]
         super().setUpClass()
 
 
-class UnadaptedTests(ResetAppsMixin, TestCase):
+class UnadaptedTests(TestCase):
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_no_adapter_apps(self):
         hlp = run_command("adapted", "--help")[0]
