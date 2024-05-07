@@ -198,7 +198,7 @@ class ResetAppsMixin:
 class UnadaptedTests(TestCase):
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_no_adapter_apps(self):
-        hlp = run_command("adapted", "--help")[0]
+        hlp = run_command("adapted", "--help", "--no-color")[0]
         self.assertGreater(
             sim := similarity(adapted_help_no_adapters, hlp),
             0.99,  # width inconsistences drive this number < 1
