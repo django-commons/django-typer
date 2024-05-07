@@ -85,8 +85,6 @@ from django_typer import patch
 
 patch.apply()
 
-from typing import Generic
-
 from typer import Typer
 from typer import echo as typer_echo
 from typer import secho as typer_secho
@@ -219,7 +217,7 @@ def get_command(
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
-    **kwargs: t.Dict[str, t.Any],
+    **kwargs,
 ) -> t.Union[BaseCommand, MethodType]:
     """
     Get a Django_ command by its name and instantiate it with the provided options. This
@@ -578,7 +576,7 @@ class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
         return super().common_params()
 
 
-class GroupFunction(Generic[P, R], Typer):
+class GroupFunction(t.Generic[P, R], Typer):
     """
     Typer_ adds additional groups of commands by adding Typer_ apps to parent
     Typer_ apps. This class extends the ``typer.Typer`` class so that we can add
@@ -644,15 +642,17 @@ class GroupFunction(Generic[P, R], Typer):
             return MethodType(self._callback, obj)
         return self._callback
 
-    def __init__(self, *args, parent: t.Optional["GroupFunction"] = None, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.groups = []
         self._bindings = {}
-        self.parent = parent
+        self.parent = t.cast(t.Optional["GroupFunction"], kwargs.pop("parent", None))
         self._callback = kwargs["callback"]
         params = list(inspect.signature(self._callback).parameters)
         if params:
             self._callback_is_method = params[0] == "self"
-        super().__init__(*args, **kwargs)
+        # for python < 3.9 passing cls results in an exception that
+        # multiple cls params are passed to __new__, can remove when 3.8 no longer supported
+        super().__init__(*args, cls=kwargs.pop("tcls", None), **kwargs)
 
     def bind(
         self, django_command: t.Type["TyperCommand"], parent: t.Optional[Typer] = None
@@ -902,7 +902,7 @@ class GroupFunction(Generic[P, R], Typer):
             self.groups.append(
                 GroupFunction(
                     name=name,
-                    cls=cls,
+                    tcls=cls,
                     invoke_without_command=invoke_without_command,
                     no_args_is_help=no_args_is_help,
                     subcommand_metavar=subcommand_metavar,
@@ -953,7 +953,7 @@ def initialize(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs: t.Dict[str, t.Any],
+    **kwargs,
 ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
     A function decorator that creates a Typer_
@@ -1095,7 +1095,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     deprecated: bool = False,
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs: t.Dict[str, t.Any],
+    **kwargs,
 ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
     A function decorator that creates a new command and attaches it to the root
@@ -1199,7 +1199,7 @@ def group(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs: t.Dict[str, t.Any],
+    **kwargs,
 ) -> t.Callable[[t.Callable[P, R]], GroupFunction[P, R]]:
     """
     A function decorator that creates a new subgroup and attaches it to the root
@@ -1268,7 +1268,7 @@ def group(
     def create_app(func: t.Callable[P, R]) -> GroupFunction[P, R]:
         grp = GroupFunction(  # type: ignore
             name=name,
-            cls=cls,
+            tcls=cls,
             invoke_without_command=invoke_without_command,
             no_args_is_help=no_args_is_help,
             subcommand_metavar=subcommand_metavar,
@@ -1881,7 +1881,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs: t.Dict[str, t.Any],
+        **kwargs,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
         Add a command to this command class after it has been defined. You can
@@ -1980,7 +1980,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs: t.Dict[str, t.Any],
+        **kwargs,
     ) -> t.Callable[[t.Callable[P, R]], GroupFunction[P, R]]:
         """
         Add a group to this command class after it has been defined. You can
@@ -2048,7 +2048,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         def create_app(func: t.Callable[P, R]) -> GroupFunction[P, R]:
             grp_func = GroupFunction(  # type: ignore
                 name=name,
-                cls=cls,
+                tcls=cls,
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
                 subcommand_metavar=subcommand_metavar,
@@ -2117,7 +2117,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         stderr: t.Optional[t.TextIO] = None,
         no_color: bool = no_color,
         force_color: bool = force_color,
-        **kwargs: t.Dict[str, t.Any],
+        **kwargs,
     ):
         assert self.typer_app.info.name
         load_command_extensions(self.typer_app.info.name)
