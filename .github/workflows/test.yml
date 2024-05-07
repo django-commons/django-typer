@@ -167,8 +167,8 @@ jobs:
         echo "  compinit" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
         echo "fpath+=~/.zfunc" >> ~/.zshrc
-        chmod go-w /usr/local/share
-        chmod -R go-w /usr/local/share/zsh
+        chmod go-w /opt/homebrew/share
+        chmod -R go-w /opt/homebrew/share/zsh
         source ~/.zshrc
         sudo chsh -s /bin/zsh runner
     # - name: Install Bash Completions
