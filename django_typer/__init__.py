@@ -79,6 +79,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.core.management.color import Style as ColorStyle
 from django.db.models import Model
+from django.utils.functional import classproperty
 from django.utils.translation import gettext as _
 
 from django_typer import patch
@@ -537,9 +538,7 @@ class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
         """
         if (
             hasattr(self, "django_command")
-            and self.django_command._num_commands < 2
-            and not self.django_command._has_callback
-            and not self.django_command._root_groups
+            and not self.django_command.typer_app.registered_callback
         ):
             return [
                 param
@@ -558,14 +557,17 @@ class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
     you should not - you should inherit from this class.
     """
 
+    common_init: bool = False
+
     def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
         """
         Add the common parameters to this group only if this group is the root
         command's user specified initialize callback.
         """
-        if (
-            hasattr(self, "django_command") and self.django_command._has_callback
-        ) or getattr(self, "common_init", False):
+        if self.common_init or (
+            hasattr(self, "django_command")
+            and self.django_command.typer_app.registered_callback
+        ):
             return [
                 param
                 for param in _get_common_params()
@@ -1292,6 +1294,26 @@ def group(
     return create_app
 
 
+def _add_common_initializer(
+    cmd_cls: t.Union["TyperCommandMeta", t.Type["TyperCommand"]],
+):
+    """
+    Add a callback to the typer app that will add the unsuppressed
+    common django base command parameters to the CLI.
+    """
+    cmd_cls.typer_app.callback(
+        cls=type(
+            "_AdaptedCallback",
+            (TyperGroupWrapper,),
+            {
+                "django_command": cmd_cls,
+                "callback_is_method": False,
+                "common_init": True,
+            },
+        )
+    )(lambda: None)
+
+
 class TyperCommandMeta(type):
     """
     The metaclass used to build the TyperCommand class. This metaclass is responsible
@@ -1357,9 +1379,7 @@ class TyperCommandMeta(type):
     typer_app: Typer
     no_color: bool
     force_color: bool
-    _num_commands: int = 0
-    _has_callback: bool = False
-    _root_groups: int = 0
+    is_compound_command: bool
     _handle: t.Optional[t.Callable[..., t.Any]]
 
     def __new__(
@@ -1477,11 +1497,8 @@ class TyperCommandMeta(type):
                 if not issubclass(cmd_cls, TyperCommand) or cmd_cls is TyperCommand:
                     continue
                 for name, attr in [*cls_attrs.items(), ("_handle", cls._handle)]:
-                    cls._num_commands += hasattr(attr, "_typer_command_")
-                    cls._has_callback |= hasattr(attr, "_typer_callback_")
                     if isinstance(attr, GroupFunction) and not attr.is_child_group:
                         attr.bind(cls)  # type: ignore
-                        cls._root_groups += 1
 
                 if cmd_cls._handle:
                     ctor = get_ctor(cmd_cls._handle)
@@ -1492,7 +1509,6 @@ class TyperCommandMeta(type):
                             _help=getattr(cls, "help", None),
                         )
                     else:
-                        cls._num_commands += 1
                         cls.typer_app.command(
                             cls.typer_app.info.name,
                             cls=type(
@@ -1506,20 +1522,8 @@ class TyperCommandMeta(type):
                 for attr in cls_attrs.values():
                     (get_ctor(attr) or (lambda _: None))(cls)
 
-            if (
-                cls._num_commands > 1 or cls._root_groups > 0
-            ) and not cls.typer_app.registered_callback:
-                cls.typer_app.callback(
-                    cls=type(
-                        "_AdaptedCallback",
-                        (TyperGroupWrapper,),
-                        {
-                            "django_command": cls,
-                            "callback_is_method": False,
-                            "common_init": True,
-                        },
-                    )
-                )(lambda: None)
+            if cls.is_compound_command and not cls.typer_app.registered_callback:
+                _add_common_initializer(cls)
 
         super().__init__(name, bases, attrs, **kwargs)
 
@@ -1856,9 +1860,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     typer_app: Typer
     no_color: bool = False
     force_color: bool = False
-    _num_commands: int = 0
-    _has_callback: bool = False
-    _root_groups: int = 0
     _handle: t.Callable[..., t.Any]
     _traceback: bool = False
 
@@ -2072,6 +2073,13 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
         return create_app
 
+    @classproperty
+    def is_compound_command(cls):
+        return (
+            cls.typer_app.registered_groups
+            or len(cls.typer_app.registered_commands) > 1
+        )
+
     @property
     def _name(self) -> str:
         """The name of the django command"""
@@ -2121,6 +2129,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     ):
         assert self.typer_app.info.name
         load_command_extensions(self.typer_app.info.name)
+        if self.is_compound_command and self.typer_app.registered_callback is None:
+            _add_common_initializer(self.__class__)
         self.force_color = force_color
         self.no_color = no_color
         with self:

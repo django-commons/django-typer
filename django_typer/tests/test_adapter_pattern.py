@@ -11,7 +11,17 @@ adapted_help = """
 Usage: ./manage.py adapted [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --help  Show this message and exit.
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 
 Commands:
   adapted
@@ -26,17 +36,7 @@ Arguments:
   MESSAGE  [required]
 
 Options:
-  --version          Show program's version number and exit.
-  --settings TEXT    The Python path to a settings module, e.g.
-                     "myproject.settings.main". If this isn't provided, the
-                     DJANGO_SETTINGS_MODULE environment variable will be used.
-  --pythonpath PATH  A directory to add to the Python path, e.g.
-                     "/home/djangoprojects/myproject".
-  --traceback        Raise on CommandError exceptions
-  --no-color         Don't colorize the command output.
-  --force-color      Force colorization of the command output.
-  --skip-checks      Skip system checks.
-  --help             Show this message and exit.
+  --help  Show this message and exit.
 """
 
 adapted_rich_help = """
@@ -44,6 +44,20 @@ adapted_rich_help = """
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Django ─────────────────────────────────────────────────────────────────────╮
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│                            [default: None]                                   │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ adapted                                                                      │
@@ -61,20 +75,6 @@ adapted_adapted_rich_help = """
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                  Show program's version number and exit.           │
-│ --settings           TEXT  The Python path to a settings module, e.g.        │
-│                            "myproject.settings.main". If this isn't          │
-│                            provided, the DJANGO_SETTINGS_MODULE environment  │
-│                            variable will be used.                            │
-│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
-│                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
-│ --traceback                Raise on CommandError exceptions                  │
-│ --no-color                 Don't colorize the command output.                │
-│ --force-color              Force colorization of the command output.         │
-│ --skip-checks              Skip system checks.                               │
-╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 adapted_echo_help = """
@@ -87,17 +87,7 @@ Arguments:
   MSG2  [required]
 
 Options:
-  --version          Show program's version number and exit.
-  --settings TEXT    The Python path to a settings module, e.g.
-                     "myproject.settings.main". If this isn't provided, the
-                     DJANGO_SETTINGS_MODULE environment variable will be used.
-  --pythonpath PATH  A directory to add to the Python path, e.g.
-                     "/home/djangoprojects/myproject".
-  --traceback        Raise on CommandError exceptions
-  --no-color         Don't colorize the command output.
-  --force-color      Force colorization of the command output.
-  --skip-checks      Skip system checks.
-  --help             Show this message and exit.
+  --help  Show this message and exit.
 """
 
 adapted_echo_rich_help = """
@@ -112,23 +102,9 @@ adapted_echo_rich_help = """
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                  Show program's version number and exit.           │
-│ --settings           TEXT  The Python path to a settings module, e.g.        │
-│                            "myproject.settings.main". If this isn't          │
-│                            provided, the DJANGO_SETTINGS_MODULE environment  │
-│                            variable will be used.                            │
-│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
-│                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
-│ --traceback                Raise on CommandError exceptions                  │
-│ --no-color                 Don't colorize the command output.                │
-│ --force-color              Force colorization of the command output.         │
-│ --skip-checks              Skip system checks.                               │
-╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
-adapted_help_no_adapters = """                       
+adapted_help_no_adapters = """
  Usage: ./manage.py adapted [OPTIONS] MESSAGE                                   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
@@ -216,6 +192,9 @@ class UnadaptedTests(TestCase):
         )
         print(f"adapted --help similiarity: {sim}")
 
+    def test_adapted_is_compound(self):
+        self.assertFalse(get_command("adapted").is_compound_command)
+
 
 @override_settings(
     INSTALLED_APPS=[
@@ -230,6 +209,9 @@ class UnadaptedTests(TestCase):
     ]
 )
 class AdapterTests(ResetAppsMixin, TestCase):
+    def test_adapted_is_compound(self):
+        self.assertTrue(get_command("adapted").is_compound_command)
+
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_adapted_helps_no_rich(self):
         hlp = run_command(
@@ -243,9 +225,9 @@ class AdapterTests(ResetAppsMixin, TestCase):
 
         hlp = run_command(
             "adapted",
-            "adapted",
             "--settings",
             "django_typer.tests.settings.adapted",
+            "adapted",
             "--help",
         )[0]
         self.assertGreater(
@@ -256,9 +238,9 @@ class AdapterTests(ResetAppsMixin, TestCase):
 
         hlp = run_command(
             "adapted",
-            "echo",
             "--settings",
             "django_typer.tests.settings.adapted",
+            "echo",
             "--help",
         )[0]
         self.assertGreater(
@@ -271,9 +253,9 @@ class AdapterTests(ResetAppsMixin, TestCase):
         self.assertEqual(
             run_command(
                 "adapted",
-                "adapted",
                 "--settings",
                 "django_typer.tests.settings.adapted",
+                "adapted",
                 "hello",
             )[0].strip(),
             "test_app: hello",
@@ -281,9 +263,9 @@ class AdapterTests(ResetAppsMixin, TestCase):
         self.assertEqual(
             run_command(
                 "adapted",
-                "echo",
                 "--settings",
                 "django_typer.tests.settings.adapted",
+                "echo",
                 "hello",
                 "world",
             )[0].strip(),
@@ -318,7 +300,8 @@ class AdapterTests(ResetAppsMixin, TestCase):
         )
         print(f"adapted --help similiarity: {sim}")
 
-        stdout.seek(0)
+        stdout = StringIO()
+        adapted = get_command("adapted", no_color=True, stdout=stdout)
         adapted.print_help("./manage.py", "adapted", "adapted")
         self.assertGreater(
             sim := similarity(adapted_adapted_rich_help, stdout.getvalue()),
@@ -326,7 +309,8 @@ class AdapterTests(ResetAppsMixin, TestCase):
         )
         print(f"adapted adapted --help similiarity: {sim}")
 
-        stdout.seek(0)
+        stdout = StringIO()
+        adapted = get_command("adapted", no_color=True, stdout=stdout)
         adapted.print_help("./manage.py", "adapted", "echo")
         self.assertGreater(
             sim := similarity(adapted_echo_rich_help, stdout.getvalue()),
