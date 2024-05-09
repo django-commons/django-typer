@@ -16,13 +16,16 @@ django_typer
    :exclude-members: TyperCommand, Context
    :show-inheritance:
 
+.. autoclass:: django_typer.Typer
+    :members:
+
 .. autoclass:: django_typer.TyperCommand
     :members:
 
 .. autoclass:: django_typer.TyperCommandMeta
 
-.. autoclass:: django_typer.GroupFunction
-    :members: group, command
+.. autoclass:: django_typer.CommandGroup
+    :members: callback, group, command
 
 
 .. _types:

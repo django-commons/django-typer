@@ -11,7 +11,7 @@ import sys
 import typing as t
 from pathlib import Path
 from threading import local
-from types import ModuleType
+from types import MethodType, ModuleType
 
 from django.conf import settings
 
@@ -159,3 +159,27 @@ def called_from_module() -> bool:
     if frame:
         return frame.f_code.co_name == "<module>"
     return False
+
+
+def is_method(
+    func_or_params: t.Optional[t.Union[t.Callable[..., t.Any], t.List[str]]],
+) -> t.Optional[bool]:
+    """
+    This logic is used to to determine if a function should be bound as a method
+    or not. Right now django-typer will treat module scope functions as methods
+    when binding to command classes if they have a first argument named 'self'.
+
+    :param func: The function to check or a list of parameter names, or None
+    :return: True if the function should be considered a method, False if not and None
+        if undetermined.
+    """
+    if func_or_params:
+        params = (
+            list(inspect.signature(func_or_params).parameters)
+            if callable(func_or_params)
+            else func_or_params
+        )
+        if params:
+            return params[0] == "self"
+        return isinstance(func_or_params, MethodType)
+    return None
