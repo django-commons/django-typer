@@ -212,7 +212,8 @@ class TestNativeGroups(TestCase):
 
             parts = cmd_pth.split()
             sim = similarity(
-                expected_help, run_command(*[parts[0], "--no-color", *parts[1:]], "--help")[0].strip()
+                expected_help,
+                run_command(*[parts[0], "--no-color", *parts[1:]], "--help")[0].strip(),
             )
             print(f"run_command({cmd_pth}) --help similiarity: {sim}")
             self.assertGreater(sim, 0.99)
