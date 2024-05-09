@@ -511,28 +511,28 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         ]
 
         def call_with_self(*args, **kwargs):
-            if callback:
-                ctx = t.cast(Context, click.get_current_context())
-                return callback(
-                    *args,
-                    **{
-                        # we could call param.process_value() here to allow named
-                        # parameters to be passed as their unparsed string values,
-                        # we don't because this forces some weird idempotency on custom
-                        # parsers that might make errors more frequent for users and also
-                        # this would be inconsistent with call_command behavior for BaseCommands
-                        # which expect the parsed values to be passed by name. Unparsed values can
-                        # always be passed as argument strings.
-                        param: val
-                        for param, val in kwargs.items()
-                        if param in expected
-                    },
-                    **(
-                        {str(params[0].name): getattr(ctx, "django_command", None)}
-                        if self.is_method
-                        else {}
-                    ),
-                )
+            assert callback
+            ctx = t.cast(Context, click.get_current_context())
+            return callback(
+                *args,
+                **{
+                    # we could call param.process_value() here to allow named
+                    # parameters to be passed as their unparsed string values,
+                    # we don't because this forces some weird idempotency on custom
+                    # parsers that might make errors more frequent for users and also
+                    # this would be inconsistent with call_command behavior for BaseCommands
+                    # which expect the parsed values to be passed by name. Unparsed values can
+                    # always be passed as argument strings.
+                    param: val
+                    for param, val in kwargs.items()
+                    if param in expected
+                },
+                **(
+                    {str(params[0].name): getattr(ctx, "django_command", None)}
+                    if self.is_method
+                    else {}
+                ),
+            )
 
         super().__init__(
             *args,
@@ -690,7 +690,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         return self._django_command or getattr(self.parent, "django_command", None)
 
     @django_command.setter
-    def django_command(self, cmd: t.Type["TyperCommand"]):
+    def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
 
     def __init__(
@@ -894,8 +894,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         **kwargs,
     ) -> None:
         typer_instance.parent = self
-        if self.django_command:
-            typer_instance.django_command = self.django_command
+        typer_instance.django_command = self.django_command
         return super().add_typer(
             typer_instance=typer_instance,
             name=name,
@@ -935,7 +934,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     is_method: t.Optional[bool] = None
 
     @Typer.django_command.setter  # type: ignore[attr-defined]
-    def django_command(self, cmd: t.Type["TyperCommand"]):
+    def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
         self.initializer = self.initializer  # trigger class binding
 
@@ -945,6 +944,15 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
 
     @initializer.setter
     def initializer(self, initializer: t.Optional[t.Callable[P, R]]):
+        """
+        Set the initializer function for this command group (callback in typer parlance).
+        We need to make sure (for the typer-style case) that the initializer and commands
+        associated with this group are set as function attributes on the command class.
+
+        ..note::
+            If a callback is not registered for an app added by add_typer it will not register
+            as a group of commands. This is upstream typer behavior.
+        """
         self._initializer = initializer
         self.is_method = None
         if initializer:
@@ -996,9 +1004,8 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         )
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        if self.initializer:
-            return self.initializer(*args, **kwargs)
-        return None  # type: ignore
+        assert self.initializer
+        return self.initializer(*args, **kwargs)
 
     def __get__(
         self, obj: t.Any, owner: t.Any = None
