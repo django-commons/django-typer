@@ -160,66 +160,78 @@ class TestNative(TestCase):
     Tests that native-typer style interface works as expected.
     """
 
+    command = "native"
+
     def test_native_direct(self):
-        native = get_command("native")
+        native = get_command(self.command)
         self.assertEqual(native.main("Brian"), {"name": "Brian"})
 
     def test_native_cli(self):
         self.assertEqual(
-            run_command("native", "Brian")[0].strip(), str({"name": "Brian"})
+            run_command(self.command, "Brian")[0].strip(), str({"name": "Brian"})
         )
-        self.assertEqual(run_command("native", "--version")[0].strip(), DJANGO_VERSION)
+        self.assertEqual(
+            run_command(self.command, "--version")[0].strip(), DJANGO_VERSION
+        )
 
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_help_rich(self):
         stdout = StringIO()
-        native = get_command("native", no_color=True, stdout=stdout)
+        native = get_command(self.command, no_color=True, stdout=stdout)
         native.print_help("./manage.py", "native")
         sim = similarity(native_help_rich, stdout.getvalue())
-        print(f"native --help similiarity: {sim}")
+        print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_native_help_no_rich(self):
         stdout = StringIO()
-        native = get_command("native", no_color=True, stdout=stdout)
-        native.print_help("./manage.py", "native")
+        native = get_command(self.command, no_color=True, stdout=stdout)
+        native.print_help("./manage.py", self.command)
         sim = similarity(native_help_no_rich, stdout.getvalue())
-        print(f"native --help similiarity: {sim}")
+        print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
     def test_native_call_command(self):
-        self.assertEqual(call_command("native", "Brian"), {"name": "Brian"})
+        self.assertEqual(call_command(self.command, "Brian"), {"name": "Brian"})
+
+
+class TestNativeWithSelf(TestNative):
+    command = "native_self"
 
 
 class TestNativeGroups(TestCase):
+    command = "native_groups"
+
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_groups_helps(self):
         for cmd_pth, expected_help in [
-            ("native_groups", native_groups_help_rich),
-            ("native_groups main", native_groups_main_help_rich),
-            ("native_groups grp1", native_groups_grp1_help_rich),
-            ("native_groups grp1 subgrp", native_groups_grp1_subgrp_help_rich),
-            ("native_groups grp1 cmd1", native_groups_grp1_cmd1_help_rich),
-            ("native_groups grp1 cmd2", native_groups_grp1_cmd2_help_rich),
+            (self.command, native_groups_help_rich),
+            (f"{self.command} main", native_groups_main_help_rich),
+            (f"{self.command} grp1", native_groups_grp1_help_rich),
+            (f"{self.command} grp1 subgrp", native_groups_grp1_subgrp_help_rich),
+            (f"{self.command} grp1 cmd1", native_groups_grp1_cmd1_help_rich),
+            (f"{self.command} grp1 cmd2", native_groups_grp1_cmd2_help_rich),
         ]:
             stdout = StringIO()
-            native_groups = get_command("native_groups", no_color=True, stdout=stdout)
+            native_groups = get_command(self.command, no_color=True, stdout=stdout)
             native_groups.print_help("./manage.py", *(cmd_pth.split()))
-            sim = similarity(expected_help, stdout.getvalue())
+            sim = similarity(
+                expected_help.replace("native_groups", self.command), stdout.getvalue()
+            )
             print(f"print_help({cmd_pth}) --help similiarity: {sim}")
             self.assertGreater(sim, 0.99)
 
             parts = cmd_pth.split()
             sim = similarity(
-                expected_help,
+                expected_help.replace("native_groups", self.command),
                 run_command(*[parts[0], "--no-color", *parts[1:]], "--help")[0].strip(),
             )
             print(f"run_command({cmd_pth}) --help similiarity: {sim}")
             self.assertGreater(sim, 0.99)
 
     def test_native_groups_direct(self):
-        native_groups = get_command("native_groups")
+        native_groups = get_command(self.command)
         native_groups.initialize(verbosity=3)
         self.assertEqual(native_groups.main("Brian"), {"verbosity": 3, "name": "Brian"})
 
@@ -241,48 +253,50 @@ class TestNativeGroups(TestCase):
 
     def test_native_groups_run(self):
         self.assertEqual(
-            run_command("native_groups", "--verbosity", "3", "main", "Brian")[
-                0
-            ].strip(),
+            run_command(self.command, "--verbosity", "3", "main", "Brian")[0].strip(),
             str({"verbosity": 3, "name": "Brian"}),
         )
 
         self.assertEqual(
             run_command(
-                "native_groups", "--verbosity", "2", "grp1", "--flag", "cmd1", "5"
+                self.command, "--verbosity", "2", "grp1", "--flag", "cmd1", "5"
             )[0].strip(),
             str({"verbosity": 2, "flag": True, "count": 5}),
         )
 
         self.assertEqual(
-            run_command("native_groups", "--verbosity", "1", "grp1", "cmd2", "2.5")[
+            run_command(self.command, "--verbosity", "1", "grp1", "cmd2", "2.5")[
                 0
             ].strip(),
             str({"verbosity": 1, "flag": False, "fraction": 2.5}),
         )
 
         self.assertEqual(
-            run_command("native_groups", "grp1", "subgrp", "42!")[0].strip(),
+            run_command(self.command, "grp1", "subgrp", "42!")[0].strip(),
             str({"verbosity": 0, "flag": False, "msg": "42!"}),
         )
 
     def test_native_groups_call(self):
         self.assertEqual(
-            call_command("native_groups", "main", "Brian", verbosity=3),
+            call_command(self.command, "main", "Brian", verbosity=3),
             {"verbosity": 3, "name": "Brian"},
         )
 
         self.assertEqual(
-            call_command("native_groups", "grp1", "cmd1", "5", verbosity=2, flag=True),
+            call_command(self.command, "grp1", "cmd1", "5", verbosity=2, flag=True),
             {"verbosity": 2, "flag": True, "count": 5},
         )
 
         self.assertEqual(
-            call_command("native_groups", "--verbosity", "1", "grp1", "cmd2", "2.5"),
+            call_command(self.command, "--verbosity", "1", "grp1", "cmd2", "2.5"),
             {"verbosity": 1, "flag": False, "fraction": 2.5},
         )
 
         self.assertEqual(
-            call_command("native_groups", "grp1", "subgrp", "42!", flag=False),
+            call_command(self.command, "grp1", "subgrp", "42!", flag=False),
             {"verbosity": 0, "flag": False, "msg": "42!"},
         )
+
+
+class TestNativeGroupsWithSelf(TestNativeGroups):
+    command = "native_groups_self"
