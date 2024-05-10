@@ -6,6 +6,10 @@ from django_typer import TyperCommand, command, initialize
 
 
 class Command(TyperCommand):
+    """
+    Class docstring.
+    """
+
     @initialize()
     def init(self, verbosity: int = 1):
         """

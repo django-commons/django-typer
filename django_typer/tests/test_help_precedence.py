@@ -93,3 +93,9 @@ class TestHelpPrecedence(TestCase):
         self.assertIn(
             "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
         )
+
+    def test_help_precedence9(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence9", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence9")
+        self.assertIn("Class docstring.", buffer.getvalue())

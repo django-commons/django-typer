@@ -22,6 +22,7 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
       <define-shellcompletions>`
     * Refactor existing management commands into TyperCommands because TyperCommand is interface
       compatible with BaseCommand.
+    * Use either a class-based interface or the basic Typer style interface to define commands.
 
 
 :big:`Installation`
@@ -65,6 +66,14 @@ documented features of BaseCommand_ work!
    :caption: A Basic Command
    :linenos:
 
+Or, you may also use an interface identitical to Typer's. Just import typer from django_typer
+instead of typer:
+
+.. literalinclude:: ../../django_typer/examples/typer/basic.py
+   :language: python
+   :caption: A Typer-style Basic Command
+   :linenos:
+
 
 .. typer:: django_typer.examples.basic.Command:typer_app
     :prog: ./manage.py basic
@@ -75,11 +84,18 @@ documented features of BaseCommand_ work!
 
 :big:`Multiple Subcommands Example`
 
-Or commands with multiple subcommands can be defined:
+Commands with multiple subcommands can be defined:
 
 .. literalinclude:: ../../django_typer/examples/multi.py
    :language: python
    :caption: A Command w/Subcommands
+   :linenos:
+
+Or using the typer-style interface this could be written:
+
+.. literalinclude:: ../../django_typer/examples/typer/multi.py
+   :language: python
+   :caption: A Typer-style Command w/Subcommands
    :linenos:
 
 
@@ -107,13 +123,22 @@ command like so:
     20.00
 
 Any number of groups and subcommands and subgroups of other groups can be defined allowing
-for arbitrarily complex command hierarchies.
+for arbitrarily complex command hierarchies. Using the class-based interface we could define
+the command like this:
 
 .. literalinclude:: ../../django_typer/examples/hierarchy.py
    :language: python
    :caption: A Command w/Grouping Hierarchy
    :linenos:
 
+The typer-style interface builds a TyperCommand class for us. This allows you to optionally
+accept the self argument in your commands. We could define the above command using the typer
+interface like this:
+
+.. literalinclude:: ../../django_typer/examples/typer/hierarchy.py
+   :language: python
+   :caption: A Typer-style Command w/Grouping Hierarchy
+   :linenos:
 
 .. typer:: django_typer.examples.hierarchy.Command:typer_app
     :prog: ./manage.py hierarchy

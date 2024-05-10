@@ -6,6 +6,10 @@ from django_typer import TyperCommand
 
 
 class Command(TyperCommand, help=_("Test minimal TyperCommand subclass - typer param")):
+    """
+    Class docstring.
+    """
+
     help = _("Test minimal TyperCommand subclass - class member")
 
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):

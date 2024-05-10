@@ -64,7 +64,7 @@ def interact(command, *args, **kwargs):
         os.chdir(cwd)
 
 
-def run_command(command, *args, parse_json=True, **kwargs) -> Tuple[str, str]:
+def run_command(command, *args, parse_json=True, **kwargs) -> Tuple[str, str, int]:
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:

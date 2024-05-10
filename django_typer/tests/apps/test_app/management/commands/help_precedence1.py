@@ -6,6 +6,10 @@ from django_typer import TyperCommand, command, initialize
 
 
 class Command(TyperCommand, help=_("Test minimal TyperCommand subclass - typer param")):
+    """
+    Class docstring.
+    """
+
     help = _("Test minimal TyperCommand subclass - class member")
 
     @initialize(help=_("Test minimal TyperCommand subclass - callback method"))

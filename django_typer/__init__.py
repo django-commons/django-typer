@@ -1785,23 +1785,54 @@ def group(
 
 
 def _add_common_initializer(
-    cmd_cls: t.Union["TyperCommandMeta", t.Type["TyperCommand"]],
-):
+    cmd: t.Union["TyperCommandMeta", t.Type["TyperCommand"], "TyperCommand"],
+) -> t.Optional[typer.models.TyperInfo]:
     """
     Add a callback to the typer app that will add the unsuppressed
-    common django base command parameters to the CLI.
+    common django base command parameters to the CLI if the command
+    is a compound command and no existing callback is registered.
+
+    :param cmd: The command class or instance.
+    :return: The callback that was/is registered on the command
     """
-    cmd_cls.typer_app.callback(
-        cls=type(
-            "_Initializer",
-            (TyperGroupWrapper,),
-            {
-                "django_command": cmd_cls,
-                "_callback_is_method": False,
-                "common_init": True,
-            },
-        )
-    )(lambda: None)
+    if cmd.is_compound_command and not cmd.typer_app.registered_callback:
+        cmd.typer_app.callback(
+            cls=type(
+                "_Initializer",
+                (TyperGroupWrapper,),
+                {
+                    "django_command": cmd,
+                    "_callback_is_method": False,
+                    "common_init": True,
+                },
+            )
+        )(lambda: None)
+    return cmd.typer_app.registered_callback
+
+
+def _resolve_help(dj_cmd: "TyperCommand"):
+    """
+    If no help string would be rendered for the root level command and a class docstring is
+    present, use it as the help string.
+
+    :param dj_cmd: The TyperCommand to resolve the help string for.
+    """
+    hlp = dj_cmd.__class__.__doc__
+    if hlp:
+        if dj_cmd.typer_app.registered_callback:
+            cb = dj_cmd.typer_app.registered_callback
+            if not cb.help and not cb.callback.__doc__:
+                cb.help = hlp
+        else:
+            cmd = (
+                dj_cmd.typer_app.registered_commands[0]
+                if dj_cmd.typer_app.registered_commands
+                else None
+            )
+            if cmd and not cmd.help and not cmd.callback.__doc__:
+                cmd.help = hlp
+            elif not dj_cmd.typer_app.info.help:
+                dj_cmd.typer_app.info.help = hlp
 
 
 class TyperCommandMeta(type):
@@ -2019,8 +2050,7 @@ class TyperCommandMeta(type):
                 for attr in cls_attrs.values():
                     (get_ctor(attr) or (lambda _: None))(cls)
 
-            if cls.is_compound_command and not cls.typer_app.registered_callback:
-                _add_common_initializer(cls)
+            _add_common_initializer(cls)
 
         super().__init__(cls_name, bases, attrs, **kwargs)
 
@@ -2572,10 +2602,11 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         return create_app
 
     @classproperty
-    def is_compound_command(cls):
-        return (
+    def is_compound_command(cls) -> bool:
+        return bool(
             cls.typer_app.registered_groups
             or len(cls.typer_app.registered_commands) > 1
+            or cls.typer_app.registered_callback
         )
 
     @property
@@ -2627,8 +2658,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     ):
         assert self.typer_app.info.name
         load_command_extensions(self.typer_app.info.name)
-        if self.is_compound_command and self.typer_app.registered_callback is None:
-            _add_common_initializer(self.__class__)
+        _add_common_initializer(self)
+        _resolve_help(self)
+
         self.force_color = force_color
         self.no_color = no_color
         with self:
@@ -2647,7 +2679,16 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.stderr = OutputWrapper(stderr or sys.stderr)
             self.stdout.style_func = stdout_style_func
             self.stderr.style_func = stderr_style_func
-            self.command_tree = self._build_cmd_tree(get_typer_command(self.typer_app))
+            try:
+                self.command_tree = self._build_cmd_tree(
+                    get_typer_command(self.typer_app)
+                )
+            except RuntimeError as rerr:
+                raise NotImplementedError(
+                    _(
+                        "No commands or command groups were registered on {command}"
+                    ).format(command=self._name)
+                ) from rerr
 
     def get_subcommand(self, *command_path: str) -> CommandNode:
         """Get the CommandNode"""
