@@ -178,8 +178,10 @@ class TestNative(TestCase):
     def test_native_help_rich(self):
         stdout = StringIO()
         native = get_command(self.command, no_color=True, stdout=stdout)
-        native.print_help("./manage.py", "native")
-        sim = similarity(native_help_rich, stdout.getvalue())
+        native.print_help("./manage.py", self.command)
+        sim = similarity(
+            native_help_rich.replace("native", self.command), stdout.getvalue()
+        )
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
@@ -188,7 +190,9 @@ class TestNative(TestCase):
         stdout = StringIO()
         native = get_command(self.command, no_color=True, stdout=stdout)
         native.print_help("./manage.py", self.command)
-        sim = similarity(native_help_no_rich, stdout.getvalue())
+        sim = similarity(
+            native_help_no_rich.replace("native", self.command), stdout.getvalue()
+        )
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
@@ -219,7 +223,7 @@ class TestNativeGroups(TestCase):
             native_groups.print_help("./manage.py", *(cmd_pth.split()))
             sim = similarity(expected_help, stdout.getvalue())
             print(f"print_help({cmd_pth}) --help similiarity: {sim}")
-            self.assertGreater(sim, 0.98)
+            self.assertGreater(sim, 0.99)
 
             parts = cmd_pth.split()
             sim = similarity(
@@ -227,7 +231,7 @@ class TestNativeGroups(TestCase):
                 run_command(*[parts[0], "--no-color", *parts[1:]], "--help")[0].strip(),
             )
             print(f"run_command({cmd_pth}) --help similiarity: {sim}")
-            self.assertGreater(sim, 0.98)
+            self.assertGreater(sim, 0.99)
 
     def test_native_groups_direct(self):
         native_groups = get_command(self.command)
