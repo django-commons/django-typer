@@ -5,7 +5,7 @@ Change Log
 v1.2.0
 ======
 
-* Fixed `An intelligible exception be thrown when a command is invoked that has no implementation. <https://github.com/bckohan/django-typer/issues/63>`_
+* Fixed `An intelligible exception should be thrown when a command is invoked that has no implementation. <https://github.com/bckohan/django-typer/issues/63>`_
 * Implemented `TyperCommand class docstring should be used as the help as a last resort. <https://github.com/bckohan/django-typer/issues/62>`_
 * Implemented `Adapter pattern that allows commands and groups to be added without extension by apps further up the app stack. <https://github.com/bckohan/django-typer/issues/61>`_
 * Fixed `ModelObjectParser should use a metavar appropriate to the field type. <https://github.com/bckohan/django-typer/issues/60>`_

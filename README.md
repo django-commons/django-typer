@@ -12,7 +12,7 @@
 [![Test Status](https://github.com/bckohan/django-typer/workflows/test/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/test.yml)
 [![Lint Status](https://github.com/bckohan/django-typer/workflows/lint/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/lint.yml)
 
-Use [Typer](https://typer.tiangolo.com/) to define the CLI for your [Django](https://www.djangoproject.com/) management commands. Provides a TyperCommand class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) and allows typer-style annotated parameter types. All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop-in replacement.
+Use [Typer](https://typer.tiangolo.com/) to define the CLI for your [Django](https://www.djangoproject.com/) management commands using the typer interface. Optionally use the provided TyperCommand class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). This class maps the typer interface onto a class based interface that Django developers will be familiar with. All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
 
 **django-typer makes it easy to:**
 

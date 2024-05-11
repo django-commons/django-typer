@@ -365,8 +365,17 @@ Extend/Override TyperCommands
 
 You can extend typer commands simply by subclassing them. All of the normal inheritance rules
 apply. You can either subclass an existing command from an upstream app and leave its module the
-same name to extend and override the command or you can subclass and rename the module to provide
-an adapted version of the upstream command with a different name.
+same name to override the command or you can subclass and rename the module to provide an adapted
+version of the upstream command with a different name. Loosley coupled additive extension is also
+supported by apps in INSTALLED_APPS order. This is useful for namespacing a number of tightly
+coupled subcommands under one Django command. The root command app or extending apps do not need
+to know anything about the other apps extending the command because the ultimate command is
+composed respecting the order of INSTALLED_APPS.
+
+.. note::
+    
+    For more information on extension patterns see the section on
+    :ref:`Extending Commands <extensions>`.
 
 
 .. _configure-rich-exception-tracebacks:

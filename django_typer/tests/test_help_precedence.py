@@ -1,8 +1,12 @@
 import re
 from io import StringIO
 from django.test import TestCase
+import os
 
 from django_typer import get_command
+from django_typer.tests.utils import run_command
+from pathlib import Path
+import pytest
 
 
 class TestHelpPrecedence(TestCase):
@@ -99,3 +103,18 @@ class TestHelpPrecedence(TestCase):
         cmd = get_command("help_precedence9", stdout=buffer, no_color=True)
         cmd.print_help("./manage.py", "help_precedence9")
         self.assertIn("Class docstring.", buffer.getvalue())
+
+    @pytest.mark.skipif(
+        not Path("/usr").exists(), reason="/usr directory does not exist!"
+    )
+    def test_help_from_other_dir(self):
+        """
+        This test is for coverage that the help ouput resolves the correct script when
+        called from a non-relative path.
+        """
+        cwd = os.getcwd()
+        os.chdir("/usr")
+        stdout, _, retcode = run_command("help_precedence9", "--help")
+        self.assertEqual(retcode, 0)
+        self.assertIn("Class docstring.", stdout)
+        os.chdir(cwd)
