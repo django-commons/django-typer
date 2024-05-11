@@ -112,12 +112,9 @@ class TestHelpPrecedence(TestCase):
         This test is for coverage that the help ouput resolves the correct script when
         called from a non-relative path.
         """
-        cwd = os.getcwd()
-        os.chdir("/usr")
         stdout, _, retcode = run_command(
             "help_precedence9", "--no-color", "--help", chdir=False
         )
         self.assertEqual(retcode, 0)
         self.assertIn("Class docstring.", stdout)
         self.assertIn(f"Usage: {manage_py}", stdout)
-        os.chdir(cwd)
