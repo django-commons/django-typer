@@ -66,7 +66,7 @@ documented features of BaseCommand_ work!
    :caption: A Basic Command
    :linenos:
 
-Or, you may also use an interface identitical to Typer's. Just import typer from django_typer
+Or, you may also use an interface identitical to Typer's. Simply import Typer from django_typer
 instead of typer:
 
 .. literalinclude:: ../../django_typer/examples/typer/basic.py
