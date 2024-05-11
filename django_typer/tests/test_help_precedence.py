@@ -2,6 +2,7 @@ import re
 from io import StringIO
 from django.test import TestCase
 import os
+import pytest
 
 from django_typer import get_command
 from django_typer.tests.utils import run_command, manage_py
@@ -102,17 +103,23 @@ class TestHelpPrecedence(TestCase):
         cmd.print_help("./manage.py", "help_precedence9")
         self.assertIn("Class docstring.", buffer.getvalue())
 
+    @pytest.mark.skip()
     def test_help_from_other_dir(self):
         """
         This test is for coverage that the help ouput resolves the correct script when
         called from a non-relative path.
+
+        TODO - running from another directory screws up the code coverage b/c relative
+        paths. Fix this.
         """
         cwd = os.getcwd()
-        os.chdir("./django_typer/tests")
-        stdout, _, retcode = run_command(
-            "help_precedence9", "--no-color", "--help", chdir=False
-        )
-        self.assertEqual(retcode, 0)
-        self.assertIn("Class docstring.", stdout)
-        self.assertIn(f"Usage: {manage_py}", stdout)
-        os.chdir(cwd)
+        try:
+            os.chdir("./django_typer/tests")
+            stdout, _, retcode = run_command(
+                "help_precedence9", "--no-color", "--help", chdir=False
+            )
+            self.assertEqual(retcode, 0)
+            self.assertIn("Class docstring.", stdout)
+            self.assertIn(f"Usage: {manage_py}", stdout)
+        finally:
+            os.chdir(cwd)
