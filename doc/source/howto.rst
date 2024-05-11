@@ -373,7 +373,7 @@ to know anything about the other apps extending the command because the ultimate
 composed respecting the order of INSTALLED_APPS.
 
 .. note::
-    
+
     For more information on extension patterns see the section on
     :ref:`Extending Commands <extensions>`.
 

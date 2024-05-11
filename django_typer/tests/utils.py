@@ -64,14 +64,22 @@ def interact(command, *args, **kwargs):
         os.chdir(cwd)
 
 
-def run_command(command, *args, parse_json=True, **kwargs) -> Tuple[str, str, int]:
+def run_command(
+    command, *args, parse_json=True, chdir=True, **kwargs
+) -> Tuple[str, str, int]:
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
         env = os.environ.copy()
-        os.chdir(manage_py.parent)
+        if chdir:
+            os.chdir(manage_py.parent)
         result = subprocess.run(
-            [sys.executable, f"./{manage_py.name}", command, *args],
+            [
+                sys.executable,
+                f"./{manage_py.name}" if chdir else manage_py,
+                command,
+                *args,
+            ],
             capture_output=True,
             text=True,
             env=env,

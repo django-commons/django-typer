@@ -4,7 +4,7 @@ from django.test import TestCase
 import os
 
 from django_typer import get_command
-from django_typer.tests.utils import run_command
+from django_typer.tests.utils import run_command, manage_py
 from pathlib import Path
 import pytest
 
@@ -114,7 +114,8 @@ class TestHelpPrecedence(TestCase):
         """
         cwd = os.getcwd()
         os.chdir("/usr")
-        stdout, _, retcode = run_command("help_precedence9", "--help")
+        stdout, _, retcode = run_command("help_precedence9", "--help", chdir=False)
         self.assertEqual(retcode, 0)
         self.assertIn("Class docstring.", stdout)
+        self.assertIn(f"Usage: {manage_py}", stdout)
         os.chdir(cwd)
