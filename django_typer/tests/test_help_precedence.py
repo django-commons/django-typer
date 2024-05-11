@@ -104,9 +104,6 @@ class TestHelpPrecedence(TestCase):
         cmd.print_help("./manage.py", "help_precedence9")
         self.assertIn("Class docstring.", buffer.getvalue())
 
-    @pytest.mark.skipif(
-        not Path("/usr").exists(), reason="/usr directory does not exist!"
-    )
     def test_help_from_other_dir(self):
         """
         This test is for coverage that the help ouput resolves the correct script when
