@@ -114,7 +114,7 @@ class TestHelpPrecedence(TestCase):
         """
         cwd = os.getcwd()
         os.chdir("/usr")
-        stdout, _, retcode = run_command("help_precedence9", "--help", chdir=False)
+        stdout, _, retcode = run_command("help_precedence9", "--no-color", "--help", chdir=False)
         self.assertEqual(retcode, 0)
         self.assertIn("Class docstring.", stdout)
         self.assertIn(f"Usage: {manage_py}", stdout)
