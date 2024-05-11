@@ -5,8 +5,6 @@ import os
 
 from django_typer import get_command
 from django_typer.tests.utils import run_command, manage_py
-from pathlib import Path
-import pytest
 
 
 class TestHelpPrecedence(TestCase):
@@ -109,9 +107,12 @@ class TestHelpPrecedence(TestCase):
         This test is for coverage that the help ouput resolves the correct script when
         called from a non-relative path.
         """
+        cwd = os.getcwd()
+        os.chdir("./django_typer/tests")
         stdout, _, retcode = run_command(
             "help_precedence9", "--no-color", "--help", chdir=False
         )
         self.assertEqual(retcode, 0)
         self.assertIn("Class docstring.", stdout)
         self.assertIn(f"Usage: {manage_py}", stdout)
+        os.chdir(cwd)
