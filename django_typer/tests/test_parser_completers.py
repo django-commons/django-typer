@@ -901,3 +901,92 @@ class TestShellCompletersAndParsers(TestCase):
             "shell ",
         )[0]
         self.assertTrue("shell " in result)
+
+    def test_import_path_completer(self):
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --settings "
+        )[0]
+        self.assertIn('"importlib"', result)
+        self.assertIn('"django_typer"', result)
+        self.assertIn('"typer"', result)
+        self.assertNotIn(".django_typer", result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --settings "
+        )[0]
+        self.assertIn('"importlib"', result)
+        self.assertIn('"django_typer"', result)
+        self.assertIn('"typer"', result)
+        self.assertNotIn(".django_typer", result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --settings djan"
+        )[0]
+        self.assertNotIn('"importlib"', result)
+        self.assertIn('"django"', result)
+        self.assertIn('"django_typer"', result)
+        self.assertNotIn('"typer"', result)
+        self.assertNotIn(".django_typer", result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --settings django_ty",
+        )[0]
+        self.assertNotIn('"importlib"', result)
+        self.assertNotIn('"typer"', result)
+        self.assertNotIn(".django_typer", result)
+
+        self.assertIn('"django_typer.completers"', result)
+        self.assertIn('"django_typer.management"', result)
+        self.assertIn('"django_typer.parsers"', result)
+        self.assertIn('"django_typer.patch"', result)
+        self.assertIn('"django_typer.tests"', result)
+        self.assertIn('"django_typer.types"', result)
+        self.assertIn('"django_typer.utils"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --settings django_typer.tests.settings.",
+        )[0]
+        self.assertNotIn('"importlib"', result)
+        self.assertNotIn('"typer"', result)
+        self.assertNotIn(".django_typer", result)
+        settings_expected = [
+            "django_typer.tests.settings.adapted",
+            "django_typer.tests.settings.adapted1",
+            "django_typer.tests.settings.adapted1_2",
+            "django_typer.tests.settings.adapted2_1",
+            "django_typer.tests.settings.base",
+            "django_typer.tests.settings.examples",
+            "django_typer.tests.settings.mod_init",
+            "django_typer.tests.settings.override",
+            "django_typer.tests.settings.settings2",
+            "django_typer.tests.settings.settings_fail_check",
+            "django_typer.tests.settings.settings_tb_bad_config",
+            "django_typer.tests.settings.settings_tb_change_defaults",
+            "django_typer.tests.settings.settings_tb_false",
+            "django_typer.tests.settings.settings_tb_no_install",
+            "django_typer.tests.settings.settings_tb_none",
+            "django_typer.tests.settings.settings_throw_init_exception",
+            "django_typer.tests.settings.typer_examples",
+        ]
+        for mod in settings_expected:
+            self.assertIn(f'"{mod}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --settings django_typer.tests.settings.typer_examples",
+        )[0]
+        for mod in settings_expected[:-1]:
+            self.assertNotIn(f'"{mod}"', result)
+
+        self.assertIn(f'"{settings_expected[-1]}"', result)

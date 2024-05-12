@@ -16,7 +16,10 @@ types:
 
 # pylint: disable=line-too-long
 
+import pkgutil
+import sys
 import typing as t
+from pathlib import Path
 from types import MethodType
 from uuid import UUID
 
@@ -389,3 +392,40 @@ def complete_app_label(
             and app.label not in present
         ]
     return ret
+
+
+def complete_import_path(
+    ctx: Context, param: Parameter, incomplete: str
+) -> t.List[CompletionItem]:
+    """
+    A completer that completes a python dot import path string based on sys.path.
+
+    :param ctx: The click context.
+    :param param: The click parameter.
+    :param incomplete: The incomplete string.
+    :return: A list of available matching import paths
+    """
+    incomplete = incomplete.strip()
+    completions = []
+    packages = [pkg for pkg in incomplete.split(".") if pkg]
+    pkg_complete = not incomplete or incomplete.endswith(".")
+    module_import = ".".join(packages) if pkg_complete else ".".join(packages[:-1])
+    module_path = Path(module_import.replace(".", "/"))
+    search_paths = []
+    for pth in sys.path:
+        if (Path(pth) / module_path).exists():
+            search_paths.append(str(Path(pth) / module_path))
+
+    prefix = "" if pkg_complete else packages[-1]
+    for module in pkgutil.iter_modules(path=search_paths):
+        if module.name.startswith(prefix):
+            completions.append(
+                CompletionItem(
+                    f'{module_import}{"." if module_import else ""}{module.name}'
+                )
+            )
+    if len(completions) == 1 and not completions[0].value.endswith("."):
+        return (
+            complete_import_path(ctx, param, f"{completions[0].value}.") or completions
+        )
+    return completions
