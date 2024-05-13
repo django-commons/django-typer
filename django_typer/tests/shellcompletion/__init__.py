@@ -174,7 +174,7 @@ class _DefaultCompleteTestCase:
         self.assertIn("makemigrations", completions)
         self.assertIn("migrate", completions)
         self.assertIn("completion", completions)
-        self.assertIn("help_precedence", completions)
+        self.assertIn("basic", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
