@@ -5,6 +5,7 @@ Change Log
 v1.2.0
 ======
 
+* Implemented `Shell completion for --pythonpath <https://github.com/bckohan/django-typer/issues/65>`_
 * Implemented `Shell completion for --settings <https://github.com/bckohan/django-typer/issues/64>`_
 * Fixed `An intelligible exception should be thrown when a command is invoked that has no implementation. <https://github.com/bckohan/django-typer/issues/63>`_
 * Implemented `TyperCommand class docstring should be used as the help as a last resort. <https://github.com/bckohan/django-typer/issues/62>`_

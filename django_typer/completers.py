@@ -16,9 +16,11 @@ types:
 
 # pylint: disable=line-too-long
 
+import os
 import pkgutil
 import sys
 import typing as t
+from functools import partial
 from pathlib import Path
 from types import MethodType
 from uuid import UUID
@@ -429,3 +431,69 @@ def complete_import_path(
             complete_import_path(ctx, param, f"{completions[0].value}.") or completions
         )
     return completions
+
+
+def complete_path(
+    ctx: Context, param: Parameter, incomplete: str, dir_only: t.Optional[bool] = None
+) -> t.List[CompletionItem]:
+    """
+    A completer that completes a path. Relative incomplete paths are interpreted relative to
+    the current working directory.
+
+    :param ctx: The click context.
+    :param param: The click parameter.
+    :param incomplete: The incomplete string.
+    :param dir_only: Restrict completions to paths to directories only, otherwise complete
+        directories or files.
+    :return: A list of available matching directories
+    """
+
+    def exists(pth: Path) -> bool:
+        if dir_only:
+            return pth.is_dir()
+        return pth.exists() or pth.is_symlink()
+
+    completions = []
+    incomplete_path = Path(incomplete)
+    partial_dir = ""
+    if not exists(incomplete_path) and not incomplete.endswith(os.sep):
+        partial_dir = incomplete_path.name
+        incomplete_path = incomplete_path.parent
+    if incomplete_path.is_dir():
+        for child in os.listdir(incomplete_path):
+            if not exists(incomplete_path / child):
+                continue
+            if child.startswith(partial_dir):
+                to_complete = incomplete[0 : (-len(partial_dir) or None)]
+                completions.append(
+                    CompletionItem(
+                        f"{to_complete}"
+                        f"{"" if not to_complete or to_complete.endswith(os.sep) else os.sep}"
+                        f"{child}",
+                        type="dir" if (incomplete_path / child).is_dir() else "file",
+                    )
+                )
+    if (
+        len(completions) == 1
+        and Path(completions[0].value).is_dir()
+        and [
+            child
+            for child in os.listdir(completions[0].value)
+            if exists(Path(completions[0].value) / child)
+        ]
+    ):
+        # recurse because we can go futher
+        return complete_path(ctx, param, completions[0].value, dir_only=dir_only)
+    return completions
+
+
+complete_directory = partial(complete_path, dir_only=True)
+"""
+A completer that completes a directory path (but not files). Relative incomplete paths
+are interpreted relative to the current working directory.
+
+:param ctx: The click context.
+:param param: The click parameter.
+:param incomplete: The incomplete string.
+:return: A list of available matching directories
+"""

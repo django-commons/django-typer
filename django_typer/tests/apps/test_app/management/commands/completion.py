@@ -1,6 +1,7 @@
 import json
 import sys
 import typing as t
+from pathlib import Path
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
@@ -31,6 +32,13 @@ class Command(TyperCommand):
                 parser=parsers.parse_app_label,
                 help=_("An app given as an option."),
                 shell_complete=completers.complete_app_label,
+            ),
+        ] = None,
+        path: Annotated[
+            t.Optional[Path],
+            typer.Option(
+                help=_("A path given as an option."),
+                shell_complete=completers.complete_path,
             ),
         ] = None,
     ):

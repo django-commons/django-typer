@@ -3,6 +3,8 @@ import json
 from decimal import Decimal
 from io import StringIO
 import re
+import os
+from pathlib import Path
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -990,3 +992,205 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertNotIn(f'"{mod}"', result)
 
         self.assertIn(f'"{settings_expected[-1]}"', result)
+
+    def test_pythonpath_completer(self):
+        local_dirs = [pth for pth in os.listdir() if Path(pth).is_dir()]
+        local_files = [f for f in os.listdir() if not Path(f).is_dir()]
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath "
+        )[0]
+        for pth in local_dirs:
+            self.assertIn(f'"{pth}"', result)
+        for pth in local_files:
+            self.assertNotIn(f'"{pth}"', result)
+
+        for incomplete in [".", "./"]:
+            result = run_command(
+                "shellcompletion",
+                "complete",
+                "--shell",
+                "zsh",
+                f"multi --pythonpath {incomplete}",
+            )[0]
+            for pth in local_dirs:
+                self.assertIn(f'"./{pth}"', result)
+            for pth in local_files:
+                self.assertNotIn(f'"./{pth}"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath ./d"
+        )[0]
+        self.assertIn('"./doc"', result)
+        self.assertIn('"./django_typer"', result)
+        for pth in [
+            *local_files,
+            *[pth for pth in local_dirs if not pth.startswith("d")],
+        ]:
+            self.assertNotIn(f'"./{pth}"', result)
+
+        local_dirs = [
+            str(Path("django_typer") / d)
+            for d in os.listdir("django_typer")
+            if (Path("django_typer") / d).is_dir()
+        ]
+        local_files = [
+            str(Path("django_typer") / f)
+            for f in os.listdir("django_typer")
+            if not (Path("django_typer") / f).is_dir()
+        ]
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath dj"
+        )[0]
+        for pth in local_dirs:
+            self.assertIn(f'"{pth}"', result)
+        for pth in local_files:
+            self.assertNotIn(f'"{pth}"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath ./dj"
+        )[0]
+        for pth in local_dirs:
+            self.assertIn(f'"./{pth}"', result)
+        for pth in local_files:
+            self.assertNotIn(f'"./{pth}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --pythonpath ./django_typer",
+        )[0]
+        self.assertIn('"./django_typer/management"', result)
+        self.assertIn('"./django_typer/examples"', result)
+        self.assertIn('"./django_typer/tests"', result)
+        self.assertNotIn('"./django_typer/__init__.py"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --pythonpath django_typer/",
+        )[0]
+        self.assertIn('"django_typer/management"', result)
+        self.assertIn('"django_typer/examples"', result)
+        self.assertIn('"django_typer/tests"', result)
+        self.assertNotIn('"django_typer/__init__.py"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --pythonpath django_typer/man",
+        )[0]
+        self.assertIn('"django_typer/management/commands"', result)
+        self.assertNotIn('"django_typer/examples"', result)
+        self.assertNotIn('"django_typer/tests"', result)
+        self.assertNotIn('"django_typer/management/__init__.py"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath /"
+        )[0]
+        for pth in os.listdir("/"):
+            if Path(f"/{pth}").is_dir():
+                self.assertIn(f'"/{pth}"', result)
+            else:
+                self.assertNotIn(f'"/{pth}"', result)
+
+    def test_path_completer(self):
+        local_paths = [pth for pth in os.listdir()]
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path "
+        )[0]
+        for pth in local_paths:
+            self.assertIn(f'"{pth}"', result)
+
+        for incomplete in [".", "./"]:
+            result = run_command(
+                "shellcompletion",
+                "complete",
+                "--shell",
+                "zsh",
+                f"completion --path {incomplete}",
+            )[0]
+            for pth in local_paths:
+                self.assertIn(f'"./{pth}"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./d"
+        )[0]
+        self.assertIn('"./doc"', result)
+        self.assertIn('"./django_typer"', result)
+        for pth in [
+            *[pth for pth in local_paths if not pth.startswith("d")],
+        ]:
+            self.assertNotIn(f'"./{pth}"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./p"
+        )[0]
+        for pth in [
+            *[pth for pth in local_paths if not pth.startswith("p")],
+        ]:
+            self.assertNotIn(f'"./{pth}"', result)
+
+        local_paths = [
+            str(Path("django_typer") / d)
+            for d in os.listdir("django_typer")
+            if (Path("django_typer") / d).is_dir()
+        ]
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path dj"
+        )[0]
+        for pth in local_paths:
+            self.assertIn(f'"{pth}"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./dj"
+        )[0]
+        for pth in local_paths:
+            self.assertIn(f'"./{pth}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --path ./django_typer",
+        )[0]
+        self.assertIn('"./django_typer/management"', result)
+        self.assertIn('"./django_typer/examples"', result)
+        self.assertIn('"./django_typer/tests"', result)
+        self.assertIn('"./django_typer/__init__.py"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --path django_typer/",
+        )[0]
+        self.assertIn('"django_typer/management"', result)
+        self.assertIn('"django_typer/examples"', result)
+        self.assertIn('"django_typer/tests"', result)
+        self.assertIn('"django_typer/__init__.py"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --path django_typer/man",
+        )[0]
+        self.assertIn('"django_typer/management/__init__.py"', result)
+        self.assertIn('"django_typer/management/commands"', result)
+        self.assertNotIn('"django_typer/examples"', result)
+        self.assertNotIn('"django_typer/tests"', result)
+
+        result = run_command(
+            "shellcompletion", "complete", "--shell", "zsh", "completion --path /"
+        )[0]
+        for pth in os.listdir("/"):
+            self.assertIn(f'"/{pth}"', result)
