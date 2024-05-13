@@ -204,6 +204,14 @@ class TestNativeWithSelf(TestNative):
     command = "native_self"
 
 
+class TestNativeInheritance(TestNative):
+    command = "native_inheritance1"
+
+
+class TestNativeInheritanceWithSelf(TestNative):
+    command = "native_inheritance2"
+
+
 class TestNativeGroups(TestCase):
     command = "native_groups"
 
@@ -303,3 +311,11 @@ class TestNativeGroups(TestCase):
 
 class TestNativeGroupsWithSelf(TestNativeGroups):
     command = "native_groups_self"
+
+
+class TestNativeInheritanceGroups(TestNativeGroups):
+    command = "native_inheritance3"
+
+
+class TestNativeInheritanceGroupsWithSelf(TestNativeGroups):
+    command = "native_inheritance4"

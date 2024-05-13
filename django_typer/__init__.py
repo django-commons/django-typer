@@ -153,6 +153,8 @@ __all__ = [
 P = ParamSpec("P")
 R = t.TypeVar("R")
 
+_CACHE_KEY = "_register_typer"
+
 
 def model_parser_completer(
     model_cls: t.Type[Model],
@@ -570,6 +572,71 @@ class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
     """
 
 
+def _staticmethod(func: t.Callable[..., t.Any]) -> staticmethod:
+    static_wrapper = staticmethod(func)
+    cached = getattr(func, _CACHE_KEY, None)
+    if cached:
+        setattr(static_wrapper, _CACHE_KEY, cached)
+    return static_wrapper
+
+
+def _cache_initializer(
+    callback: t.Callable[..., t.Any],
+    common_init: bool,
+    name: t.Optional[str] = Default(None),
+    help: t.Optional[str] = Default(None),
+    cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+    **kwargs,
+):
+    if not hasattr(callback, _CACHE_KEY):
+
+        def register(
+            cmd: "TyperCommand",
+            _name: t.Optional[str] = Default(None),
+            _help: t.Optional[str] = Default(None),
+            **extra,
+        ):
+            return cmd.typer_app.callback(
+                name=name or _name,
+                cls=type(
+                    "_Initializer",
+                    (cls,),
+                    {"django_command": cmd, "common_init": common_init},
+                ),
+                help=cmd.typer_app.info.help or help or _help,
+                **kwargs,
+                **extra,
+            )(callback)
+
+        setattr(callback, _CACHE_KEY, register)
+
+
+def _cache_command(
+    callback: t.Callable[..., t.Any],
+    name: t.Optional[str] = None,
+    help: t.Optional[str] = None,
+    cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+    **kwargs,
+):
+    if not hasattr(callback, _CACHE_KEY):
+
+        def register(
+            cmd: "TyperCommand",
+            _name: t.Optional[str] = None,
+            _help: t.Optional[str] = None,
+            **extra,
+        ):
+            return cmd.typer_app.command(
+                name=name or _name,
+                cls=type("_Command", (cls,), {"django_command": cmd}),
+                help=help or _help,
+                **kwargs,
+                **extra,
+            )(callback)
+
+        setattr(callback, _CACHE_KEY, register)
+
+
 class AppFactory(type):
     def __call__(
         app_cls,  # pyright: ignore[reportSelfClsParameterName]
@@ -812,11 +879,35 @@ class Typer(typer.Typer, metaclass=AppFactory):
         def make_initializer(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
+            if self.__class__ is Typer:
+                # only cache at the top level - this enables subclassing of
+                # commands defined through the typer style interface.
+                _cache_initializer(
+                    func,
+                    common_init=self.parent is None,
+                    name=name,
+                    help=help,
+                    cls=cls,
+                    invoke_without_command=invoke_without_command,
+                    no_args_is_help=no_args_is_help,
+                    subcommand_metavar=subcommand_metavar,
+                    chain=chain,
+                    result_callback=result_callback,
+                    context_settings=context_settings,
+                    epilog=epilog,
+                    short_help=short_help,
+                    options_metavar=options_metavar,
+                    add_help_option=add_help_option,
+                    hidden=hidden,
+                    deprecated=deprecated,
+                    rich_help_panel=rich_help_panel,
+                    **kwargs,
+                )
             if self.django_command and not hasattr(self.django_command, func.__name__):
                 setattr(
                     self.django_command,
                     func.__name__,
-                    func if is_method(func) else staticmethod(func),
+                    func if is_method(func) else _staticmethod(func),
                 )
             return register_initializer(func)
 
@@ -844,9 +935,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
     ]:
         register_command = super().command(
             name=name,
-            cls=type(
-                "_AdaptedCommand", (cls,), {"django_command": self.django_command}
-            ),
+            cls=type("_Command", (cls,), {"django_command": self.django_command}),
             context_settings=context_settings,
             help=help,
             epilog=epilog,
@@ -863,11 +952,30 @@ class Typer(typer.Typer, metaclass=AppFactory):
         def make_command(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
+            if self.__class__ is Typer:
+                # only cache at the top level - this enables subclassing of
+                # commands defined through the typer style interface.
+                _cache_command(
+                    func,
+                    name=name,
+                    help=help,
+                    cls=cls,
+                    context_settings=context_settings,
+                    epilog=epilog,
+                    short_help=short_help,
+                    options_metavar=options_metavar,
+                    add_help_option=add_help_option,
+                    no_args_is_help=no_args_is_help,
+                    hidden=hidden,
+                    deprecated=deprecated,
+                    rich_help_panel=rich_help_panel,
+                    **kwargs,
+                )
             if self.django_command and not hasattr(self.django_command, func.__name__):
                 setattr(
                     self.django_command,
                     func.__name__,
-                    func if is_method(func) else staticmethod(func),
+                    func if is_method(func) else _staticmethod(func),
                 )
             return register_command(func)
 
@@ -968,7 +1076,8 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                     setattr(
                         cmd_cls,
                         initializer.__name__,
-                        initializer if self.is_method else staticmethod(initializer),
+                        # initializer if self.is_method else staticmethod(initializer),
+                        self,
                     )
                 for cmd in getattr(self, "registered_commands", []):
                     if not hasattr(cmd_cls, cmd.callback.__name__):
@@ -977,12 +1086,14 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                             cmd.callback.__name__,
                             cmd.callback
                             if is_method(cmd.callback)
-                            else staticmethod(cmd.callback),
+                            else _staticmethod(cmd.callback),
                         )
 
     @property
     def is_child_group(self):
-        return bool(self.parent)
+        # used by TyperCommand metclass to determine if this is a top level group
+        # or not, if it is - it needs to be bound to the class's app
+        return bool(self.parent) and self.parent.__class__ is not Typer
 
     @property
     def bound(self) -> bool:
@@ -1274,7 +1385,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
             owner = kwargs.pop("_owner", None)
             if owner:
                 # attach this function to the adapted Command class
-                setattr(owner, f.__name__, f if is_method(f) else staticmethod(f))
+                setattr(owner, f.__name__, f if is_method(f) else _staticmethod(f))
             return super(  # pylint: disable=super-with-arguments
                 CommandGroup, self
             ).command(
@@ -1543,34 +1654,26 @@ def initialize(
     """
 
     def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
-        setattr(
+        _cache_initializer(
             func,
-            "_register_typer",
-            lambda cmd,
-            _name=None,
-            _help=Default(None),
-            **extra: cmd.typer_app.callback(
-                name=name or _name,
-                cls=type(
-                    "_Initializer", (cls,), {"django_command": cmd, "common_init": True}
-                ),
-                invoke_without_command=invoke_without_command,
-                subcommand_metavar=subcommand_metavar,
-                chain=chain,
-                result_callback=result_callback,
-                context_settings=context_settings,
-                help=cmd.typer_app.info.help or help or _help,
-                epilog=epilog,
-                short_help=short_help,
-                options_metavar=options_metavar,
-                add_help_option=add_help_option,
-                no_args_is_help=no_args_is_help,
-                hidden=hidden,
-                deprecated=deprecated,
-                rich_help_panel=rich_help_panel,
-                **kwargs,
-                **extra,
-            )(func),
+            common_init=True,
+            name=name,
+            cls=cls,
+            invoke_without_command=invoke_without_command,
+            subcommand_metavar=subcommand_metavar,
+            chain=chain,
+            result_callback=result_callback,
+            context_settings=context_settings,
+            help=help,
+            epilog=epilog,
+            short_help=short_help,
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            no_args_is_help=no_args_is_help,
+            hidden=hidden,
+            deprecated=deprecated,
+            rich_help_panel=rich_help_panel,
+            **kwargs,
         )
         return func
 
@@ -1651,26 +1754,22 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     """
 
     def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
-        setattr(
+        _cache_command(
             func,
-            "_register_typer",
-            lambda cmd, _name=None, _help=None, **extra: cmd.typer_app.command(
-                name=name or _name,
-                cls=cls,
-                context_settings=context_settings,
-                help=help or _help,
-                epilog=epilog,
-                short_help=short_help,
-                options_metavar=options_metavar,
-                add_help_option=add_help_option,
-                no_args_is_help=no_args_is_help,
-                hidden=hidden,
-                deprecated=deprecated,
-                # Rich settings
-                rich_help_panel=rich_help_panel,
-                **kwargs,
-                **extra,
-            )(func),
+            name=name,
+            cls=cls,
+            context_settings=context_settings,
+            help=help,
+            epilog=epilog,
+            short_help=short_help,
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            no_args_is_help=no_args_is_help,
+            hidden=hidden,
+            deprecated=deprecated,
+            # Rich settings
+            rich_help_panel=rich_help_panel,
+            **kwargs,
         )
         return func
 
@@ -2013,7 +2112,7 @@ class TyperCommandMeta(type):
             )
 
             def get_ctor(attr: t.Any) -> t.Optional[t.Callable[..., t.Any]]:
-                return getattr(attr, "_register_typer", None)
+                return getattr(attr, _CACHE_KEY, None)
 
             # because we're mapping a non-class based interface onto a class based
             # interface, we have to handle this class mro stuff manually here
@@ -2023,9 +2122,15 @@ class TyperCommandMeta(type):
             ]:
                 if not issubclass(cmd_cls, TyperCommand) or cmd_cls is TyperCommand:
                     continue
-                for attr in [*cls_attrs.values(), cls._handle]:
+
+                to_register = []
+                for name, attr in cls_attrs.items():
+                    if name == "_handle":
+                        continue
                     if isinstance(attr, CommandGroup) and not attr.is_child_group:
                         attr.attach(cls)
+                    elif register := get_ctor(attr):
+                        to_register.append(register)
 
                 if cmd_cls._handle:
                     ctor = get_ctor(cmd_cls._handle)
@@ -2038,16 +2143,11 @@ class TyperCommandMeta(type):
                     else:
                         cls.typer_app.command(
                             cls.typer_app.info.name,
-                            cls=type(
-                                "_AdaptedCommand",
-                                (TyperCommandWrapper,),
-                                {"django_command": cls},
-                            ),
                             help=cls.typer_app.info.help or None,
                         )(cmd_cls._handle)
 
-                for attr in cls_attrs.values():
-                    (get_ctor(attr) or (lambda _: None))(cls)
+                for cmd in to_register:
+                    cmd(cls)
 
             _add_common_initializer(cls)
 
@@ -2481,7 +2581,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 rich_help_panel=rich_help_panel,
                 **kwargs,
             )(func)
-            setattr(cmd, func.__name__, func if is_method(func) else staticmethod(func))
+            setattr(
+                cmd, func.__name__, func if is_method(func) else _staticmethod(func)
+            )
             return func
 
         return make_command
