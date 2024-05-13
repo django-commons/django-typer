@@ -1,5 +1,7 @@
-from django_typer import Typer
+from django_typer import Typer, TyperCommand
 from django_typer.types import Verbosity
+
+Command: TyperCommand
 
 app = Typer()
 

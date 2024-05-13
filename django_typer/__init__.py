@@ -491,7 +491,12 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
                 for param in _get_common_params()
                 if param.name
                 and param.name
-                not in (self.django_command.suppressed_base_arguments or [])
+                not in (
+                    {
+                        arg.lstrip("--").replace("-", "_")
+                        for arg in self.django_command.suppressed_base_arguments or []
+                    }
+                )
             ]
             if self.common_init or self.no_callback
             else []
@@ -1540,7 +1545,7 @@ def initialize(
     def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
-            "_register_callback",
+            "_register_typer",
             lambda cmd,
             _name=None,
             _help=Default(None),
@@ -1648,7 +1653,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
         setattr(
             func,
-            "_register_command",
+            "_register_typer",
             lambda cmd, _name=None, _help=None, **extra: cmd.typer_app.command(
                 name=name or _name,
                 cls=cls,
@@ -2006,15 +2011,9 @@ class TyperCommandMeta(type):
             cls.typer_app.info.name = (
                 cls.typer_app.info.name or cls.__module__.rsplit(".", maxsplit=1)[-1]
             )
-            cls.suppressed_base_arguments = {
-                arg.lstrip("--").replace("-", "_")
-                for arg in cls.suppressed_base_arguments or []
-            }  # per django docs - allow these to be specified by either the option or param name
 
             def get_ctor(attr: t.Any) -> t.Optional[t.Callable[..., t.Any]]:
-                return getattr(
-                    attr, "_register_command", getattr(attr, "_register_callback", None)
-                )
+                return getattr(attr, "_register_typer", None)
 
             # because we're mapping a non-class based interface onto a class based
             # interface, we have to handle this class mro stuff manually here
