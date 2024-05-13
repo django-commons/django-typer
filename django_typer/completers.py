@@ -423,7 +423,8 @@ def complete_import_path(
         if module.name.startswith(prefix):
             completions.append(
                 CompletionItem(
-                    f'{module_import}{"." if module_import else ""}{module.name}'
+                    f'{module_import}{"." if module_import else ""}{module.name}',
+                    type="dir",
                 )
             )
     if len(completions) == 1 and not completions[0].value.endswith("."):
@@ -459,6 +460,8 @@ def complete_path(
     if not exists(incomplete_path) and not incomplete.endswith(os.sep):
         partial_dir = incomplete_path.name
         incomplete_path = incomplete_path.parent
+    elif incomplete_path.is_file() and not dir_only:
+        return [CompletionItem(incomplete, type="file")]
     if incomplete_path.is_dir():
         for child in os.listdir(incomplete_path):
             if not exists(incomplete_path / child):

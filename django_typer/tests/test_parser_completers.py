@@ -1099,6 +1099,15 @@ class TestShellCompletersAndParsers(TestCase):
             else:
                 self.assertNotIn(f'"/{pth}"', result)
 
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --pythonpath django_typer/completers.py",
+        )[0]
+        self.assertNotIn('"django_typer/completers.py"', result)
+
     def test_path_completer(self):
         local_paths = [pth for pth in os.listdir()]
         result = run_command(
@@ -1194,3 +1203,12 @@ class TestShellCompletersAndParsers(TestCase):
         )[0]
         for pth in os.listdir("/"):
             self.assertIn(f'"/{pth}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --path django_typer/completers.py",
+        )[0]
+        self.assertIn('"django_typer/completers.py"', result)
