@@ -1105,7 +1105,7 @@ class TestShellCompletersAndParsers(TestCase):
             "--shell",
             "zsh",
             "multi --pythonpath django_typer/completers.py",
-        )[0]
+        )
         self.assertNotIn('"django_typer/completers.py"', result)
 
         result = run_command(
@@ -1114,6 +1114,15 @@ class TestShellCompletersAndParsers(TestCase):
             "--shell",
             "zsh",
             "multi --pythonpath django_typer/does_not_exist",
+        )[0]
+        self.assertNotIn("django_typer", result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "multi --pythonpath does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
 
@@ -1228,5 +1237,14 @@ class TestShellCompletersAndParsers(TestCase):
             "--shell",
             "zsh",
             "completion --path django_typer/does_not_exist",
+        )[0]
+        self.assertNotIn("django_typer", result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --path does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
