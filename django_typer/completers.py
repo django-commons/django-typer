@@ -468,7 +468,7 @@ def complete_path(
                 completions.append(
                     CompletionItem(
                         f"{to_complete}"
-                        f"{"" if not to_complete or to_complete.endswith(os.sep) else os.sep}"
+                        f"{'' if not to_complete or to_complete.endswith(os.sep) else os.sep}"
                         f"{child}",
                         type="dir" if (incomplete_path / child).is_dir() else "file",
                     )
