@@ -51,6 +51,15 @@ def get_named_arguments(function):
     ]
 
 
+def get_named_defaults(function):
+    sig = inspect.signature(function)
+    return {
+        name: param.default
+        for name, param in sig.parameters.items()
+        if param.default != inspect.Parameter.empty
+    }
+
+
 def interact(command, *args, **kwargs):
     cwd = os.getcwd()
     try:

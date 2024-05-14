@@ -161,6 +161,8 @@ class TestNative(TestCase):
     """
 
     command = "native"
+    native_help_rich = native_help_rich
+    native_help_no_rich = native_help_no_rich
 
     def test_native_direct(self):
         native = get_command(self.command)
@@ -180,7 +182,8 @@ class TestNative(TestCase):
         native = get_command(self.command, no_color=True, stdout=stdout)
         native.print_help("./manage.py", self.command)
         sim = similarity(
-            native_help_rich.replace("native", self.command), stdout.getvalue()
+            self.native_help_rich.replace(" native ", f" {self.command} "),
+            stdout.getvalue(),
         )
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
@@ -191,7 +194,8 @@ class TestNative(TestCase):
         native = get_command(self.command, no_color=True, stdout=stdout)
         native.print_help("./manage.py", self.command)
         sim = similarity(
-            native_help_no_rich.replace("native", self.command), stdout.getvalue()
+            self.native_help_no_rich.replace(" native ", f" {self.command} "),
+            stdout.getvalue(),
         )
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
@@ -204,28 +208,25 @@ class TestNativeWithSelf(TestNative):
     command = "native_self"
 
 
-class TestNativeInheritance(TestNative):
-    command = "native_inheritance1"
-
-
-class TestNativeInheritanceWithSelf(TestNative):
-    command = "native_inheritance2"
-
-
 class TestNativeGroups(TestCase):
     command = "native_groups"
 
+    commands = [
+        ("{command}", native_groups_help_rich),
+        ("{command} main", native_groups_main_help_rich),
+        ("{command} grp1", native_groups_grp1_help_rich),
+        ("{command} grp1 subgrp", native_groups_grp1_subgrp_help_rich),
+        ("{command} grp1 cmd1", native_groups_grp1_cmd1_help_rich),
+        ("{command} grp1 cmd2", native_groups_grp1_cmd2_help_rich),
+    ]
+
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_groups_helps(self):
-        for cmd_pth, expected_help in [
-            (self.command, native_groups_help_rich),
-            (f"{self.command} main", native_groups_main_help_rich),
-            (f"{self.command} grp1", native_groups_grp1_help_rich),
-            (f"{self.command} grp1 subgrp", native_groups_grp1_subgrp_help_rich),
-            (f"{self.command} grp1 cmd1", native_groups_grp1_cmd1_help_rich),
-            (f"{self.command} grp1 cmd2", native_groups_grp1_cmd2_help_rich),
-        ]:
-            expected_help = expected_help.replace("native_groups", self.command)
+        for cmd_pth, expected_help in self.commands:
+            cmd_pth = cmd_pth.format(command=self.command)
+            expected_help = expected_help.replace(
+                " native_groups ", f" {self.command} "
+            )
             stdout = StringIO()
             native_groups = get_command(self.command, no_color=True, stdout=stdout)
             native_groups.print_help("./manage.py", *(cmd_pth.split()))
@@ -257,9 +258,14 @@ class TestNativeGroups(TestCase):
         self.assertEqual(
             native_groups.cmd2(3.5), {"verbosity": 3, "flag": False, "fraction": 3.5}
         )
+
+    def test_native_groups_direct_run_subgrp(self, flag=False):
+        native_groups = get_command(self.command)
+        native_groups.initialize(verbosity=3)
+        native_groups.init_grp1(flag=flag)
         self.assertEqual(
             native_groups.run_subgrp("hello!"),
-            {"verbosity": 3, "flag": False, "msg": "hello!"},
+            {"verbosity": 3, "flag": flag, "msg": "hello!"},
         )
 
     def test_native_groups_run(self):
@@ -282,9 +288,10 @@ class TestNativeGroups(TestCase):
             str({"verbosity": 1, "flag": False, "fraction": 2.5}),
         )
 
+    def test_native_groups_run_subgrp(self, flag=False):
         self.assertEqual(
             run_command(self.command, "grp1", "subgrp", "42!")[0].strip(),
-            str({"verbosity": 0, "flag": False, "msg": "42!"}),
+            str({"verbosity": 0, "flag": flag, "msg": "42!"}),
         )
 
     def test_native_groups_call(self):
@@ -303,9 +310,10 @@ class TestNativeGroups(TestCase):
             {"verbosity": 1, "flag": False, "fraction": 2.5},
         )
 
+    def test_native_groups_call_subgrp(self, flag=False):
         self.assertEqual(
-            call_command(self.command, "grp1", "subgrp", "42!", flag=False),
-            {"verbosity": 0, "flag": False, "msg": "42!"},
+            call_command(self.command, "grp1", "subgrp", "42!", flag=flag),
+            {"verbosity": 0, "flag": flag, "msg": "42!"},
         )
 
 
@@ -313,9 +321,63 @@ class TestNativeGroupsWithSelf(TestNativeGroups):
     command = "native_groups_self"
 
 
-class TestNativeInheritanceGroups(TestNativeGroups):
-    command = "native_inheritance3"
+native_tweaks_help_rich = """
+ Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
+                                                                                
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    name      TEXT  [default: None] [required]                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Django ─────────────────────────────────────────────────────────────────────╮
+│ --version                                    Show program's version number   │
+│                                              and exit.                       │
+│ --verbosity         INTEGER RANGE [0<=x<=3]  Verbosity level; 0=minimal      │
+│                                              output, 1=normal output,        │
+│                                              2=verbose output, 3=very        │
+│                                              verbose output                  │
+│                                              [default: 1]                    │
+│ --settings          TEXT                     The Python path to a settings   │
+│                                              module, e.g.                    │
+│                                              "myproject.settings.main". If   │
+│                                              this isn't provided, the        │
+│                                              DJANGO_SETTINGS_MODULE          │
+│                                              environment variable will be    │
+│                                              used.                           │
+│ --pythonpath        PATH                     A directory to add to the       │
+│                                              Python path, e.g.               │
+│                                              "/home/djangoprojects/myprojec… │
+│                                              [default: None]                 │
+│ --no-color                                   Don't colorize the command      │
+│                                              output.                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+"""
+
+native_tweaks_help_no_rich = """
+Usage: ./manage.py native_tweaks [OPTIONS] NAME
+
+Arguments:
+  NAME  [required]
+
+Options:
+  --version                  Show program's version number and exit.
+  --verbosity INTEGER RANGE  Verbosity level; 0=minimal output, 1=normal
+                             output, 2=verbose output, 3=very verbose output
+                             [default: 1; 0<=x<=3]
+  --settings TEXT            The Python path to a settings module, e.g.
+                             "myproject.settings.main". If this isn't
+                             provided, the DJANGO_SETTINGS_MODULE environment
+                             variable will be used.
+  --pythonpath PATH          A directory to add to the Python path, e.g.
+                             "/home/djangoprojects/myproject".
+  --no-color                 Don't colorize the command output.
+  --help                     Show this message and exit.
+"""
 
 
-class TestNativeInheritanceGroupsWithSelf(TestNativeGroups):
-    command = "native_inheritance4"
+class TestNativeTweaks(TestNative):
+    command = "native_tweaks"
+
+    native_help_rich = native_tweaks_help_rich
+    native_help_no_rich = native_tweaks_help_no_rich

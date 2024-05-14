@@ -1,7 +1,13 @@
-from django_typer import TyperCommand
-from django_typer.tests.apps.test_app.management.commands import native_self
-from copy import deepcopy
+from django_typer import Typer, TyperCommand
 
-Command: TyperCommand = deepcopy(getattr(native_self, "Command"))
+Command: TyperCommand
 
-Command.suppressed_base_arguments = {"--skip-checks", "traceback"}
+app = Typer()
+
+# safe to use Command after first Typer() call
+Command.suppressed_base_arguments = {"--skip-checks", "traceback", "force_color"}
+
+
+@app.command()
+def main(name: str):
+    return {"name": name}

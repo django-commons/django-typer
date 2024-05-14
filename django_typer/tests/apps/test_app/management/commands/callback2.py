@@ -1,6 +1,6 @@
 import json
 
-from django_typer import TyperCommand, command, initialize
+from django_typer import TyperCommand, command, callback
 
 
 class Command(TyperCommand, invoke_without_command=True):
@@ -8,7 +8,7 @@ class Command(TyperCommand, invoke_without_command=True):
 
     parameters = {}
 
-    @initialize(
+    @callback(
         context_settings={
             "allow_interspersed_args": True,
             "ignore_unknown_options": True,

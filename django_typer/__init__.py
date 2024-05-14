@@ -913,6 +913,8 @@ class Typer(typer.Typer, metaclass=AppFactory):
 
         return make_initializer
 
+    initialize = callback  # allow initialize as an alias for callback
+
     def command(  # type: ignore
         self,
         name: t.Optional[str] = None,
@@ -1254,17 +1256,6 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     ) -> t.Callable[
         [typer.models.CommandFunctionType], typer.models.CommandFunctionType
     ]:
-        if not called_from_module():
-            # We've adapted the typer interface to be more intuitive for django users so we
-            # disallow callback() from class definitions because the callback was registered
-            # by the @group decorator that created the CommandGroup.
-            raise NotImplementedError(
-                _(
-                    "callback is not supported in class definitions - the function decorated by "
-                    "group() is the callback."
-                )
-            )
-
         def make_callback(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
@@ -1678,6 +1669,9 @@ def initialize(
         return func
 
     return make_initializer
+
+
+callback = initialize  # allow callback as an alias
 
 
 def command(  # pylint: disable=keyword-arg-before-vararg
