@@ -2118,7 +2118,7 @@ class TyperCommandMeta(type):
                     continue
 
                 to_register = []
-                for name, attr in cls_attrs.items():
+                for name, attr in list(cls_attrs.items()):
                     if name == "_handle":
                         continue
                     if isinstance(attr, CommandGroup) and not attr.is_child_group:

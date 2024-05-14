@@ -244,7 +244,7 @@ class TestNativeGroups(TestCase):
 
     def test_native_groups_direct(self):
         native_groups = get_command(self.command)
-        native_groups.initialize(verbosity=3)
+        native_groups.init(verbosity=3)
         self.assertEqual(native_groups.main("Brian"), {"verbosity": 3, "name": "Brian"})
 
         native_groups.init_grp1(flag=True)
@@ -261,7 +261,7 @@ class TestNativeGroups(TestCase):
 
     def test_native_groups_direct_run_subgrp(self, flag=False):
         native_groups = get_command(self.command)
-        native_groups.initialize(verbosity=3)
+        native_groups.init(verbosity=3)
         native_groups.init_grp1(flag=flag)
         self.assertEqual(
             native_groups.run_subgrp("hello!"),

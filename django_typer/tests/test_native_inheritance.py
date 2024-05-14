@@ -88,7 +88,7 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
 
     def test_native_groups_direct(self):
         native_groups = get_command(self.command)
-        native_groups.initialize(verbosity=3)
+        native_groups.init(verbosity=3)
         self.assertEqual(native_groups.main("Brian"), {"verbosity": 3, "name": "Brian"})
 
         native_groups.init_grp1(flag=8)
@@ -253,7 +253,7 @@ class TestNativeOverrides(test_native.TestNativeGroups):
 
     def test_native_groups_direct_run_subgrp(self):
         native_groups = get_command(self.command)
-        native_groups.initialize(verbosity=3)
+        native_groups.init(verbosity=3)
         native_groups.init_grp1(flag=True)
         native_groups.run_subgrp(option2=False, option1=True)
         self.assertEqual(

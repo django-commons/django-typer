@@ -5,7 +5,7 @@ app = Typer()
 
 
 @app.callback()
-def initialize(self, verbosity: Verbosity = 0):
+def init(self, verbosity: Verbosity = 0):
     assert isinstance(self, TyperCommand)
     self.verbosity = verbosity
 

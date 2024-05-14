@@ -11,7 +11,7 @@ _flag = None
 
 
 @app.callback()
-def initialize(verbosity: Verbosity = 0):
+def init(verbosity: Verbosity = 0):
     global _verbosity
     _verbosity = verbosity
 
