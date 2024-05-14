@@ -150,7 +150,7 @@ class _DefaultCompleteTestCase:
         # Read the output
         output = read_all_from_fd_with_timeout(master_fd, 3)
 
-        if "do you wish" in output:
+        if "do you wish" in output or "Display all" in output:
             os.write(master_fd, b"y\n")
             time.sleep(0.5)
             output = read_all_from_fd_with_timeout(master_fd, 3)
