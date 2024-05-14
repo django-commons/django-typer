@@ -79,6 +79,8 @@ class InterfaceTests(TestCase):
             len(dt_params),
         )
 
+        self.assertEqual(Typer.initialize, Typer.callback)
+
     def test_typer_add_typer_interface_matches(self):
         dt_params = set(get_named_arguments(Typer.add_typer))
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
@@ -153,7 +155,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_initialize_interface_matches(self):
-        from django_typer import initialize
+        from django_typer import initialize, callback
 
         initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
@@ -163,6 +165,8 @@ class InterfaceTests(TestCase):
             self.compare_defaults(initialize_params, initialize, typer.Typer.callback),
             len(initialize_params),
         )
+
+        self.assertTrue(initialize is callback)
 
     def test_typercommandmeta_interface_matches(self):
         from django_typer import TyperCommandMeta
@@ -248,6 +252,22 @@ class InterfaceTests(TestCase):
             ),
             len(command_params),
         )
+
+    def test_base_class_initialize_interface_matches(self):
+        from django_typer import TyperCommand
+
+        command_params = set(get_named_arguments(TyperCommand.initialize))
+        typer_params = set(get_named_arguments(typer.Typer.callback))
+
+        self.assertFalse(command_params.symmetric_difference(typer_params))
+        self.assertEqual(
+            self.compare_defaults(
+                command_params, TyperCommand.initialize, typer.Typer.callback
+            ),
+            len(command_params),
+        )
+
+        self.assertEqual(TyperCommand.initialize, TyperCommand.callback)
 
     def test_base_class_group_interface_matches(self):
         from django_typer import TyperCommand

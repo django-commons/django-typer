@@ -2486,6 +2486,124 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     command_tree: CommandNode
 
     @classmethod
+    def initialize(
+        cmd,  # pyright: ignore[reportSelfClsParameterName]
+        name: t.Optional[str] = Default(None),
+        *,
+        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        invoke_without_command: bool = Default(False),
+        no_args_is_help: bool = Default(False),
+        subcommand_metavar: t.Optional[str] = Default(None),
+        chain: bool = Default(False),
+        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        # Command
+        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
+        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        epilog: t.Optional[str] = Default(None),
+        short_help: t.Optional[str] = Default(None),
+        options_metavar: str = Default("[OPTIONS]"),
+        add_help_option: bool = Default(True),
+        hidden: bool = Default(False),
+        deprecated: bool = Default(False),
+        # Rich settings
+        rich_help_panel: t.Union[str, None] = Default(None),
+        **kwargs,
+    ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
+        """
+        Override the initializer for this command class after it has been defined.
+
+        .. todo::
+            See link_ for details on when you might want to use this adaptor pattern.
+
+        .. warning::
+            Do not use this classmethod when
+
+        .. code-block:: python
+
+            from your_app.management.commands.your_command import Command as YourCommand
+
+            @YourCommand.initialize()
+            def init(self, ...):
+                # implement your command initialization logic here
+
+        :param name: the name of the callback (defaults to the name of the decorated
+            function)
+        :param cls: the command class to use - (the initialize() function is technically
+            the root command group)
+        :param invoke_without_command: whether to invoke the callback if no command was
+            specified.
+        :param no_args_is_help: whether to show the help if no arguments are provided
+        :param subcommand_metavar: the metavar to use for subcommands in the help output
+        :param chain: whether to chain commands, this allows multiple commands from the group
+            to be specified and run in order sequentially in one call from the command line.
+        :param result_callback: a callback to invoke with the result of the command
+        :param context_settings: the click context settings to use - see
+            `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :param help: the help string to use, defaults to the function docstring, if you need
+            to translate the help you should use the help kwarg instead because docstrings
+            will not be translated.
+        :param epilog: the epilog to use in the help output
+        :param short_help: the short help to use in the help output
+        :param options_metavar: the metavar to use for options in the help output
+        :param add_help_option: whether to add the help option to the command
+        :param hidden: whether to hide this group from the help output
+        :param deprecated: show a deprecation warning
+        :param rich_help_panel: the rich help panel to use - if rich is installed
+            this can be used to group commands into panels in the help output.
+        """
+        if not called_from_module():
+            return initialize(
+                name=name,
+                cls=cls,
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                hidden=hidden,
+                deprecated=deprecated,
+                # Rich settings
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )
+
+        def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            cmd.typer_app.callback(
+                name=name,
+                cls=type("_Initializer", (cls,), {"django_command": cmd}),
+                context_settings=context_settings,
+                help=help,
+                epilog=epilog,
+                short_help=short_help,
+                options_metavar=options_metavar,
+                add_help_option=add_help_option,
+                invoke_without_command=invoke_without_command,
+                no_args_is_help=no_args_is_help,
+                subcommand_metavar=subcommand_metavar,
+                chain=chain,
+                result_callback=result_callback,
+                hidden=hidden,
+                deprecated=deprecated,
+                # Rich settings
+                rich_help_panel=rich_help_panel,
+                **kwargs,
+            )(func)
+            setattr(
+                cmd, func.__name__, func if is_method(func) else _staticmethod(func)
+            )
+            return func
+
+        return make_initializer
+
+    callback = initialize
+
+    @classmethod
     def command(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
         name: t.Optional[str] = None,
@@ -2520,7 +2638,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
             @YourCommand.command()
             def new_command(self, ...):
-                # implement your command additional command here
+                # implement your additional command here
 
         :param name: the name of the command (defaults to the name of the decorated
             function)
@@ -2561,7 +2679,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
             cmd.typer_app.command(
                 name=name,
-                cls=type("_AdaptedCommand", (cls,), {"django_command": cmd}),
+                cls=type("_Command", (cls,), {"django_command": cmd}),
                 context_settings=context_settings,
                 help=help,
                 epilog=epilog,
