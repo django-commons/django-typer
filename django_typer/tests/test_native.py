@@ -247,6 +247,9 @@ class TestNativeGroups(TestCase):
         native_groups.init(verbosity=3)
         self.assertEqual(native_groups.main("Brian"), {"verbosity": 3, "name": "Brian"})
 
+        with self.assertRaises(TypeError):
+            native_groups.init(verbosity=3, fog=False)
+
         native_groups.init_grp1(flag=True)
 
         self.assertEqual(

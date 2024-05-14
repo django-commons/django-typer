@@ -30,7 +30,8 @@ native_override_init_help_rich = """
  Usage: ./manage.py native_override_init [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --help          Show this message and exit.                                  │
+│ --fog     --no-fog      [default: no-fog]                                    │
+│ --help                  Show this message and exit.                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
 │ --verbosity        INTEGER RANGE [0<=x<=3]  Verbosity level; 0=minimal       │
@@ -99,6 +100,9 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
         native_groups.init_grp1()
         self.assertEqual(
             native_groups.cmd2(3.5), {"verbosity": 3, "flag": 4, "fraction": 3.5}
+        )
+        self.assertEqual(
+            native_groups.init(fog=True, verbosity=7), {"verbosity": 7, "fog": True}
         )
 
     def test_native_groups_run(self):
