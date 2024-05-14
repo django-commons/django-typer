@@ -6,8 +6,3 @@ class TestApp2Config(AppConfig):
     name = "django_typer.tests.apps.test_app2"
     label = name.replace(".", "_")
     verbose_name = "Test App2"
-
-    def ready(self):
-        from .management import adapters
-
-        register_command_extensions(adapters)

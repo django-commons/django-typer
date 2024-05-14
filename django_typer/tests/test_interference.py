@@ -7,6 +7,7 @@ from django_typer.tests.utils import run_command, rich_installed, similarity
 
 @override_settings(
     INSTALLED_APPS=[
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app2",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",

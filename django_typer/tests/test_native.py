@@ -164,16 +164,20 @@ class TestNative(TestCase):
     native_help_rich = native_help_rich
     native_help_no_rich = native_help_no_rich
 
+    settings = []
+
     def test_native_direct(self):
         native = get_command(self.command)
         self.assertEqual(native.main("Brian"), {"name": "Brian"})
 
     def test_native_cli(self):
         self.assertEqual(
-            run_command(self.command, "Brian")[0].strip(), str({"name": "Brian"})
+            run_command(self.command, *self.settings, "Brian")[0].strip(),
+            str({"name": "Brian"}),
         )
         self.assertEqual(
-            run_command(self.command, "--version")[0].strip(), DJANGO_VERSION
+            run_command(self.command, *self.settings, "--version")[0].strip(),
+            DJANGO_VERSION,
         )
 
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
@@ -211,6 +215,8 @@ class TestNativeWithSelf(TestNative):
 class TestNativeGroups(TestCase):
     command = "native_groups"
 
+    settings = []
+
     commands = [
         ("{command}", native_groups_help_rich),
         ("{command} main", native_groups_main_help_rich),
@@ -232,14 +238,23 @@ class TestNativeGroups(TestCase):
             native_groups.print_help("./manage.py", *(cmd_pth.split()))
             sim = similarity(expected_help, stdout.getvalue())
             print(f"print_help({cmd_pth}) --help similiarity: {sim}")
-            self.assertGreater(sim, 0.99)
+            try:
+                self.assertGreater(sim, 0.99)
+            except AssertionError:
+                import ipdb
+
+                ipdb.set_trace()
 
             parts = cmd_pth.split()
             sim = similarity(
                 expected_help,
-                run_command(*[parts[0], "--no-color", *parts[1:]], "--help")[0].strip(),
+                run_command(
+                    *[parts[0], *self.settings, "--no-color", *parts[1:]], "--help"
+                )[0].strip(),
             )
-            print(f"run_command({cmd_pth}) --help similiarity: {sim}")
+            print(
+                f"run_command({cmd_pth}) {' '.join(self.settings)} --help similiarity: {sim}"
+            )
             self.assertGreater(sim, 0.99)
 
     def test_native_groups_direct(self):
@@ -273,27 +288,38 @@ class TestNativeGroups(TestCase):
 
     def test_native_groups_run(self):
         self.assertEqual(
-            run_command(self.command, "--verbosity", "3", "main", "Brian")[0].strip(),
+            run_command(
+                self.command, *self.settings, "--verbosity", "3", "main", "Brian"
+            )[0].strip(),
             str({"verbosity": 3, "name": "Brian"}),
         )
 
         self.assertEqual(
             run_command(
-                self.command, "--verbosity", "2", "grp1", "--flag", "cmd1", "5"
+                self.command,
+                *self.settings,
+                "--verbosity",
+                "2",
+                "grp1",
+                "--flag",
+                "cmd1",
+                "5",
             )[0].strip(),
             str({"verbosity": 2, "flag": True, "count": 5}),
         )
 
         self.assertEqual(
-            run_command(self.command, "--verbosity", "1", "grp1", "cmd2", "2.5")[
-                0
-            ].strip(),
+            run_command(
+                self.command, *self.settings, "--verbosity", "1", "grp1", "cmd2", "2.5"
+            )[0].strip(),
             str({"verbosity": 1, "flag": False, "fraction": 2.5}),
         )
 
     def test_native_groups_run_subgrp(self, flag=False):
         self.assertEqual(
-            run_command(self.command, "grp1", "subgrp", "42!")[0].strip(),
+            run_command(self.command, *self.settings, "grp1", "subgrp", "42!")[
+                0
+            ].strip(),
             str({"verbosity": 0, "flag": flag, "msg": "42!"}),
         )
 

@@ -6,31 +6,18 @@ from django.core.management import call_command
 
 from django_typer import get_command
 from django_typer.tests.utils import run_command
+from django.test import override_settings
 
 from . import test_native
-
-
-class TestNativeInheritance(test_native.TestNative):
-    command = "native_inheritance1"
-
-
-class TestNativeInheritanceWithSelf(test_native.TestNative):
-    command = "native_inheritance2"
-
-
-class TestNativeInheritanceGroups(test_native.TestNativeGroups):
-    command = "native_inheritance3"
-
-
-class TestNativeInheritanceGroupsWithSelf(test_native.TestNativeGroups):
-    command = "native_inheritance4"
+from . import test_native_inheritance
+from . import test_adapter_pattern
 
 
 native_override_init_help_rich = """
  Usage: ./manage.py native_override_init [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --fog     --no-fog      [default: no-fog]                                    │
+│ --bog     --no-bog      [default: no-bog]                                    │
 │ --help                  Show this message and exit.                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
@@ -53,6 +40,7 @@ native_override_init_help_rich = """
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ grp1   Override GRP1 (initialize only)                                       │
+│ grp2   test_app2::grp2                                                       │
 │ main                                                                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
@@ -74,9 +62,51 @@ native_override_init_grp1_help_rich = """
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
+native_groups_grp2_help_rich = """
+ Usage: ./manage.py native_override_init grp2 [OPTIONS] COMMAND [ARGS]...       
+                                                                                
+ test_app2::grp2                                                                
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ cmd1   test_app2::grp2::grp2_cmd1                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+"""
 
-class TestNativeInitOverride(test_native.TestNativeGroups):
+native_groups_grp2_cmd1_help_rich = """
+ Usage: ./manage.py native_override_init grp2 cmd1 [OPTIONS] G2ARG1             
+                                                                                
+ test_app2::grp2::grp2_cmd1                                                     
+                                                                                
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    g2arg1      INTEGER  [default: None] [required]                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+"""
+
+
+@override_settings(
+    INSTALLED_APPS=[
+        "django_typer.tests.apps.adapter0",
+        "django_typer.tests.apps.test_app",
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
+    ]
+)
+class TestNativeInitOverride(
+    test_adapter_pattern.ResetAppsMixin, test_native_inheritance.TestNativeInitOverride
+):
     command = "native_override_init"
+
+    settings = ["--settings", "django_typer.tests.settings.adapted"]
 
     commands = [
         ("{command}", native_override_init_help_rich),
@@ -85,6 +115,8 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
         ("{command} grp1 subgrp", test_native.native_groups_grp1_subgrp_help_rich),
         ("{command} grp1 cmd1", test_native.native_groups_grp1_cmd1_help_rich),
         ("{command} grp1 cmd2", test_native.native_groups_grp1_cmd2_help_rich),
+        ("{command} grp2", native_groups_grp2_help_rich),
+        ("{command} grp2 cmd1", native_groups_grp2_cmd1_help_rich),
     ]
 
     def test_native_groups_direct(self):
@@ -102,14 +134,18 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
             native_groups.cmd2(3.5), {"verbosity": 3, "flag": 4, "fraction": 3.5}
         )
         self.assertEqual(
-            native_groups.init(fog=True, verbosity=7), {"verbosity": 7, "fog": True}
+            native_groups.init(bog=True, verbosity=7), {"verbosity": 7, "bog": True}
+        )
+
+        native_groups.grp2()
+        self.assertEqual(
+            native_groups.grp2_cmd1(7),
+            {"verbosity": 7, "bog": True, "grp2_called": True, "g2arg1": 7},
         )
 
     def test_native_groups_run(self):
         self.assertEqual(
-            run_command(
-                self.command, *self.settings, "--verbosity", "3", "main", "Brian"
-            )[0].strip(),
+            run_command(self.command, "--verbosity", "3", "main", "Brian")[0].strip(),
             str({"verbosity": 3, "name": "Brian"}),
         )
 
@@ -135,6 +171,13 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
             str({"verbosity": 1, "flag": 4, "fraction": 2.5}),
         )
 
+        self.assertEqual(
+            run_command(
+                self.command, *self.settings, "--verbosity=1", "grp2", "cmd1", "6"
+            )[0].strip(),
+            str({"verbosity": 1, "bog": False, "grp2_called": True, "g2arg1": 6}),
+        )
+
     def test_native_groups_call(self):
         self.assertEqual(
             call_command(self.command, "main", "Brian", verbosity=3),
@@ -151,6 +194,11 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
                 self.command, "--verbosity", "1", "grp1", "--flag", "2", "cmd2", "2.5"
             ),
             {"verbosity": 1, "flag": 2, "fraction": 2.5},
+        )
+
+        self.assertEqual(
+            call_command(self.command, "grp2", "cmd1", "7", verbosity=3),
+            {"verbosity": 3, "bog": False, "grp2_called": True, "g2arg1": 7},
         )
 
     def test_native_groups_direct_run_subgrp(self, flag=3):
@@ -289,7 +337,6 @@ class TestNativeOverrides(test_native.TestNativeGroups):
         self.assertEqual(
             run_command(
                 self.command,
-                *self.settings,
                 "--verbosity",
                 "1",
                 "grp1",
@@ -303,7 +350,6 @@ class TestNativeOverrides(test_native.TestNativeGroups):
         self.assertEqual(
             run_command(
                 self.command,
-                *self.settings,
                 "--verbosity",
                 "2",
                 "grp1",

@@ -162,7 +162,8 @@ class ResetAppsMixin:
                     for path in [
                         "django_typer.tests.apps.adapter1",
                         "django_typer.tests.apps.adapter2",
-                        "django_typer.tests.apps.test_app2.management.adapters",
+                        "django_typer.tests.apps.test_app2.management.adapters"
+                        "django_typer.tests.apps.adapter0",
                     ]
                 ]
             ):
@@ -198,7 +199,7 @@ class UnadaptedTests(TestCase):
 
 @override_settings(
     INSTALLED_APPS=[
-        "django_typer.tests.apps.test_app2",
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",
         "django.contrib.auth",
@@ -370,6 +371,7 @@ class Adapter2InterferenceTests(ResetAppsMixin, TestCase):
 
 @override_settings(
     INSTALLED_APPS=[
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app2",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",
@@ -552,6 +554,7 @@ class Adapter2AdaptedLevel1Tests(ResetAppsMixin, TestCase):
 @override_settings(
     INSTALLED_APPS=[
         "django_typer.tests.apps.adapter1",
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app2",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",
@@ -738,6 +741,7 @@ class Adapter2AdaptedLevel2Tests(ResetAppsMixin, TestCase):
     INSTALLED_APPS=[
         "django_typer.tests.apps.adapter2",
         "django_typer.tests.apps.adapter1",
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app2",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",
@@ -949,6 +953,7 @@ class Adapter2AdaptedLevel3Tests(ResetAppsMixin, TestCase):
     INSTALLED_APPS=[
         "django_typer.tests.apps.adapter1",
         "django_typer.tests.apps.adapter2",
+        "django_typer.tests.apps.adapter0",
         "django_typer.tests.apps.test_app2",
         "django_typer.tests.apps.test_app",
         "django.contrib.admin",
