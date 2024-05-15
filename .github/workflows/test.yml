@@ -9,6 +9,8 @@ on:
         description: 'Set to on, to open ssh debug session.'
         required: true
         default: 'off'
+  schedule:
+    - cron: '0 13 * * *'  # Runs at 6 am pacific every day
 
 jobs:
 
