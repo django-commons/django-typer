@@ -28,6 +28,7 @@ from uuid import UUID
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
 from django.apps import apps
+from django.conf import settings
 from django.db.models import (
     CharField,
     DecimalField,
@@ -499,4 +500,32 @@ are interpreted relative to the current working directory.
 :param param: The click parameter.
 :param incomplete: The incomplete string.
 :return: A list of available matching directories
+"""
+
+
+def these_strings(strings: t.List[str], allow_duplicates: bool = False):
+    """
+    Get a completer that provides completion logic that matches the allowed strings.
+
+    :param strings: A list of allowed strings.
+    :param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+    :return: A completer function.
+    """
+
+    def complete(ctx: Context, param: Parameter, incomplete: str):
+        present = []
+        if not allow_duplicates:
+            present = [value for value in (ctx.params.get(param.name or "") or [])]
+        return [
+            CompletionItem(item)
+            for item in strings
+            if item.startswith(incomplete) and item not in present
+        ]
+
+    return complete
+
+
+databases = these_strings([alias for alias in settings.DATABASES.keys()])
+"""
+Get a completer that provides completion logic for Django database aliases.
 """
