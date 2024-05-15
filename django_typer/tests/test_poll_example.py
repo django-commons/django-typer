@@ -23,7 +23,7 @@ class TestPollExample(SimpleTestCase):
     q2 = None
     q3 = None
 
-    databases = ["default"]
+    databases = {"default"}
 
     def setUp(self):
         self.q1 = Question.objects.create(
