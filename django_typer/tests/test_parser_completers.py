@@ -1248,3 +1248,66 @@ class TestShellCompletersAndParsers(TestCase):
             "completion --path does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
+
+    def test_these_strings_completer(self):
+        for opt in ["--str", "--dup"]:
+            result = run_command(
+                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} "
+            )[0]
+            for s in ["str1", "str2", "ustr"]:
+                self.assertIn(f'"{s}"', result)
+
+            result = run_command(
+                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} s"
+            )[0]
+            self.assertNotIn(f'"ustr"', result)
+            for s in ["str1", "str2"]:
+                self.assertIn(f'"{s}"', result)
+
+            result = run_command(
+                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} str"
+            )[0]
+            self.assertNotIn(f'"ustr"', result)
+            for s in ["str1", "str2"]:
+                self.assertIn(f'"{s}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --str str1 --str ",
+        )[0]
+        self.assertNotIn(f'"str1"', result)
+        for s in ["str2", "ustr"]:
+            self.assertIn(f'"{s}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --dup str1 --dup ",
+        )[0]
+        for s in ["str1", "str2", "ustr"]:
+            self.assertIn(f'"{s}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --str str1 --dup ",
+        )[0]
+        for s in ["str1", "str2", "ustr"]:
+            self.assertIn(f'"{s}"', result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "--shell",
+            "zsh",
+            "completion --dup str1 --str ",
+        )[0]
+        for s in ["str1", "str2", "ustr"]:
+            self.assertIn(f'"{s}"', result)

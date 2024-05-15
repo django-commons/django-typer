@@ -41,6 +41,24 @@ class Command(TyperCommand):
                 shell_complete=completers.complete_path,
             ),
         ] = None,
+        strings_unique: Annotated[
+            t.Optional[t.List[str]],
+            typer.Option(
+                "--str",
+                help=_("A list of unique strings."),
+                shell_complete=completers.these_strings(["str1", "str2", "ustr"]),
+            ),
+        ] = None,
+        strings_duplicates: Annotated[
+            t.Optional[t.List[str]],
+            typer.Option(
+                "--dup",
+                help=_("A list of strings that can have duplicates."),
+                shell_complete=completers.these_strings(
+                    ["str1", "str2", "ustr"], allow_duplicates=True
+                ),
+            ),
+        ] = None,
     ):
         assert self.__class__ == Command
         for app in django_apps:
