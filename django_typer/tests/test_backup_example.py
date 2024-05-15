@@ -1,4 +1,6 @@
 import os
+import sys
+import pytest
 
 from django.test import SimpleTestCase
 from pathlib import Path
@@ -9,6 +11,7 @@ import shutil
 BACKUP_DIRECTORY = Path(__file__).parent / "_test_archive"
 
 
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
 class TestBackupExample(SimpleTestCase):
     databases = {"default"}
 
