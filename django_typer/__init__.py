@@ -2516,9 +2516,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             See :ref:`extensions` for details on when you might want to use this extension
             pattern.
 
-        .. warning::
-            Do not use this classmethod when inheriting from a command.
-
         .. code-block:: python
 
             from your_app.management.commands.your_command import Command as YourCommand
@@ -2631,9 +2628,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             See :ref:`extensions` for details on when you might want to use this extension
             pattern.
 
-        .. warning::
-            Do not use this classmethod when inheriting from a command.
-
         .. code-block:: python
 
             from your_app.management.commands.your_command import Command as YourCommand
@@ -2732,9 +2726,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         .. note::
             See :ref:`extensions` for details on when you might want to use this extension
             pattern.
-
-        .. warning::
-            Do not use this classmethod when inheriting from a command.
 
         .. code-block:: python
 
