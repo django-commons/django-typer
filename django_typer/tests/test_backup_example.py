@@ -25,7 +25,11 @@ class TestBackupExample(SimpleTestCase):
     def test_base_backup(self):
         lines = (
             run_command(
-                "backup", "--no-color", "--settings", "django_typer.tests.settings.backup", "list"
+                "backup",
+                "--no-color",
+                "--settings",
+                "django_typer.tests.settings.backup",
+                "list",
             )[0]
             .strip()
             .splitlines()[1:]
@@ -90,7 +94,11 @@ class TestBackupExample(SimpleTestCase):
         lines = [
             line.strip()
             for line in run_command(
-                "backup", "--no-color", "--settings", "django_typer.tests.settings.backup_ext", "list"
+                "backup",
+                "--no-color",
+                "--settings",
+                "django_typer.tests.settings.backup_ext",
+                "list",
             )[0]
             .strip()
             .splitlines()[1:]
