@@ -155,8 +155,8 @@ interface like this:
    :caption: Contents:
 
    tutorial
-   howto
    extensions
+   howto
    shell_completion
    reference
    changelog

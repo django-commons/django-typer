@@ -110,6 +110,23 @@ def register_command_extensions(
     """
     Register a command extension for the given command within the given package.
 
+    For example, use this in your AppConfig's ready() method:
+
+    .. code-block:: python
+
+        from django.apps import AppConfig
+        from django_typer.utils import register_command_extensions
+
+
+        class MyAppConfig(AppConfig):
+            name = "myapp"
+
+            def ready(self):
+                from .management import extensions
+
+                register_command_extensions(extensions)
+
+
     :param package: The package the command extension module resides in
     :param commands: The names of the commands/modules, if not provided, all modules
         in the package will be registered as extensions

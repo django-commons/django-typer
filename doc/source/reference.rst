@@ -13,19 +13,19 @@ django_typer
 
 .. automodule:: django_typer
    :members:
-   :exclude-members: TyperCommand, Context
+   :exclude-members: Typer, CommandGroup, TyperCommand, Context
    :show-inheritance:
 
 .. autoclass:: django_typer.Typer
-    :members:
+    :members: callback, initialize, command, add_typer
 
 .. autoclass:: django_typer.TyperCommand
-    :members:
+    :members: initialize, callback, command, group, echo, secho, print_help
 
 .. autoclass:: django_typer.TyperCommandMeta
 
 .. autoclass:: django_typer.CommandGroup
-    :members: callback, group, command
+    :members: callback, initialize, group, command
 
 
 .. _types:
@@ -58,7 +58,7 @@ utils
 -----
 
 .. automodule:: django_typer.utils
-    :members: traceback_config, get_current_command
+    :members: traceback_config, get_current_command, register_command_extensions
 
 .. _shellcompletion:
 

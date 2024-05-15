@@ -1,8 +1,8 @@
 .. include:: ./refs.rst
 
-========
-Tutorial
-========
+===========================
+Tutorial: Building Commands
+===========================
 
 Using the :class:`~django_typer.TyperCommand` class is very similar to using the BaseCommand_
 class. The main difference is that we use Typer_'s decorators, classes and type annotations

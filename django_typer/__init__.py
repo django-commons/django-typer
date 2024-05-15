@@ -2512,11 +2512,12 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         Override the initializer for this command class after it has been defined.
 
-        .. todo::
-            See link_ for details on when you might want to use this adaptor pattern.
+        .. note::
+            See :ref:`extensions` for details on when you might want to use this extension
+            pattern.
 
         .. warning::
-            Do not use this classmethod when
+            Do not use this classmethod when inheriting from a command.
 
         .. code-block:: python
 
@@ -2626,11 +2627,12 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         Add a command to this command class after it has been defined. You can
         use this decorator to add commands to a root command from other Django apps.
 
-        .. todo::
-            See link_ for details on when you might want to use this adaptor pattern.
+        .. note::
+            See :ref:`extensions` for details on when you might want to use this extension
+            pattern.
 
         .. warning::
-            Do not use this classmethod when
+            Do not use this classmethod when inheriting from a command.
 
         .. code-block:: python
 
@@ -2727,8 +2729,12 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         Add a group to this command class after it has been defined. You can
         use this decorator to add groups to a root command from other Django apps.
 
-        .. todo::
-            See link_ for details on when you might want to use this adaptor pattern.
+        .. note::
+            See :ref:`extensions` for details on when you might want to use this extension
+            pattern.
+
+        .. warning::
+            Do not use this classmethod when inheriting from a command.
 
         .. code-block:: python
 
@@ -2816,6 +2822,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     @classproperty
     def is_compound_command(cls) -> bool:
+        """Return True if this command has more than a single executable block."""
         return bool(
             cls.typer_app.registered_groups
             or len(cls.typer_app.registered_commands) > 1

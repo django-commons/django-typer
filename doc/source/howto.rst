@@ -245,6 +245,44 @@ This is like defining a group at the command root and is an extension of the
             ...
 
 
+Use the Typer-like Interface
+----------------------------
+
+It may be more comfortable for developers familiar with Typer_ to use the function based interface
+they are familiar with from Typer_. This is possible using django-typer simply by changing the
+Typer import:
+
+.. code-block:: python
+
+    from django_typer import Typer  # do this instead of from typer import Typer
+
+    app = Typer()  # this will install a Command class into this module
+
+    @app.command()
+    def main(name: str):
+        ...
+
+    # we can add groups by creating additional Typer apps just as you would in Typer
+    def app2_init():
+        # this is a typer callback() or initializer in django-typer parlance
+
+    app2 = Typer(callback=app2_init)
+
+    @app2.command()
+    def app2_cmd(self):
+        # the self argument is optional and supported on all decorated functions
+        # in django-typer even in the Typer-like interface. Behind the scenes a
+        # Command class is created and when invoked so to an instance, so we always
+        # have the option of accepting self
+
+    app.add_typer(app2)  # do not forget to attach the subgroup!
+
+
+.. note::
+
+    Decorated command functions that do not accept self are treated as staticmethods.
+
+
 Call TyperCommands from Code
 ----------------------------
 
@@ -366,16 +404,173 @@ Extend/Override TyperCommands
 You can extend typer commands simply by subclassing them. All of the normal inheritance rules
 apply. You can either subclass an existing command from an upstream app and leave its module the
 same name to override the command or you can subclass and rename the module to provide an adapted
-version of the upstream command with a different name. Loosley coupled additive extension is also
-supported by apps in INSTALLED_APPS order. This is useful for namespacing a number of tightly
-coupled subcommands under one Django command. The root command app or extending apps do not need
-to know anything about the other apps extending the command because the ultimate command is
-composed respecting the order of INSTALLED_APPS.
+version of the upstream command with a different name. For example:
+
+Say we have a command that looks like:
+
+.. code-block:: python
+    :caption: my_app/management/commands/my_cmd.py
+
+    from django_Typer import TyperCommand, initialize, command, group
+
+    class Command(TyperCommand):
+
+        @initialize()
+        def init(self):
+            ...
+
+        @command()
+        def sub1(self):
+            ...
+
+        @command()
+        def sub2(self):
+            ...
+
+        @group()
+        def grp1(self):
+            ...
+
+        @grp1.command()
+        def grp1_cmd1(self):
+            ...
+
+
+We can inherit and override or add additional commands and groups like so:
+
+.. code-block:: python
+    :caption: other_app/management/commands/ext_cmd.py
+
+    from my_app.management.commands.my_cmd import Command as MyCMD
+    from django_Typer import TyperCommand, initialize, command
+
+    class Command(MyCMD):
+
+        # override init
+        @initialize()
+        def init(self):
+            ...
+
+        # override sub1
+        @command()
+        def sub1(self):
+            ...
+
+        # add a 3rd top level command
+        @command()
+        def sub3(self):
+            ...
+
+        # add a new subcommand to grp1
+        @MyCMD.grp1.command()
+        def grp1_cmd2(self):
+            ...
+
+
+Notice that if we are adding to a group from the parent class, we have to use the group directly
+(i.e. @ParentClass.group_name). Since we named our command ext_cmd it does not override my_cmd.
+my_cmd is not affected and may be invoked in the same way as if ext_cmd was not present.
 
 .. note::
 
-    For more information on extension patterns see the section on
+    For more information on extension patterns see the tutorial on
     :ref:`Extending Commands <extensions>`.
+
+
+Add to Existing TyperCommands
+-----------------------------
+
+You may add additional subcommands and command groups to existing commands by using django-typer_'s
+extension pattern. This allows apps that do not know anything about each other to attach additional
+CLI behavior to an upstream command and can be convenient for grouping loosely related behavior
+into a single namespace (parent command).
+
+To use our example from above, lets add and override the same behavior of my_cmd we did in ext_cmd
+using this pattern instead:
+
+First in other_app we need to create a new package under management. It can be called anything, but
+for clarity lets call it extensions:
+
+.. code-block:: text
+
+    site/
+    ├── my_app/
+    │   ├── __init__.py
+    │   ├── apps.py
+    │   ├── management/
+    │   │   ├── __init__.py
+    │   │   └── commands/
+    │   │       ├── __init__.py
+    │   │       └── my_cmd.py
+    └── other_app/
+        ├── __init__.py
+        ├── apps.py
+        └── management/
+            ├── __init__.py
+            ├── extensions/
+            │   ├── __init__.py
+            │   └── my_cmd.py <---- put your additive extensions to my_cmd here
+            └── commands/
+                └── __init__.py
+
+Now we need to make sure our extensions are loaded. We do this by using the provided
+:func:`~django_typer.utils.register_command_extensions` convenience function in
+our app's ready() method:
+
+.. code-block:: python
+    :caption: other_app/apps.py
+
+    from django.apps import AppConfig
+    from django_typer.utils import register_command_extensions
+
+
+    class MyAppConfig(AppConfig):
+        name = "myapp"
+
+        def ready(self):
+            from .management import extensions
+
+            register_command_extensions(extensions)
+
+
+Now we can add extensions:
+
+
+.. code-block:: python
+    :caption: other_app/management/extensions/my_cmd.py
+
+    from my_app.management.commands.my_cmd import Command as MyCMD
+
+    # override init
+    @MyCMD.initialize()
+    def init(self):
+        ...
+
+    # override sub1
+    @MyCMD.command()
+    def sub1(self):
+        ...
+
+    # add a 3rd top level command
+    @MyCMD.command()
+    def sub3():  # self is always optional!
+        ...
+
+    # add a new subcommand to grp1
+    @MyCMD.grp1.command()
+    def grp1_cmd2(self):
+        ...
+
+The main difference here from normal inheritance is that we do not declare a new class, instead we
+use the classmethod decorators on the class of the command we are extending. These extension
+functions will also be added to the class. The self argument is always optional in django-typer_
+and if it is not provided the function will be treated as a
+`staticmethod <https://docs.python.org/3/library/functions.html#staticmethod>`_.
+
+.. note::
+
+    **Conflicting extensions are resolved in INSTALLED_APPS order.** For a detailed discussion
+    about the utility of this pattern, see the tutorial on :ref:`Extending Commands <extensions>`.
 
 
 .. _configure-rich-exception-tracebacks:
@@ -520,3 +715,51 @@ streams:
 
         def handle(self):
             self.secho('Success!', fg=typer.colors.GREEN)
+
+
+.. _howto-typer-style:
+
+Adjust BaseCommand Parameters with a Typer-like Definition
+-----------------------------------------------------------
+
+You should probably just use the class-based interface! It is more natural
+if you need to interface with BaseCommand_ features. But if you insist or
+you just can't be bothered to convert an existing command here's how:
+
+.. code-block:: python
+    :caption: my_app/management/commands/my_command.py
+
+    from django_typer import Typer, TyperCommand
+
+    Command: TyperCommand  # use a type hint to give your IDE some autocomplete ideas!
+
+    app = Typer()  # this will install a Command class into this module
+
+    # Now you can just make adjustments directly to that Command class:
+    # (safe to use Command after first Typer() call)
+    Command.suppressed_base_arguments = {"--skip-checks", "--traceback", "--force-color"}
+
+    @app.command()
+    def main(name: str):
+        ...
+
+
+Extend Commands defined in the Typer-style
+------------------------------------------
+
+Commands that were defined using the Typer_ style interface generate Command classes that are
+identical to the command if it were defined using :class:`~django_typer.TyperCommand`. Therefore
+they can be inherited from just like commands defined using the class-based interface!
+
+For example to extend the command from the :ref:`how-to above <howto-typer-style>`.
+
+.. code-block:: python
+    :caption: other_app/management/commands/my_command.py
+
+    from my_app.management.commands.my_command import Command as MyCommand
+
+    class Command(MyCommand):
+
+        # all extension features work the same way as if MyCommand had been defined
+        # using the class-based interface
+        ...
