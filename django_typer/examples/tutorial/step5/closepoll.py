@@ -22,7 +22,9 @@ class Command(TyperCommand):
             t.List[Poll],
             Argument(
                 parser=ModelObjectParser(Poll),
-                shell_complete=ModelObjectCompleter(Poll, help_field="question_text"),
+                shell_complete=ModelObjectCompleter(
+                    Poll, help_field="question_text"
+                ),
                 help=_("The database IDs of the poll(s) to close."),
             ),
         ],

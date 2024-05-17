@@ -195,7 +195,8 @@ include = [
 line-length = 88
 exclude = [
     "doc",
-    "dist"
+    "dist",
+    "django_typer/examples"
 ]
 
 [tool.ruff.lint]

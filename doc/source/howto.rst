@@ -334,12 +334,6 @@ The rule of them is this:
     and :ref:`here <multi_commands>` for the nuances of calling commands when handle() is and is
     not implemented.
 
-Access Default Django Options
------------------------------
-
-.. todo::
-
-    Write this.
 
 Change Default Django Options
 -----------------------------

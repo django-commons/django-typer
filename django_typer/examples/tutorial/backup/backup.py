@@ -24,13 +24,12 @@ class Command(TyperCommand):
 
     databases = [alias for alias in settings.DATABASES.keys()]
 
-    DEFAULT_DATABASE_FILENAME = "{database}.json"
-
     output_directory: Path
 
     @initialize(invoke_without_command=True)
-    def default(
+    def init_or_run_all(
         self,
+        # if we add a context argument click will provide it
         context: typer.Context,
         output_directory: t.Annotated[
             Path,
@@ -50,16 +49,24 @@ class Command(TyperCommand):
         if not self.output_directory.is_dir():
             raise CommandError(f"{self.output_directory} is not a directory.")
 
+        # here we use the context to determine if a subcommand was invoked and
+        # if it was not we run all the backup routines
         if not context.invoked_subcommand:
-            for cmd in self.get_default_routines():
+            for cmd in self.get_backup_routines():
                 getattr(self, cmd)()
 
-    def get_default_routines(self) -> t.List[str]:
+    def get_backup_routines(self) -> t.List[str]:
         """
-        Return the list of backup subcommands. This is every registered command except for the
-        list command.
+        Return the list of backup subcommands. This is every registered command
+        except for the list command.
         """
-        return [cmd for cmd in self.get_subcommand().children.keys() if cmd != "list"]
+        # fetch all the command names at the top level of our command tree,
+        # except for list, which we know to not be a backup routine
+        return [
+            cmd
+            for cmd in self.get_subcommand().children.keys()
+            if cmd != "list"
+        ]
 
     @command()
     def list(self):
@@ -67,7 +74,7 @@ class Command(TyperCommand):
         List the default backup routines in the order they will be run.
         """
         self.echo("Default backup routines:")
-        for cmd in self.get_default_routines():
+        for cmd in self.get_backup_routines():
             kwargs = {
                 name: str(param.default)
                 for name, param in inspect.signature(
@@ -86,19 +93,20 @@ class Command(TyperCommand):
                 "-f",
                 "--filename",
                 help=(
-                    "The name of the file to use for the backup fixture. The filename may "
-                    "optionally contain a {database} formatting placeholder."
+                    "The name of the file to use for the backup fixture. The "
+                    "filename may optionally contain a {database} formatting "
+                    "placeholder."
                 ),
             ),
-        ] = DEFAULT_DATABASE_FILENAME,
+        ] = "{database}.json",
         databases: t.Annotated[
             t.Optional[t.List[str]],
             typer.Option(
                 "-d",
                 "--database",
                 help=(
-                    "The name of the database(s) to backup. If not provided, all databases "
-                    "will be backed up."
+                    "The name of the database(s) to backup. If not provided, "
+                    "all databases will be backed up."
                 ),
                 shell_complete=completers.databases,
             ),

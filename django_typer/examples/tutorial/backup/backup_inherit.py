@@ -12,8 +12,6 @@ from django_typer.tests.apps.backup.backup.management.commands.backup import (
 
 
 class Command(Backup):
-    DEFAULT_MEDIA_FILENAME = "media.tar.gz"
-
     @command()
     def media(
         self,
@@ -24,7 +22,7 @@ class Command(Backup):
                 "--filename",
                 help=("The name of the file to use for the media backup tar."),
             ),
-        ] = DEFAULT_MEDIA_FILENAME,
+        ] = "media.tar.gz",
     ):
         """
         Backup the media files (i.e. those files in MEDIA_ROOT).

@@ -14,7 +14,9 @@ class Command(TyperCommand):
     @command()
     def create(
         self,
-        name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
+        name: t.Annotated[
+            str, Argument(help=_("The name of the object to create."))
+        ],
     ):
         """
         Create an object.
@@ -22,7 +24,10 @@ class Command(TyperCommand):
 
     @command()
     def delete(
-        self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
+        self,
+        id: t.Annotated[
+            int, Argument(help=_("The id of the object to delete."))
+        ],
     ):
         """
         Delete an object.

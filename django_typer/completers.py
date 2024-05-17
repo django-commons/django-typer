@@ -527,5 +527,6 @@ def these_strings(strings: t.List[str], allow_duplicates: bool = False):
 
 databases = these_strings([alias for alias in settings.DATABASES.keys()])
 """
-Get a completer that provides completion logic for Django database aliases.
+A completer that provides completion logic for the Django database aliases
+configured in settings.DATABASES.
 """

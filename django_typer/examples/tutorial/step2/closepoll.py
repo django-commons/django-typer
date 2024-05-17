@@ -20,7 +20,8 @@ class Command(TyperCommand):
     def handle(
         self,
         poll_ids: Annotated[
-            t.List[int], Argument(help=_("The database IDs of the poll(s) to close."))
+            t.List[int],
+            Argument(help=_("The database IDs of the poll(s) to close.")),
         ],
         delete: Annotated[
             bool, Option(help=_("Delete poll instead of closing it."))

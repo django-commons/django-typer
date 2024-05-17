@@ -223,11 +223,12 @@ are arguments and the delete flag is an option. Here is what that would look lik
         ):
             # ...
 
-See that our help text now shows up in the command line interface. Also note, that lazy translations
-work for the help strings. Typer_ also allows us to specify our help text in the docstrings of the
-command function or class, in this case either Command or handle() - but docstrings are not
-available to the translation system. If translation is not necessary and your help text is extensive
-or contains markup the docstring may be the more appropriate place to put it.
+See that our help text now shows up in the command line interface. Also note, that
+`lazy translations <https://docs.djangoproject.com/en/stable/topics/i18n/translation/>`_ work for
+the help strings. Typer_ also allows us to specify our help text in the docstrings of the command
+function or class, in this case either Command or handle() - but docstrings are not available to
+the translation system. If translation is not necessary and your help text is extensive or contains
+markup the docstring may be the more appropriate place to put it.
 
 .. typer:: django_typer.examples.tutorial.step2.closepoll.Command:typer_app
     :prog: manage.py closepoll
@@ -248,7 +249,7 @@ Defining custom and reusable parameter types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We may have other commands that need to operate on Poll objects from given poll ids. We could
-duplicate our for loop that loads Poll objects from ids, but that wouldn't be very DRY. Instead,
+duplicate our for loop that loads Poll objects from ids, but that wouldn't be very DRY_. Instead,
 Typer_ allows us to define custom parsers for arbitrary parameter types. Lets see what that would
 look like if we used the Poll class as our type hint:
 

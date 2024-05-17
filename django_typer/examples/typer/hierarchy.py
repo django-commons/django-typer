@@ -6,7 +6,9 @@ from typer import Argument, Option
 
 from django_typer import Typer
 
-app = Typer(help=_("A more complex command that defines a hierarchy of subcommands."))
+app = Typer(
+    help=_("A more complex command that defines a hierarchy of subcommands.")
+)
 
 
 math_grp = Typer(help=_("Do some math at the given precision."))
@@ -27,7 +29,9 @@ def math(
 @math_grp.command(help=_("Multiply the given numbers."))
 def multiply(
     self,
-    numbers: t.Annotated[t.List[float], Argument(help=_("The numbers to multiply"))],
+    numbers: t.Annotated[
+        t.List[float], Argument(help=_("The numbers to multiply"))
+    ],
 ):
     return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
