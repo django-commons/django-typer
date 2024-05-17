@@ -196,7 +196,11 @@ line-length = 88
 exclude = [
     "doc",
     "dist",
-    "django_typer/examples"
+    "django_typer/examples",
+    "django_typer/tests/apps/examples",
+    "django_typer/tests/apps/polls",
+    "django_typer/tests/apps/backup",
+    "django_typer/tests/apps/typer_examples"
 ]
 
 [tool.ruff.lint]
