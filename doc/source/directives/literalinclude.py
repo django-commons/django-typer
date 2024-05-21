@@ -1,4 +1,3 @@
-import os
 from docutils.parsers.rst import directives
 from docutils.nodes import literal_block, Text
 from sphinx.directives.code import LiteralInclude

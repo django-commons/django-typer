@@ -162,6 +162,10 @@ class TestGroups(TestCase):
         ],
     )
     def test_command_line(self, settings=None):
+        from django_typer.tests.apps.test_app.management.commands.groups import (
+            Command as Groups,
+        )
+
         override = settings is not None
         settings = ("--settings", settings) if settings else []
 
@@ -183,18 +187,21 @@ class TestGroups(TestCase):
             "hey!",
         )
 
-        self.assertEqual(get_command("groups").echo("hey!").strip(), "hey!")
+        self.assertEqual(get_command("groups", Groups).echo("hey!").strip(), "hey!")
 
-        self.assertEqual(get_command("groups").echo(message="hey!").strip(), "hey!")
+        self.assertEqual(
+            get_command("groups", Groups).echo(message="hey!").strip(), "hey!"
+        )
 
         result = run_command("groups", "--no-color", *settings, "echo", "hey!", "5")
         if override:
             self.assertEqual(result[0].strip(), ("hey! " * 5).strip())
             self.assertEqual(
-                get_command("groups").echo("hey!", 5).strip(), ("hey! " * 5).strip()
+                get_command("groups", Groups).echo("hey!", 5).strip(),
+                ("hey! " * 5).strip(),
             )
             self.assertEqual(
-                get_command("groups").echo(message="hey!", echoes=5).strip(),
+                get_command("groups", Groups).echo(message="hey!", echoes=5).strip(),
                 ("hey! " * 5).strip(),
             )
             self.assertEqual(
@@ -211,7 +218,7 @@ class TestGroups(TestCase):
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
             with self.assertRaises(TypeError):
-                get_command("groups").echo(message="hey!", echoes=5)
+                get_command("groups", Groups).echo(message="hey!", echoes=5)
 
         self.assertEqual(
             run_command(
@@ -229,7 +236,7 @@ class TestGroups(TestCase):
             "-51.66000",
         )
 
-        grp_cmd = get_command("groups")
+        grp_cmd = get_command("groups", Groups)
         grp_cmd.math(precision=5)
         self.assertEqual(grp_cmd.multiply(1.2, 3.5, [-12.3]), "-51.66000")
 

@@ -8,5 +8,4 @@ class Extend2Config(AppConfig):
 
     def ready(self):
         from .management import extensions
-
         register_command_extensions(extensions)

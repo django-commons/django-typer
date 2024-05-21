@@ -11,7 +11,8 @@ from django_typer.tests.apps.backup.backup.management.commands.backup import (
 )
 
 
-class Command(Backup):
+class Command(Backup):  # inherit from the original command
+    # add a new command called media that archives the MEDIA_ROOT dir
     @command()
     def media(
         self,

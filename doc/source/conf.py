@@ -10,7 +10,7 @@ django.setup()
 
 sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'examples'))
 sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'tests'))
-sys.path.append(str(Path(__file__).parent / 'extensions'))
+sys.path.append(str(Path(__file__).parent / 'directives'))
 import django_typer
 from literalinclude import ExtendedLiteralInclude
 

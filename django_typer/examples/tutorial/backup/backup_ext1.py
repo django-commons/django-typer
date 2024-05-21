@@ -9,11 +9,13 @@ from django_typer.tests.apps.backup.backup.management.commands.backup import (
     Command as Backup,
 )
 
-DEFAULT_MEDIA_FILENAME = "media.tar.gz"
 
-
+# instead of inheriting we add the command using the classmethod decorator
+# on the backup Command class to decorate a module scoped function
 @Backup.command()
 def media(
+    # self is optional, but if you want to access the command instance, you
+    # can specify it
     self,
     filename: t.Annotated[
         str,
@@ -22,7 +24,7 @@ def media(
             "--filename",
             help=("The name of the file to use for the media backup tar."),
         ),
-    ] = DEFAULT_MEDIA_FILENAME,
+    ] = "media.tar.gz",
 ):
     """
     Backup the media files (i.e. those files in MEDIA_ROOT).

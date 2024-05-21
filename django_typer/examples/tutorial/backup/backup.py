@@ -7,7 +7,13 @@ import typer
 from django.conf import settings
 from django.core.management import CommandError, call_command
 
-from django_typer import TyperCommand, command, completers, initialize
+from django_typer import (
+    TyperCommand,
+    CommandNode,
+    command,
+    completers,
+    initialize,
+)
 
 
 class Command(TyperCommand):
@@ -29,7 +35,7 @@ class Command(TyperCommand):
     @initialize(invoke_without_command=True)
     def init_or_run_all(
         self,
-        # if we add a context argument click will provide it
+        # if we add a context argument Typer will provide it
         context: typer.Context,
         output_directory: t.Annotated[
             Path,
@@ -53,9 +59,9 @@ class Command(TyperCommand):
         # if it was not we run all the backup routines
         if not context.invoked_subcommand:
             for cmd in self.get_backup_routines():
-                getattr(self, cmd)()
+                cmd()
 
-    def get_backup_routines(self) -> t.List[str]:
+    def get_backup_routines(self) -> t.List[CommandNode]:
         """
         Return the list of backup subcommands. This is every registered command
         except for the list command.
@@ -64,8 +70,8 @@ class Command(TyperCommand):
         # except for list, which we know to not be a backup routine
         return [
             cmd
-            for cmd in self.get_subcommand().children.keys()
-            if cmd != "list"
+            for name, cmd in self.get_subcommand().children.items()
+            if name != "list"
         ]
 
     @command()
@@ -75,14 +81,15 @@ class Command(TyperCommand):
         """
         self.echo("Default backup routines:")
         for cmd in self.get_backup_routines():
-            kwargs = {
-                name: str(param.default)
+            sig = {
+                name: param.default
                 for name, param in inspect.signature(
-                    getattr(self, cmd)
+                    cmd.callback
                 ).parameters.items()
+                if not name == "self"
             }
-            params = ", ".join([f"{k}={v}" for k, v in kwargs.items()])
-            self.secho(f"  {cmd}({params})", fg="green")
+            params = ", ".join([f"{k}={v}" for k, v in sig.items()])
+            self.secho(f"  {cmd.name}({params})", fg="green")
 
     @command()
     def database(

@@ -5,6 +5,7 @@ import pytest
 from django.test import SimpleTestCase
 from pathlib import Path
 from django_typer.tests.utils import run_command
+import datetime
 import shutil
 
 
@@ -93,9 +94,7 @@ class TestBackupExample(SimpleTestCase):
         self.assertEqual(retcode, 0, msg=stderr)
         lines = [line.strip() for line in stdout.strip().splitlines()[1:]]
         self.assertEqual(len(lines), 3)
-        self.assertTrue(
-            "database(filename={database}.json, databases=['default'])" in lines
-        )
+        self.assertTrue("database()" in lines)
         self.assertTrue("environment(filename=requirements.txt)" in lines)
         self.assertTrue("media(filename=media.tar.gz)" in lines)
 
@@ -108,7 +107,9 @@ class TestBackupExample(SimpleTestCase):
         )
         self.assertEqual(retcode, 0, msg=stderr)
         self.assertTrue(BACKUP_DIRECTORY.exists())
-        self.assertTrue((BACKUP_DIRECTORY / "default.json").exists())
+        self.assertTrue(
+            (BACKUP_DIRECTORY / f"backup_{datetime.date.today()}.sqlite3").exists()
+        )
         self.assertTrue((BACKUP_DIRECTORY / "media.tar.gz").exists())
         self.assertTrue((BACKUP_DIRECTORY / "requirements.txt").exists())
         self.assertTrue(len(os.listdir(BACKUP_DIRECTORY)) == 3)

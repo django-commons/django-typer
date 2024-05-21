@@ -152,6 +152,7 @@ __all__ = [
 
 P = ParamSpec("P")
 R = t.TypeVar("R")
+C = t.TypeVar("C", bound=BaseCommand)
 
 _CACHE_KEY = "_register_typer"
 
@@ -220,15 +221,52 @@ def model_parser_completer(
     }
 
 
-def get_command(
+@t.overload
+def get_command(  # type: ignore[overload-overlap]
     command_name: str,
-    *subcommand: str,
     stdout: t.Optional[t.IO[str]] = None,
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
     **kwargs,
-) -> t.Union[BaseCommand, MethodType]:
+) -> BaseCommand: ...
+
+
+@t.overload
+# mypy seems to break on this one, but this is correct
+def get_command(
+    command_name: str,
+    cmd_type: t.Type[C],
+    stdout: t.Optional[t.IO[str]] = None,
+    stderr: t.Optional[t.IO[str]] = None,
+    no_color: bool = False,
+    force_color: bool = False,
+    **kwargs,
+) -> C: ...
+
+
+@t.overload
+def get_command(
+    command_name: str,
+    path0: str,
+    *path: str,
+    stdout: t.Optional[t.IO[str]] = None,
+    stderr: t.Optional[t.IO[str]] = None,
+    no_color: bool = False,
+    force_color: bool = False,
+    **kwargs,
+) -> MethodType: ...
+
+
+def get_command(
+    command_name,
+    *path,
+    stdout=None,
+    stderr=None,
+    no_color: bool = False,
+    force_color: bool = False,
+    **kwargs,
+):
     """
     Get a Django_ command by its name and instantiate it with the provided options. This
     will work for subclasses of BaseCommand_ as well as for :class:`~django_typer.TyperCommand`
@@ -261,8 +299,17 @@ def get_command(
         divide = get_command('hierarchy', 'math', 'divide')
         result = divide(10, 2)
 
+    When fetching an entire TyperCommand (i.e. no group or subcommand path), you may supply
+    the type of the expected TyperCommand as the second argument. This will allow the type
+    system to infer the correct return type:
+
+    .. code-block:: python
+
+        from myapp.management.commands import Command as Hierarchy
+        hierarchy: Hierarchy = get_command('hierarchy', Hierarchy)
+
     :param command_name: the name of the command to get
-    :param subcommand: the subcommand to get if any
+    :param path: the path walking down the group/command tree
     :param stdout: the stdout stream to use
     :param stderr: the stderr stream to use
     :param no_color: whether to disable color
@@ -274,16 +321,15 @@ def get_command(
     module = import_module(
         f"{get_commands()[command_name]}.management.commands.{command_name}"
     )
-    cmd = module.Command(
+    cmd: BaseCommand = module.Command(
         stdout=stdout,
         stderr=stderr,
         no_color=no_color,
         force_color=force_color,
         **kwargs,
     )
-    if subcommand:
-        method = cmd.get_subcommand(*subcommand).click_command._callback.__wrapped__
-        return MethodType(method, cmd)  # return the bound method
+    if path and (isinstance(path[0], str) or len(path) > 1):
+        return t.cast(TyperCommand, cmd).get_subcommand(*path).callback
 
     return cmd
 
@@ -406,7 +452,7 @@ class Context(TyperContext):
             parent.children.append(self)
 
 
-class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
+class DjangoTyperCommand(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     """
     A mixin we use to add additional needed contextual awareness to click Commands
     and Groups.
@@ -556,7 +602,7 @@ class _DjangoAdapterMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         )
 
 
-class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
+class TyperCommandWrapper(DjangoTyperCommand, CoreTyperCommand):
     """
     This class extends the TyperCommand class to work with the django-typer
     interfaces. If you need to add functionality to the command class - which
@@ -564,7 +610,7 @@ class TyperCommandWrapper(_DjangoAdapterMixin, CoreTyperCommand):
     """
 
 
-class TyperGroupWrapper(_DjangoAdapterMixin, CoreTyperGroup):
+class TyperGroupWrapper(DjangoTyperCommand, CoreTyperGroup):
     """
     This class extends the TyperGroup class to work with the django-typer
     interfaces. If you need to add functionality to the group class - which
@@ -2162,16 +2208,47 @@ class CommandNode:
     """
 
     name: str
-    click_command: click.Command
+    """
+    The name of the group or command that this node represents.
+    """
+
+    click_command: DjangoTyperCommand
+    """
+    The click command object that this node represents.
+    """
+
     context: TyperContext
+    """
+    The Typer context object used to run this command.
+    """
+
     django_command: "TyperCommand"
+    """
+    Back reference to the django command instance that this command belongs to.
+    """
+
     parent: t.Optional["CommandNode"] = None
+    """
+    The parent node of this command node or None if this is a root node.
+    """
+
     children: t.Dict[str, "CommandNode"]
+    """
+    The child group and command nodes of this command node.
+    """
+
+    @property
+    def callback(self) -> t.Callable[..., t.Any]:
+        """Get the function for this command or group"""
+        cb = getattr(self.click_command._callback, "__wrapped__")
+        return (
+            MethodType(cb, self.django_command) if self.click_command.is_method else cb
+        )
 
     def __init__(
         self,
         name: str,
-        click_command: click.Command,
+        click_command: DjangoTyperCommand,
         context: TyperContext,
         django_command: "TyperCommand",
         parent: t.Optional["CommandNode"] = None,
@@ -2197,8 +2274,9 @@ class CommandNode:
         Return the command node for the given command path at or below
         this node.
 
-        :param command_path: the path(s) to the command to retrieve
-        :return: the command node at the given path
+        :param command_path: the parent group names followed by the name of the command
+            or group to retrieve
+        :return: the command node at the given group/subcommand path
         :raises LookupError: if the command path does not exist
         """
         if not command_path:
@@ -2207,6 +2285,15 @@ class CommandNode:
             return self.children[command_path[0]].get_command(*command_path[1:])
         except KeyError as err:
             raise LookupError(f'No such command "{command_path[0]}"') from err
+
+    def __call__(self, *args, **kwargs) -> t.Any:
+        """
+        Call this command or group directly.
+
+        :param args: the arguments to pass to the command or group callback
+        :param kwargs: the named parameters to pass to the command or group callback
+        """
+        return self.callback(*args, **kwargs)
 
 
 class TyperParser:
@@ -2902,7 +2989,14 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 ) from rerr
 
     def get_subcommand(self, *command_path: str) -> CommandNode:
-        """Get the CommandNode"""
+        """
+        Retrieve a :class:`~django_typer.CommandNode` at the given command path.
+
+        :param command_path: the path to the command to retrieve, where each argument
+            is the string name in order of a group or command in the hierarchy.
+        :return: the command node at the given path
+        :raises LookupError: if no group or command exists at the given path
+        """
         return self.command_tree.get_command(*command_path)
 
     def _filter_commands(
@@ -2955,6 +3049,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param node: the parent node or None if this is a root node
         """
         assert cmd.name
+        assert isinstance(cmd, DjangoTyperCommand)
         ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
         current = CommandNode(cmd.name, cmd, ctx, self, parent=node)
         if node:
