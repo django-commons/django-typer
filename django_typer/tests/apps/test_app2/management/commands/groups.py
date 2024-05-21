@@ -23,6 +23,8 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
 
     suppressed_base_arguments = ["--version"]
 
+    setting_name: str
+
     @initialize()
     def init(self, verbosity: types.Verbosity = verbosity):
         """
@@ -47,7 +49,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
 
     # test override base class command and remove arguments
     @GroupsCommand.case.command()
-    def upper(self):
+    def upper(self) -> None:
         return super().upper(0, None)
 
     @GroupsCommand.string.command()
@@ -63,7 +65,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
         Get or set Django settings.
         """
         assert self.__class__ is Command
-        self.setting = setting
+        self.setting_name = setting
 
     @setting.command()
     def print(
@@ -75,5 +77,5 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
         """
         assert self.__class__ is Command
         if safe:
-            return getattr(settings, self.setting, None)
-        return getattr(settings, self.setting)
+            return getattr(settings, self.setting_name, None)
+        return getattr(settings, self.setting_name)

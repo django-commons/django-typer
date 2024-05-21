@@ -151,7 +151,9 @@ __all__ = [
 ]
 
 P = ParamSpec("P")
+P2 = ParamSpec("P2")
 R = t.TypeVar("R")
+R2 = t.TypeVar("R2")
 C = t.TypeVar("C", bound=BaseCommand)
 
 _CACHE_KEY = "_register_typer"
@@ -1171,6 +1173,16 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         assert self.initializer
         return self.initializer(*args, **kwargs)
 
+    @t.overload
+    def __get__(
+        self, obj: t.Union[None, t.Type["TyperCommand"]], owner: t.Any = None
+    ) -> "CommandGroup[P, R]": ...
+
+    @t.overload
+    def __get__(
+        self, obj: "TyperCommand", owner: t.Any = None
+    ) -> t.Union[MethodType, t.Callable[P, R]]: ...
+
     def __get__(
         self, obj: t.Any, owner: t.Any = None
     ) -> t.Union["CommandGroup[P, R]", MethodType, t.Callable[P, R]]:
@@ -1347,7 +1359,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs,
-    ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
+    ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
         """
         A function decorator that creates a new command and attaches it to this group.
         This is a passthrough to Typer.command() and the options are the same, except
@@ -1418,7 +1430,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 **kwargs,
             )
 
-        def make_command(f: t.Callable[P, R]) -> t.Callable[P, R]:
+        def make_command(f: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
             owner = kwargs.pop("_owner", None)
             if owner:
                 # attach this function to the adapted Command class
@@ -1464,7 +1476,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs,
-    ) -> t.Callable[[t.Callable[P, R]], "CommandGroup[P, R]"]:
+    ) -> t.Callable[[t.Callable[P2, R2]], "CommandGroup[P2, R2]"]:
         """
         Create a new subgroup and attach it to this group. This is like creating a new
         Typer app and adding it to a parent Typer app. The kwargs are passed through
@@ -1540,7 +1552,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
             )
             return grp
 
-        def create_app(func: t.Callable[P, R]) -> CommandGroup[P, R]:
+        def create_app(func: t.Callable[P2, R2]) -> CommandGroup[P2, R2]:
             owner = t.cast(t.Optional[t.Type[TyperCommand]], kwargs.pop("_owner", None))
             self.groups.append(
                 CommandGroup(  # pyright: ignore[reportArgumentType]
@@ -1597,7 +1609,7 @@ def initialize(
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
     **kwargs,
-) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
+) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
     """
     A function decorator that creates a Typer_
     `callback <https://typer.tiangolo.com/tutorial/commands/callback/>`_. This
@@ -1690,7 +1702,7 @@ def initialize(
         this can be used to group commands into panels in the help output.
     """
 
-    def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
+    def make_initializer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
         _cache_initializer(
             func,
             common_init=True,
