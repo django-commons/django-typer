@@ -5,6 +5,8 @@ Change Log
 v1.2.0
 ======
 
+* Fixed `Overriding handle() in inherited commands results in multiple commands. <https://github.com/bckohan/django-typer/issues/74>`_
+* Fixed `Helps from class docstrings and TyperCommand class parameters are not inherited. <https://github.com/bckohan/django-typer/issues/69>`_
 * Implemented `Allow callback and initialize to be aliases of each other. <https://github.com/bckohan/django-typer/issues/66>`_
 * Implemented `Shell completion for --pythonpath <https://github.com/bckohan/django-typer/issues/65>`_
 * Implemented `Shell completion for --settings <https://github.com/bckohan/django-typer/issues/64>`_

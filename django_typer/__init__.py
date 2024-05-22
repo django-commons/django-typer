@@ -2011,7 +2011,18 @@ def _resolve_help(dj_cmd: "TyperCommand"):
 
     :param dj_cmd: The TyperCommand to resolve the help string for.
     """
-    hlp = dj_cmd.__class__.__doc__
+    hlp = None
+    for cmd_cls in [
+        dj_cmd.__class__,
+        *[
+            c
+            for c in dj_cmd.__class__.__mro__
+            if issubclass(c, TyperCommand) and c is not TyperCommand
+        ],
+    ]:
+        hlp = cmd_cls.__doc__
+        if hlp:
+            break
     if hlp:
         if dj_cmd.typer_app.registered_callback:
             cb = dj_cmd.typer_app.registered_callback
@@ -2154,10 +2165,18 @@ class TyperCommandMeta(type):
                     "short", pretty_exceptions_short
                 )
 
+            attr_help = attrs.get("help", Default(None))
+            if not help:
+                for base in [base for base in bases if issubclass(base, TyperCommand)]:
+                    if isinstance(help, DefaultPlaceholder):
+                        help = base._help_kwarg  # type: ignore[unreachable]
+                    if isinstance(attr_help, DefaultPlaceholder):
+                        attr_help = base.help
+
             typer_app = Typer(
                 name=name or attrs["__module__"].rsplit(".", maxsplit=1)[-1],
                 # cls=cls,
-                help=help or attrs.get("help", Default(None)),
+                help=help or attr_help,  # pyright: ignore[reportArgumentType]
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
                 subcommand_metavar=subcommand_metavar,
@@ -2187,6 +2206,12 @@ class TyperCommandMeta(type):
                 **attrs,
                 "typer_app": typer_app,
             }
+        else:
+            # we do this to avoid typing complaints on handle overrides
+            attrs["handle"] = attrs.pop("_run")
+
+        if help:
+            attrs["_help_kwarg"] = help
 
         return super().__new__(mcs, cls_name, bases, attrs)
 
@@ -2206,6 +2231,7 @@ class TyperCommandMeta(type):
 
             # because we're mapping a non-class based interface onto a class based
             # interface, we have to handle this class mro stuff manually here
+            handle = None  # there can be only one or none
             for cmd_cls, cls_attrs in [
                 *[(base, vars(base)) for base in reversed(bases)],
                 (cls, attrs),
@@ -2222,22 +2248,24 @@ class TyperCommandMeta(type):
                     elif register := get_ctor(attr):
                         to_register.append(register)
 
-                if cmd_cls._handle:
-                    ctor = get_ctor(cmd_cls._handle)
-                    if ctor:
-                        ctor(
-                            cls,
-                            _name=cls.typer_app.info.name,
-                            _help=getattr(cls, "help", None),
-                        )
-                    else:
-                        cls.typer_app.command(
-                            cls.typer_app.info.name,
-                            help=cls.typer_app.info.help or None,
-                        )(cmd_cls._handle)
+                handle = cmd_cls._handle or handle
 
                 for cmd in to_register:
                     cmd(cls)
+
+            if handle:
+                ctor = get_ctor(handle)
+                if ctor:
+                    ctor(
+                        cls,
+                        _name=cls.typer_app.info.name,
+                        _help=getattr(cls, "help", None),
+                    )
+                else:
+                    cls.typer_app.command(
+                        cls.typer_app.info.name,
+                        help=cls.typer_app.info.help or None,
+                    )(handle)
 
             _add_common_initializer(cls)
 
@@ -2619,8 +2647,15 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     force_color: bool = False
     _handle: t.Callable[..., t.Any]
     _traceback: bool = False
+    _help_kwarg: t.Optional[str] = Default(None)
+
+    help: t.Optional[t.Union[DefaultPlaceholder, str]] = Default(None)  # type: ignore
 
     command_tree: CommandNode
+
+    # allow deriving commands to override handle() from BaseCommand
+    # without triggering static type checking complaints
+    handle = None  # type: ignore
 
     @classmethod
     def initialize(
@@ -3189,7 +3224,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 ).format(cls=self.__class__)
             )
 
-    def handle(self, *args, **options):
+    @t.no_type_check
+    def _run(self, *args, **options):
         """
         Invoke the underlying Typer app with the given arguments and parameters.
 

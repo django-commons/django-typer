@@ -103,6 +103,51 @@ class TestHelpPrecedence(TestCase):
         cmd.print_help("./manage.py", "help_precedence9")
         self.assertIn("Class docstring.", buffer.getvalue())
 
+    def test_help_precedence10(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence10", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence10")
+        self.assertIn("Class docstring.", buffer.getvalue())
+
+    def test_help_precedence11(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence11", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence11")
+        self.assertIn("This docstring overrides base docstring.", buffer.getvalue())
+
+    def test_help_precedence12(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence12", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence12")
+        self.assertIn("Class docstring.", buffer.getvalue())
+
+    def test_help_precedence13(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence13", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence13")
+        self.assertIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+        self.assertNotIn("Override higher precedence inherit.", buffer.getvalue())
+
+    def test_help_precedence14(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence14", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence14")
+        self.assertIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+        self.assertNotIn("Override higher precedence inherit.", buffer.getvalue())
+
+    def test_help_precedence15(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence15", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence15")
+        self.assertNotIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+        self.assertIn("Now class docstring is used!", buffer.getvalue())
+
     @pytest.mark.skip()
     def test_help_from_other_dir(self):
         """

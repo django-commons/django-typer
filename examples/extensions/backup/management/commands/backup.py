@@ -8,8 +8,8 @@ from django.conf import settings
 from django.core.management import CommandError, call_command
 
 from django_typer import (
-    TyperCommand,
     CommandNode,
+    TyperCommand,
     command,
     completers,
     initialize,

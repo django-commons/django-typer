@@ -1,11 +1,11 @@
+import datetime
 import shutil
 import subprocess
 import typing as t
-import datetime
 
 import typer
-
 from django.conf import settings
+
 from django_typer.tests.apps.examples.extensions.backup.management.commands.backup import (
     Command as Backup,
 )

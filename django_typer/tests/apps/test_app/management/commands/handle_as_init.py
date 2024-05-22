@@ -1,5 +1,5 @@
 from click import get_current_context
-
+import typing as t
 from django_typer import TyperCommand, command, initialize
 
 

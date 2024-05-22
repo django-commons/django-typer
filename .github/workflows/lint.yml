@@ -66,14 +66,6 @@ jobs:
       - name: Run Static Analysis
         run: |
           source .venv/bin/activate
-          ruff format --check django_typer
-          ruff check --no-fix --select I django_typer
-          ruff check django_typer
-          mypy django_typer
-          pyright
-          poetry check
-          pip check
+          ./check.sh --no-fix
           python -m readme_renderer ./README.md -o /tmp/README.html
-          cd ./doc
-          doc8 --ignore-path build --max-line-length 100
           echo "$(poetry env info --path)/bin" >> $GITHUB_PATH

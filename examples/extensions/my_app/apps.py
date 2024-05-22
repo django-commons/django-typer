@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+
 from django_typer.utils import register_command_extensions
 
 
