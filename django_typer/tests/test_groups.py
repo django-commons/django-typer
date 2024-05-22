@@ -280,7 +280,9 @@ class TestGroups(TestCase):
             "-0.03",
         )
 
-        self.assertEqual(get_command("groups").divide(1.2, 3.5, [-12.3]), "-0.03")
+        self.assertEqual(
+            get_command("groups", Groups).divide(1.2, 3.5, [-12.3]), "-0.03"
+        )
         self.assertEqual(
             get_command("groups", "math", "divide")(1.2, 3.5, [-12.3]), "-0.03"
         )
@@ -297,7 +299,7 @@ class TestGroups(TestCase):
             "annamontes",
         )
 
-        grp_cmd = get_command("groups")
+        grp_cmd = get_command("groups", Groups)
         grp_cmd.string("ANNAmontes")
         self.assertEqual(grp_cmd.lower(), "annamontes")
 

@@ -64,13 +64,14 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 # quirk imposed by the base class for users to be aware of.
 # ruff: noqa: E402
 
-# Most of the bookeeping complexity is induced by the necessity of figuring out if and
-# where django's base command line parameters should be attached. To do this commands
-# and Typer instances (groups in django-typer parlance) need to be able to access the
-# django command class they are attached to. The length of this file is largely a result
-# of wrapping Typer.command, Typer.callback and Typer.add_typer in many different contexts
+# Most of the book keeping complexity is induced by the necessity of figuring out if and
+# where django's base command line parameters should be attached and how to bind a method
+# function to a class that may not been created yet. To do this commands and Typer
+# instances (groups in click/django-typer parlance) need to be able to access the django
+# command class they are attached to. The length of this file is largely a result of
+# wrapping Typer.command, Typer.callback and Typer.add_typer in many different contexts
 # to achieve the nice interface we would like and also because we list out each parameter
-# for developer experience reasons
+# for developer experience reasons, its only ~600 actual statements
 
 import inspect
 import sys
@@ -142,6 +143,12 @@ __copyright__ = "Copyright 2023-2024 Brian Kohan"
 
 __all__ = [
     "TyperCommand",
+    "CommandNode",
+    "CommandGroup",
+    "Typer",
+    "DjangoTyperMixin",
+    "DTCommand",
+    "DTGroup",
     "Context",
     "initialize",
     "command",
@@ -454,7 +461,7 @@ class Context(TyperContext):
             parent.children.append(self)
 
 
-class DjangoTyperCommand(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
+class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     """
     A mixin we use to add additional needed contextual awareness to click Commands
     and Groups.
@@ -604,19 +611,47 @@ class DjangoTyperCommand(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         )
 
 
-class TyperCommandWrapper(DjangoTyperCommand, CoreTyperCommand):
+class DTCommand(DjangoTyperMixin, CoreTyperCommand):
     """
-    This class extends the TyperCommand class to work with the django-typer
-    interfaces. If you need to add functionality to the command class - which
-    you should not - you should inherit from this class.
+    This class extends the TyperCommand class to work with the django-typer interfaces.
+    If you need to add functionality to the command class - you should inherit from
+    this class. You can then pass your custom class to the command() decorators
+    using the cls parameter.
+
+    .. code-block:: python
+
+        from django_typer import TyperCommand, DTCommand, command
+
+        class CustomCommand(DTCommand):
+            ...
+
+        class Command(TyperCommand):
+
+            @command(cls=CustomCommand)
+            def handle(self):
+                ...
     """
 
 
-class TyperGroupWrapper(DjangoTyperCommand, CoreTyperGroup):
+class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     """
-    This class extends the TyperGroup class to work with the django-typer
-    interfaces. If you need to add functionality to the group class - which
-    you should not - you should inherit from this class.
+    This class extends the TyperGroup class to work with the django-typer interfaces.
+    If you need to add functionality to the group class you should inherit from this
+    class. You can then pass your custom class to the command() decorators using the
+    cls parameter.
+
+    .. code-block:: python
+
+        from django_typer import TyperCommand, DTGroup, group
+
+        class CustomGroup(DTGroup):
+            ...
+
+        class Command(TyperCommand):
+
+            @group(cls=CustomGroup)
+            def grp(self):
+                ...
     """
 
 
@@ -633,7 +668,7 @@ def _cache_initializer(
     common_init: bool,
     name: t.Optional[str] = Default(None),
     help: t.Optional[str] = Default(None),
-    cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+    cls: t.Type[DTGroup] = DTGroup,
     **kwargs,
 ):
     if not hasattr(callback, _CACHE_KEY):
@@ -663,7 +698,7 @@ def _cache_command(
     callback: t.Callable[..., t.Any],
     name: t.Optional[str] = None,
     help: t.Optional[str] = None,
-    cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+    cls: t.Type[DTCommand] = DTCommand,
     **kwargs,
 ):
     if not hasattr(callback, _CACHE_KEY):
@@ -690,7 +725,7 @@ class AppFactory(type):
         app_cls,  # pyright: ignore[reportSelfClsParameterName]
         *args,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -817,7 +852,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         self,
         *,
         name: t.Optional[str] = Default(None),
-        cls: t.Optional[t.Type[TyperGroupWrapper]] = TyperGroupWrapper,
+        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -876,7 +911,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         self,
         name: t.Optional[str] = Default(None),
         *,
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -967,7 +1002,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         self,
         name: t.Optional[str] = None,
         *,
-        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
         help: t.Optional[str] = None,
         epilog: t.Optional[str] = None,
@@ -1036,7 +1071,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
         typer_instance: "CommandGroup",
         *,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1181,11 +1216,14 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     @t.overload
     def __get__(
         self, obj: "TyperCommand", owner: t.Any = None
-    ) -> t.Union[MethodType, t.Callable[P, R]]: ...
+    ) -> MethodType:  # t.Union[MethodType, t.Callable[P, R]]
+        # todo - we could return the generic callable type here but the problem
+        # is self is included in the ParamSpec and it seems tricky to remove?
+        # MethodType loses the parameters but is preferable to type checking errors
+        # https://github.com/bckohan/django-typer/issues/73
+        ...
 
-    def __get__(
-        self, obj: t.Any, owner: t.Any = None
-    ) -> t.Union["CommandGroup[P, R]", MethodType, t.Callable[P, R]]:
+    def __get__(self, obj, owner=None):
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
@@ -1204,7 +1242,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         self,
         *,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1293,7 +1331,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         self,
         name: t.Optional[str] = Default(None),
         *,
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1346,7 +1384,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         self,
         name: t.Optional[str] = None,
         *,
-        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
         help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = None,
@@ -1458,7 +1496,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     def group(
         self,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1591,7 +1629,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
 def initialize(
     name: t.Optional[str] = Default(None),
     *,
-    cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+    cls: t.Type[DTGroup] = DTGroup,
     invoke_without_command: bool = Default(False),
     no_args_is_help: bool = Default(False),
     subcommand_metavar: t.Optional[str] = Default(None),
@@ -1735,7 +1773,7 @@ callback = initialize  # allow callback as an alias
 def command(  # pylint: disable=keyword-arg-before-vararg
     name: t.Optional[str] = None,
     *,
-    cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+    cls: t.Type[DTCommand] = DTCommand,
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
     help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = None,
@@ -1830,7 +1868,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
 
 def group(
     name: t.Optional[str] = Default(None),
-    cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+    cls: t.Type[DTGroup] = DTGroup,
     invoke_without_command: bool = Default(False),
     no_args_is_help: bool = Default(False),
     subcommand_metavar: t.Optional[str] = Default(None),
@@ -1955,7 +1993,7 @@ def _add_common_initializer(
         cmd.typer_app.callback(
             cls=type(
                 "_Initializer",
-                (TyperGroupWrapper,),
+                (DTGroup,),
                 {
                     "django_command": cmd,
                     "_callback_is_method": False,
@@ -2065,7 +2103,7 @@ class TyperCommandMeta(type):
         bases,
         attrs,
         name: t.Optional[str] = Default(None),
-        cls: t.Optional[t.Type[TyperGroupWrapper]] = TyperGroupWrapper,
+        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -2224,7 +2262,7 @@ class CommandNode:
     The name of the group or command that this node represents.
     """
 
-    click_command: DjangoTyperCommand
+    click_command: DjangoTyperMixin
     """
     The click command object that this node represents.
     """
@@ -2260,7 +2298,7 @@ class CommandNode:
     def __init__(
         self,
         name: str,
-        click_command: DjangoTyperCommand,
+        click_command: DjangoTyperMixin,
         context: TyperContext,
         django_command: "TyperCommand",
         parent: t.Optional["CommandNode"] = None,
@@ -2589,7 +2627,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         cmd,  # pyright: ignore[reportSelfClsParameterName]
         name: t.Optional[str] = Default(None),
         *,
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -2705,7 +2743,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         cmd,  # pyright: ignore[reportSelfClsParameterName]
         name: t.Optional[str] = None,
         *,
-        cls: t.Type[TyperCommandWrapper] = TyperCommandWrapper,
+        cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
         help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = None,
@@ -2799,7 +2837,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     def group(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
         name: t.Optional[str] = Default(None),
-        cls: t.Type[TyperGroupWrapper] = TyperGroupWrapper,
+        cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -3061,7 +3099,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param node: the parent node or None if this is a root node
         """
         assert cmd.name
-        assert isinstance(cmd, DjangoTyperCommand)
+        assert isinstance(cmd, DjangoTyperMixin)
         ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
         current = CommandNode(cmd.name, cmd, ctx, self, parent=node)
         if node:
