@@ -1,1 +1,0 @@
-../../../../../examples/typer/basic.py

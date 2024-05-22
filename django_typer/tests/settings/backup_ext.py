@@ -1,7 +1,7 @@
 from .backup import *
 
 INSTALLED_APPS = [
-    "django_typer.tests.apps.backup.extend2",
-    "django_typer.tests.apps.backup.extend1",
+    "django_typer.tests.apps.examples.extensions.my_app",
+    "django_typer.tests.apps.examples.extensions.media2",
     *INSTALLED_APPS,
 ]

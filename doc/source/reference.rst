@@ -13,7 +13,7 @@ django_typer
 
 .. automodule:: django_typer
    :members:
-   :exclude-members: Typer, CommandGroup, TyperCommand, Context
+   :exclude-members: Typer, CommandGroup, TyperCommand, Context, CommandNode
    :show-inheritance:
 
 .. autoclass:: django_typer.Typer

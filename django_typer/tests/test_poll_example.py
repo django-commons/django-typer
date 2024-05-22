@@ -6,7 +6,7 @@ from django.test import SimpleTestCase
 from django.utils import timezone
 
 from django_typer import get_command
-from django_typer.tests.apps.polls.models import Question
+from django_typer.tests.apps.examples.polls.models import Question
 from django_typer.tests.utils import run_command
 
 

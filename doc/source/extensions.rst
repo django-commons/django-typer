@@ -31,12 +31,12 @@ subroutines added by extensions at runtime using :func:`~django_typer.TyperComma
 Our command might look like this:
 
 
-.. literalinclude:: ../../django_typer/examples/tutorial/backup/backup.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup.py
    :language: python
    :caption: Base Backup Command
    :linenos:
 
-.. typer:: django_typer.examples.tutorial.backup.backup.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.extensions.backup.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :show-nested:
@@ -64,7 +64,7 @@ Say our app tree looks like this:
 
 .. code-block:: text
 
-    site/
+    ./
     ├── backup/
     │   ├── __init__.py
     │   ├── apps.py
@@ -92,15 +92,15 @@ Say our app tree looks like this:
 
 Our backup.py implementation in the media app might look like this:
 
-.. literalinclude:: ../../django_typer/examples/tutorial/backup/backup_inherit.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup.py
    :language: python
    :caption: Media Backup Extension
    :replace:
-        django_typer.tests.apps.backup : site.media
+        django_typer.tests.apps.examples.extensions.backup : media
 
 Now you'll see we have another command called media available:
 
-.. typer:: django_typer.examples.tutorial.backup.backup_inherit.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.extensions.media1.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :convert-png: latex
@@ -111,7 +111,7 @@ Now you'll see we have another command called media available:
 Now we have a media backup routine that we can run individually or part of the entire
 backup batch:
 
-.. typer:: django_typer.examples.tutorial.backup.backup_inherit.Command:typer_app:media
+.. typer:: django_typer.tests.apps.examples.extensions.media1.management.commands.backup.Command:typer_app:media
     :prog: manage.py backup media
     :width: 80
     :convert-png: latex
@@ -164,7 +164,7 @@ the upstream backup app. Our app tree now might look like this:
 
 .. code-block:: text
 
-    site/
+    ./
     ├── backup/
     │   ├── __init__.py
     │   ├── apps.py
@@ -179,8 +179,8 @@ the upstream backup app. Our app tree now might look like this:
     │   └── management/
     │       ├── __init__.py
     │       ├── commands/
-    │       │   └── __init__.py
     │       └── extensions/
+    │           └── __init__.py
     │           └── backup.py
     └── my_app/
         ├── __init__.py
@@ -188,8 +188,8 @@ the upstream backup app. Our app tree now might look like this:
         └── management/
             ├── __init__.py
             ├── commands/
-            │   └── __init__.py
             └── extensions/
+                └── __init__.py
                 └── backup.py
 
 
@@ -221,23 +221,23 @@ this:
 For composition to work, we'll need to re-mplement media from above as a composed extension
 and that would look like this:
 
-.. literalinclude:: ../../django_typer/examples/tutorial/backup/backup_ext1.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup.py
    :language: python
    :caption: Media Backup Extension
    :replace:
-        django_typer.tests.apps.backup : site.backup
+        django_typer.tests.apps.examples.extensions.backup : backup
 
 And our my_app extension might look like this:
 
-.. literalinclude:: ../../django_typer/examples/tutorial/backup/backup_ext2.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup.py
    :language: python
    :caption: MyApp Backup Extension
    :replace:
-        django_typer.tests.apps.backup : site.backup
+        django_typer.tests.apps.examples.extensions.backup : backup
 
 Note that we now have a new environment command available:
 
-.. typer:: django_typer.examples.tutorial.backup.backup.Command:typer_app
+.. typer:: backup_example:app
     :prog: manage.py backup
     :width: 80
     :convert-png: latex
@@ -247,7 +247,7 @@ Note that we now have a new environment command available:
 
 And the command line parameters to database have been removed:
 
-.. typer:: django_typer.examples.tutorial.backup.backup.Command:typer_app:database
+.. typer:: backup_example:app:database
     :prog: manage.py backup database
     :width: 80
     :convert-png: latex

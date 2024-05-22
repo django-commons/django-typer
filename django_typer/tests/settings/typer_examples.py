@@ -1,7 +1,7 @@
 from .base import *
 
 INSTALLED_APPS = [
-    "django_typer.tests.apps.typer_examples",
+    "django_typer.tests.apps.examples.typer",
     "django_typer",
     "django.contrib.admin",
     "django.contrib.auth",

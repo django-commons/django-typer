@@ -63,7 +63,7 @@ For example TyperCommands can be a very simple drop in replacement for BaseComma
 documented features of BaseCommand_ work!
 
 
-.. literalinclude:: ../../django_typer/examples/basic.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/basic.py
    :language: python
    :caption: A Basic Command
    :linenos:
@@ -71,13 +71,13 @@ documented features of BaseCommand_ work!
 Or, you may also use an interface identitical to Typer's. Simply import Typer from django_typer
 instead of typer:
 
-.. literalinclude:: ../../django_typer/examples/typer/basic.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/basic.py
    :language: python
    :caption: A Typer-style Basic Command
    :linenos:
 
 
-.. typer:: django_typer.examples.basic.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.basic.Command:typer_app
     :prog: ./manage.py basic
     :width: 80
     :convert-png: latex
@@ -88,20 +88,20 @@ instead of typer:
 
 Commands with multiple subcommands can be defined:
 
-.. literalinclude:: ../../django_typer/examples/multi.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/multi.py
    :language: python
    :caption: A Command w/Subcommands
    :linenos:
 
 Or using the typer-style interface this could be written:
 
-.. literalinclude:: ../../django_typer/examples/typer/multi.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/multi.py
    :language: python
    :caption: A Typer-style Command w/Subcommands
    :linenos:
 
 
-.. typer:: django_typer.examples.multi.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.multi.Command:typer_app
     :prog: ./manage.py multi
     :width: 80
     :show-nested:
@@ -128,7 +128,7 @@ Any number of groups and subcommands and subgroups of other groups can be define
 for arbitrarily complex command hierarchies. Using the class-based interface we could define
 the command like this:
 
-.. literalinclude:: ../../django_typer/examples/hierarchy.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/hierarchy.py
    :language: python
    :caption: A Command w/Grouping Hierarchy
    :linenos:
@@ -137,12 +137,12 @@ The typer-style interface builds a TyperCommand class for us. This allows you to
 accept the self argument in your commands. We could define the above command using the typer
 interface like this:
 
-.. literalinclude:: ../../django_typer/examples/typer/hierarchy.py
+.. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/hierarchy.py
    :language: python
    :caption: A Typer-style Command w/Grouping Hierarchy
    :linenos:
 
-.. typer:: django_typer.examples.hierarchy.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.hierarchy.Command:typer_app
     :prog: ./manage.py hierarchy
     :width: 80
     :show-nested:

@@ -112,10 +112,7 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-exclude = [
-    "tests",
-    "examples"
-]
+exclude = ["tests"]
 
 
 # todo doc8 configuration here is not being picked up and doesnt seem to be working
@@ -141,10 +138,7 @@ addopts = [
 ]
 
 [tool.coverage.run]
-omit = [
-  "django_typer/tests/**/*.py",
-  "django_typer/examples/**/*.py"
-]
+omit = ["django_typer/tests/**/*.py"]
 branch = true
 source = ["django_typer"]
 concurrency = ["multiprocessing"]
@@ -183,10 +177,7 @@ disable = [
 ]
 
 [tool.pyright]
-exclude = [
-    "django_typer/tests/**/*",
-    "django_typer/examples/**/*"
-]
+exclude = ["django_typer/tests/**/*"]
 include = [
     "django_typer"
 ]
@@ -196,11 +187,7 @@ line-length = 88
 exclude = [
     "doc",
     "dist",
-    "django_typer/examples",
-    "django_typer/tests/apps/examples",
-    "django_typer/tests/apps/polls",
-    "django_typer/tests/apps/backup",
-    "django_typer/tests/apps/typer_examples"
+    "django_typer/tests/apps/examples"
 ]
 
 [tool.ruff.lint]

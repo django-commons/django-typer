@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from django_typer import get_command
-from django_typer.tests.apps.polls.models import Question
+from django_typer.tests.apps.examples.polls.models import Question
 from django_typer.tests.apps.test_app.models import ShellCompleteTester
 from django_typer.tests.utils import run_command
 
@@ -93,7 +93,7 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_model_object_parser_idempotency(self):
         from django_typer.parsers import ModelObjectParser
-        from django_typer.tests.apps.polls.models import Question
+        from django_typer.tests.apps.examples.polls.models import Question
 
         parser = ModelObjectParser(Question)
         self.assertEqual(parser.convert(self.q1, None, None), self.q1)
@@ -101,7 +101,7 @@ class TestShellCompletersAndParsers(TestCase):
     def test_app_label_parser_idempotency(self):
         from django_typer.parsers import parse_app_label
 
-        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
+        poll_app = apps.get_app_config("django_typer_tests_apps_examples_polls")
         self.assertEqual(parse_app_label(poll_app), poll_app)
 
     def test_app_label_parser_completers(self):
@@ -113,56 +113,49 @@ class TestShellCompletersAndParsers(TestCase):
                 "shellcompletion", "complete", "completion django_typer.tests."
             )
         result = result.getvalue()
-        self.assertTrue("django_typer.tests.apps.polls" in result)
+        self.assertTrue("django_typer.tests.apps.examples.polls" in result)
         self.assertTrue("django_typer.tests.apps.test_app" in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "completion django_typer_tests")
         result = result.getvalue()
-        self.assertTrue("django_typer_tests_apps_polls" in result)
+        self.assertTrue("django_typer_tests_apps_examples_polls" in result)
         self.assertTrue("django_typer_tests_apps_test_app" in result)
 
         self.assertEqual(
-            json.loads(call_command("completion", "django_typer_tests_apps_polls")),
-            ["django_typer_tests_apps_polls"],
+            json.loads(
+                call_command("completion", "django_typer_tests_apps_examples_polls")
+            ),
+            ["django_typer_tests_apps_examples_polls"],
         )
         self.assertEqual(
-            json.loads(call_command("completion", "django_typer.tests.apps.polls")),
-            ["django_typer_tests_apps_polls"],
+            json.loads(
+                call_command("completion", "django_typer.tests.apps.examples.polls")
+            ),
+            ["django_typer_tests_apps_examples_polls"],
         )
 
         with self.assertRaises(CommandError):
             call_command("completion", "django_typer_tests.polls")
 
-        poll_app = apps.get_app_config("django_typer_tests_apps_polls")
+        poll_app = apps.get_app_config("django_typer_tests_apps_examples_polls")
         test_app = apps.get_app_config("django_typer_tests_apps_test_app")
         cmd = get_command("completion")
         self.assertEqual(
             json.loads(cmd([poll_app])),
-            ["django_typer_tests_apps_polls"],
+            ["django_typer_tests_apps_examples_polls"],
         )
 
         self.assertEqual(
-            json.loads(cmd(django_apps=[poll_app])), ["django_typer_tests_apps_polls"]
+            json.loads(cmd(django_apps=[poll_app])),
+            ["django_typer_tests_apps_examples_polls"],
         )
 
         self.assertEqual(
             json.loads(cmd(django_apps=[poll_app], option=test_app)),
             {
-                "django_apps": ["django_typer_tests_apps_polls"],
-                "option": "django_typer_tests_apps_test_app",
-            },
-        )
-
-        self.assertEqual(
-            json.loads(
-                call_command(
-                    "completion", "django_typer_tests_apps_polls", option=test_app
-                )
-            ),
-            {
-                "django_apps": ["django_typer_tests_apps_polls"],
+                "django_apps": ["django_typer_tests_apps_examples_polls"],
                 "option": "django_typer_tests_apps_test_app",
             },
         )
@@ -171,12 +164,26 @@ class TestShellCompletersAndParsers(TestCase):
             json.loads(
                 call_command(
                     "completion",
-                    "django_typer_tests_apps_polls",
+                    "django_typer_tests_apps_examples_polls",
+                    option=test_app,
+                )
+            ),
+            {
+                "django_apps": ["django_typer_tests_apps_examples_polls"],
+                "option": "django_typer_tests_apps_test_app",
+            },
+        )
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "completion",
+                    "django_typer_tests_apps_examples_polls",
                     "--option=django_typer_tests_apps_test_app",
                 )
             ),
             {
-                "django_apps": ["django_typer_tests_apps_polls"],
+                "django_apps": ["django_typer_tests_apps_examples_polls"],
                 "option": "django_typer_tests_apps_test_app",
             },
         )
@@ -1062,7 +1069,6 @@ class TestShellCompletersAndParsers(TestCase):
             "multi --pythonpath ./django_typer",
         )[0]
         self.assertIn('"./django_typer/management"', result)
-        self.assertIn('"./django_typer/examples"', result)
         self.assertIn('"./django_typer/tests"', result)
         self.assertNotIn('"./django_typer/__init__.py"', result)
 
@@ -1074,7 +1080,6 @@ class TestShellCompletersAndParsers(TestCase):
             "multi --pythonpath django_typer/",
         )[0]
         self.assertIn('"django_typer/management"', result)
-        self.assertIn('"django_typer/examples"', result)
         self.assertIn('"django_typer/tests"', result)
         self.assertNotIn('"django_typer/__init__.py"', result)
 
@@ -1188,7 +1193,6 @@ class TestShellCompletersAndParsers(TestCase):
             "completion --path ./django_typer",
         )[0]
         self.assertIn('"./django_typer/management"', result)
-        self.assertIn('"./django_typer/examples"', result)
         self.assertIn('"./django_typer/tests"', result)
         self.assertIn('"./django_typer/__init__.py"', result)
 
@@ -1200,7 +1204,6 @@ class TestShellCompletersAndParsers(TestCase):
             "completion --path django_typer/",
         )[0]
         self.assertIn('"django_typer/management"', result)
-        self.assertIn('"django_typer/examples"', result)
         self.assertIn('"django_typer/tests"', result)
         self.assertIn('"django_typer/__init__.py"', result)
 

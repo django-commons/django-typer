@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "django_typer.tests.apps.test_app",
     "django_typer",
-    "django_typer.tests.apps.polls.apps.PollsConfig",
+    "django_typer.tests.apps.examples.polls.apps.PollsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

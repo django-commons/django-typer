@@ -1,7 +1,0 @@
-from django.apps import AppConfig
-
-
-class TyperExamplesConfig(AppConfig):
-    name = "django_typer.tests.apps.typer_examples"
-    label = name.replace(".", "_")
-    verbose_name = "Typer Examples"

@@ -2,7 +2,7 @@ from .base import *
 from pathlib import Path
 
 INSTALLED_APPS = [
-    "django_typer.tests.apps.backup.backup",
+    "django_typer.tests.apps.examples.extensions.backup",
     "django_typer",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -12,6 +12,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-from django_typer.tests.apps import backup
+from django_typer.tests.apps import examples
 
-MEDIA_ROOT = str(Path(backup.__file__).parent / "media")
+MEDIA_ROOT = str(Path(examples.__file__).parent.parent.parent / "media")
