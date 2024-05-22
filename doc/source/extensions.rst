@@ -243,6 +243,12 @@ Note that we now have a new environment command available:
     :convert-png: latex
     :theme: dark
 
+.. typer:: backup_example:app:environment
+    :prog: manage.py backup environment
+    :width: 80
+    :convert-png: latex
+    :theme: dark
+
 |
 
 And the command line parameters to database have been removed:
