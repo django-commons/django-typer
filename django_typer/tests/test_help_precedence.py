@@ -148,6 +148,15 @@ class TestHelpPrecedence(TestCase):
         )
         self.assertIn("Now class docstring is used!", buffer.getvalue())
 
+    def test_help_precedence16(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence16", stdout=buffer, no_color=True)
+        cmd.print_help("./manage.py", "help_precedence16")
+        self.assertNotIn(
+            "Test minimal TyperCommand subclass - typer param", buffer.getvalue()
+        )
+        self.assertIn("Now class docstring is used!", buffer.getvalue())
+
     @pytest.mark.skip()
     def test_help_from_other_dir(self):
         """

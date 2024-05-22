@@ -652,6 +652,26 @@ The precedence order, for a simple command is as follows:
                 4: Function docstring is last priority and is not subject to translation.
                 """
 
+The rule for how helps are resolved when inheriting from other commands is that higher precedence
+helps in base classes will be chosen over lower priority helps in deriving classes. However, if
+you would like to use a docstring as the help in a derived class instead of the high priority
+help in a base class you can set the equivalent priority help in the deriving class to the empty
+string:
+
+.. code-block:: python
+
+    class Command(TyperCommand, help=_("High precedence help defined in base class.")):
+        ...
+
+    ...
+
+    from upstream.management.commands.command import Command as BaseCommand
+    class Command(BaseCommand, help=None):
+        """
+        Docstring will be used as help.
+        """
+
+
 
 Document Commands w/Sphinx
 --------------------------
