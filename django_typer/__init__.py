@@ -712,7 +712,7 @@ def _cache_command(
             return cmd.typer_app.command(
                 name=name or _name,
                 cls=type("_Command", (cls,), {"django_command": cmd}),
-                help=help or _help,
+                help=help or _help or None,
                 **kwargs,
                 **extra,
             )(callback)
@@ -2259,7 +2259,7 @@ class TyperCommandMeta(type):
                     ctor(
                         cls,
                         _name=cls.typer_app.info.name,
-                        _help=getattr(cls, "help", None),
+                        _help=getattr(cls, "help", Default(None)),
                     )
                 else:
                     cls.typer_app.command(
