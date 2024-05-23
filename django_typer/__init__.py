@@ -230,7 +230,7 @@ def model_parser_completer(
     }
 
 
-@t.overload
+@t.overload  # pragma: no cover
 def get_command(  # type: ignore[overload-overlap]
     command_name: str,
     stdout: t.Optional[t.IO[str]] = None,
@@ -241,7 +241,7 @@ def get_command(  # type: ignore[overload-overlap]
 ) -> BaseCommand: ...
 
 
-@t.overload
+@t.overload  # pragma: no cover
 # mypy seems to break on this one, but this is correct
 def get_command(
     command_name: str,
@@ -254,7 +254,7 @@ def get_command(
 ) -> C: ...
 
 
-@t.overload
+@t.overload  # pragma: no cover
 def get_command(
     command_name: str,
     path0: str,
@@ -1208,12 +1208,12 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         assert self.initializer
         return self.initializer(*args, **kwargs)
 
-    @t.overload
+    @t.overload  # pragma: no cover
     def __get__(
         self, obj: t.Union[None, t.Type["TyperCommand"]], owner: t.Any = None
     ) -> "CommandGroup[P, R]": ...
 
-    @t.overload
+    @t.overload  # pragma: no cover
     def __get__(
         self, obj: "TyperCommand", owner: t.Any = None
     ) -> MethodType:  # t.Union[MethodType, t.Callable[P, R]]
