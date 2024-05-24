@@ -71,7 +71,10 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 # command class they are attached to. The length of this file is largely a result of
 # wrapping Typer.command, Typer.callback and Typer.add_typer in many different contexts
 # to achieve the nice interface we would like and also because we list out each parameter
-# for developer experience reasons, its only ~600 actual statements
+# for developer experience
+# The other complexity comes from the fact that we enter pull in methods into the typer
+# infrastructure before classes are created so we have to do some booking to make sure
+# methods are bound to the right objects when called
 
 import inspect
 import sys
@@ -80,6 +83,7 @@ from copy import copy, deepcopy
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
+import threading
 
 import click
 from click.shell_completion import CompletionItem
@@ -655,8 +659,10 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     """
 
 
-def _staticmethod(func: t.Callable[..., t.Any]) -> staticmethod:
-    static_wrapper = staticmethod(func)
+def _staticmethod(func: t.Callable[..., t.Any]) -> t.Callable[..., t.Any]:
+    static_wrapper = func
+    if not type(func).__name__ == "staticmethod":
+        static_wrapper = staticmethod(func)
     cached = getattr(func, _CACHE_KEY, None)
     if cached:
         setattr(static_wrapper, _CACHE_KEY, cached)
@@ -848,6 +854,23 @@ class Typer(typer.Typer, metaclass=AppFactory):
     def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
 
+    def __deepcopy__(self, memo):
+        """
+        A one level deep shallow-ish deepcopy that makes sure we have our own new lists
+        of commands and groups, which is all we care about.
+        """
+        if id(self) in memo:
+            return memo[id(self)]
+        new_obj = self.__class__.__new__(self.__class__)
+        memo[id(self)] = new_obj
+        for k, v in self.__dict__.items():
+            if callable(v) and type(v).__name__ == "staticmethod":
+                if hasattr(self.__class__, k):
+                    setattr(new_obj, k, getattr(self.__class__, k))
+            else:
+                setattr(new_obj, k, copy(v))
+        return new_obj
+
     def __init__(
         self,
         *,
@@ -881,6 +904,8 @@ class Typer(typer.Typer, metaclass=AppFactory):
     ):
         self.parent = parent
         self._django_command = django_command
+        if callback and not is_method(callback):
+            callback = staticmethod(callback)
         super().__init__(
             name=name,
             cls=cls,
@@ -962,11 +987,15 @@ class Typer(typer.Typer, metaclass=AppFactory):
         def make_initializer(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
+            fn = t.cast(
+                typer.models.CommandFunctionType,
+                func if is_method(func) else _staticmethod(func),
+            )
             if self.__class__ is Typer:
                 # only cache at the top level - this enables subclassing of
                 # commands defined through the typer style interface.
                 _cache_initializer(
-                    func,
+                    fn,
                     common_init=self.parent is None,
                     name=name,
                     help=help,
@@ -987,12 +1016,8 @@ class Typer(typer.Typer, metaclass=AppFactory):
                     **kwargs,
                 )
             if self.django_command and not hasattr(self.django_command, func.__name__):
-                setattr(
-                    self.django_command,
-                    func.__name__,
-                    func if is_method(func) else _staticmethod(func),
-                )
-            return register_initializer(func)
+                setattr(self.django_command, func.__name__, fn)
+            return register_initializer(fn)
 
         return make_initializer
 
@@ -1037,11 +1062,15 @@ class Typer(typer.Typer, metaclass=AppFactory):
         def make_command(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
+            fn = t.cast(
+                typer.models.CommandFunctionType,
+                func if is_method(func) else _staticmethod(func),
+            )
             if self.__class__ is Typer:
                 # only cache at the top level - this enables subclassing of
                 # commands defined through the typer style interface.
                 _cache_command(
-                    func,
+                    fn,
                     name=name,
                     help=help,
                     cls=cls,
@@ -1057,12 +1086,8 @@ class Typer(typer.Typer, metaclass=AppFactory):
                     **kwargs,
                 )
             if self.django_command and not hasattr(self.django_command, func.__name__):
-                setattr(
-                    self.django_command,
-                    func.__name__,
-                    func if is_method(func) else _staticmethod(func),
-                )
-            return register_command(func)
+                setattr(self.django_command, func.__name__, fn)
+            return register_command(fn)
 
         return make_command
 
@@ -1093,6 +1118,8 @@ class Typer(typer.Typer, metaclass=AppFactory):
     ) -> None:
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
+        if callback and not is_method(callback):
+            callback = _staticmethod(callback)
         return super().add_typer(
             typer_instance=typer_instance,
             name=name,
@@ -1116,6 +1143,48 @@ class Typer(typer.Typer, metaclass=AppFactory):
         )
 
 
+class _ChainBoundMethod:
+    """
+    A descriptor utility class that allows us to call sub groups and commands
+    like this:
+
+    .. code-block:: python
+        Command().grp1.grp2()
+        Command().grp1.grp2.cmd()
+
+    If grp1 and grp2 return themselves you can chain calls like this:
+
+    .. code-block:: python
+        Command().grp1().grp2().cmd()
+    """
+    parent: t.Optional["Typer"] = None
+
+    is_method: t.Optional[bool] = None
+    
+    _callback: t.Callable[..., t.Any]
+    _local = threading.local()
+
+    def __init__(self, callback: t.Callable[..., t.Any]):
+        self._callback = callback
+
+    @property
+    def cmd_obj(self) -> t.Optional["TyperCommand"]:
+        """
+        If this command group was ultimately accessed from a TyperCommand instance,
+        get that instance. For instance Command().lvl1.lvl2.cmd() will pass self
+        to cmd()
+        """
+        assert self.parent is None or isinstance(self.parent, Typer)
+        obj = self._local.object or (
+            self.parent.cmd_obj if isinstance(self.parent, _ChainBoundMethod) else None
+        )
+        return (
+            obj
+            if isinstance(obj, TyperCommand)
+            else None
+        )
+
+
 class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     """
     Typer_ adds additional groups of commands by adding Typer_ apps to parent
@@ -1128,13 +1197,18 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     _initializer: t.Optional[t.Callable[P, R]] = None
     _bindings: t.Dict[t.Type["TyperCommand"], "CommandGroup[P, R]"]
     _owner: t.Any = None
-
-    is_method: t.Optional[bool] = None
+    _local = threading.local()
 
     @Typer.django_command.setter  # type: ignore[attr-defined]
     def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
         self.initializer = self.initializer  # trigger class binding
+
+    @property
+    def name(self) -> t.Optional[str]:
+        if self.initializer:
+            return self.initializer.__name__
+        return None
 
     @property
     def initializer(self) -> t.Optional[t.Callable[P, R]]:
@@ -1161,7 +1235,6 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                     setattr(
                         cmd_cls,
                         initializer.__name__,
-                        # initializer if self.is_method else staticmethod(initializer),
                         self,
                     )
                 for cmd in getattr(self, "registered_commands", []):
@@ -1185,7 +1258,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         return bool(len(self._bindings))
 
     @property
-    def owner(self):
+    def owner(self) -> t.Optional[t.Type["TyperCommand"]]:
         """
         If this function or its root ancestor was accessed as a member of a TyperCommand class,
         return that class, if it was accessed in any other way - return None.
@@ -1206,6 +1279,8 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         assert self.initializer
+        if self.is_method:
+            return MethodType(self.initializer, self.owner)(*args, **kwargs)
         return self.initializer(*args, **kwargs)
 
     @t.overload  # pragma: no cover
@@ -1232,11 +1307,17 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         on the class and subclasses.
         """
         self._owner = owner or None
-        if obj is None or not isinstance(obj, TyperCommand) or not self.initializer:
+        self._local.object = obj
+        if obj is None or not isinstance(obj, (TyperCommand, Typer)) or not self.initializer:
             return self
         if self.is_method:
             return MethodType(self.initializer, obj)
         return self.initializer
+
+    def __deepcopy__(self, memo):
+        new_obj = super().__deepcopy__(memo)
+        new_obj.initializer = self.initializer
+        return new_obj
 
     def __init__(
         self,
@@ -1316,6 +1397,9 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         # it. This is done to avoid polluting the base command which should still be expected
         # to be instantiable and behave normally regardless of the app stack. This is not an
         # issue when using the typer-style interface because no inheritance is involved.
+        # we also take this opportunity to add direct functions of groups and commands to parent
+        # command groups as attributes. This allows fully namespaced references to be used when
+        # calling command trees. Should be rarely used, but a nice basically zero cost feature.
         self.django_command = self.django_command or django_command
         if not parent:
             parent = django_command.typer_app
@@ -1325,6 +1409,18 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         self._bindings[django_command] = cpy
         for grp in self.groups:
             grp.attach(django_command=django_command, parent=cpy)
+            initializer = getattr(cpy, "initializer", None)
+            if grp.name and initializer and not hasattr(initializer, grp.name):
+                setattr(initializer, grp.name, grp)
+        for cmd in getattr(self, "registered_commands", []):
+            if not hasattr(cpy, cmd.callback.__name__):
+                setattr(
+                    cpy,
+                    cmd.callback.__name__,
+                    cmd.callback
+                    if is_method(cmd.callback)
+                    else _staticmethod(cmd.callback),
+                )
         return self
 
     def callback(  # type: ignore
@@ -1470,9 +1566,12 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
 
         def make_command(f: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
             owner = kwargs.pop("_owner", None)
+            cmd = f if is_method(f) else _staticmethod(f)
             if owner:
                 # attach this function to the adapted Command class
-                setattr(owner, f.__name__, f if is_method(f) else _staticmethod(f))
+                setattr(owner, f.__name__, cmd)
+            if not hasattr(self, f.__name__):
+                setattr(self, f.__name__, cmd)
             return super(  # pylint: disable=super-with-arguments
                 CommandGroup, self
             ).command(
@@ -1615,12 +1714,15 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                     **kwargs,
                 )
             )
+            new_grp = self.groups[-1]
             if owner:
-                new_grp = self.groups[-1]
                 cpy = deepcopy(new_grp)
                 new_grp._bindings[owner] = cpy
                 self.add_typer(cpy)
                 setattr(owner, func.__name__, new_grp)
+            assert new_grp.name
+            if not hasattr(self, new_grp.name):
+                setattr(self, new_grp.name, new_grp)
             return self.groups[-1]
 
         return create_app
@@ -1741,6 +1843,8 @@ def initialize(
     """
 
     def make_initializer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
+        if not is_method(func):
+            func = staticmethod(func)
         _cache_initializer(
             func,
             common_init=True,
@@ -1844,6 +1948,8 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     """
 
     def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
+        if not is_method(func):
+            func = staticmethod(func)
         _cache_command(
             func,
             name=name,
@@ -1952,6 +2058,8 @@ def group(
     """
 
     def create_app(func: t.Callable[P, R]) -> CommandGroup[P, R]:
+        if not is_method(func):
+            func = staticmethod(func)
         grp: CommandGroup = CommandGroup(  # pyright: ignore[reportAssignmentType]
             name=name,
             cls=cls,
@@ -2744,6 +2852,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            func = t.cast(
+                t.Callable[P, R], func if is_method(func) else _staticmethod(func)
+            )
             cmd.typer_app.callback(
                 name=name,
                 cls=type("_Initializer", (cls,), {"django_command": cmd}),
@@ -2764,9 +2875,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 rich_help_panel=rich_help_panel,
                 **kwargs,
             )(func)
-            setattr(
-                cmd, func.__name__, func if is_method(func) else _staticmethod(func)
-            )
+            setattr(cmd, func.__name__, func)
             return func
 
         return make_initializer
@@ -2845,6 +2954,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            func = t.cast(
+                t.Callable[P, R], func if is_method(func) else _staticmethod(func)
+            )
             cmd.typer_app.command(
                 name=name,
                 cls=type("_Command", (cls,), {"django_command": cmd}),
@@ -2861,9 +2973,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 rich_help_panel=rich_help_panel,
                 **kwargs,
             )(func)
-            setattr(
-                cmd, func.__name__, func if is_method(func) else _staticmethod(func)
-            )
+            setattr(cmd, func.__name__, func)
             return func
 
         return make_command

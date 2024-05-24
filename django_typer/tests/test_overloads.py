@@ -164,3 +164,63 @@ class TestOverloaded(TestCase):
                 "test": {"precision": 5, "flag": True},
             },
         )
+
+
+class TestGroupOverloads(TestCase):
+    def test_grp_overload_run(self):
+        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g0:l2(1)")
+
+        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g1:l2(a)")
+
+        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g0:l2:cmd()")
+
+        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g1:l2:cmd()")
+
+        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd2")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g0:l2:cmd2()")
+
+        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd2")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "g1:l2:cmd2()")
+
+    def test_grp_overload_call(self):
+        stdout = call_command("grp_overload", "g0", "l2", "1")
+        self.assertEqual(stdout.strip(), "g0:l2(1)")
+
+        stdout = call_command("grp_overload", "g1", "l2", "a")
+        self.assertEqual(stdout.strip(), "g1:l2(a)")
+
+        stdout = call_command("grp_overload", "g0", "l2", "1", "cmd")
+        self.assertEqual(stdout.strip(), "g0:l2:cmd()")
+
+        stdout = call_command("grp_overload", "g1", "l2", "a", "cmd")
+        self.assertEqual(stdout.strip(), "g1:l2:cmd()")
+
+        stdout = call_command("grp_overload", "g0", "l2", "1", "cmd2")
+        self.assertEqual(stdout.strip(), "g0:l2:cmd2()")
+
+        stdout = call_command("grp_overload", "g1", "l2", "a", "cmd2")
+        self.assertEqual(stdout.strip(), "g1:l2:cmd2()")
+
+    def test_grp_overload_direct(self):
+        from django_typer.tests.apps.test_app.management.commands.grp_overload import (
+            Command as GrpOverload,
+        )
+
+        grp_overload = get_command("grp_overload", GrpOverload)
+
+        self.assertEqual(grp_overload.g1.l2("a"), "g1:l2(a)")
+        self.assertEqual(grp_overload.g0.l2(1), "g0:l2(1)")
+        self.assertEqual(grp_overload.g0.l2.cmd(), "g0:l2:cmd()")
+        self.assertEqual(grp_overload.g1.l2.cmd(), "g1:l2:cmd()")
+        # self.assertEqual(grp_overload.g0.l2.cmd2(), "g0:l2:cmd2()")
+        # self.assertEqual(grp_overload.g1.l2.cmd2(), "g1:l2:cmd2()")

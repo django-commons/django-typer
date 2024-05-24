@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import Error, register
+from django_typer.utils import register_command_extensions
 
 
 @register()
@@ -27,4 +28,6 @@ class TestAppConfig(AppConfig):
         if getattr(settings, "DJANGO_TYPER_THROW_TEST_EXCEPTION", False):
             raise Exception("Test ready exception")
 
-        # print(self.label)
+        from .management import extensions
+
+        register_command_extensions(extensions)
