@@ -64,26 +64,28 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 # quirk imposed by the base class for users to be aware of.
 # ruff: noqa: E402
 
-# Most of the book keeping complexity is induced by the necessity of figuring out if and
-# where django's base command line parameters should be attached and how to bind a method
-# function to a class that may not been created yet. To do this commands and Typer
-# instances (groups in click/django-typer parlance) need to be able to access the django
-# command class they are attached to. The length of this file is largely a result of
-# wrapping Typer.command, Typer.callback and Typer.add_typer in many different contexts
-# to achieve the nice interface we would like and also because we list out each parameter
-# for developer experience
+# This file has lots of interdependent code that would be difficult to break out into
+# smaller files. Most of the book keeping complexity is induced by the necessity of
+# figuring out if and where django's base command line parameters should be attached
+# and how to bind a method function to a class that may not been created yet. To do
+# this commands and Typer instances (groups in click/django-typer parlance) need to
+# be able to access the django command class they are attached to. The length of this
+# file is largely a result of wrapping Typer.command, Typer.callback and
+# Typer.add_typer in many different contexts to achieve the nice interface we would
+# like and also because we list out each parameter for developer experience
+#
 # The other complexity comes from the fact that we enter pull in methods into the typer
 # infrastructure before classes are created so we have to do some booking to make sure
 # methods are bound to the right objects when called
 
 import inspect
 import sys
+import threading
 import typing as t
 from copy import copy, deepcopy
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
-import threading
 
 import click
 from click.shell_completion import CompletionItem
@@ -846,6 +848,11 @@ class Typer(typer.Typer, metaclass=AppFactory):
 
     _django_command: t.Optional[t.Type["TyperCommand"]] = None
 
+    # these aren't defined on the super class which messes up __getattr__
+    registered_groups: t.List[typer.models.TyperInfo] = []
+    registered_commands: t.List[typer.models.CommandInfo] = []
+    registered_callback: t.Optional[typer.models.TyperInfo] = None
+
     @property
     def django_command(self) -> t.Optional[t.Type["TyperCommand"]]:
         return self._django_command or getattr(self.parent, "django_command", None)
@@ -854,7 +861,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
     def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: t.Dict[int, t.Any]) -> "Typer":
         """
         A one level deep shallow-ish deepcopy that makes sure we have our own new lists
         of commands and groups, which is all we care about.
@@ -865,8 +872,12 @@ class Typer(typer.Typer, metaclass=AppFactory):
         memo[id(self)] = new_obj
         for k, v in self.__dict__.items():
             if callable(v) and type(v).__name__ == "staticmethod":
-                if hasattr(self.__class__, k):
-                    setattr(new_obj, k, getattr(self.__class__, k))
+                # if hasattr(self.__class__, k):
+                #     setattr(new_obj, k, getattr(self.__class__, k))
+                pass
+            elif isinstance(v, _ChainBoundMethod):
+                pass
+                # setattr(new_obj, k, _ChainBoundMethod(v.method, new_obj))
             else:
                 setattr(new_obj, k, copy(v))
         return new_obj
@@ -1118,6 +1129,7 @@ class Typer(typer.Typer, metaclass=AppFactory):
     ) -> None:
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
+
         if callback and not is_method(callback):
             callback = _staticmethod(callback)
         return super().add_typer(
@@ -1143,46 +1155,25 @@ class Typer(typer.Typer, metaclass=AppFactory):
         )
 
 
-class _ChainBoundMethod:
+class _ChainBoundMethod(t.Generic[P, R]):
     """
-    A descriptor utility class that allows us to call sub groups and commands
-    like this:
+    A wrapper around a command method that lets us invoke the command with
+    the correct self argument if it is invoked from its parent group instance.
 
     .. code-block:: python
-        Command().grp1.grp2()
-        Command().grp1.grp2.cmd()
-
-    If grp1 and grp2 return themselves you can chain calls like this:
-
-    .. code-block:: python
-        Command().grp1().grp2().cmd()
+        cmd = Command()
+        cmd.grp1.grp2.sub_cmd()  # self passed to sub_cmd is cmd
     """
-    parent: t.Optional["Typer"] = None
 
-    is_method: t.Optional[bool] = None
-    
-    _callback: t.Callable[..., t.Any]
-    _local = threading.local()
+    method: t.Callable[P, R]
+    parent: "CommandGroup"
 
-    def __init__(self, callback: t.Callable[..., t.Any]):
-        self._callback = callback
+    def __init__(self, method: t.Callable[P, R], parent: Typer):
+        self.method = method
+        self.parent = t.cast(CommandGroup, parent)
 
-    @property
-    def cmd_obj(self) -> t.Optional["TyperCommand"]:
-        """
-        If this command group was ultimately accessed from a TyperCommand instance,
-        get that instance. For instance Command().lvl1.lvl2.cmd() will pass self
-        to cmd()
-        """
-        assert self.parent is None or isinstance(self.parent, Typer)
-        obj = self._local.object or (
-            self.parent.cmd_obj if isinstance(self.parent, _ChainBoundMethod) else None
-        )
-        return (
-            obj
-            if isinstance(obj, TyperCommand)
-            else None
-        )
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        return MethodType(self.method, self.parent.cmd_obj())(*args, **kwargs)
 
 
 class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
@@ -1193,10 +1184,13 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     and other groups specified on the django command.
     """
 
-    groups: t.List["CommandGroup"]
+    groups: t.List["CommandGroup"] = []
+    is_method: t.Optional[bool] = None
+
     _initializer: t.Optional[t.Callable[P, R]] = None
-    _bindings: t.Dict[t.Type["TyperCommand"], "CommandGroup[P, R]"]
+    _bindings: t.Dict[t.Type["TyperCommand"], "CommandGroup[P, R]"] = {}
     _owner: t.Any = None
+
     _local = threading.local()
 
     @Typer.django_command.setter  # type: ignore[attr-defined]
@@ -1229,7 +1223,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         self.is_method = None
         if initializer:
             self.is_method = is_method(initializer)
-            cmd_cls = self.owner or self.django_command
+            cmd_cls = self.owner() or self.django_command
             if cmd_cls:
                 if not hasattr(cmd_cls, initializer.__name__):
                     setattr(
@@ -1257,7 +1251,6 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
     def bound(self) -> bool:
         return bool(len(self._bindings))
 
-    @property
     def owner(self) -> t.Optional[t.Type["TyperCommand"]]:
         """
         If this function or its root ancestor was accessed as a member of a TyperCommand class,
@@ -1269,7 +1262,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         """
         assert self.parent is None or isinstance(self.parent, Typer)
         owner = self._owner or (
-            self.parent.owner if isinstance(self.parent, CommandGroup) else None
+            self.parent.owner() if isinstance(self.parent, CommandGroup) else None
         )
         return (
             owner
@@ -1277,11 +1270,39 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
             else None
         )
 
+    def cmd_obj(self) -> t.Optional["TyperCommand"]:
+        """
+        If this command group was ultimately accessed from a TyperCommand instance,
+        get that instance. For instance:
+
+        .. code-block:: python
+
+            cmd = Command()
+            assert cmd.lvl1.lvl2.cmd_obj() is cmd
+
+        This enables namespaced direct calls that work despite group or command
+        name collisions.
+        """
+        assert self.parent is None or isinstance(self.parent, Typer)
+        obj = self._local.object or (
+            self.parent.cmd_obj() if isinstance(self.parent, CommandGroup) else None
+        )
+        return obj if isinstance(obj, TyperCommand) else None
+
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        """
+        CommandGroups more than one level deep will route invocations through this
+        function which wraps our initializer.
+        """
         assert self.initializer
         if self.is_method:
-            return MethodType(self.initializer, self.owner)(*args, **kwargs)
+            return MethodType(self.initializer, self.cmd_obj())(*args, **kwargs)
         return self.initializer(*args, **kwargs)
+
+    @t.overload  # pragma: no cover
+    def __get__(
+        self, obj: _ChainBoundMethod, owner: t.Any = None
+    ) -> "CommandGroup[P, R]": ...
 
     @t.overload  # pragma: no cover
     def __get__(
@@ -1298,24 +1319,64 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
         # https://github.com/bckohan/django-typer/issues/73
         ...
 
-    def __get__(self, obj, owner=None):
+    def __get__(self, obj, owner=None):  # pyright: ignore[reportInconsistentOverload]
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
         so it may be called directly - but when accessed on the class
         the app itself is returned so it can modified by other decorators
         on the class and subclasses.
-        """
-        self._owner = owner or None
-        self._local.object = obj
-        if obj is None or not isinstance(obj, (TyperCommand, Typer)) or not self.initializer:
-            return self
-        if self.is_method:
-            return MethodType(self.initializer, obj)
-        return self.initializer
 
-    def __deepcopy__(self, memo):
-        new_obj = super().__deepcopy__(memo)
+        ..note::
+            Descriptors are only called when the attribute is on the *class* dictionary.
+            This means this descriptor is only invoked when CommandGroups from groups
+            attached to the root command class are accessed. This works because we need
+            to capture the root command class and the command instance for calls further
+            down the chain.
+        """
+        self._owner = owner or None  # same in all threads
+        if isinstance(obj, TyperCommand):
+            self._local.object = obj
+            if self._owner:
+                return self._bindings.get(self._owner, self)
+        else:
+            self._local.object = None
+        return self
+        # if obj is None or not isinstance(obj, TyperCommand) or not self.initializer:
+        #     return self
+        # if self.is_method:
+        #     return MethodType(self.initializer, obj)
+        # return self.initializer
+
+    def __getattr__(self, name: str) -> t.Any:
+        owner = self.owner()
+        cmd_obj = self.cmd_obj()
+        if cmd_obj or owner and called_from_module():
+            owner = owner
+            if not owner:
+                assert cmd_obj
+                owner = cmd_obj.__class__
+            assert owner
+            self = self._bindings.get(owner, self)
+        for cmd in self.registered_commands:
+            assert cmd.callback
+            if name in [cmd.callback.__name__, cmd.name]:
+                return (
+                    MethodType(cmd.callback, cmd_obj)
+                    if cmd_obj and is_method(cmd.callback)
+                    else cmd.callback
+                )
+        for grp in self.groups:
+            if name in [grp.name, grp.info.name]:
+                return grp
+        raise AttributeError(
+            "{cls} object has no attribute {name}".format(
+                cls=self.__class__.__name__, name=name
+            )
+        )
+
+    def __deepcopy__(self, memo: t.Dict[int, t.Any]) -> "CommandGroup[P, R]":
+        new_obj = t.cast(CommandGroup[P, R], super().__deepcopy__(memo))
         new_obj.initializer = self.initializer
         return new_obj
 
@@ -1417,7 +1478,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 setattr(
                     cpy,
                     cmd.callback.__name__,
-                    cmd.callback
+                    _ChainBoundMethod(cmd.callback, self)
                     if is_method(cmd.callback)
                     else _staticmethod(cmd.callback),
                 )
@@ -1543,11 +1604,12 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
             # if this group was already bound to one or more classes and this function
             # was called at module scope it means we're adding onto an existing command
             # so we find which command and re-call on the copied and bound group instance.
-            assert self.owner and self.owner in self._bindings, _(
+            owner = self.owner()
+            assert owner and owner in self._bindings, _(
                 "When adding onto an existing command, command() must be called from the "
                 "command class to extend. (e.g. @CommandClass.group.command())"
             )
-            return self._bindings[self.owner].command(
+            return self._bindings[owner].command(
                 name=name,
                 cls=cls,
                 context_settings=context_settings,
@@ -1560,7 +1622,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 hidden=hidden,
                 deprecated=deprecated,
                 rich_help_panel=rich_help_panel,
-                _owner=self.owner,
+                _owner=self.owner(),
                 **kwargs,
             )
 
@@ -1571,7 +1633,11 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 # attach this function to the adapted Command class
                 setattr(owner, f.__name__, cmd)
             if not hasattr(self, f.__name__):
-                setattr(self, f.__name__, cmd)
+                setattr(
+                    self,
+                    f.__name__,
+                    _ChainBoundMethod(cmd, self) if is_method(cmd) else cmd,
+                )
             return super(  # pylint: disable=super-with-arguments
                 CommandGroup, self
             ).command(
@@ -1663,11 +1729,12 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
             # if this group was already bound to one or more classes and this function
             # was called at module scope it means we're adding onto an existing command
             # so we find which command and re-call on the copied and bound group instance.
-            assert self.owner and self.owner in self._bindings, _(
+            owner = self.owner()
+            assert owner and owner in self._bindings, _(
                 "When adding onto an existing command, group() must be called from the "
                 "command class to extend. (e.g. @CommandClass.parent_group.group())"
             )
-            grp = self._bindings[self.owner].group(
+            grp = self._bindings[owner].group(
                 name=name,
                 cls=cls,
                 invoke_without_command=invoke_without_command,
@@ -1684,7 +1751,7 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 hidden=hidden,
                 deprecated=deprecated,
                 rich_help_panel=rich_help_panel,
-                _owner=self.owner,
+                _owner=self.owner(),
                 **kwargs,
             )
             return grp
@@ -1715,7 +1782,12 @@ class CommandGroup(t.Generic[P, R], Typer, metaclass=type):
                 )
             )
             new_grp = self.groups[-1]
+            # this could be called from:
+            #  1) a class before it is created
+            #  2) a subclass of a class where the parent group is already defined
+            #  3) an extension module
             if owner:
+                # extension module
                 cpy = deepcopy(new_grp)
                 new_grp._bindings[owner] = cpy
                 self.add_typer(cpy)
@@ -2148,6 +2220,31 @@ def _resolve_help(dj_cmd: "TyperCommand"):
                 dj_cmd.typer_app.info.help = hlp
 
 
+def depth_first_match(
+    app: typer.Typer, name: str
+) -> t.Optional[t.Union[t.Callable[..., t.Any], CommandGroup]]:
+    """
+    Perform a depth first search for a command or group by name.
+
+    :param app: The Typer app to search.
+    :param name: The name of the command or group to search for.
+    :return: The command or group if found, otherwise None.
+    """
+    for cmd in app.registered_commands:
+        if name in [cmd.name, *([cmd.callback.__name__] if cmd.callback else [])]:
+            return cmd.callback
+    for grp in app.registered_groups:
+        assert grp.typer_instance
+        grp_app = t.cast(CommandGroup, grp.typer_instance)
+        if name in [grp.name, grp_app.name]:
+            return grp_app
+        if grp.typer_instance:
+            found = depth_first_match(grp_app, name)
+            if found:
+                return found
+    return None
+
+
 class TyperCommandMeta(type):
     """
     The metaclass used to build the TyperCommand class. This metaclass is responsible
@@ -2378,6 +2475,19 @@ class TyperCommandMeta(type):
             _add_common_initializer(cls)
 
         super().__init__(cls_name, bases, attrs, **kwargs)
+
+    def __getattr__(cls, name: str) -> t.Any:
+        """
+        Fall back depth first search of the typer app tree to resolve attribute access es of the type:
+            Command.sub_grp or Command.sub_cmd
+        """
+        if name != "typer_app" and cls.typer_app:
+            found = depth_first_match(cls.typer_app, name)
+            if found:
+                return found
+        raise AttributeError(
+            "{cls} object has no attribute {name}".format(cls=cls.__name__, name=name)
+        )
 
 
 class CommandNode:
@@ -3293,6 +3403,22 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         with self:
             self.create_parser(prog_name, subcommand).print_help(*cmd_path)
+
+    def __getattr__(self, name: str) -> t.Any:
+        """
+        Do a breadth first search of the typer app tree to find a command or group
+        and return that command or group if the attribute name matches the command/group
+        function OR its registered CLI name.
+        """
+        if name != "typer_app" and self.typer_app:
+            found = depth_first_match(self.typer_app, name)
+            if found:
+                return found
+        raise AttributeError(
+            "{cls} object has no attribute {name}".format(
+                cls=self.__class__.__name__, name=name
+            )
+        )
 
     def __call__(self, *args, **kwargs):
         """

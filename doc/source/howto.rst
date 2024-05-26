@@ -322,11 +322,28 @@ Say we have this command, called ``mycommand``:
     assert mycommand(10) == 10
 
 
-The rule of them is this:
+The rule of thumb is this:
 
     - Use call_command_ if your options and arguments need parsing.
     - Use :func:`~django_typer.get_command` and invoke the command functions directly if your
       options and arguments are already of the correct type.
+
+If the second argument is a type, static type checking will assume the return value of get_command
+to be of that type:
+
+.. code-block:: python
+
+    from django_typer import get_command
+    from myapp.management.commands.math import Command as Math
+
+    math = get_command("math", Math)
+    math.add(10, 5)  # type checkers will resolve add parameters correctly
+
+You may also fetch a subcommand function directly by passing its path:
+
+.. code-block:: python
+
+    get_command("math", "add")(10, 5)
 
 .. tip::
 
@@ -655,8 +672,8 @@ The precedence order, for a simple command is as follows:
 The rule for how helps are resolved when inheriting from other commands is that higher precedence
 helps in base classes will be chosen over lower priority helps in deriving classes. However, if
 you would like to use a docstring as the help in a derived class instead of the high priority
-help in a base class you can set the equivalent priority help in the deriving class to the empty
-string:
+help in a base class you can set the equivalent priority help in the deriving class to a falsy
+value:
 
 .. code-block:: python
 

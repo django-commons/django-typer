@@ -238,12 +238,7 @@ class TestNativeGroups(TestCase):
             native_groups.print_help("./manage.py", *(cmd_pth.split()))
             sim = similarity(expected_help, stdout.getvalue())
             print(f"print_help({cmd_pth}) --help similiarity: {sim}")
-            try:
-                self.assertGreater(sim, 0.99)
-            except AssertionError:
-                import ipdb
-
-                ipdb.set_trace()
+            self.assertGreater(sim, 0.99)
 
             parts = cmd_pth.split()
             sim = similarity(

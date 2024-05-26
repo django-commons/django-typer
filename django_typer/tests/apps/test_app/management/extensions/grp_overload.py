@@ -12,3 +12,13 @@ def cmd2():
 def cmd2(self):
     assert self.__class__ is GrpOverload
     return f"g1:l2:cmd2()"
+
+
+@GrpOverload.group(invoke_without_command=True)
+def g2(self):
+    return "g2()"
+
+
+@GrpOverload.g2.group()
+def l2():
+    return "g2:l2()"

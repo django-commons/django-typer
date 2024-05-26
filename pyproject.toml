@@ -88,6 +88,7 @@ django-stubs = "^4.2.7"
 pexpect = "^4.9.0"
 pyright = "^1.1.357"
 ruff = "^0.4.1"
+graphviz = "^0.20.3"
 
 [tool.poetry.extras]
 rich = ["rich"]
