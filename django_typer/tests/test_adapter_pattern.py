@@ -1078,10 +1078,11 @@ class Adapter2AdaptedPrecedenceTests(ResetAppsMixin, TestCase):
         # were added to the command class. We don't because the bookeeping is not necessarily
         # worth it and also this provides some flexibility for apps to call functions directly
         # on command objects they adapt with confidence
-        self.assertEqual(
-            adapted2.__class__.subsub_grp2(),
-            "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
-        )
+        # self.assertEqual(
+        #     adapted2.__class__.subsub_grp2(),
+        #     "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
+        # )
+        self.assertFalse(hasattr(adapted2.__class__, "subsub_grp2"))
         self.assertEqual(
             adapted2.subsub_grp2(),
             "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",

@@ -91,6 +91,7 @@ class TestGroups(TestCase):
         ],
     )
     def test_helps(self, app="test_app"):
+        print("test_helps")
         for cmds in [
             ("groups",),
             ("groups", "echo"),
@@ -118,15 +119,18 @@ class TestGroups(TestCase):
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
             helps_dir = "helps" if self.rich_installed else "helps_no_rich"
-            self.assertGreater(
-                sim := similarity(
-                    hlp,
-                    (
-                        TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
-                    ).read_text(),
-                ),
-                0.96,  # width inconsistences drive this number < 1
-            )
+            try:
+                self.assertGreater(
+                    sim := similarity(
+                        hlp,
+                        (
+                            TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
+                        ).read_text(),
+                    ),
+                    0.96,  # width inconsistences drive this number < 1
+                )
+            except AssertionError:
+                raise
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)
@@ -148,6 +152,7 @@ class TestGroups(TestCase):
         ],
     )
     def test_helps_override(self):
+        print("test_helps_override")
         self.test_helps.__wrapped__(self, app="test_app2")
 
     @override_settings(
@@ -169,10 +174,9 @@ class TestGroups(TestCase):
         override = settings is not None
         settings = ("--settings", settings) if settings else []
 
-        self.assertEqual(
-            run_command("groups", *settings, "echo", "hey!")[0].strip(),
-            "hey!",
-        )
+        stdout, stderr, retcode = run_command("groups", *settings, "echo", "hey!")
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "hey!")
 
         self.assertEqual(
             call_command("groups", "echo", "hey!").strip(),

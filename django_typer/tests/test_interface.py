@@ -4,7 +4,6 @@ from django.test import TestCase
 from django_typer import (
     get_command,
     Typer,
-    CommandGroup,
     AppFactory,
     command,
     group,
@@ -110,33 +109,6 @@ class InterfaceTests(TestCase):
             len(dt_params),
         )
 
-    def test_commandgroup_init_interface_matches(self):
-        dt_params = set(get_named_arguments(CommandGroup.__init__))
-        typer_params = set(get_named_arguments(typer.Typer.__init__))
-        if "django_command" in dt_params:
-            dt_params.remove("django_command")
-        dt_params.remove("parent")
-        self.assertFalse(dt_params.symmetric_difference(typer_params))
-        self.assertEqual(
-            self.compare_defaults(
-                dt_params, CommandGroup.__init__, typer.Typer.__init__
-            ),
-            len(dt_params),
-        )
-
-    def test_typer_metaclass_interface_matches(self):
-        dt_params = set(get_named_arguments(AppFactory.__call__))
-        typer_params = set(get_named_arguments(typer.Typer.__init__))
-        if "django_command" in dt_params:
-            dt_params.remove("django_command")
-        if "parent" in dt_params:
-            dt_params.remove("parent")
-        self.assertFalse(dt_params.symmetric_difference(typer_params))
-        self.assertEqual(
-            self.compare_defaults(dt_params, AppFactory.__call__, typer.Typer.__init__),
-            len(dt_params),
-        )
-
     def test_command_interface_matches(self):
         from django_typer import command
 
@@ -180,8 +152,10 @@ class InterfaceTests(TestCase):
         from django_typer import TyperCommandMeta
 
         typer_command_params = set(get_named_arguments(TyperCommandMeta.__new__))
+        typer_command_params.remove("inherit_extensions")
         typer_params = set(get_named_arguments(typer.Typer.__init__))
         typer_params.remove("add_completion")
+        typer_params.remove("cls")
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
         typer_command_params.remove("pretty_exceptions_enable")
@@ -207,42 +181,16 @@ class InterfaceTests(TestCase):
             3,
         )
 
-    def test_commandgroup_group_interface_matches(self):
-        from django_typer import CommandGroup
+    def test_typer_group_interface_matches(self):
+        from django_typer import Typer
 
-        typer_command_params = set(get_named_arguments(CommandGroup.group))
+        typer_command_params = set(get_named_arguments(Typer.group))
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
         typer_params.remove("callback")
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
         self.assertEqual(
             self.compare_defaults(
-                typer_command_params, CommandGroup.group, typer.Typer.add_typer
-            ),
-            len(typer_command_params),
-        )
-
-    def test_group_command_interface_matches(self):
-        from django_typer import CommandGroup
-
-        typer_command_params = set(get_named_arguments(CommandGroup.command))
-        typer_params = set(get_named_arguments(typer.Typer.command))
-        self.assertFalse(typer_command_params.symmetric_difference(typer_params))
-        self.assertEqual(
-            self.compare_defaults(
-                typer_command_params, CommandGroup.command, typer.Typer.command
-            ),
-            len(typer_command_params),
-        )
-
-    def test_group_callback_interface_matches(self):
-        from django_typer import CommandGroup
-
-        typer_command_params = set(get_named_arguments(CommandGroup.callback))
-        typer_params = set(get_named_arguments(typer.Typer.callback))
-        self.assertFalse(typer_command_params.symmetric_difference(typer_params))
-        self.assertEqual(
-            self.compare_defaults(
-                typer_command_params, CommandGroup.callback, typer.Typer.callback
+                typer_command_params, Typer.group, typer.Typer.add_typer
             ),
             len(typer_command_params),
         )

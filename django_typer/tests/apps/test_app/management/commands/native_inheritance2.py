@@ -1,5 +1,5 @@
-from .native_self import Command as NativeSelf
+from . import native_self
+from django_typer import Typer
 
 
-class Command(NativeSelf):
-    pass
+app = Typer(native_self.app)

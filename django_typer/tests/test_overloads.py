@@ -168,28 +168,28 @@ class TestOverloaded(TestCase):
 
 class TestGroupOverloads(TestCase):
     def test_grp_overload_run(self):
-        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g0", "l2", "1")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g0:l2(1)")
 
-        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g1", "l2", "a")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g1:l2(a)")
 
-        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g0:l2:cmd()")
 
-        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g1:l2:cmd()")
 
-        stdout, _, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd2")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g0", "l2", "1", "cmd2")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g0:l2:cmd2()")
 
-        stdout, _, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd2")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command("grp_overload", "g1", "l2", "a", "cmd2")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "g1:l2:cmd2()")
 
     def test_grp_overload_call(self):

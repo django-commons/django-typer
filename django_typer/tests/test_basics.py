@@ -5,7 +5,7 @@ import django
 from django.core.management import call_command
 from django.test import TestCase
 
-from django_typer import get_command
+from django_typer import get_command, TyperCommand
 from django_typer.tests.utils import run_command
 from django_typer.utils import get_current_command
 
@@ -17,18 +17,26 @@ class BasicTests(TestCase):
         self.assertIsNone(_common_options())
 
     def test_command_line(self):
+        stdout, stderr, retcode = run_command("basic", "a1", "a2")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(
-            run_command("basic", "a1", "a2")[0],
+            stdout,
             {"arg1": "a1", "arg2": "a2", "arg3": 0.5, "arg4": 1},
         )
 
+        stdout, stderr, retcode = run_command(
+            "basic", "a1", "a2", "--arg3", "0.75", "--arg4", "2"
+        )
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(
-            run_command("basic", "a1", "a2", "--arg3", "0.75", "--arg4", "2")[0],
+            stdout,
             {"arg1": "a1", "arg2": "a2", "arg3": 0.75, "arg4": 2},
         )
 
     def test_cmd_name(self):
-        self.assertEqual(get_command("shellcompletion")._name, "shellcompletion")
+        self.assertEqual(
+            get_command("shellcompletion", TyperCommand)._name, "shellcompletion"
+        )
 
     def test_call_command(self):
         out = StringIO()
@@ -73,8 +81,8 @@ class BasicTests(TestCase):
             parser.add_argument()
 
     def test_command_context(self):
-        basic = get_command("basic")
-        multi = get_command("multi")
+        basic = get_command("basic", TyperCommand)
+        multi = get_command("multi", TyperCommand)
         self.assertIsNone(get_current_command())
         with basic:
             self.assertEqual(basic, get_current_command())
@@ -87,14 +95,26 @@ class BasicTests(TestCase):
         self.assertIsNone(get_current_command())
 
     def test_renaming(self):
-        self.assertEqual(run_command("rename", "default")[0].strip(), "handle")
-        self.assertEqual(run_command("rename", "renamed")[0].strip(), "subcommand1")
-        self.assertEqual(run_command("rename", "renamed2")[0].strip(), "subcommand2")
+        from django_typer.tests.apps.test_app.management.commands.rename import (
+            Command as Rename,
+        )
+
+        stdout, stderr, retcode = run_command("rename", "default")
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "handle")
+
+        stdout, stderr, retcode = run_command("rename", "renamed")
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "subcommand1")
+
+        stdout, stderr, retcode = run_command("rename", "renamed2")
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "subcommand2")
 
         self.assertEqual(call_command("rename", "default"), "handle")
         self.assertEqual(call_command("rename", "renamed"), "subcommand1")
         self.assertEqual(call_command("rename", "renamed2"), "subcommand2")
 
-        self.assertEqual(get_command("rename")(), "handle")
-        self.assertEqual(get_command("rename").subcommand1(), "subcommand1")
-        self.assertEqual(get_command("rename").subcommand2(), "subcommand2")
+        self.assertEqual(get_command("rename", TyperCommand)(), "handle")
+        self.assertEqual(get_command("rename", Rename).subcommand1(), "subcommand1")
+        self.assertEqual(get_command("rename", Rename).subcommand2(), "subcommand2")

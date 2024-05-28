@@ -1,7 +1,7 @@
 import typing as t
 from django.core.management.base import CommandError
 import typer.core
-from django_typer import TyperCommand, completers, get_command, Typer, CommandGroup
+from django_typer import TyperCommand, completers, get_command, Typer
 import importlib
 import sys
 
@@ -38,10 +38,10 @@ class Command(TyperCommand):
 
     def handle(
         self,
-        command: Annotated[
-            str,
+        commands: Annotated[
+            t.List[str],
             typer.Argument(
-                help="An import path to the command to graph, or simply the name of the command.",
+                help="Import path(s) to the command to graph, or simply the name of the command.",
                 shell_complete=completers.complete_import_path,
             ),
         ],
@@ -68,22 +68,32 @@ class Command(TyperCommand):
             typer.Option(help="Instantiate the command before graphing the app tree."),
         ] = True,
     ):
-        self.cmd_name = command.split(".")[-1]
-        if "." in command:
-            self.cmd = getattr(importlib.import_module(command), "Command")
-            if instantiate:
-                self.cmd = self.cmd()
-        elif instantiate:
-            self.cmd = get_command(command, TyperCommand)
-        else:
-            raise CommandError("Cannot instantiate a command that is not imported.")
+        for command in commands:
+            self.level = -1
+            self.cmd_name = command.split(".")[-1]
+            if "." in command:
+                self.cmd = getattr(importlib.import_module(command), "Command")
+                if instantiate:
+                    self.cmd = self.cmd()
+            elif instantiate:
+                self.cmd = get_command(command, TyperCommand)
+            else:
+                raise CommandError("Cannot instantiate a command that is not imported.")
 
-        output = Path(output.parent) / Path(output.name.format(command=self.cmd_name))
+            output = Path(output.parent) / Path(
+                output.name.format(command=self.cmd_name)
+            )
 
-        self.visit_app(self.cmd.typer_app)
-        self.dot.render(output, format=format, view=True)
+            self.visit_app(self.cmd.typer_app)
 
-    def get_node_name(self, obj: t.Union[typer.models.CommandInfo, CommandGroup]):
+            of = output.parent / f"{output.stem}.{format}"
+            num = 1
+            while of.exists():
+                of = output.parent / f"{output.stem}({num}).{format}"
+                num += 1
+            self.dot.render(of.parent / of.stem, format=format, view=len(commands) == 1)
+
+    def get_node_name(self, obj: t.Union[typer.models.CommandInfo, Typer]):
         assert obj.callback
         name = (
             obj.callback.__name__
@@ -106,13 +116,16 @@ class Command(TyperCommand):
         self.level += 1
         parent_node = self.get_node_name(app) if self.level else self.cmd_name
 
-        self.dot.node(str(id(app)), parent_node)
+        style = {}
+        if self.level:
+            style = {"style": "filled", "fillcolor": "lightblue"}
+        self.dot.node(str(id(app)), parent_node, **style)
         for cmd in app.registered_commands:
             node_name = self.get_node_name(cmd)
-            self.dot.node(str(id(cmd)), node_name)
+            self.dot.node(str(id(cmd)), node_name, style="filled", fillcolor="green")
             self.dot.edge(str(id(app)), str(id(cmd)))
         for grp in app.registered_groups:
             assert grp.typer_instance
-            node_name = self.get_node_name(t.cast(CommandGroup, grp.typer_instance))
+            node_name = self.get_node_name(t.cast(Typer, grp.typer_instance))
             self.dot.edge(str(id(app)), str(id(grp.typer_instance)))
             self.visit_app(t.cast(Typer, grp.typer_instance))

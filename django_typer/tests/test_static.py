@@ -36,6 +36,16 @@ class TestStatic(TestCase):
         self.assertEqual(retcode, 0)
         self.assertEqual(stdout.strip(), "grp2_cmd")
 
+        stdout, stderr, retcode = run_command(self.cmd, "grp2", "grp2-subgrp")
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "grp2_subgrp")
+
+        stdout, stderr, retcode = run_command(
+            self.cmd, "grp2", "grp2-subgrp", "grp2-subgrp-cmd"
+        )
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "grp2_subgrp_cmd")
+
     def test_call(self):
         stdout = call_command(self.cmd)
         self.assertEqual(stdout.strip(), "init")
@@ -58,6 +68,12 @@ class TestStatic(TestCase):
         stdout = call_command(self.cmd, "grp2", "grp2-cmd")
         self.assertEqual(stdout.strip(), "grp2_cmd")
 
+        stdout = call_command(self.cmd, "grp2", "grp2-subgrp")
+        self.assertEqual(stdout.strip(), "grp2_subgrp")
+
+        stdout = call_command(self.cmd, "grp2", "grp2-subgrp", "grp2-subgrp-cmd")
+        self.assertEqual(stdout.strip(), "grp2_subgrp_cmd")
+
     def test_direct(self):
         from django_typer.tests.apps.test_app.management.commands.static import (
             Command as Static,
@@ -72,6 +88,12 @@ class TestStatic(TestCase):
         self.assertEqual(static.grp2(), "grp2")
         self.assertEqual(static.grp1_cmd(), "grp1_cmd")
         self.assertEqual(static.grp2_cmd(), "grp2_cmd")
+
+        self.assertEqual(static.grp2_subgrp(), "grp2_subgrp")
+        self.assertEqual(static.grp2_subgrp_cmd(), "grp2_subgrp_cmd")
+
+        self.assertEqual(static.grp2.grp2_subgrp(), "grp2_subgrp")
+        self.assertEqual(static.grp2.grp2_subgrp.grp2_subgrp_cmd(), "grp2_subgrp_cmd")
 
 
 class TestStatic2(TestStatic):

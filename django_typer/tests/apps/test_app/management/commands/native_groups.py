@@ -1,6 +1,5 @@
-from django_typer import Typer, TyperCommand, CommandGroup
+from django_typer import Typer, TyperCommand
 from django_typer.types import Verbosity
-import typing as t
 
 Command: TyperCommand
 
@@ -23,9 +22,6 @@ def main(name: str):
 
 
 grp2 = Typer()
-
-# # this does not work
-# app.add_typer(t.cast(CommandGroup, grp2))
 
 
 @grp2.callback(name="grp1")

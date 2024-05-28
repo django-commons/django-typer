@@ -1,5 +1,4 @@
-from .native_groups_self import Command as NativeGroupsSelf
+from . import native_groups_self
+from django_typer import Typer
 
-
-class Command(NativeGroupsSelf):
-    pass
+app = Typer(native_groups_self.app)

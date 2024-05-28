@@ -41,3 +41,13 @@ class Command(TyperCommand):
     @staticmethod
     def grp2_cmd():
         return "grp2_cmd"
+
+    @grp2.group(invoke_without_command=True)
+    @staticmethod
+    def grp2_subgrp():
+        return "grp2_subgrp"
+
+    @grp2_subgrp.command()
+    @staticmethod
+    def grp2_subgrp_cmd():
+        return "grp2_subgrp_cmd"

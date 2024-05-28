@@ -3,7 +3,7 @@ Tests for the typer-native style interface.
 """
 
 from io import StringIO
-
+import typing as t
 import pytest
 from django import __version__ as DJANGO_VERSION
 from django.core.management import call_command
@@ -253,7 +253,7 @@ class TestNativeGroups(TestCase):
             self.assertGreater(sim, 0.99)
 
     def test_native_groups_direct(self):
-        native_groups = get_command(self.command)
+        native_groups: t.Any = get_command(self.command)
         native_groups.init(verbosity=3)
         self.assertEqual(native_groups.main("Brian"), {"verbosity": 3, "name": "Brian"})
 
@@ -273,7 +273,7 @@ class TestNativeGroups(TestCase):
         )
 
     def test_native_groups_direct_run_subgrp(self, flag=False):
-        native_groups = get_command(self.command)
+        native_groups: t.Any = get_command(self.command)
         native_groups.init(verbosity=3)
         native_groups.init_grp1(flag=flag)
         self.assertEqual(
