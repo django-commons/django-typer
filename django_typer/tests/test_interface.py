@@ -152,7 +152,6 @@ class InterfaceTests(TestCase):
         from django_typer import TyperCommandMeta
 
         typer_command_params = set(get_named_arguments(TyperCommandMeta.__new__))
-        typer_command_params.remove("inherit_extensions")
         typer_params = set(get_named_arguments(typer.Typer.__init__))
         typer_params.remove("add_completion")
         typer_params.remove("cls")

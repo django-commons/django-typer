@@ -182,3 +182,76 @@ class InterferenceTests(TestCase):
         self.assertEqual(
             call_command("interference_ext"), "test_app2::interference::init(True)"
         )
+
+    def test_initialize_classmethod_run(self):
+        stdout, stderr, returncode = run_command(
+            "interference_ext_init",
+            "--settings",
+            "django_typer.tests.settings.override",
+        )
+        self.assertEqual(returncode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "test_app2::interference_ext_init::init(5)")
+
+        stdout, stderr, returncode = run_command(
+            "method_override",
+            "--settings",
+            "django_typer.tests.settings.adapted",
+        )
+        self.assertEqual(returncode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "adapter0::init()")
+
+    def test_initialize_classmethod_call(self):
+        self.assertEqual(
+            call_command("interference_ext_init"),
+            "test_app2::interference_ext_init::init(5)",
+        )
+
+        self.assertEqual(
+            call_command("method_override"),
+            "adapter0::init()",
+        )
+
+    def test_initialize_classmethod_direct(self):
+        from django_typer import TyperCommand
+
+        command = get_command("interference_ext_init", TyperCommand)
+        self.assertEqual(command.init(), "test_app2::interference_ext_init::init(5)")
+
+        command = get_command("method_override", TyperCommand)
+        self.assertEqual(command.init(), "adapter0::init()")
+
+    def test_command_classmethod_run(self):
+        stdout, stderr, returncode = run_command(
+            "method_override",
+            "--settings",
+            "django_typer.tests.settings.adapted",
+            "cmd1",
+        )
+        self.assertEqual(returncode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "adapter0::cmd1()")
+
+        stdout, stderr, returncode = run_command(
+            "method_override",
+            "--settings",
+            "django_typer.tests.settings.adapted",
+            "cmd2",
+        )
+        self.assertEqual(returncode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), "adapter0::cmd2()")
+
+    def test_command_classmethod_call(self):
+        self.assertEqual(
+            call_command("method_override", "cmd1"),
+            "adapter0::cmd1()",
+        )
+        self.assertEqual(
+            call_command("method_override", "cmd2"),
+            "adapter0::cmd2()",
+        )
+
+    def test_command_classmethod_direct(self):
+        from django_typer import TyperCommand
+
+        command = get_command("method_override", TyperCommand)
+        self.assertEqual(command.cmd1(), "adapter0::cmd1()")
+        self.assertEqual(command.cmd2(), "adapter0::cmd2()")

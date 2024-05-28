@@ -798,7 +798,6 @@ class AppFactory(type):
                     name=kwargs.pop("name", None) or cmd_module.__name__.split(".")[-1],
                     **kwargs,
                     typer_app=args[0] if args else None,
-                    inherit_extensions=True,
                 ):
                     pass
 
@@ -1830,9 +1829,6 @@ class TyperCommandMeta(type):
         in the traceback configuration setting (off by default). This allows tracebacks
         to be configured by the user on a per deployment basis in the settings file. We
         therefore do not advise hardcoding this value.
-    :param inherit_extensions: whether to inherit extensions from the parent class, that
-        is any commands or groups that were defined on the parent class after its
-        definition.
     """
 
     style: ColorStyle
@@ -1878,7 +1874,6 @@ class TyperCommandMeta(type):
             True
         ),
         pretty_exceptions_short: t.Union[DefaultPlaceholder, bool] = Default(True),
-        inherit_extensions: bool = False,
         **kwargs,
     ):
         """
@@ -1948,21 +1943,6 @@ class TyperCommandMeta(type):
                 pretty_exceptions_short=t.cast(bool, pretty_exceptions_short),
                 **kwargs,
             )
-
-            if inherit_extensions:
-                for base in command_bases():
-                    typer_app.registered_callback = (
-                        typer_app.registered_callback
-                        or base.typer_app.registered_callback
-                    )
-                    typer_app.registered_commands = [
-                        *copy(base.typer_app.registered_commands),
-                        *typer_app.registered_commands,
-                    ]
-                    typer_app.registered_groups = [
-                        *deepcopy(base.typer_app.registered_groups),
-                        *typer_app.registered_groups,
-                    ]
 
             # move up here
             def get_ctor(attr: t.Any) -> t.Optional[t.Callable[..., t.Any]]:
@@ -2553,6 +2533,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            # we might have to override a method defined in the base class
+            setattr(cmd, func.__name__, func)
             cmd.typer_app.callback(
                 name=name,
                 cls=type("_Initializer", (cls,), {"django_command": cmd}),
@@ -2651,6 +2633,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
+            # we might have to override a method defined in the base class
+            setattr(cmd, func.__name__, func)
             cmd.typer_app.command(
                 name=name,
                 cls=type("_Command", (cls,), {"django_command": cmd}),
