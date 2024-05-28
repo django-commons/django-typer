@@ -723,27 +723,25 @@ def _cache_initializer(
     cls: t.Type[DTGroup] = DTGroup,
     **kwargs,
 ):
-    if not hasattr(callback, _CACHE_KEY):
-
-        def register(
-            cmd: "TyperCommand",
-            _name: t.Optional[str] = Default(None),
-            _help: t.Optional[str] = Default(None),
+    def register(
+        cmd: "TyperCommand",
+        _name: t.Optional[str] = Default(None),
+        _help: t.Optional[str] = Default(None),
+        **extra,
+    ):
+        return cmd.typer_app.callback(
+            name=name or _name,
+            cls=type(
+                "_Initializer",
+                (cls,),
+                {"django_command": cmd, "common_init": common_init},
+            ),
+            help=cmd.typer_app.info.help or help or _help,
+            **kwargs,
             **extra,
-        ):
-            return cmd.typer_app.callback(
-                name=name or _name,
-                cls=type(
-                    "_Initializer",
-                    (cls,),
-                    {"django_command": cmd, "common_init": common_init},
-                ),
-                help=cmd.typer_app.info.help or help or _help,
-                **kwargs,
-                **extra,
-            )(_strip_static(callback))
+        )(_strip_static(callback))
 
-        setattr(callback, _CACHE_KEY, register)
+    setattr(callback, _CACHE_KEY, register)
 
 
 def _cache_command(
@@ -753,23 +751,21 @@ def _cache_command(
     cls: t.Type[DTCommand] = DTCommand,
     **kwargs,
 ):
-    if not hasattr(callback, _CACHE_KEY):
-
-        def register(
-            cmd: "TyperCommand",
-            _name: t.Optional[str] = None,
-            _help: t.Optional[str] = None,
+    def register(
+        cmd: "TyperCommand",
+        _name: t.Optional[str] = None,
+        _help: t.Optional[str] = None,
+        **extra,
+    ):
+        return cmd.typer_app.command(
+            name=name or _name,
+            cls=type("_Command", (cls,), {"django_command": cmd}),
+            help=help or _help or None,
+            **kwargs,
             **extra,
-        ):
-            return cmd.typer_app.command(
-                name=name or _name,
-                cls=type("_Command", (cls,), {"django_command": cmd}),
-                help=help or _help or None,
-                **kwargs,
-                **extra,
-            )(_strip_static(callback))
+        )(_strip_static(callback))
 
-        setattr(callback, _CACHE_KEY, register)
+    setattr(callback, _CACHE_KEY, register)
 
 
 def _get_direct_function(
@@ -813,8 +809,8 @@ class AppFactory(type):
 
         if sys.version_info < (3, 9):
             # this is a workaround for a bug in python 3.8 that causes multiple
-            # values for cls error. 3.8 support is sunsetting soon so we just punt
-            # on this one - REMOVE in next version
+            # values for cls error. 3.8 support is sun setting soon so we just punt
+            # on this one - REMOVE when 3.8 support is dropped
             kwargs.pop("cls", None)
         return super().__call__(*args, **kwargs)
 
@@ -863,11 +859,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     @t.overload  # pragma: no cover
     def __get__(
-        self, obj: "TyperCommand", owner: t.Type["TyperCommand"]
-    ) -> "Typer[P, R]": ...
-
-    @t.overload  # pragma: no cover
-    def __get__(
         self, obj: "TyperCommandMeta", owner: t.Type["TyperCommandMeta"]
     ) -> "Typer[P, R]": ...
 
@@ -888,7 +879,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     @t.overload  # pragma: no cover
     def __get__(
         self, obj: "TyperCommand", owner: t.Any = None
-    ) -> MethodType:  # t.Union[MethodType, t.Callable[P, R]]
+    ) -> "Typer[P, R]":  # t.Union[MethodType, t.Callable[P, R]]
         # todo - we could return the generic callable type here but the problem
         # is self is included in the ParamSpec and it seems tricky to remove?
         # MethodType loses the parameters but is preferable to type checking errors
@@ -913,18 +904,18 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         cmd_obj = self.cmd_obj()
         for cmd in self.registered_commands:
             assert cmd.callback
-            if name in [cmd.callback.__name__, cmd.name]:
+            if name in (cmd.callback.__name__, cmd.name):
                 if cmd_obj:
                     return _get_direct_function(cmd_obj, cmd)
                 return cmd
         for grp in self.registered_groups:
             cmd_grp = t.cast(Typer, grp.typer_instance)
             assert cmd_grp
-            if name in [
+            if name in (
                 cmd_grp.name,
                 grp.name,
                 getattr(cmd_grp.info.callback, "__name__", None),
-            ]:
+            ):
                 return cmd_grp
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
@@ -1024,8 +1015,11 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             self.registered_callback = typer_app.registered_callback
             self.registered_commands = copy(typer_app.registered_commands)
             self.registered_groups = deepcopy(typer_app.registered_groups)
-            if isinstance(self.rich_help_panel, DefaultPlaceholder):
-                self.rich_help_panel = typer_app.rich_help_panel  # type: ignore[unreachable]
+            self.rich_help_panel = (
+                typer_app.rich_help_panel
+                if isinstance(self.rich_help_panel, DefaultPlaceholder)
+                else self.rich_help_panel
+            )
             for param, cfg in vars(self.info).items():
                 if isinstance(cfg, DefaultPlaceholder):
                     setattr(self.info, param, getattr(typer_app.info, param))
@@ -1775,10 +1769,9 @@ def depth_first_match(
     for grp in reversed(app.registered_groups):
         assert grp.typer_instance
         grp_app = t.cast(Typer, grp.typer_instance)
-        if grp.typer_instance:
-            found = depth_first_match(grp_app, name)
-            if found:
-                return found
+        found = depth_first_match(grp_app, name)
+        if found:
+            return found
     return None
 
 
@@ -2999,22 +2992,21 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         and return that command or group if the attribute name matches the command/group
         function OR its registered CLI name.
         """
-        if name != "typer_app" and self.typer_app:
-            init = getattr(
-                self.typer_app.registered_callback,
-                "callback",
-                self.typer_app.info.callback,
-            )
-            if init and init and name == init.__name__:
-                return MethodType(init, self) if is_method(init) else staticmethod(init)
-            found = depth_first_match(self.typer_app, name)
-            if found:
-                if isinstance(found, Typer):
-                    # todo shouldn't be needed
-                    found._local.object = self
-                else:
-                    return _get_direct_function(self, found)
-                return found
+        init = getattr(
+            self.typer_app.registered_callback,
+            "callback",
+            self.typer_app.info.callback,
+        )
+        if init and init and name == init.__name__:
+            return MethodType(init, self) if is_method(init) else staticmethod(init)
+        found = depth_first_match(self.typer_app, name)
+        if found:
+            if isinstance(found, Typer):
+                # todo shouldn't be needed
+                found._local.object = self
+            else:
+                return _get_direct_function(self, found)
+            return found
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
                 cls=self.__class__.__name__, name=name

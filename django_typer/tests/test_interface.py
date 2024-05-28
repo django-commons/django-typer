@@ -261,3 +261,21 @@ class InterfaceTests(TestCase):
         self.assertEqual(multi_parser._actions[7].nargs, -1)
         self.assertEqual(multi_parser._actions[8].param.name, "flag1")
         self.assertEqual(multi_parser._actions[8].nargs, 0)
+
+    def test_cmd_getattr(self):
+        from django_typer.tests.apps.test_app.management.commands.groups import (
+            Command as Groups,
+        )
+
+        self.assertIsInstance(Groups.math.divide, typer.models.CommandInfo)
+        try:
+            Groups.does_not_exist
+            self.assertFalse(True, "should have thrown AttributeError")
+        except AttributeError as e:
+            pass
+
+        try:
+            Groups.math.does_not_exist
+            self.assertFalse(True, "should have thrown AttributeError")
+        except AttributeError as e:
+            pass
