@@ -171,6 +171,28 @@ C = t.TypeVar("C", bound=BaseCommand)
 _CACHE_KEY = "_register_typer"
 
 
+if sys.version_info < (3, 10):
+    # todo - remove this when support for <=3.9 is dropped
+    class static_factory(type):
+        def __call__(self, *args, **kwargs):
+            assert args
+            if type(args[0]).__name__ == "staticmethod":
+                return args[0]
+            return super().__call__(*args, **kwargs)
+
+    class staticmethod(t.Generic[P, R], metaclass=static_factory):
+        __func__: t.Callable[P, R]
+
+        def __init__(self, func: t.Callable[P, R]):
+            self.__func__ = func
+
+        def __getattr__(self, name):
+            return getattr(self.__func__, name)
+
+        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+            return self.__func__(*args, **kwargs)
+
+
 def model_parser_completer(
     model_cls: t.Type[Model],
     lookup_field: t.Optional[str] = None,
@@ -789,6 +811,11 @@ class AppFactory(type):
             else:
                 return Typer(**kwargs)
 
+        if sys.version_info < (3, 9):
+            # this is a workaround for a bug in python 3.8 that causes multiple
+            # values for cls error. 3.8 support is sunsetting soon so we just punt
+            # on this one - REMOVE in next version
+            kwargs.pop("cls", None)
         return super().__call__(*args, **kwargs)
 
 
