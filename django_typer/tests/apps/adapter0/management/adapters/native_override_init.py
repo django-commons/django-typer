@@ -1,17 +1,17 @@
 from django_typer.tests.apps.test_app.management.commands.native_override_init import (
-    Command as NativeOverrideInit,
+    app,
 )
 from django_typer.types import Verbosity
 
 
-@NativeOverrideInit.initialize()
+@app.initialize()
 def init(self, verbosity: Verbosity = 0, bog: bool = False):
     self.verbosity = verbosity
     self.bog = bog
     return {"verbosity": self.verbosity, "bog": self.bog}
 
 
-@NativeOverrideInit.group()
+@app.group()
 def grp2(self):
     """
     test_app2::grp2
@@ -19,7 +19,7 @@ def grp2(self):
     self.grp2_called = True
 
 
-@grp2.command(name="cmd1")
+@app.grp2.command(name="cmd1")
 def grp2_cmd1(self, g2arg1: int):
     """
     test_app2::grp2::grp2_cmd1

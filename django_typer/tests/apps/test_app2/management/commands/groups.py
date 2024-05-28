@@ -48,13 +48,15 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
         return " ".join([message] * echoes)
 
     # test override base class command and remove arguments
-    @GroupsCommand.case.command()
-    def upper(self) -> None:
+    @GroupsCommand.string.case.command()
+    def upper(self) -> str:
+        assert self.__class__ is Command
         return super().upper(0, None)
 
     @GroupsCommand.string.command()
     def strip(self):
         """Strip white space off the ends of the string"""
+        assert self.__class__ is Command
         return self.op_string.strip()
 
     @group()

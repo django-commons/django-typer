@@ -115,7 +115,7 @@ class Command(TyperCommand):
             t.Optional[int],
             Argument(help=_("The ending index of the string to operate on.")),
         ] = None,
-    ):
+    ) -> str:
         """
         Convert the given string to upper case.
         """
@@ -149,16 +149,3 @@ class Command(TyperCommand):
 
     def test(self, a: int, b: int) -> int:
         return a + b
-
-
-# cmd = Command()
-# echoed = cmd.echo("hello")
-# cmd.math(3)
-# dividend = cmd.divide(10, 2, [2, 5])
-
-# reveal_type(Command.echo)
-# reveal_type(cmd.echo)
-# reveal_type(cmd.math)
-# reveal_type(Command.test)
-# reveal_type(cmd.test)
-# reveal_type(cmd.divide)

@@ -126,8 +126,14 @@ class TestNativeInitOverride(
 
         native_groups.init_grp1(flag=8)
 
-        self.assertEqual(native_groups.cmd1(5), {"verbosity": 3, "flag": 8, "count": 5})
-        native_groups.cmd1(5)
+        self.assertEqual(
+            native_groups.cmd1(5),
+            {"verbosity": 3, "bog": False, "grp2_called": None, "g2arg1": 5},
+        )
+        self.assertEqual(
+            native_groups.grp2.cmd1(5),
+            {"verbosity": 3, "bog": False, "grp2_called": None, "g2arg1": 5},
+        )
 
         native_groups.init_grp1()
         self.assertEqual(

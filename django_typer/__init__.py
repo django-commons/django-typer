@@ -658,14 +658,39 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     """
 
 
-def _staticmethod(func: t.Callable[..., t.Any]) -> t.Callable[..., t.Any]:
-    static_wrapper = func
-    if not type(func).__name__ == "staticmethod":
-        static_wrapper = staticmethod(func)
-    cached = getattr(func, _CACHE_KEY, None)
-    if cached and not hasattr(static_wrapper, _CACHE_KEY):
-        setattr(static_wrapper, _CACHE_KEY, cached)
-    return static_wrapper
+@t.overload  # pragma: no cover
+def _check_static(
+    func: typer.models.CommandFunctionType,
+) -> typer.models.CommandFunctionType: ...
+
+
+@t.overload  # pragma: no cover
+def _check_static(func: None) -> None: ...
+
+
+def _check_static(func):
+    """
+    Check if a function is a staticmethod and return it if it is.
+    """
+    if func and not is_method(func) and not isinstance(func, staticmethod):
+        return staticmethod(func)
+    return func
+
+
+@t.overload  # pragma: no cover
+def _strip_static(func: t.Callable[P, R]) -> t.Callable[P, R]: ...
+
+
+@t.overload  # pragma: no cover
+def _strip_static(func: None) -> None: ...
+
+
+def _strip_static(func: t.Optional[t.Callable[P, R]]) -> t.Optional[t.Callable[P, R]]:
+    """
+    Strip the staticmethod wrapper from a function if it is present.
+    """
+    ret = getattr(func, "__func__", func)
+    return ret
 
 
 def _cache_initializer(
@@ -694,7 +719,7 @@ def _cache_initializer(
                 help=cmd.typer_app.info.help or help or _help,
                 **kwargs,
                 **extra,
-            )(callback)
+            )(_strip_static(callback))
 
         setattr(callback, _CACHE_KEY, register)
 
@@ -720,7 +745,7 @@ def _cache_command(
                 help=help or _help or None,
                 **kwargs,
                 **extra,
-            )(callback)
+            )(_strip_static(callback))
 
         setattr(callback, _CACHE_KEY, register)
 
@@ -740,7 +765,7 @@ def _get_direct_function(
         cb = app_node.callback
         method = is_method(cb)
     assert cb
-    return MethodType(cb, obj) if method else _staticmethod(cb)
+    return MethodType(cb, obj) if method else staticmethod(cb)
 
 
 class AppFactory(type):
@@ -809,6 +834,54 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             return _get_direct_function(cmd, self)(*args, **kwargs)
         return super().__call__(*args, **kwargs)
 
+    @t.overload  # pragma: no cover
+    def __get__(
+        self, obj: "TyperCommand", owner: t.Type["TyperCommand"]
+    ) -> "Typer[P, R]": ...
+
+    @t.overload  # pragma: no cover
+    def __get__(
+        self, obj: "TyperCommandMeta", owner: t.Type["TyperCommandMeta"]
+    ) -> "Typer[P, R]": ...
+
+    @t.overload  # pragma: no cover
+    def __get__(
+        self,
+        obj: None,
+        owner: t.Type["TyperCommand"],
+    ) -> "Typer[P, R]": ...
+
+    @t.overload  # pragma: no cover
+    def __get__(
+        self,
+        obj: "Typer",
+        owner: t.Type["Typer"],
+    ) -> "Typer[P, R]": ...
+
+    @t.overload  # pragma: no cover
+    def __get__(
+        self, obj: "TyperCommand", owner: t.Any = None
+    ) -> MethodType:  # t.Union[MethodType, t.Callable[P, R]]
+        # todo - we could return the generic callable type here but the problem
+        # is self is included in the ParamSpec and it seems tricky to remove?
+        # MethodType loses the parameters but is preferable to type checking errors
+        # https://github.com/bckohan/django-typer/issues/73
+        ...
+
+    def __get__(self, obj, owner=None):  # pyright: ignore[reportInconsistentOverload]
+        """
+        Our Typer app wrapper also doubles as a descriptor, so when
+        it is accessed on the instance, we return the wrapped function
+        so it may be called directly - but when accessed on the class
+        the app itself is returned so it can modified by other decorators
+        on the class and subclasses.
+        """
+        if isinstance(obj, TyperCommand):
+            self._local.object = obj
+        else:
+            self._local.object = None
+        return self
+
     def __getattr__(self, name: str) -> t.Any:
         cmd_obj = self.cmd_obj()
         for cmd in self.registered_commands:
@@ -820,54 +893,17 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         for grp in self.registered_groups:
             cmd_grp = t.cast(Typer, grp.typer_instance)
             assert cmd_grp
-            if name in [cmd_grp.name, grp.name, getattr(cmd_grp.info.callback, '__name__', None)]:
+            if name in [
+                cmd_grp.name,
+                grp.name,
+                getattr(cmd_grp.info.callback, "__name__", None),
+            ]:
                 return cmd_grp
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
                 cls=self.__class__.__name__, name=name
             )
         )
-
-    # @t.overload  # pragma: no cover
-    # def __get__(
-    #     self, obj: t.Union[None, t.Type["TyperCommand"]], owner: t.Any = None
-    # ) -> "Typer[P, R]": ...
-
-    # @t.overload  # pragma: no cover
-    # def __get__(
-    #     self, obj: t.Any, owner: t.Union[t.Type["TyperCommand"], t.Type["Typer"]]
-    # ) -> "Typer[P, R]": ...
-
-    # @t.overload  # pragma: no cover
-    # def __get__(
-    #     self, obj: "TyperCommand", owner: t.Any = None
-    # ) -> MethodType:  # t.Union[MethodType, t.Callable[P, R]]
-    #     # todo - we could return the generic callable type here but the problem
-    #     # is self is included in the ParamSpec and it seems tricky to remove?
-    #     # MethodType loses the parameters but is preferable to type checking errors
-    #     # https://github.com/bckohan/django-typer/issues/73
-    #     ...
-
-    # def __get__(self, obj, owner=None):  # pyright: ignore[reportInconsistentOverload]
-    #     """
-    #     Our Typer app wrapper also doubles as a descriptor, so when
-    #     it is accessed on the instance, we return the wrapped function
-    #     so it may be called directly - but when accessed on the class
-    #     the app itself is returned so it can modified by other decorators
-    #     on the class and subclasses.
-
-    #     ..note::
-    #         Descriptors are only called when the attribute is on the *class* dictionary.
-    #         This means this descriptor is only invoked when Typers from groups
-    #         attached to the root command class are accessed. This works because we need
-    #         to capture the root command class and the command instance for calls further
-    #         down the chain.
-    #     """
-    #     if isinstance(obj, TyperCommand):
-    #         self._local.object = obj
-    #     else:
-    #         self._local.object = None
-    #     return self
 
     def cmd_obj(self) -> t.Optional["TyperCommand"]:
         """
@@ -887,24 +923,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             self.parent.cmd_obj() if isinstance(self.parent, Typer) else None
         )
         return obj if isinstance(obj, TyperCommand) else None
-
-    def __deepcopy__(self, memo: t.Dict[int, t.Any]) -> "Typer":
-        """
-        A one level deep shallow-ish deepcopy that makes sure we have our own new lists
-        of commands and groups, which is all we care about.
-        """
-        if id(self) in memo:
-            return memo[id(self)]
-        new_obj = self.__class__.__new__(self.__class__)
-        memo[id(self)] = new_obj
-        for k, v in self.__dict__.items():
-            if callable(v) and type(v).__name__ == "staticmethod":
-                setattr(new_obj, k, getattr(self.__class__, k))
-            elif k == "registered_groups":
-                setattr(new_obj, k, deepcopy(v, memo=memo))
-            else:
-                setattr(new_obj, k, copy(v))
-        return new_obj
 
     def __init__(
         self,
@@ -943,11 +961,10 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         self._local.object = None
         self.top_level = kwargs.pop("top_level", False)
         typer_app = kwargs.pop("typer_app", None)
+        callback = _strip_static(callback)
         if callback:
             self.name = callback.__name__
             self.is_method = is_method(callback)
-            if self.is_method:
-                callback = _staticmethod(callback)
         super().__init__(
             name=name,
             cls=type(
@@ -1043,7 +1060,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 rich_help_panel=rich_help_panel,
                 **kwargs,
             )
-            return func
+            return _check_static(func)
 
         return make_callback
 
@@ -1114,25 +1131,27 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         """
 
         def make_command(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
-            if not is_method(func):
-                func = _staticmethod(func)  # type: ignore
-            return super(  # pylint: disable=super-with-arguments
-                Typer, self
-            ).command(
-                name=name,
-                cls=type("_Command", (cls,), {"django_command": self.django_command}),
-                context_settings=context_settings,
-                help=help,
-                epilog=epilog,
-                short_help=short_help,
-                options_metavar=options_metavar,
-                add_help_option=add_help_option,
-                no_args_is_help=no_args_is_help,
-                hidden=hidden,
-                deprecated=deprecated,
-                rich_help_panel=rich_help_panel,
-                **kwargs,
-            )(func)
+            return _check_static(
+                super(  # pylint: disable=super-with-arguments
+                    Typer, self
+                ).command(
+                    name=name,
+                    cls=type(
+                        "_Command", (cls,), {"django_command": self.django_command}
+                    ),
+                    context_settings=context_settings,
+                    help=help,
+                    epilog=epilog,
+                    short_help=short_help,
+                    options_metavar=options_metavar,
+                    add_help_option=add_help_option,
+                    no_args_is_help=no_args_is_help,
+                    hidden=hidden,
+                    deprecated=deprecated,
+                    rich_help_panel=rich_help_panel,
+                    **kwargs,
+                )(_strip_static(func))
+            )
 
         return make_command
 
@@ -1164,8 +1183,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
 
-        if callback and not is_method(callback):
-            callback = _staticmethod(callback)
         return super().add_typer(
             typer_instance=typer_instance,
             name=name,
@@ -1176,7 +1193,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             chain=chain,
             result_callback=result_callback,
             context_settings=context_settings,
-            callback=callback,
+            callback=_strip_static(callback),
             help=help,
             epilog=epilog,
             short_help=short_help,
@@ -1257,8 +1274,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         """
 
         def create_app(func: t.Callable[P2, R2]) -> Typer[P2, R2]:
-            if not is_method(func):
-                func = _staticmethod(func)
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
                 name=name,
                 cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
@@ -1401,8 +1416,7 @@ def initialize(
     """
 
     def make_initializer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
-        if not is_method(func):
-            func = _staticmethod(func)  # type: ignore
+        func = _check_static(func)
         _cache_initializer(
             func,
             common_init=True,
@@ -1506,8 +1520,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     """
 
     def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
-        if not is_method(func):
-            func = _staticmethod(func)
+        func = _check_static(func)
         _cache_command(
             func,
             name=name,
@@ -1616,8 +1629,6 @@ def group(
     """
 
     def create_app(func: t.Callable[P, R]) -> Typer[P, R]:
-        if not is_method(func):
-            func = _staticmethod(func)
         grp = Typer(
             name=name,
             cls=cls,
@@ -1728,7 +1739,11 @@ def depth_first_match(
         # some weirdness, grp_app.info not always == grp
         # todo __deepcopy__ problem?
         # assert grp_app.info is grp
-        if name in [grp.name, grp_app.name, getattr(grp_app.info.callback, '__name__', None)]:
+        if name in [
+            grp.name,
+            grp_app.name,
+            getattr(grp_app.info.callback, "__name__", None),
+        ]:
             return grp_app
     for grp in reversed(app.registered_groups):
         assert grp.typer_instance
@@ -1953,10 +1968,9 @@ class TyperCommandMeta(type):
                     if name != "typer_app" and isinstance(attr, Typer):
                         assert name
                         to_remove.append(name)
-                        if attr.top_level:
-                            _defined_groups[name] = attr
-                            if name != attr.callback.__name__:
-                                _defined_groups[attr.callback.__name__] = attr
+                        _defined_groups[name] = attr
+                        if attr.info.name and name != attr.info.name:
+                            _defined_groups[attr.info.name] = attr
                     elif register := get_ctor(attr):
                         to_register.append(register)
 
@@ -1965,9 +1979,10 @@ class TyperCommandMeta(type):
             handle = local_handle or handle
 
             for grp in set(_defined_groups.values()):
-                cpy = deepcopy(grp)
-                cpy.parent = typer_app
-                typer_app.add_typer(cpy)
+                if grp.top_level:
+                    cpy = deepcopy(grp)
+                    cpy.parent = typer_app
+                    typer_app.add_typer(cpy)
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
@@ -2518,9 +2533,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_initializer(func: t.Callable[P, R]) -> t.Callable[P, R]:
-            func = t.cast(
-                t.Callable[P, R], func if is_method(func) else _staticmethod(func)
-            )
             cmd.typer_app.callback(
                 name=name,
                 cls=type("_Initializer", (cls,), {"django_command": cmd}),
@@ -2540,7 +2552,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 # Rich settings
                 rich_help_panel=rich_help_panel,
                 **kwargs,
-            )(func)
+            )(_strip_static(func))
             return func
 
         return make_initializer
@@ -2619,9 +2631,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def make_command(func: t.Callable[P, R]) -> t.Callable[P, R]:
-            func = t.cast(
-                t.Callable[P, R], func if is_method(func) else _staticmethod(func)
-            )
             cmd.typer_app.command(
                 name=name,
                 cls=type("_Command", (cls,), {"django_command": cmd}),
@@ -2637,7 +2646,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 # Rich settings
                 rich_help_panel=rich_help_panel,
                 **kwargs,
-            )(func)
+            )(_strip_static(func))
             return func
 
         return make_command
@@ -2730,8 +2739,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def create_app(func: t.Callable[P, R]) -> Typer[P, R]:
-            if not is_method(func):
-                func = _staticmethod(func)  # type: ignore
             grp: Typer[P, R] = Typer(
                 name=name,
                 cls=cls,
@@ -2972,9 +2979,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 self.typer_app.info.callback,
             )
             if init and init and name == init.__name__:
-                return (
-                    MethodType(init, self) if is_method(init) else _staticmethod(init)
-                )
+                return MethodType(init, self) if is_method(init) else staticmethod(init)
             found = depth_first_match(self.typer_app, name)
             if found:
                 if isinstance(found, Typer):

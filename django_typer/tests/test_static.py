@@ -8,32 +8,32 @@ class TestStatic(TestCase):
     cmd = "static"
 
     def test_run(self):
-        stdout, _, retcode = run_command(self.cmd)
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd)
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "init")
 
-        stdout, _, retcode = run_command(self.cmd, "cmd1")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "cmd1")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "cmd1")
 
-        stdout, _, retcode = run_command(self.cmd, "cmd2")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "cmd2")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "cmd2")
 
-        stdout, _, retcode = run_command(self.cmd, "grp1")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "grp1")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "grp1")
 
-        stdout, _, retcode = run_command(self.cmd, "grp2")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "grp2")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "grp2")
 
-        stdout, _, retcode = run_command(self.cmd, "grp1", "grp1-cmd")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "grp1", "grp1-cmd")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "grp1_cmd")
 
-        stdout, _, retcode = run_command(self.cmd, "grp2", "grp2-cmd")
-        self.assertEqual(retcode, 0)
+        stdout, stderr, retcode = run_command(self.cmd, "grp2", "grp2-cmd")
+        self.assertEqual(retcode, 0, msg=stderr)
         self.assertEqual(stdout.strip(), "grp2_cmd")
 
         stdout, stderr, retcode = run_command(self.cmd, "grp2", "grp2-subgrp")
