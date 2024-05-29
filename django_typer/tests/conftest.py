@@ -3,11 +3,14 @@ def pytest_collection_modifyitems(items):
     """Modifies test items in place to ensure test modules run in a given order."""
     sorted_tests = []
     interference_tests = []
-    adapter_tests = []  # push these to the back
+    plugin_tests = []  # push these to the back
+    native_plugin_tests = []
 
     for test in items:
-        if "plugin" in test.module.__name__:
-            adapter_tests.append(test)
+        if "plugin_pattern" in test.module.__name__:
+            plugin_tests.append(test)
+        elif "native_plugin" in test.module.__name__:
+            native_plugin_tests.append(test)
         elif "test_interference" in test.module.__name__:
             interference_tests.append(test)
         else:
@@ -15,6 +18,7 @@ def pytest_collection_modifyitems(items):
 
     items[:] = [
         *sorted_tests,
-        *adapter_tests,
+        *plugin_tests,
+        *native_plugin_tests,
         *interference_tests,
     ]
