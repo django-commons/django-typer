@@ -2950,8 +2950,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         and return that command or group if the attribute name matches the command/group
         function OR its registered CLI name.
         """
-        if isinstance(attr := getattr(self.__class__, name, None), property):
-            return t.cast(t.Callable, attr.fget)(self)
         init = getattr(
             self.typer_app.registered_callback,
             "callback",

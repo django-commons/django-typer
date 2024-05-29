@@ -310,7 +310,7 @@ class InterfaceTests(TestCase):
                     pass
 
     def test_attribute_access_outside_of_definition(self):
-        from django_typer import TyperCommand
+        from django_typer import TyperCommand, TyperCommandMeta
         from django_typer.tests.apps.test_app.management.commands.native import app
 
         with self.assertRaises(AttributeError):
@@ -321,3 +321,6 @@ class InterfaceTests(TestCase):
 
         with self.assertRaises(AttributeError):
             TyperCommand.maths
+
+        with self.assertRaises(AttributeError):
+            TyperCommandMeta.maths
