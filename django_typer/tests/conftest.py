@@ -6,7 +6,7 @@ def pytest_collection_modifyitems(items):
     adapter_tests = []  # push these to the back
 
     for test in items:
-        if "adapt" in test.module.__name__:
+        if "plugin" in test.module.__name__:
             adapter_tests.append(test)
         elif "test_interference" in test.module.__name__:
             interference_tests.append(test)
