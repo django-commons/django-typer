@@ -24,8 +24,8 @@ __all__ = [
     "get_current_command",
     "with_typehint",
     "register_command_extensions",
-    "load_command_extensions",
     "called_from_module",
+    "called_from_command_definition",
 ]
 
 
@@ -142,7 +142,7 @@ def register_command_extensions(
             _command_extensions[command].append(package)
 
 
-def load_command_extensions(command: str) -> int:
+def _load_command_extensions(command: str) -> int:
     """
     Load any extensions for the given command by loading the registered
     modules in registration order.

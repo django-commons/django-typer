@@ -128,7 +128,7 @@ from .utils import (
     called_from_module,
     get_usage_script,
     is_method,
-    load_command_extensions,
+    _load_command_extensions,
     traceback_config,
     with_typehint,
 )
@@ -2869,7 +2869,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         **kwargs,
     ):
         assert self.typer_app.info.name
-        load_command_extensions(self.typer_app.info.name)
+        _load_command_extensions(self.typer_app.info.name)
         _add_common_initializer(self)
         _resolve_help(self)
 
