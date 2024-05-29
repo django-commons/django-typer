@@ -8,6 +8,7 @@ v2.0.0
 This major version release, includes an extensive internal refactor, numerous bug fixes and the
 addition of a plugin-based extension pattern.
 
+* Fixed `Stack trace produced when attempted to tab-complete a non-existent management command. <https://github.com/bckohan/django-typer/issues/75>`_
 * Fixed `Overriding handle() in inherited commands results in multiple commands. <https://github.com/bckohan/django-typer/issues/74>`_
 * Implemented `Support subgroup name overloads. <https://github.com/bckohan/django-typer/issues/70>`_
 * Fixed `Helps from class docstrings and TyperCommand class parameters are not inherited. <https://github.com/bckohan/django-typer/issues/69>`_

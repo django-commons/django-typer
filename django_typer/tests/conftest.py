@@ -1,6 +1,6 @@
 # conftest.py
 def pytest_collection_modifyitems(items):
-    """Modifies test items in place to ensure test modules run in a given order."""
+    """Modifies test items in place to ensure plugin tests run in a specific order."""
     sorted_tests = []
     interference_tests = []
     plugin_tests = []  # push these to the back

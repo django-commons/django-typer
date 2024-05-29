@@ -220,9 +220,7 @@ Using the class-based interface we could define the command like this:
 
 ```
 
-The typer-style interface builds a TyperCommand class for us. This allows you to optionally 
-accept the self argument in your commands. We could define the above command using the typer
-interface like this:
+The typer-style interface builds a TyperCommand class for us. **This allows you to optionally accept the self argument in your commands.** We could define the above command using the typer interface like this:
 
 ```python
 

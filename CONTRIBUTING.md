@@ -53,14 +53,13 @@ is accepted the following must be run, and static analysis tools should not prod
 warnings. Disabling certain errors or warnings where justified is acceptable:
 
 ```bash
-poetry run ruff format django_typer
-poetry run ruff check --fix --select I django_typer
-poetry run ruff check django_typer
-poetry run mypy django_typer
-pyright
-poetry check
-poetry run pip check
-poetry run python -m readme_renderer ./README.md
+./check.sh
+```
+
+To run static analysis without automated fixing you can run:
+
+```bash
+./check.sh --no-fix
 ```
 
 ## Running Tests

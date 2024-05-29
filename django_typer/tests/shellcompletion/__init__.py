@@ -143,6 +143,7 @@ class _DefaultCompleteTestCase:
         os.write(master_fd, (" ".join(cmds)).encode())
         time.sleep(0.5)
 
+        print(f'"{(" ".join(cmds))}"')
         os.write(master_fd, b"\t\t")
 
         time.sleep(0.5)
@@ -160,7 +161,8 @@ class _DefaultCompleteTestCase:
         os.close(master_fd)
         process.terminate()
         process.wait()
-        return output
+        # remove bell character which can show up in some terminals where we hit tab
+        return output.replace("\x07", "")
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")
@@ -173,7 +175,7 @@ class _DefaultCompleteTestCase:
         self.assertIn("staticfiles", completions)
 
     def run_command_completion(self):
-        completions = self.get_completions(self.launch_script, "complet", "")
+        completions = self.get_completions(self.launch_script, "complet")
         self.assertIn("completion", completions)
         completions = self.get_completions(self.launch_script, " ")
         self.assertIn("makemigrations", completions)
