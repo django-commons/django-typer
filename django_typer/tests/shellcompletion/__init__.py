@@ -183,7 +183,9 @@ class _DefaultCompleteTestCase:
 
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
-        self.assertIn("completion", completions)
+        # annoingly in CI there are some spaces inserted between the incomplete phrase
+        # and the completion on linux in bash specifically
+        self.assertTrue(re.match(r".*complet\s*ion.*", completions))
         completions = self.get_completions(self.launch_script, " ")
         self.assertIn("makemigrations", completions)
         self.assertIn("migrate", completions)
