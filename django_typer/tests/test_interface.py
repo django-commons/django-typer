@@ -262,6 +262,7 @@ class InterfaceTests(TestCase):
         self.assertEqual(multi_parser._actions[8].nargs, 0)
 
     def test_cmd_getattr(self):
+        from django_typer import TyperCommand
         from django_typer.tests.apps.test_app.management.commands.groups import (
             Command as Groups,
         )
@@ -275,6 +276,12 @@ class InterfaceTests(TestCase):
 
         try:
             Groups.math.does_not_exist
+            self.assertFalse(True, "should have thrown AttributeError")
+        except AttributeError as e:
+            pass
+
+        try:
+            TyperCommand.does_not_exist
             self.assertFalse(True, "should have thrown AttributeError")
         except AttributeError as e:
             pass

@@ -9,6 +9,7 @@ import pkgutil
 import shutil
 import sys
 import typing as t
+from functools import partial
 from pathlib import Path
 from threading import local
 from types import MethodType, ModuleType
@@ -163,10 +164,12 @@ def load_command_extensions(command: str) -> int:
     return len(extensions)
 
 
-def called_from_module() -> bool:
+def _check_call_frame(frame_name: str) -> bool:
     """
-    Returns True if the stack frame one frame above where this function is called was at module
-    scope. Regrettable interface simplifying voodoo. This is, at least, reliable.
+    Returns True if the stack frame one frame above where this function has the given
+    name.
+
+    :param frame_name: The name of the frame to check for
     """
     frame = inspect.currentframe()
     for _ in range(0, 2):
@@ -174,8 +177,12 @@ def called_from_module() -> bool:
             break
         frame = frame.f_back
     if frame:
-        return frame.f_code.co_name == "<module>"
+        return frame.f_code.co_name == frame_name
     return False
+
+
+called_from_module = partial(_check_call_frame, "<module>")
+called_from_command_definition = partial(_check_call_frame, "Command")
 
 
 def is_method(

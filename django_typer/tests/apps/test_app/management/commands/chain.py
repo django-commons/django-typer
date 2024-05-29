@@ -21,7 +21,7 @@ class Command(TyperCommand, rich_markup_mode="markdown", chain=True):
         print("command1")
         return option
 
-    @command()
+    @TyperCommand.command()
     def command2(self, option: t.Optional[str] = None):
         """This is a *markdown* help string"""
         print("command2")

@@ -124,6 +124,7 @@ from .types import (
 )
 from .utils import (
     _command_context,
+    called_from_command_definition,
     called_from_module,
     get_usage_script,
     is_method,
@@ -258,7 +259,7 @@ def model_parser_completer(
 
 
 class CallableCommand(t.Protocol):
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> t.Any: ...
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> t.Any: ...  # pragma: no cover
 
 
 @t.overload  # pragma: no cover
@@ -698,6 +699,10 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     """
 
 
+# staticmethod objects are not picklable which causes problems with deepcopy
+# hence the following mishegoss
+
+
 @t.overload  # pragma: no cover
 def _check_static(
     func: typer.models.CommandFunctionType,
@@ -710,7 +715,8 @@ def _check_static(func: None) -> None: ...
 
 def _check_static(func):
     """
-    Check if a function is a staticmethod and return it if it is.
+    Check if a function is a staticmethod and return it if it is otherwise make
+    it static if it should be but isn't.
     """
     if func and not is_method(func) and not isinstance(func, staticmethod):
         return staticmethod(func)
@@ -805,6 +811,11 @@ def _get_direct_function(
 
 
 class AppFactory(type):
+    """
+    A metaclass used to define/set Command classes into the defining module when
+    the Typer-like functional interface is used.
+    """
+
     def __call__(self, *args, **kwargs) -> "Typer":
         if called_from_module():
             frame = inspect.currentframe()
@@ -819,6 +830,7 @@ class AppFactory(type):
                 ):
                     pass
 
+                Command.__module__ = cmd_module.__name__  # spoof it hard
                 setattr(cmd_module, "Command", Command)
                 return Command.typer_app
             else:
@@ -2066,7 +2078,7 @@ class TyperCommandMeta(type):
             Command.sub_grp or Command.sub_cmd
         """
         if name != "typer_app":
-            if not called_from_module():
+            if called_from_command_definition():
                 if name in cls._defined_groups:
                     return cls._defined_groups[name]
             elif cls.typer_app:
@@ -2528,7 +2540,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        if not called_from_module():
+        if called_from_command_definition():
             return initialize(
                 name=name,
                 cls=cls,
@@ -2632,7 +2644,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        if not called_from_module():
+        if called_from_command_definition():
             return command(
                 name=name,
                 cls=cls,
@@ -2739,7 +2751,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        if not called_from_module():
+        if called_from_command_definition():
             return group(
                 name=name,
                 cls=cls,

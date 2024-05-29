@@ -1082,7 +1082,7 @@ class Adapter2AdaptedPrecedenceTests(ResetAppsMixin, TestCase):
         #     adapted2.__class__.subsub_grp2(),
         #     "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
         # )
-        self.assertFalse(hasattr(adapted2.__class__, "subsub_grp2"))
+        self.assertTrue(hasattr(adapted2.__class__, "subsub_grp2"))
         self.assertEqual(
             adapted2.subsub_grp2(),
             "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
