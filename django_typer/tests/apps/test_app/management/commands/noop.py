@@ -5,4 +5,4 @@ class Command(TyperCommand):
     help = "Do nothing"
 
     def handle(self):
-        pass
+        assert self.__class__ is Command

@@ -24,6 +24,7 @@ class Command(TyperCommand):
         """
         Do some math at the given precision.
         """
+        assert self.__class__ is Command
         self.parameters = {}
         self.parameters["test"] = {
             "precision": precision,
@@ -34,6 +35,7 @@ class Command(TyperCommand):
     def samename(
         self, precision: int, flag: Annotated[bool, Option(help="A flag.")] = False
     ):
+        assert self.__class__ is Command
         self.parameters["samename"] = {
             "precision": precision,
             "flag": flag,
@@ -46,6 +48,7 @@ class Command(TyperCommand):
         precision2: Annotated[int, Argument(metavar="precision")],
         flag2: Annotated[bool, Option("--flag/--no-flag", help="A flag.")] = False,
     ):
+        assert self.__class__ is Command
         self.parameters["diffname"] = {
             "precision2": precision2,
             "flag2": flag2,

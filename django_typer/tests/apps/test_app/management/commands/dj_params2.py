@@ -9,14 +9,14 @@ class Command(TyperCommand):
 
     @command()
     def cmd1(self, throw: bool = False):
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         log_django_parameters(self)
         if throw:
             raise CommandError("Test Exception")
 
     @command()
     def cmd2(self, throw: bool = False):
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         log_django_parameters(self)
         if throw:
             raise CommandError("Test Exception")

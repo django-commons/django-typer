@@ -25,11 +25,12 @@ compatibility with the Django management command system. This means that the Bas
 interface is preserved and the Typer_ interface is added on top of it. This means that
 this code base is more robust to changes in the Django management command system - because
 most of the base class functionality is preserved but many Typer_ and click_ internals are
-used directly to achieve this. We rely on robust CI to catch breaking changes upstream.
+used directly to achieve this. We rely on robust CI to catch breaking changes upstream and
+keep a tight version lock on Typer.
 """
 
 # During development of django-typer_ I've wrestled with a number of encumbrances in the
-# aging django management command design. I detail them here mostly to keep track of them
+# old django management command design. I detail them here mostly to keep track of them
 # for possible future refactors of core Django.
 
 # 1) BaseCommand::execute() prints results to stdout without attempting to convert them
@@ -74,8 +75,8 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 # Typer.add_typer in many different contexts to achieve the nice interface we would
 # like and also because we list out each parameter for developer experience
 #
-# The other complexity comes from the fact that we enter pull in methods into the typer
-# infrastructure before classes are created so we have to do some booking to make sure
+# The other complexity comes from the fact that we pull in methods into the typer
+# infrastructure before classes are created so we have to do some bookkeeping to make sure
 # methods are bound to the right objects when called
 
 import inspect
@@ -124,11 +125,11 @@ from .types import (
 )
 from .utils import (
     _command_context,
+    _load_command_extensions,
     called_from_command_definition,
     called_from_module,
     get_usage_script,
     is_method,
-    _load_command_extensions,
     traceback_config,
     with_typehint,
 )
@@ -173,7 +174,7 @@ _CACHE_KEY = "_register_typer"
 
 
 if sys.version_info < (3, 10):
-    # todo - remove this when support for <=3.9 is dropped
+    # todo - remove this when support for <3.10 is dropped
     class static_factory(type):
         def __call__(self, *args, **kwargs):
             assert args
@@ -256,10 +257,6 @@ def model_parser_completer(
             distinct=distinct,
         ),
     }
-
-
-class CallableCommand(t.Protocol):
-    def __call__(self, *args: t.Any, **kwargs: t.Any) -> t.Any: ...  # pragma: no cover
 
 
 @t.overload  # pragma: no cover
@@ -841,7 +838,9 @@ class AppFactory(type):
                 ):
                     pass
 
-                Command.__module__ = cmd_module.__name__  # spoof it hard
+                # spoof it so hard
+                Command.__module__ = cmd_module.__name__
+                Command.__qualname__ = f"{cmd_module.__name__}.Command"
                 setattr(cmd_module, "Command", Command)
                 return Command.typer_app
             else:
@@ -901,9 +900,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         return self
 
     def __getattr__(self, name: str) -> t.Any:
-        if isinstance(attr := getattr(self.__class__, name, None), property):
-            return t.cast(t.Callable, attr.fget)(self)
-
         for cmd in self.registered_commands:
             assert cmd.callback
             if name in (cmd.callback.__name__, cmd.name):
@@ -1988,8 +1984,6 @@ class TyperCommandMeta(type):
                         assert name
                         to_remove.append(name)
                         _defined_groups[name] = attr
-                        if attr.info.name and name != attr.info.name:
-                            _defined_groups[attr.info.name] = attr
                     elif register := get_ctor(attr):
                         to_register.append(register)
 

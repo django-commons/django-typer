@@ -8,4 +8,5 @@ class Command(Handle):
 
     @command()
     def handle(self) -> str:
+        assert self.__class__ is Command
         return "handle1"

@@ -32,6 +32,7 @@ class Command(TyperCommand):
             Option("--version", help="Override default version argument."),
         ] = None,
     ):
+        assert self.__class__ is Command
         return {
             "settings": settings,
             "version": version,

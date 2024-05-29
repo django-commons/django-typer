@@ -10,6 +10,8 @@ app = Typer(native_groups_self.app)
 
 @app.initialize(invoke_without_command=True)
 def init(self, verbosity: Verbosity = 0, fog: bool = False):
+    assert not isinstance(self, native_groups_self.Command)
+    assert isinstance(self, Command)
     self.verbosity = verbosity
     self.fog = fog
     return {"verbosity": verbosity, "fog": self.fog}
@@ -20,6 +22,8 @@ def init_grp1(self, flag: int = 4):
     """
     Override GRP1 (initialize only)
     """
+    assert not isinstance(self, native_groups_self.Command)
+    assert isinstance(self, Command)
     self.flag = flag
 
 

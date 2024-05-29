@@ -12,7 +12,7 @@ class Command(TyperCommand):
         """
         A command that takes a list of files and a flag.
         """
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         return json.dumps({"files": files, "flag1": flag1})
 
     @command()
@@ -20,7 +20,7 @@ class Command(TyperCommand):
         """
         Sum the given numbers.
         """
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         return str(sum(numbers))
 
     @command()
@@ -28,5 +28,5 @@ class Command(TyperCommand):
         """
         A command with no arguments.
         """
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         return json.dumps({})

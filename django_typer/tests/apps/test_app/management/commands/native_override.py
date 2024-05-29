@@ -1,6 +1,8 @@
 from . import native_groups
-from django_typer import Typer
+from django_typer import Typer, TyperCommand
 from django.utils.translation import gettext_lazy as _
+
+Command: TyperCommand
 
 app = Typer(native_groups.app)
 
@@ -10,6 +12,8 @@ def run_subgrp(self, option1: bool = False, option2: bool = False):
     """
     Override SUBGROUP
     """
+    assert not isinstance(self, native_groups.Command)
+    assert isinstance(self, Command)
     self.option1 = option1
     self.option2 = option2
 
@@ -19,6 +23,8 @@ def sg_cmd1(self):
     """
     Subgroup command 1. No args.
     """
+    assert not isinstance(self, native_groups.Command)
+    assert isinstance(self, Command)
     return {
         "verbosity": native_groups._verbosity,
         "flag": native_groups._flag,
@@ -29,6 +35,8 @@ def sg_cmd1(self):
 
 @run_subgrp.command(help=_("Subgroup command 2, Takes an int."))
 def sg_cmd2(self, number: int):
+    assert not isinstance(self, native_groups.Command)
+    assert isinstance(self, Command)
     return {
         "verbosity": native_groups._verbosity,
         "flag": native_groups._flag,

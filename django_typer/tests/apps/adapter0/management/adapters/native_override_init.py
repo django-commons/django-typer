@@ -1,5 +1,6 @@
 from django_typer.tests.apps.test_app.management.commands.native_override_init import (
     app,
+    Command,
 )
 from django_typer.types import Verbosity
 
@@ -8,6 +9,7 @@ from django_typer.types import Verbosity
 def init(self, verbosity: Verbosity = 0, bog: bool = False):
     self.verbosity = verbosity
     self.bog = bog
+    assert self.__class__ is Command
     return {"verbosity": self.verbosity, "bog": self.bog}
 
 
@@ -16,6 +18,7 @@ def grp2(self):
     """
     test_app2::grp2
     """
+    assert self.__class__ is Command
     self.grp2_called = True
 
 
@@ -24,6 +27,7 @@ def grp2_cmd1(self, g2arg1: int):
     """
     test_app2::grp2::grp2_cmd1
     """
+    assert self.__class__ is Command
     return {
         "verbosity": self.verbosity,
         "bog": self.bog,

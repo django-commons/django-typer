@@ -18,8 +18,8 @@ class Command(TyperCommand):
 
     @initialize()
     def init(self):
-        pass
+        assert self.__class__ is Command
 
     @command(add_help_option=False)
     def cmd(self):
-        pass
+        assert self.__class__ is Command

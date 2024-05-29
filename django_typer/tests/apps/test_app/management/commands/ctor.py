@@ -5,6 +5,7 @@ class Command(TyperCommand):
     help = "Constructor tests"
 
     def handle(self):
+        assert self.__class__ is Command
         self.stderr.write(
             f"err\nno_color={self.no_color}\nforce_color={self.force_color}\n"
         )

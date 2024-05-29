@@ -1,5 +1,7 @@
 from django_typer import Typer, TyperCommand
 
+Command: TyperCommand
+
 app = Typer()
 
 

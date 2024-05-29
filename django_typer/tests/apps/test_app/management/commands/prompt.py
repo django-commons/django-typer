@@ -23,6 +23,7 @@ class Command(TyperCommand):
             t.Optional[str], Option("-p", hide_input=True, prompt=True)
         ] = None,
     ):
+        assert self.__class__ is Command
         return f"{username} {password}"
 
     @command()
@@ -34,6 +35,7 @@ class Command(TyperCommand):
             Option("-p", hide_input=True, prompt=True, prompt_required=False),
         ] = None,
     ):
+        assert self.__class__ is Command
         return f"{username} {password}"
 
     @command()
@@ -44,6 +46,7 @@ class Command(TyperCommand):
             str, Option("-p", hide_input=True, prompt=True, prompt_required=False)
         ] = "default",
     ):
+        assert self.__class__ is Command
         return f"{username} {password}"
 
     @group()
@@ -53,6 +56,7 @@ class Command(TyperCommand):
             str, Option("-f", hide_input=True, prompt=True, prompt_required=True)
         ],
     ):
+        assert self.__class__ is Command
         self.flag = flag
 
     @group1.command()
@@ -61,4 +65,5 @@ class Command(TyperCommand):
         username: str,
         password: Annotated[str, Option("-p", hide_input=True, prompt=True)],
     ):
+        assert self.__class__ is Command
         return f"{self.flag} {username} {password}"

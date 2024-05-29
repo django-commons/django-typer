@@ -20,9 +20,10 @@ def {routine}(self, {flag_args}):
 class Command(TyperCommand):
     @initialize()
     def init(self):
-        pass
+        assert self.__class__ is Command
 
     def run(self, routine: str, flags: t.Optional[t.List[str]]):
+        assert self.__class__ is Command
         return routine, flags
 
 

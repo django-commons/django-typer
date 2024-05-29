@@ -19,4 +19,4 @@ class Command(TyperCommand):
         flag1: bool = False,
         opt1: Annotated[int, Option(help="An option")] = 5,
     ):
-        pass
+        assert self.__class__ is Command

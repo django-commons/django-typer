@@ -285,3 +285,39 @@ class InterfaceTests(TestCase):
             self.assertFalse(True, "should have thrown AttributeError")
         except AttributeError as e:
             pass
+
+    def test_proxied_property(self):
+        from django_typer import BoundProxy
+        from django_typer.tests.apps.test_app.management.commands.basic import (
+            Command as Basic,
+        )
+
+        basic = get_command("basic", Basic)
+        self.assertIsInstance(basic.typer_app, BoundProxy)
+        self.assertTrue(basic.typer_app.django_command is Basic)
+        self.assertTrue(basic.typer_app.proxied.django_command is Basic)
+
+    def test_attribute_access_in_definition(self):
+        from django_typer.tests.apps.test_app.management.commands.groups import (
+            Command as Groups,
+        )
+
+        with self.assertRaises(AttributeError):
+
+            class Command(Groups):
+                @Groups.maths.command()
+                def sqrt(self):
+                    pass
+
+    def test_attribute_access_outside_of_definition(self):
+        from django_typer import TyperCommand
+        from django_typer.tests.apps.test_app.management.commands.native import app
+
+        with self.assertRaises(AttributeError):
+
+            @app.maths.group()
+            def sqrt():
+                pass
+
+        with self.assertRaises(AttributeError):
+            TyperCommand.maths

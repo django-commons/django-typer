@@ -10,7 +10,7 @@ from django.test import override_settings
 
 from . import test_native
 from . import test_native_inheritance
-from . import test_adapter_pattern
+from . import test_plugin_pattern
 
 
 native_override_init_help_rich = """
@@ -102,7 +102,7 @@ native_groups_grp2_cmd1_help_rich = """
     ]
 )
 class TestNativeInitOverride(
-    test_adapter_pattern.ResetAppsMixin, test_native_inheritance.TestNativeInitOverride
+    test_plugin_pattern.ResetAppsMixin, test_native_inheritance.TestNativeInitOverride
 ):
     command = "native_override_init"
 

@@ -8,7 +8,7 @@ def new_echo(self, msg1: str, msg2: str):
     """
     Echo both messages.
     """
-    assert isinstance(self, Adapted)
+    assert self.__class__ is Adapted
     self.echo(f"test_app2: {msg1} {msg2}")
 
 

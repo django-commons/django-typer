@@ -8,6 +8,7 @@ class Command(TyperCommand):
 
     @initialize(invoke_without_command=True)
     def handle(self):
+        assert self.__class__ is Command
         if (ctx := get_current_context(silent=True)) and ctx.invoked_subcommand:
             return
 
@@ -16,4 +17,5 @@ class Command(TyperCommand):
 
     @command()
     def subcommand(self):
+        assert self.__class__ is Command
         return "subcommand"

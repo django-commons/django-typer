@@ -14,6 +14,7 @@ class Command(TyperCommand):
         error: Optional[bool] = False,
         nl: Optional[bool] = True,
     ):
+        assert self.__class__ is Command
         if color:
             self.echo(typer.style(message, fg=color), nl=nl, err=error)
         else:
@@ -27,4 +28,5 @@ class Command(TyperCommand):
         error: Optional[bool] = False,
         nl: Optional[bool] = True,
     ):
+        assert self.__class__ is Command
         self.secho(message, nl=nl, err=error, fg=color)

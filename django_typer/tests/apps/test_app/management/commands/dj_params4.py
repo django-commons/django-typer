@@ -28,7 +28,7 @@ class Command(TyperCommand):
             ),
         ] = True,  # this should change the default!
     ):
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         log_django_parameters(self, verbosity=verbosity, traceback=traceback)
         if throw:
             raise CommandError("Test Exception")

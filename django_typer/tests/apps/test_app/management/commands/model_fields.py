@@ -30,6 +30,7 @@ def obj_not_found(model_cls, value, exc):
 class Command(TyperCommand):
     @initialize()
     def init(self, verbosity: types.Verbosity = 1):
+        assert self.__class__ is Command
         self.verbosity = verbosity
 
     @command()
@@ -134,7 +135,7 @@ class Command(TyperCommand):
             ),
         ] = None,
     ):
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         objects = {}
         if char is not None:
             assert isinstance(char, ShellCompleteTester)

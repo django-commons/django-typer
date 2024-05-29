@@ -60,7 +60,7 @@ class Command(TyperCommand):
             ),
         ] = None,
     ):
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         for app in django_apps:
             assert isinstance(app, AppConfig)
         if option:

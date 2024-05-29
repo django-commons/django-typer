@@ -18,11 +18,13 @@ class Command(TyperCommand, rich_markup_mode="markdown", chain=True):
     @command()
     def command1(self, option: t.Optional[str] = None):
         """This is a *markdown* help string"""
+        assert self.__class__ is Command
         print("command1")
         return option
 
     @TyperCommand.command()
     def command2(self, option: t.Optional[str] = None):
         """This is a *markdown* help string"""
+        assert self.__class__ is Command
         print("command2")
         return option

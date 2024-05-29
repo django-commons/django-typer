@@ -11,6 +11,7 @@ class Command(TyperCommand):
 
     @command()
     def error(self, throw_command: bool = False, throw_other: bool = False):
+        assert self.__class__ is Command
         if throw_command and throw_other:
             raise click.exceptions.UsageError(
                 "--throw-command and --throw-other are mutually exclusive."
@@ -22,4 +23,5 @@ class Command(TyperCommand):
 
     @command()
     def exit(self, code: int = 0):
+        assert self.__class__ is Command
         sys.exit(code)

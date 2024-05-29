@@ -25,6 +25,6 @@ class Command(TyperCommand, help=_("Test minimal TyperCommand subclass - typer p
         """
         Test minimal TyperCommand subclass - docstring
         """
-        assert self.__class__ == Command
+        assert self.__class__ is Command
         opts = {"arg1": arg1, "arg2": arg2, "arg3": arg3, "arg4": arg4}
         return json.dumps(opts)
