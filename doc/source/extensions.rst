@@ -14,7 +14,7 @@ changing or extending the behavior of commands. :class:`~django_typer.TyperComma
 or add additional commands to a command implemented elsewhere. You can then use Django's built in
 command override precedence (INSTALLED_APPS) to ensure your command is used instead of the upstream
 command or give it a different name if you would like the upstream command to still be available.
-The :ref:`composition pattern <composition>` allows commands and groups to be added or overridden
+The :ref:`plugin pattern <plugin>` allows commands and groups to be added or overridden
 directly on upstream commands without inheritance. This mechanism is useful when you might expect
 other apps to also modify the original command. Conflicts are resolved in INSTALLED_APPS order.
 
@@ -139,15 +139,15 @@ expect other apps to also modify the same command. It's also a good choice when 
 a different flavor of a command under a different name.
 
 What if other apps want to alter the same command and we don't know about them, but they may end up
-installed along with our app? This is where the composition pattern will serve us better.
+installed along with our app? This is where the plugin pattern will serve us better.
 
 
-.. _composition:
+.. _plugin:
 
-Composition
+Plugins
 -----------
 
-**The composition pattern allows us to add or override commands and groups on an upstream command
+**The plugin pattern allows us to add or override commands and groups on an upstream command
 directly without overriding it or changing its name. This allows downstream apps that know
 nothing about each other to add their own behavior to the same command. If there are conflicts
 they are resolved in INSTALLED_APPS order.**
@@ -159,7 +159,7 @@ Because we're now mostly working at the level of our particular site we may want
 backup logic. For instance, lets say we know our site will always run on sqlite and we prefer
 to just copy the file to backup our database. Lets also pretend that it is useful for us to backup
 the python stack (e.g. requirements.txt) running on our server. To do that we can use the
-composition pattern to add our environment backup routine and override the database routine from
+plugin pattern to add our environment backup routine and override the database routine from
 the upstream backup app. Our app tree now might look like this:
 
 .. code-block:: text
@@ -218,7 +218,7 @@ this:
     do this inside ready() because conflicts are resolved in the order in which the extension
     modules are registered and ready() methods are called in INSTALLED_APPS order.
 
-For composition to work, we'll need to re-mplement media from above as a composed extension
+For plugins to work, we'll need to re-mplement media from above as a composed extension
 and that would look like this:
 
 .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup.py
@@ -310,10 +310,10 @@ You may even override the initializer of a predefined group:
         and groups.
         """
 
-When Does Composition Make Sense?
+When Do Plugins Make Sense?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Composition can be used to group like behavior together under a common root command. This can be
+Plugins can be used to group like behavior together under a common root command. This can be
 thought of as a way to namespace CLI tools or easily share significant code between tools that have
 common initialization logic. Moreover it allows you to do this safely and in a way that can be
 deterministically controlled in settings. Most use cases are not this complex and even our backup
@@ -321,7 +321,7 @@ example could probably better be implemented as a batch of commands.
 
 Django apps are great for forcing separation of concerns on your code base. In large self contained
 projects its often a good idea to break your code into apps that are as self contained as possible.
-Composition can be a good way to organize commands in a code base that follows this pattern. It
+Plugins can be a good way to organize commands in a code base that follows this pattern. It
 also allows for deployments that install a subset of those apps and is therefore a good way to
 organize commands in code bases that serve as a framework for a particular kind of site or that
 support selecting the features to install.

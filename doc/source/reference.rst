@@ -17,7 +17,7 @@ django_typer
    :show-inheritance:
 
 .. autoclass:: django_typer.Typer
-    :members: callback, initialize, command, add_typer
+    :members: callback, initialize, command, group, add_typer
 
 .. autoclass:: django_typer.TyperCommand
     :members: initialize, callback, command, group, echo, secho, print_help, get_subcommand
@@ -26,10 +26,6 @@ django_typer
     :members: name, click_command, context, parent, children, get_command, print_help
 
 .. autoclass:: django_typer.TyperCommandMeta
-
-.. autoclass:: django_typer.CommandGroup
-    :members: callback, initialize, group, command
-
 
 .. _types:
 
