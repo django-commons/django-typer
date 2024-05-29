@@ -9,7 +9,7 @@ import termios
 import time
 import typing as t
 from pathlib import Path
-
+import re
 from shellingham import detect_shell
 
 from django_typer import get_command
@@ -45,6 +45,11 @@ def read_all_from_fd_with_timeout(fd, timeout):
         all_data.extend(data)
 
     return bytes(all_data).decode()
+
+
+def scrub(output: str) -> str:
+    """Scrub control code characters and ansi escape sequences for terminal colors from output"""
+    return re.sub(r"[\x00-\x1F\x7F]|\x1B\[[0-?]*[ -/]*[@-~]", "", output)
 
 
 class _DefaultCompleteTestCase:
@@ -162,7 +167,7 @@ class _DefaultCompleteTestCase:
         process.terminate()
         process.wait()
         # remove bell character which can show up in some terminals where we hit tab
-        return output.replace("\x07", "")
+        return scrub(output)
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")

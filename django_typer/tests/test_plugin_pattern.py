@@ -1074,20 +1074,8 @@ class Adapter2AdaptedPrecedenceTests(ResetAppsMixin, TestCase):
                 "adapted2", "--verbosity", "2", "grp2", "sub-grp2", "4", "subsub-grp2"
             )
 
-        # you might expect that whn sub-grp2 is overridden we'd remove all child functions that
-        # were added to the command class. We don't because the bookeeping is not necessarily
-        # worth it and also this provides some flexibility for apps to call functions directly
-        # on command objects they adapt with confidence
-        # self.assertEqual(
-        #     adapted2.__class__.subsub_grp2(),
-        #     "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
-        # )
-        self.assertTrue(hasattr(adapted2.__class__, "subsub_grp2"))
-        self.assertEqual(
-            adapted2.subsub_grp2(),
-            "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()",
-        )
-        # self.assertFalse(hasattr(adapted2, 'subsub_grp2'))
+        self.assertFalse(hasattr(adapted2.__class__, "subsub_grp2"))
+        self.assertFalse(hasattr(adapted2, "subsub_grp2"))
 
         self.assertEqual(
             call_command("adapted2", "--verbosity", "2", "grp3"),

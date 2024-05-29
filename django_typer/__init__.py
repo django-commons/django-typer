@@ -82,6 +82,7 @@ keep a tight version lock on Typer.
 import inspect
 import sys
 import typing as t
+from collections import deque
 from copy import copy, deepcopy
 from functools import cached_property
 from importlib import import_module
@@ -902,16 +903,12 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     def __getattr__(self, name: str) -> t.Any:
         for cmd in self.registered_commands:
             assert cmd.callback
-            if name in (cmd.callback.__name__, cmd.name):
+            if name in _names(cmd):
                 return cmd
         for grp in self.registered_groups:
             cmd_grp = t.cast(Typer, grp.typer_instance)
             assert cmd_grp
-            if name in (
-                cmd_grp.name,
-                grp.name,
-                getattr(cmd_grp.info.callback, "__name__", None),
-            ):
+            if name in _names(cmd_grp):
                 return cmd_grp
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
@@ -1753,37 +1750,76 @@ def _resolve_help(dj_cmd: "TyperCommand"):
                 dj_cmd.typer_app.info.help = hlp
 
 
-def depth_first_match(
-    app: typer.Typer, name: str
+def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.List[str]:
+    """
+    For a command or group, get a list of attribute name and its CLI name.
+
+    This annoyingly lives in difference places depending on how the command
+    or group was defined. This logic is sensitive to typer internals.
+    """
+    names = []
+    if isinstance(tc, typer.models.CommandInfo):
+        assert tc.callback
+        names.append(tc.callback.__name__)
+        if tc.name and tc.name != tc.callback.__name__:
+            names.append(tc.name)
+    else:
+        if tc.name:
+            names.append(tc.name)
+        if tc.info.name and tc.info.name != tc.name:
+            names.append(tc.info.name)
+        cb_name = getattr(tc.info.callback, "__name__", None)
+        if cb_name and cb_name not in names:
+            names.append(cb_name)
+    return names
+
+
+def _bfs_match(
+    app: Typer, name: str
 ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer]]:
     """
-    Perform a depth first search for a command or group by name.
-
-    TODO - should be breadth first
+    Perform a breadth first search for a command or group by name.
 
     :param app: The Typer app to search.
     :param name: The name of the command or group to search for.
     :return: The command or group if found, otherwise None.
     """
-    for cmd in reversed(app.registered_commands):
-        if name in [cmd.name, *([cmd.callback.__name__] if cmd.callback else [])]:
-            return cmd
-    for grp in reversed(app.registered_groups):
-        assert grp.typer_instance
-        grp_app = t.cast(Typer, grp.typer_instance)
-        # some weirdness, grp_app.info not always == grp
-        # todo __deepcopy__ problem?
-        # assert grp_app.info is grp
-        if name in [
-            grp.name,
-            grp_app.name,
-            getattr(grp_app.info.callback, "__name__", None),
-        ]:
-            return grp_app
-    for grp in reversed(app.registered_groups):
-        assert grp.typer_instance
-        grp_app = t.cast(Typer, grp.typer_instance)
-        found = depth_first_match(grp_app, name)
+
+    def find_at_level(
+        lvl: Typer,
+    ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer]]:
+        for cmd in reversed(lvl.registered_commands):
+            if name in _names(cmd):
+                return cmd
+        if name in _names(lvl):
+            return lvl
+        return None
+
+    # fast exit out if at top level (most searches - avoid building BFS)
+    if found := find_at_level(app):
+        return found
+
+    visited = set()
+    bfs_order: t.List[Typer] = []
+    queue = deque([app])
+
+    while queue:
+        grp = queue.popleft()
+        if grp not in visited:
+            visited.add(grp)
+            bfs_order.append(grp)
+            # if names conflict, only pick the first the others have been
+            # overridden - avoids walking down stale branches
+            seen = []
+            for child_grp in reversed(grp.registered_groups):
+                child_app = t.cast(Typer, child_grp.typer_instance)
+                assert child_app
+                if child_app not in visited and child_app.name not in seen:
+                    seen.extend(_names(child_app))
+                    queue.append(child_app)
+
+    for grp in bfs_order[1:]:
+        found = find_at_level(grp)
         if found:
             return found
     return None
@@ -2057,7 +2093,7 @@ class TyperCommandMeta(type):
 
     def __getattr__(cls, name: str) -> t.Any:
         """
-        Fall back depth first search of the typer app tree to resolve attribute accesses of the type:
+        Fall back breadth first search of the typer app tree to resolve attribute accesses of the type:
             Command.sub_grp or Command.sub_cmd
         """
         if name != "typer_app":
@@ -2065,7 +2101,7 @@ class TyperCommandMeta(type):
                 if name in cls._defined_groups:
                     return cls._defined_groups[name]
             elif cls.typer_app:
-                found = depth_first_match(cls.typer_app, name)
+                found = _bfs_match(cls.typer_app, name)
                 if found:
                     return found
         raise AttributeError(
@@ -2957,7 +2993,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         )
         if init and init and name == init.__name__:
             return BoundProxy(self, init)
-        found = depth_first_match(self.typer_app, name)
+        found = _bfs_match(self.typer_app, name)
         if found:
             return BoundProxy(self, found)
         raise AttributeError(
