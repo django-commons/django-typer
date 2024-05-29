@@ -115,17 +115,19 @@ class TestOverloaded(TestCase):
                 )
             ),
             {
-                "samename": {"precision": 1, "flag": True},
                 "test": {"precision": 5, "flag": False},
+                "samename": {"precision": 1, "flag": True},
             },
         )
+
+        ret = json.loads(
+            call_command("overloaded", ["test", "5", "samename", "1"], flag=True)
+        )
         self.assertEqual(
-            json.loads(
-                call_command("overloaded", ["test", "5", "samename", "1"], flag=True)
-            ),
+            ret,
             {
-                "samename": {"precision": 1, "flag": True},
                 "test": {"precision": 5, "flag": True},
+                "samename": {"precision": 1, "flag": True},
             },
         )
 

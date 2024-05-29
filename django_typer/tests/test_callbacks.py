@@ -5,7 +5,7 @@ import django
 from django.core.management import call_command
 from django.test import TestCase
 
-from django_typer import get_command
+from django_typer import get_command, TyperCommand
 from django_typer.tests.utils import run_command
 
 

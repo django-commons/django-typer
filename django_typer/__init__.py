@@ -83,6 +83,7 @@ import sys
 import threading
 import typing as t
 from copy import copy, deepcopy
+from functools import cached_property
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -270,7 +271,7 @@ def get_command(  # type: ignore[overload-overlap]
     no_color: bool = False,
     force_color: bool = False,
     **kwargs,
-) -> CallableCommand: ...
+) -> BaseCommand: ...
 
 
 @t.overload  # pragma: no cover
@@ -794,7 +795,12 @@ def _cache_command(
 
 def _get_direct_function(
     obj: "TyperCommand",
-    app_node: t.Union["Typer", typer.models.CommandInfo, typer.models.TyperInfo],
+    app_node: t.Union[
+        "Typer",
+        typer.models.CommandInfo,
+        typer.models.TyperInfo,
+        t.Callable[..., t.Any],
+    ],
 ):
     """
     Get a direct callable function bound to the given object if it is not static held by the given
@@ -803,8 +809,11 @@ def _get_direct_function(
     if isinstance(app_node, Typer):
         method = app_node.is_method
         cb = getattr(app_node.registered_callback, "callback", app_node.info.callback)
+    elif cb := getattr(app_node, "callback", None):
+        method = is_method(cb)
     else:
-        cb = app_node.callback
+        assert callable(app_node)
+        cb = app_node
         method = is_method(cb)
     assert cb
     return MethodType(cb, obj) if method else staticmethod(cb)
@@ -886,36 +895,10 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             return _get_direct_function(cmd, self)(*args, **kwargs)
         return super().__call__(*args, **kwargs)
 
-    @t.overload  # pragma: no cover
-    def __get__(
-        self, obj: "TyperCommandMeta", owner: t.Type["TyperCommandMeta"]
-    ) -> "Typer[P, R]": ...
-
-    @t.overload  # pragma: no cover
-    def __get__(
-        self,
-        obj: None,
-        owner: t.Type["TyperCommand"],
-    ) -> "Typer[P, R]": ...
-
-    @t.overload  # pragma: no cover
-    def __get__(
-        self,
-        obj: "Typer",
-        owner: t.Type["Typer"],
-    ) -> "Typer[P, R]": ...
-
-    @t.overload  # pragma: no cover
-    def __get__(
-        self, obj: "TyperCommand", owner: t.Any = None
-    ) -> "Typer[P, R]":  # t.Union[MethodType, t.Callable[P, R]]
-        # todo - we could return the generic callable type here but the problem
-        # is self is included in the ParamSpec and it seems tricky to remove?
-        # MethodType loses the parameters but is preferable to type checking errors
-        # https://github.com/bckohan/django-typer/issues/73
-        ...
-
-    def __get__(self, obj, owner=None):  # pyright: ignore[reportInconsistentOverload]
+    # todo - this results in type hinting expecting self to be passed explicitly
+    # when this is called as a callable
+    # https://github.com/bckohan/django-typer/issues/73
+    def __get__(self, obj, _=None) -> "Typer[P, R]":
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
@@ -2113,7 +2096,7 @@ class CommandNode:
     The click command object that this node represents.
     """
 
-    context: TyperContext
+    context: Context
     """
     The Typer context object used to run this command.
     """
@@ -2123,38 +2106,50 @@ class CommandNode:
     Back reference to the django command instance that this command belongs to.
     """
 
-    parent: t.Optional["CommandNode"] = None
-    """
-    The parent node of this command node or None if this is a root node.
-    """
-
-    children: t.Dict[str, "CommandNode"]
-    """
-    The child group and command nodes of this command node.
-    """
+    @cached_property
+    def children(self) -> t.Dict[str, "CommandNode"]:
+        """
+        The child group and command nodes of this command node.
+        """
+        return {
+            name: CommandNode(name, cmd, self.django_command, parent=self.context)
+            for name, cmd in getattr(
+                self.context.command,
+                "commands",
+                {
+                    name: self.context.command.get_command(self.context, name)  # type: ignore[attr-defined]
+                    for name in (
+                        self.context.command.list_commands(self.context)
+                        if isinstance(self.context.command, click.MultiCommand)
+                        else []
+                    )
+                },
+            ).items()
+        }
 
     @property
     def callback(self) -> t.Callable[..., t.Any]:
         """Get the function for this command or group"""
-        cb = getattr(self.click_command._callback, "__wrapped__")
-        return (
-            MethodType(cb, self.django_command) if self.click_command.is_method else cb
+        return _get_direct_function(
+            self.django_command, getattr(self.click_command._callback, "__wrapped__")
         )
 
     def __init__(
         self,
         name: str,
         click_command: DjangoTyperMixin,
-        context: TyperContext,
         django_command: "TyperCommand",
-        parent: t.Optional["CommandNode"] = None,
+        parent: t.Optional[Context] = None,
     ):
         self.name = name
         self.click_command = click_command
-        self.context = context
         self.django_command = django_command
-        self.parent = parent
-        self.children = {}
+        self.context = Context(
+            self.click_command,
+            info_name=name,
+            django_command=django_command,
+            parent=parent,
+        )
 
     def print_help(self) -> t.Optional[str]:
         """
@@ -2235,9 +2230,12 @@ class TyperParser:
         @property
         def option_strings(self) -> t.List[str]:
             """
-            The list of allowable command line option strings for this parameter.
+            call_command uses this to determine a mapping of supplied options to function
+            arguments. I.e. it will remap option_string: dest. We don't want this because
+            we'd rather have supplied parameters line up with their function arguments to
+            allow deconfliction when CLI options share the same name.
             """
-            return list(self.param.opts) if isinstance(self.param, click.Option) else []
+            return []
 
     _actions: t.List[t.Any]
     _mutually_exclusive_groups: t.List[t.Any] = []
@@ -2251,6 +2249,8 @@ class TyperParser:
         self.django_command = django_command
         self.prog_name = prog_name
         self.subcommand = subcommand
+        self.tree = self.django_command.command_tree
+        self.tree.context.info_name = f"{self.prog_name} {self.subcommand}"
 
         def populate_params(node: CommandNode) -> None:
             for param in node.click_command.params:
@@ -2258,16 +2258,13 @@ class TyperParser:
             for child in node.children.values():
                 populate_params(child)
 
-        populate_params(self.django_command.command_tree)
+        populate_params(self.tree)
 
     def print_help(self, *command_path: str):
         """
         Print the help for the given command path to stdout of the django command.
         """
-        self.django_command.command_tree.context.info_name = (
-            f"{self.prog_name} {self.subcommand}"
-        )
-        command_node = self.django_command.get_subcommand(*command_path)
+        command_node = self.tree.get_command(*command_path)
         hlp = command_node.print_help()
         if hlp:
             self.django_command.stdout.write(
@@ -2470,11 +2467,21 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     help: t.Optional[t.Union[DefaultPlaceholder, str]] = Default(None)  # type: ignore
 
-    command_tree: CommandNode
-
     # allow deriving commands to override handle() from BaseCommand
     # without triggering static type checking complaints
     handle = None  # type: ignore
+
+    @property
+    def command_tree(self) -> CommandNode:
+        """
+        Get the root CommandNode for this command. Allows easy traversal of the command
+        tree.
+        """
+        return CommandNode(
+            f"{sys.argv[0]} {self._name}",
+            click_command=t.cast(DjangoTyperMixin, get_typer_command(self.typer_app)),
+            django_command=self,
+        )
 
     @classmethod
     def initialize(
@@ -2879,9 +2886,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.stdout.style_func = stdout_style_func
             self.stderr.style_func = stderr_style_func
             try:
-                self.command_tree = self._build_cmd_tree(
-                    get_typer_command(self.typer_app)
-                )
+                assert get_typer_command(self.typer_app)
             except RuntimeError as rerr:
                 raise NotImplementedError(
                     _(
@@ -2899,67 +2904,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :raises LookupError: if no group or command exists at the given path
         """
         return self.command_tree.get_command(*command_path)
-
-    def _filter_commands(
-        self, ctx: TyperContext, cmd_filter: t.Optional[t.List[str]] = None
-    ):
-        """
-        Fetch subcommand names. Given a click context, return the list of commands
-        that are valid return the list of commands that are valid for the given
-        context.
-
-        :param ctx: the click context
-        :param cmd_filter: a list of command names to filter by, if None no subcommands
-            will be filtered out
-        :return: the list of command names that are valid for the given context
-        """
-        return sorted(
-            [
-                cmd
-                for name, cmd in getattr(
-                    ctx.command,
-                    "commands",
-                    {
-                        name: ctx.command.get_command(ctx, name)  # type: ignore[attr-defined]
-                        for name in (
-                            ctx.command.list_commands(ctx)
-                            if isinstance(ctx.command, click.MultiCommand)
-                            else []
-                        )
-                    },
-                ).items()
-                if not cmd_filter or name in cmd_filter
-            ],
-            key=lambda item: item.name,
-        )
-
-    def _build_cmd_tree(
-        self,
-        cmd: click.Command,
-        parent: t.Optional[Context] = None,
-        info_name: t.Optional[str] = None,
-        node: t.Optional[CommandNode] = None,
-    ):
-        """
-        Recursively build the CommandNode tree used to walk the click command
-        hierarchy.
-
-        :param cmd: the click command to build the tree from
-        :param parent: the parent click context
-        :param info_name: the name of the command
-        :param node: the parent node or None if this is a root node
-        """
-        assert cmd.name
-        assert isinstance(cmd, DjangoTyperMixin)
-        ctx = Context(cmd, info_name=info_name, parent=parent, django_command=self)
-        current = CommandNode(cmd.name, cmd, ctx, self, parent=node)
-        if node:
-            node.children[cmd.name] = current
-        for sub_cmd in self._filter_commands(ctx):
-            self._build_cmd_tree(
-                sub_cmd, parent=ctx, info_name=sub_cmd.name, node=current
-            )
-        return current
 
     def __init_subclass__(cls, **_):
         """Avoid passing typer arguments up the subclass init chain"""
@@ -3006,6 +2950,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         and return that command or group if the attribute name matches the command/group
         function OR its registered CLI name.
         """
+        if isinstance(attr := getattr(self.__class__, name, None), property):
+            return t.cast(t.Callable, attr.fget)(self)
         init = getattr(
             self.typer_app.registered_callback,
             "callback",
@@ -3016,7 +2962,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         found = depth_first_match(self.typer_app, name)
         if found:
             if isinstance(found, Typer):
-                # todo shouldn't be needed
+                # todo shouldn't be needed - wrap these in a proxy,
+                # avoid need for threading local
                 found._local.object = self
             else:
                 return _get_direct_function(self, found)
