@@ -80,7 +80,6 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 
 import inspect
 import sys
-import threading
 import typing as t
 from copy import copy, deepcopy
 from functools import cached_property
@@ -793,14 +792,17 @@ def _cache_command(
     setattr(callback, _CACHE_KEY, register)
 
 
+TyperFunction = t.Union[
+    "Typer[P, R]",
+    typer.models.CommandInfo,
+    typer.models.TyperInfo,
+    t.Callable[..., t.Any],
+]
+
+
 def _get_direct_function(
     obj: "TyperCommand",
-    app_node: t.Union[
-        "Typer",
-        typer.models.CommandInfo,
-        typer.models.TyperInfo,
-        t.Callable[..., t.Any],
-    ],
+    app_node: TyperFunction,
 ):
     """
     Get a direct callable function bound to the given object if it is not static held by the given
@@ -872,8 +874,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     registered_commands: t.List[typer.models.CommandInfo] = []
     registered_callback: t.Optional[typer.models.TyperInfo] = None
 
-    _local = threading.local()
-
     is_method: t.Optional[bool] = None
     top_level: bool = False
 
@@ -884,16 +884,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     @django_command.setter
     def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
-
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        """
-        Typers more than one level deep will route invocations through this
-        function which wraps our initializer.
-        """
-        cmd = self.cmd_obj()
-        if self.parent and cmd:  # don't call direct if root app
-            return _get_direct_function(cmd, self)(*args, **kwargs)
-        return super().__call__(*args, **kwargs)
 
     # todo - this results in type hinting expecting self to be passed explicitly
     # when this is called as a callable
@@ -907,18 +897,16 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         on the class and subclasses.
         """
         if isinstance(obj, TyperCommand):
-            self._local.object = obj
-        else:
-            self._local.object = None
+            return t.cast(Typer[P, R], BoundProxy(obj, self))
         return self
 
     def __getattr__(self, name: str) -> t.Any:
-        cmd_obj = self.cmd_obj()
+        if isinstance(attr := getattr(self.__class__, name, None), property):
+            return t.cast(t.Callable, attr.fget)(self)
+
         for cmd in self.registered_commands:
             assert cmd.callback
             if name in (cmd.callback.__name__, cmd.name):
-                if cmd_obj:
-                    return _get_direct_function(cmd_obj, cmd)
                 return cmd
         for grp in self.registered_groups:
             cmd_grp = t.cast(Typer, grp.typer_instance)
@@ -934,25 +922,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 cls=self.__class__.__name__, name=name
             )
         )
-
-    def cmd_obj(self) -> t.Optional["TyperCommand"]:
-        """
-        If this command group was ultimately accessed from a TyperCommand instance,
-        get that instance. For instance:
-
-        .. code-block:: python
-
-            cmd = Command()
-            assert cmd.lvl1.lvl2.cmd_obj() is cmd
-
-        This enables namespaced direct calls that work despite group or command
-        name collisions.
-        """
-        assert self.parent is None or isinstance(self.parent, Typer)
-        obj = self._local.object or (
-            self.parent.cmd_obj() if isinstance(self.parent, Typer) else None
-        )
-        return obj if isinstance(obj, TyperCommand) else None
 
     def __init__(
         self,
@@ -988,7 +957,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         assert not args  # should have been removed by metaclass
         self.parent = parent
         self._django_command = django_command
-        self._local.object = None
         self.top_level = kwargs.pop("top_level", False)
         typer_app = kwargs.pop("typer_app", None)
         callback = _strip_static(callback)
@@ -1332,6 +1300,44 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             return grp
 
         return create_app
+
+
+class BoundProxy(t.Generic[P, R]):
+    """
+    A helper class that proxies the Typer or command objects and binds them
+    to the django command instance.
+    """
+
+    command: "TyperCommand"
+    proxied: TyperFunction
+
+    def __init__(self, command: "TyperCommand", proxied: TyperFunction):
+        self.command = command
+        self.proxied = proxied
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        if isinstance(self.proxied, Typer) and not self.proxied.parent:
+            # if we're calling a top level Typer app we need invoke Typer's call
+            return self.proxied(*args, **kwargs)
+        return _get_direct_function(self.command, self.proxied)(*args, **kwargs)
+
+    def __getattr__(self, name: str) -> t.Any:
+        """
+        If our proxied object __getattr__ returns a Typer or Command object we
+        wrap it in a BoundProxy so that it can be called directly as a method
+        on the django command instance.
+        """
+        if hasattr(self.proxied, name):
+            attr = getattr(self.proxied, name)
+            if isinstance(attr, (Typer, typer.models.CommandInfo)):
+                return BoundProxy(self.command, attr)
+            return attr
+
+        raise AttributeError(
+            "{cls} object has no attribute {name}".format(
+                cls=self.__class__.__name__, name=name
+            )
+        )
 
 
 def initialize(
@@ -2958,16 +2964,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.typer_app.info.callback,
         )
         if init and init and name == init.__name__:
-            return MethodType(init, self) if is_method(init) else staticmethod(init)
+            return BoundProxy(self, init)
         found = depth_first_match(self.typer_app, name)
         if found:
-            if isinstance(found, Typer):
-                # todo shouldn't be needed - wrap these in a proxy,
-                # avoid need for threading local
-                found._local.object = self
-            else:
-                return _get_direct_function(self, found)
-            return found
+            return BoundProxy(self, found)
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
                 cls=self.__class__.__name__, name=name

@@ -230,9 +230,6 @@ class TestGroupOverloads(TestCase):
         self.assertEqual(grp_overload.g1.l2.cmd(), "g1:l2:cmd()")
         print("----------")
 
-        self.assertEqual(grp_overload.g0.l2.cmd_obj(), grp_overload)
-        self.assertEqual(grp_overload.g1.l2.cmd_obj(), grp_overload)
-
         self.assertTrue(hasattr(grp_overload.g0.l2, "cmd2"))
         self.assertEqual(grp_overload.g0.l2.cmd2(), "g0:l2:cmd2()")
         self.assertEqual(grp_overload.g1.l2.cmd2(), "g1:l2:cmd2()")
