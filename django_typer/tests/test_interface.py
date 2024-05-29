@@ -324,3 +324,6 @@ class InterfaceTests(TestCase):
 
         with self.assertRaises(AttributeError):
             TyperCommandMeta.maths
+
+        with self.assertRaises(AttributeError):
+            TyperCommandMeta("dummy", tuple(), {}).maths

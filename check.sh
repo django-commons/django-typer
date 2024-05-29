@@ -13,7 +13,7 @@ else
 fi
 
 poetry run mypy django_typer
-pyright
+poetry run pyright
 poetry check
 poetry run pip check
 cd ./doc

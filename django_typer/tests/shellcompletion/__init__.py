@@ -181,6 +181,13 @@ class _DefaultCompleteTestCase:
         self.assertIn("sessions", completions)
         self.assertIn("staticfiles", completions)
 
+    def run_bad_command_completion(self):
+        completions = self.get_completions(
+            self.launch_script, "completion_does_not_exist", " "
+        )
+        self.assertTrue("Exception" not in completions)
+        self.assertTrue("traceback" not in completions)
+
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
         # annoingly in CI there are some spaces inserted between the incomplete phrase
@@ -197,6 +204,7 @@ class _DefaultCompleteTestCase:
             self.run_app_completion()
         self.install()
         self.run_app_completion()
+        self.run_bad_command_completion()
         self.run_command_completion()
         self.remove()
         with self.assertRaises(AssertionError):

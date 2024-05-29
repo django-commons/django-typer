@@ -1768,9 +1768,6 @@ def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.List[str]:
             names.append(tc.name)
         if tc.info.name and tc.info.name != tc.name:
             names.append(tc.info.name)
-        cb_name = getattr(tc.info.callback, "__name__", None)
-        if cb_name and cb_name not in names:
-            names.append(cb_name)
     return names
 
 
@@ -1799,24 +1796,21 @@ def _bfs_match(
     if found := find_at_level(app):
         return found
 
-    visited = set()
     bfs_order: t.List[Typer] = []
     queue = deque([app])
 
     while queue:
         grp = queue.popleft()
-        if grp not in visited:
-            visited.add(grp)
-            bfs_order.append(grp)
-            # if names conflict, only pick the first the others have been
-            # overridden - avoids walking down stale branches
-            seen = []
-            for child_grp in reversed(grp.registered_groups):
-                child_app = t.cast(Typer, child_grp.typer_instance)
-                assert child_app
-                if child_app not in visited and child_app.name not in seen:
-                    seen.extend(_names(child_app))
-                    queue.append(child_app)
+        bfs_order.append(grp)
+        # if names conflict, only pick the first the others have been
+        # overridden - avoids walking down stale branches
+        seen = []
+        for child_grp in reversed(grp.registered_groups):
+            child_app = t.cast(Typer, child_grp.typer_instance)
+            assert child_app
+            if child_app.name not in seen:
+                seen.extend(_names(child_app))
+                queue.append(child_app)
 
     for grp in bfs_order[1:]:
         found = find_at_level(grp)
@@ -1968,7 +1962,7 @@ class TyperCommandMeta(type):
                         yield base
 
             typer_app = Typer(
-                name=name or attrs["__module__"].rsplit(".", maxsplit=1)[-1],
+                name=name or attrs.get("__module__", "").rsplit(".", maxsplit=1)[-1],
                 cls=kwargs.pop("cls", DTGroup),
                 help=help or attr_help,  # pyright: ignore[reportArgumentType]
                 invoke_without_command=invoke_without_command,
