@@ -118,3 +118,10 @@ class BasicTests(TestCase):
         self.assertEqual(get_command("rename", TyperCommand)(), "handle")
         self.assertEqual(get_command("rename", Rename).subcommand1(), "subcommand1")
         self.assertEqual(get_command("rename", Rename).subcommand2(), "subcommand2")
+
+    def test_get_command_make_callable(self):
+        args = (1, 2, 3)
+        kwargs = {"named": "test!"}
+        self.assertEqual(
+            get_command("base")(*args, **kwargs), f"base({args}, {kwargs})"
+        )

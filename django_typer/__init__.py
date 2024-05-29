@@ -257,6 +257,10 @@ def model_parser_completer(
     }
 
 
+class CallableCommand(t.Protocol):
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> t.Any: ...
+
+
 @t.overload  # pragma: no cover
 def get_command(  # type: ignore[overload-overlap]
     command_name: str,
@@ -265,7 +269,7 @@ def get_command(  # type: ignore[overload-overlap]
     no_color: bool = False,
     force_color: bool = False,
     **kwargs,
-) -> BaseCommand: ...
+) -> CallableCommand: ...
 
 
 @t.overload  # pragma: no cover
@@ -344,6 +348,13 @@ def get_command(
         from myapp.management.commands import Command as Hierarchy
         hierarchy: Hierarchy = get_command('hierarchy', Hierarchy)
 
+    .. note::
+
+        If get_command fetches a BaseCommand that does not implement __call__ get_command will
+        make the command callable by adding a __call__ method that calls the handle method of
+        the BaseCommand. This allows you to call the command like get_command("command")() with
+        confidence.
+
     :param command_name: the name of the command to get
     :param path: the path walking down the group/command tree
     :param stdout: the stdout stream to use
@@ -366,6 +377,13 @@ def get_command(
     )
     if path and (isinstance(path[0], str) or len(path) > 1):
         return t.cast(TyperCommand, cmd).get_subcommand(*path).callback
+
+    if not hasattr(cmd, "__call__"):
+        setattr(
+            cmd.__class__,
+            "__call__",
+            lambda self, *args, **options: self.handle(*args, **options),
+        )
 
     return cmd
 

@@ -589,7 +589,7 @@ class Command(TyperCommand):
                                 cmd_str=cmd_str
                             )
                         ) from err
-                    return  # otherwise nowhere to go - just empty out
+                    raise  # otherwise nowhere to go
 
                 if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
                     # this will exit out so no return is needed here
