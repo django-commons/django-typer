@@ -12,19 +12,20 @@
 [![Test Status](https://github.com/bckohan/django-typer/workflows/test/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/test.yml)
 [![Lint Status](https://github.com/bckohan/django-typer/workflows/lint/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/lint.yml)
 
-Use [Typer](https://typer.tiangolo.com/) to define the CLI for your [Django](https://www.djangoproject.com/) management commands using the typer interface. Optionally use the provided TyperCommand class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). This class maps the typer interface onto a class based interface that Django developers will be familiar with. All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
+Use static typing to define the CLI for your [Django](https://www.djangoproject.com/) management commands with [Typer](https://typer.tiangolo.com/). Optionally use the provided [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). This class maps the [Typer](https://typer.tiangolo.com/) interface onto a class based interface that Django developers will be familiar with. All of the [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) functionality is preserved, so that [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) can be a drop in replacement.
 
 **django-typer makes it easy to:**
 
-- Define your command CLI interface in a clear, DRY, and safe way using type hints.
-- Create subcommand and group command hierarchies.
-- Use the full power of Typer's parameter types to validate and parse command line inputs.
-- Create beautiful and information dense help outputs.
-- Configure the rendering of exception stack traces using rich.
-- [Install shell tab-completion support](https://django-typer.readthedocs.io/en/latest/shell_completion.html) for TyperCommands and normal Django commands for [bash](https://www.gnu.org/software/bash/), [zsh](https://www.zsh.org/), [fish](https://fishshell.com/), and [powershell](https://learn.microsoft.com/en-us/powershell/scripting/overview).
-- [Create custom and portable shell tab-completions for your CLI parameters.](https://django-typer.readthedocs.io/en/latest/shell_completion.html#defining-custom-completions)
-- Refactor existing management commands into TyperCommands because TyperCommand is interface compatible with BaseCommand.
-- Use either a class-based interface or the basic Typer style interface to define commands.
+   * Define your command CLI interface in a clear, DRY and safe way using type hints
+   * Create subcommands and hierarchical groups of commands.
+   * Use the full power of [Typer](https://typer.tiangolo.com/)'s parameter types to validate and parse command line inputs.
+   * Create beautiful and information dense help outputs.
+   * Configure the rendering of exception stack traces using [rich](https://rich.readthedocs.io/en/latest/).
+   * [Install shell tab-completion support](https://django-typer.readthedocs.io/en/latest/shell_completion.html) for [bash](https://www.gnu.org/software/bash/), [zsh](https://www.zsh.org/), [fish](https://fishshell.com/), and [powershell](https://learn.microsoft.com/en-us/powershell/scripting/overview).
+   * [Create custom and portable shell tab-completions for your CLI parameters.](https://django-typer.readthedocs.io/en/latest/shell_completion.html#defining-custom-completions)
+   * Port existing commands ([TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) is interface compatible with [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand)).
+   * Use either a Django-style class-based interface or the Typer-style interface to define commands.
+   * Add plugins to upstream commands.
 
 Please refer to the [full documentation](https://django-typer.readthedocs.io/) for more information.
 
@@ -44,7 +45,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
    pip install "django-typer[rich]"
    ```
 
-2. Add `django_typer` to your `INSTALLED_APPS` setting:
+2. Optionally add `django_typer` to your `INSTALLED_APPS` setting:
 
    ```python
    INSTALLED_APPS = [
@@ -57,7 +58,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 
 ## Basic Example
 
-For example, TyperCommands can be a very simple drop-in replacement for BaseCommands. All of the documented features of [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) work!
+[TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) is a very simple drop in replacement for [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). All of the documented features of [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) work the same way!
 
 ```python
 from django_typer import TyperCommand
@@ -69,7 +70,7 @@ class Command(TyperCommand):
         """
 ```
 
-Or, you may also use an interface identitical to Typer's. Just import typer from django_typer instead of typer:
+Or, you may also use an interface identical to [Typer](https://typer.tiangolo.com/)'s. Simply import [Typer](https://typer.tiangolo.com/) from django_typer instead of typer.
 
 ```python
 from django_typer import Typer
@@ -220,7 +221,7 @@ Using the class-based interface we could define the command like this:
 
 ```
 
-The typer-style interface builds a TyperCommand class for us. **This allows you to optionally accept the self argument in your commands.** We could define the above command using the typer interface like this:
+The typer-style interface builds a [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) class for us **that allows you to optionally accept the self argument in your commands.** We could define the above command using the typer interface like this:
 
 ```python
 
