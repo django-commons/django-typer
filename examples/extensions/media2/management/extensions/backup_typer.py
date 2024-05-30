@@ -10,6 +10,7 @@ from django_typer.tests.apps.examples.extensions.backup.management.commands impo
 )
 
 
+# for typer-style plugins we use the decorators on the root Typer app directly
 @backup_typer.app.command()
 def media(
     # self is optional, but if you want to access the command instance, you

@@ -60,12 +60,6 @@ Install django-typer_
     rich_ is a powerful library for rich text and beautiful formatting in the terminal.
     It is not required, but highly recommended for the best experience:
 
-    .. note::
-
-        If you install rich_, `traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_
-        will be enabled by default. Refer to the :ref:`how-to <configure-rich-exception-tracebacks>` if
-        you would like to disable it.
-
 
 2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
 
@@ -80,7 +74,7 @@ Install django-typer_
 
         Adding django_typer to INSTALLED_APPS is not strictly necessary if you do not wish to use shell
         tab completions or configure `rich traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_.
-
+        Refer to the :ref:`how-to <configure-rich-exception-tracebacks>` if you would like to disable it.
 
 Convert the closepoll command to a :class:`~django_typer.TyperCommand`
 ----------------------------------------------------------------------

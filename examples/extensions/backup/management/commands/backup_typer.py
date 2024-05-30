@@ -22,6 +22,8 @@ databases = [alias for alias in settings.DATABASES.keys()]
 def init_or_run_all(
     self,
     # if we add a context argument Typer will provide it
+    # the context is a click object that contains additional
+    # information about the broader CLI invocation
     context: typer.Context,
     output_directory: t.Annotated[
         Path,

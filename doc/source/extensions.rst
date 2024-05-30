@@ -60,6 +60,12 @@ Our command might look like this:
 
 |
 
+.. code-block:: console
+
+    $> python manage.py backup list
+    Default backup routines:
+        database(filename={database}.json, databases=['default'])
+
 .. _inheritance:
 
 Inheritance
@@ -72,8 +78,8 @@ files to our site. This means we'll want to add a media backup routine to the ba
 .. note::
 
     Inheritance also works for commands defined using the Typer-style function based interface.
-    Just import Command from the upstream command module and subclass it just as you would if you
-    had defined it using the class based interface.
+    Import the root Typer_ app from the upstream command module and pass it as an argument
+    to Typer_ when you create the root app in your overriding command module.
 
 Say our app tree looks like this:
 
@@ -147,10 +153,18 @@ backup batch:
 
 .. code-block:: bash
 
+    $> python manage.py backup list
+    Default backup routines:
+        database(filename={database}.json, databases=['default'])
+        media(filename=media.tar.gz)
     # backup media only
-    $ python manage.py backup media
+    $> python manage.py backup media
+    Backing up ./media to ./media.tar.gz
     # or backup database and media
-    $ python manage.py backup
+    $> python manage.py backup
+    Backing up database [default] to: ./default.json
+    [.............................................]
+    Backing up ./media to ./media.tar.gz
 
 .. warning::
 
@@ -327,41 +341,93 @@ Overriding Groups
 ~~~~~~~~~~~~~~~~~
 
 Some commands might have deep nesting of subcommands and groups. If you want to override a
-group or subcommand of a group down a chain of commands you simply need to access the
-:class:`~django_typer.CommandGroup` instance of the group you want to override or extend:
+group or subcommand of a group down a chain of commands you would need to access the
+:class:`~django_typer.Typer` instance of the group you want to override or extend:
 
-.. code-block:: python
+.. tabs::
 
-    from somewhere.upstream.management.commands.command import Command
+    .. tab:: Django-style
 
-    # add a command to grp2 which is a subgroup of grp1
-    @Command.grp1.grp2.command()
-    def my_command():  # remember self is optional
-        pass
+        .. code-block:: python
 
-    # add a subgroup to grp2 which is a subgroup of grp1
-    @Command.grp1.grp2.group()
-    def grp3():
-        pass
+            from somewhere.upstream.management.commands.command import Command
+
+            # add a command to grp2 which is a subgroup of grp1
+            @Command.grp1.grp2.command()
+            def my_command():  # remember self is optional
+                pass
+
+            # add a subgroup to grp2 which is a subgroup of grp1
+            @Command.grp1.grp2.group()
+            def grp3():
+                pass
+
+    .. tab:: Typer-style
+
+        .. code-block:: python
+
+            from somewhere.upstream.management.commands.command import app
+
+            # add a command to grp2 which is a subgroup of grp1
+            @app.grp1.grp2.command()
+            def my_command():  # remember self is optional
+                pass
+
+            # add a subgroup to grp2 which is a subgroup of grp1
+            @app.grp1.grp2.group()
+            def grp3():
+                pass
 
 You may even override the initializer of a predefined group:
 
-.. code-block:: python
+.. tabs::
 
-    from somewhere.upstream.management.commands.command import Command
+    .. tab:: Django-style
 
-    # override the initializer (typer callback) of grp1 on Command,
-    # this will not alter the child groups of grp1 (grp2, grp3, etc.)
-    @Command.grp1.initialize()
-    def grp1_init(self):
-        pass
+        .. code-block:: python
 
-    @Command.group()
-    def grp1(self):
-        """
-        This would override grp1 entirely and remove all subcommands
-        and groups.
-        """
+            from somewhere.upstream.management.commands.command import Command
+
+            # override the initializer (typer callback) of grp1 on Command,
+            # this will not alter the child groups of grp1 (grp2, grp3, etc.)
+            @Command.grp1.initialize()
+            def grp1_init(self):
+                pass
+
+            @Command.group()
+            def grp1(self):
+                """
+                This would override grp1 entirely and remove all subcommands
+                and groups.
+                """
+
+    .. tab:: Typer-style
+
+        .. code-block:: python
+
+            from somewhere.upstream.management.commands.command import app
+
+            # override the initializer (typer callback) of grp1 on app,
+            # this will not alter the child groups of grp1 (grp2, grp3, etc.)
+            @app.grp1.initialize()
+            def grp1_init():
+                pass
+
+            @app.group()
+            def grp1():
+                """
+                This would override grp1 entirely and remove all subcommands
+                and groups.
+                """
+
+.. tip::
+
+    If a group or command has not been directly defined on a Command class, django-typer will do
+    a `breadth first search <https://en.wikipedia.org/wiki/Breadth-first_search>`_ of the command
+    tree and fetch the first group or subcommand that matches the name of the attribute. This
+    means that you do not necessarily have to walk the command hierarchy
+    (i.e. ``Command.grp1.grp2.grp3.cmd``), if there is only one cmd you can simply write
+    ``Command.cmd``. However, using the strict hierarchy will be robust to future changes.
 
 When Do Plugins Make Sense?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -377,4 +443,4 @@ projects its often a good idea to break your code into apps that are as self con
 Plugins can be a good way to organize commands in a code base that follows this pattern. It
 also allows for deployments that install a subset of those apps and is therefore a good way to
 organize commands in code bases that serve as a framework for a particular kind of site or that
-support selecting the features to install.
+support selecting the features to install by the inclusion or exclusion of specific apps.

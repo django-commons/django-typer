@@ -10,6 +10,8 @@ from django_typer.tests.apps.examples.extensions.backup.management.commands impo
     backup_typer,
 )
 
+# to inherit all commands defined upstream pass the root typer app from upstream
+# to our root app here. (This is not a standard typer interface.)
 app = Typer(backup_typer.app)
 
 
