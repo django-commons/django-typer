@@ -23,7 +23,7 @@ django_typer
     :members: initialize, callback, command, group, echo, secho, print_help, get_subcommand
 
 .. autoclass:: django_typer.CommandNode
-    :members: name, click_command, context, parent, children, get_command, print_help
+    :members: name, click_command, context, children, get_command, print_help
 
 .. autoclass:: django_typer.TyperCommandMeta
 

@@ -1322,6 +1322,7 @@ class BoundProxy(t.Generic[P, R]):
         """
         if hasattr(self.proxied, name):
             attr = getattr(self.proxied, name)
+            # want to avoid recursive binding
             if isinstance(attr, (Typer, typer.models.CommandInfo)):
                 return BoundProxy(self.command, attr)
             return attr
@@ -1331,6 +1332,9 @@ class BoundProxy(t.Generic[P, R]):
                 cls=self.__class__.__name__, name=name
             )
         )
+
+    # def __repr__(self) -> str:
+    #     return f'<{self.__class__.__module__}.{self.__class__.__name__} for {repr(self.proxied)}>'
 
 
 def initialize(
