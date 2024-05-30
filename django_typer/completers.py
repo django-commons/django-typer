@@ -26,6 +26,7 @@ from types import MethodType
 from uuid import UUID
 
 from click import Context, Parameter
+from click.core import ParameterSource
 from click.shell_completion import CompletionItem
 from django.apps import apps
 from django.conf import settings
@@ -321,7 +322,12 @@ class ModelObjectCompleter:
                 return []
 
         excluded: t.List[t.Type[Model]] = []
-        if self.distinct and parameter.name:
+        if (
+            self.distinct
+            and parameter.name
+            and context.get_parameter_source(parameter.name)
+            is not ParameterSource.DEFAULT
+        ):
             excluded = context.params.get(parameter.name, []) or []
 
         return [
@@ -380,7 +386,12 @@ def complete_app_label(
     :return: A list of matching app labels or names. Labels already present for the
         parameter on the command line will be filtered out.
     """
-    present = [app.label for app in (ctx.params.get(param.name or "") or [])]
+    present = []
+    if (
+        param.name
+        and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+    ):
+        present = [app.label for app in (ctx.params.get(param.name) or [])]
     ret = [
         CompletionItem(app.label)
         for app in apps.get_app_configs()
@@ -503,29 +514,38 @@ are interpreted relative to the current working directory.
 """
 
 
-def these_strings(strings: t.List[str], allow_duplicates: bool = False):
+def these_strings(
+    strings: t.Union[t.Callable[[], t.Sequence[str]], t.Sequence[str]],
+    allow_duplicates: bool = False,
+):
     """
     Get a completer that provides completion logic that matches the allowed strings.
 
-    :param strings: A list of allowed strings.
+    :param strings: A sequence of allowed strings or a callable that generates a sequence of
+        allowed strings.
     :param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
     :return: A completer function.
     """
 
     def complete(ctx: Context, param: Parameter, incomplete: str):
         present = []
-        if not allow_duplicates:
-            present = [value for value in (ctx.params.get(param.name or "") or [])]
+        if (
+            not allow_duplicates
+            and param.name
+            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+        ):
+            present = [value for value in (ctx.params.get(param.name) or [])]
         return [
             CompletionItem(item)
-            for item in strings
+            for item in (strings() if callable(strings) else strings)
             if item.startswith(incomplete) and item not in present
         ]
 
     return complete
 
 
-databases = these_strings([alias for alias in settings.DATABASES.keys()])
+# use a function that returns a generator because we should not access settings on import
+databases = these_strings(lambda: settings.DATABASES.keys())
 """
 A completer that provides completion logic for the Django database aliases
 configured in settings.DATABASES.
