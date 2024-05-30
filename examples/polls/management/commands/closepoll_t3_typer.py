@@ -17,7 +17,7 @@ def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
         raise CommandError(f'Poll "{poll}" does not exist')
 
 
-app = Typer()
+app = Typer(rich_markup_mode="markdown")
 
 
 @app.command()
@@ -39,10 +39,10 @@ def handle(
     ] = False,
 ):
     """
-    Closes the specified poll for voting.
-
-    As mentioned in the last section, helps can also
-    be set in the docstring
+    :sparkles: As mentioned in the last section, helps can also be set in
+    the docstring and rendered using either
+    [rich](https://rich.readthedocs.io/en/stable/markup.html)
+    or [markdown](https://www.markdownguide.org/) :sparkles:
     """
     for poll in polls:
         poll.opened = False

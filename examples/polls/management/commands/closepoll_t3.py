@@ -17,7 +17,7 @@ def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
         raise CommandError(f'Poll "{poll}" does not exist')
 
 
-class Command(TyperCommand):
+class Command(TyperCommand, rich_markup_mode="markdown"):
     def handle(
         self,
         polls: t.Annotated[
@@ -30,17 +30,17 @@ class Command(TyperCommand):
         delete: t.Annotated[
             bool,
             Option(
-                "--delete",  # we can also get rid of that unnecessary --no-delete flag
+                # we can also get rid of that unnecessary --no-delete flag
+                "--delete",
                 help=_("Delete poll instead of closing it."),
             ),
         ] = False,
     ):
         """
-        Closes the specified poll for voting.
-
-
-        As mentioned in the last section, helps can also
-        be set in the docstring
+        :sparkles: As mentioned in the last section, helps can also be set in
+        the docstring and rendered using either
+        [rich](https://rich.readthedocs.io/en/stable/markup.html)
+        or [markdown](https://www.markdownguide.org/) :sparkles:
         """
         for poll in polls:
             poll.opened = False

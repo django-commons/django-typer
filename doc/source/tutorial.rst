@@ -204,7 +204,7 @@ look like if we used the Poll class as our type hint:
 
         .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3.py
             :language: python
-            :lines: 11-53
+            :lines: 11-52
 
     .. tab:: Typer-style
 

@@ -16,6 +16,8 @@ BACKUP_DIRECTORY = Path(__file__).parent / "_test_archive"
 class TestBackupExample(SimpleTestCase):
     databases = {"default"}
 
+    typer = ""
+
     def setUp(self):
         if BACKUP_DIRECTORY.exists():
             shutil.rmtree(BACKUP_DIRECTORY)
@@ -28,7 +30,7 @@ class TestBackupExample(SimpleTestCase):
 
     def test_base_backup(self):
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--no-color",
             "--settings",
             "django_typer.tests.settings.backup",
@@ -43,7 +45,7 @@ class TestBackupExample(SimpleTestCase):
         )
 
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--settings",
             "django_typer.tests.settings.backup",
             "-o",
@@ -56,7 +58,7 @@ class TestBackupExample(SimpleTestCase):
 
     def test_inherit_backup(self):
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--no-color",
             "--settings",
             "django_typer.tests.settings.backup_inherit",
@@ -71,7 +73,7 @@ class TestBackupExample(SimpleTestCase):
         self.assertTrue("media(filename=media.tar.gz)" in lines)
 
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--settings",
             "django_typer.tests.settings.backup_inherit",
             "-o",
@@ -85,7 +87,7 @@ class TestBackupExample(SimpleTestCase):
 
     def test_extend_backup(self):
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--no-color",
             "--settings",
             "django_typer.tests.settings.backup_ext",
@@ -99,7 +101,7 @@ class TestBackupExample(SimpleTestCase):
         self.assertTrue("media(filename=media.tar.gz)" in lines)
 
         stdout, stderr, retcode = run_command(
-            "backup",
+            f"backup{self.typer}",
             "--settings",
             "django_typer.tests.settings.backup_ext",
             "-o",
@@ -113,3 +115,8 @@ class TestBackupExample(SimpleTestCase):
         self.assertTrue((BACKUP_DIRECTORY / "media.tar.gz").exists())
         self.assertTrue((BACKUP_DIRECTORY / "requirements.txt").exists())
         self.assertTrue(len(os.listdir(BACKUP_DIRECTORY)) == 3)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
+class TestBackupTyperExample(TestBackupExample):
+    typer = "_typer"

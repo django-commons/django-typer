@@ -30,11 +30,26 @@ to determine if a subcommand was called in our root initializer callback and we 
 subroutines added by extensions at runtime using :func:`~django_typer.TyperCommand.get_subcommand`.
 Our command might look like this:
 
+.. tabs::
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup.py
-   :language: python
-   :caption: Base Backup Command
-   :linenos:
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup.py
+            :language: python
+            :caption: backup/management/commands/backup.py
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.extensions.backup : backup
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup_typer.py
+            :language: python
+            :caption: backup/management/commands/backup.py
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.extensions.backup : backup
+
 
 .. typer:: django_typer.tests.apps.examples.extensions.backup.management.commands.backup.Command:typer_app
     :prog: manage.py backup
@@ -92,11 +107,23 @@ Say our app tree looks like this:
 
 Our backup.py implementation in the media app might look like this:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup.py
-   :language: python
-   :caption: Media Backup Extension
-   :replace:
-        django_typer.tests.apps.examples.extensions.backup : media
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup.py
+            :language: python
+            :caption: media/management/commands/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.media1 : media
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup_typer.py
+            :language: python
+            :caption: media/management/commands/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.media1 : media
 
 Now you'll see we have another command called media available:
 
@@ -221,19 +248,45 @@ this:
 For plugins to work, we'll need to re-mplement media from above as a composed extension
 and that would look like this:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup.py
-   :language: python
-   :caption: Media Backup Extension
-   :replace:
-        django_typer.tests.apps.examples.extensions.backup : backup
+.. tabs::
+
+    .. tab:: django-typer
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup.py
+            :language: python
+            :caption: media/management/extensions/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.media2 : media
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup_typer.py
+            :language: python
+            :caption: media/management/extensions/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.media2 : media
+
+
 
 And our my_app extension might look like this:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup.py
-   :language: python
-   :caption: MyApp Backup Extension
-   :replace:
-        django_typer.tests.apps.examples.extensions.backup : backup
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup.py
+            :language: python
+            :caption: my_app/management/extensions/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.my_app : my_app
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup_typer.py
+            :language: python
+            :caption: my_app/management/extensions/backup.py
+            :replace:
+                    django_typer.tests.apps.examples.extensions.my_app : my_app
 
 Note that we now have a new environment command available:
 
