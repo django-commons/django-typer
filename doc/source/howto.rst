@@ -91,21 +91,41 @@ Define Multiple Subcommands
 
 Commands with a single executable function should simply implement handle(), but if you would
 like have multiple subcommands you can define any number of functions decorated with
-:func:`~django_typer.command`:
+:func:`~django_typer.command` or :func:`~django_typer.Typer.command`:
 
-.. code-block:: python
+.. tabs::
 
-    from django_Typer import TyperCommand, command
+    .. tab:: Django-style
 
-    class Command(TyperCommand):
+        .. code-block:: python
 
-        @command()
-        def subcommand1(self):
-            ...
+            from django_typer import TyperCommand, command
 
-        @command()
-        def subcommand2(self):
-            ...
+            class Command(TyperCommand):
+
+                @command()
+                def subcommand1(self):
+                    ...
+
+                @command()
+                def subcommand2(self):
+                    ...
+
+    .. tab:: Typer-style
+
+        .. code-block:: python
+
+            from django_typer import Typer
+
+            app = Typer()
+
+            @app.command()
+            def subcommand1():
+                ...
+
+            @app.command()
+            def subcommand2():
+                ...
 
 .. note::
 
@@ -133,23 +153,47 @@ whatever we want the command to be. For example to define three subcommands but 
 default we can do this:
 
 
-.. code-block:: python
+.. tabs::
 
-    from django_typer import TyperCommand, command
+    .. tab:: Django-style
 
-    class Command(TyperCommand):
+        .. code-block:: python
 
-        @command(name='subcommand1')
-        def handle(self):
-            ...
+            from django_typer import TyperCommand, command
 
-        @command()
-        def subcommand2(self):
-            ...
+            class Command(TyperCommand):
 
-        @command()
-        def subcommand3(self):
-            ...
+                @command(name='subcommand1')
+                def handle(self):
+                    ...
+
+                @command()
+                def subcommand2(self):
+                    ...
+
+                @command()
+                def subcommand3(self):
+                    ...
+
+    .. tab:: Typer-style
+
+        .. code-block:: python
+
+            from django_typer import Typer
+
+            app = Typer()
+
+            @app.command(name='subcommand1')
+            def handle():
+                ...
+
+            @app.command()
+            def subcommand2():
+                ...
+
+            @app.command()
+            def subcommand3():
+                ...
 
 
 .. code-block:: python

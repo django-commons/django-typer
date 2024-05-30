@@ -3030,8 +3030,13 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param kwargs: the options to directly pass to handle()
         """
         with self:
-            if getattr(self, "_handle", None) and callable(self._handle):
-                return self._handle(*args, **kwargs)
+            handle = getattr(self, "_handle", None) or getattr(
+                self.typer_app,
+                "handle",
+                None,  # registered dynamically
+            )
+            if callable(handle):
+                return handle(*args, **kwargs)
             raise NotImplementedError(
                 _(
                     "{cls} does not implement handle(), you must call the other command "
