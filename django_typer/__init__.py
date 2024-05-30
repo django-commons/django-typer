@@ -2098,10 +2098,9 @@ class TyperCommandMeta(type):
             if called_from_command_definition():
                 if name in cls._defined_groups:
                     return cls._defined_groups[name]
-            elif cls.typer_app:
-                found = _bfs_match(cls.typer_app, name)
-                if found:
-                    return found
+            found = _bfs_match(cls.typer_app, name)
+            if found:
+                return found
         raise AttributeError(
             "{cls} object has no attribute {name}".format(cls=cls.__name__, name=name)
         )
