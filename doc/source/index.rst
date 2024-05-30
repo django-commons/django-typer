@@ -5,7 +5,7 @@
 Django Typer
 ============
 
-Use Typer_ to define the CLI for your Django_ management commands using the typer interface.
+Use Typer_ to define the CLI for your Django_ management commands using Python's static typing.
 Optionally use the provided TyperCommand class that inherits from BaseCommand_. This class maps
 the typer interface onto a class based interface that Django developers will be familiar with.
 All of the BaseCommand functionality is preserved, so that TyperCommand can be a drop in
@@ -25,6 +25,7 @@ replacement.
     * Refactor existing management commands into TyperCommands because TyperCommand is interface
       compatible with BaseCommand.
     * Use either a class-based interface or the basic Typer style interface to define commands.
+    * Add plugins to upstream commands.
 
 
 :big:`Installation`
@@ -59,9 +60,12 @@ replacement.
 
 .. note::
 
-    This documentation shows all examples using both the function orientied Typer-style interface
-    and the class based Django-style interface using tabs. Each interface is equivalent so the
-    choice of which to use is a matter of preference.
+    This documentation shows all examples using both the function oriented Typer-style interface
+    and the class based Django-style interface in separate tabs. Each interface is functionally
+    equivalent so the choice of which to use is a matter of preference and familiarity. All
+    django-typer commands are instances of :class:`~django_typer.TyperCommand`, including commands
+    defined in the Typer-style interface. **This means you may always specify a self argument to
+    receive the instance of the command in your functions.**
 
 :big:`Basic Example`
 
@@ -141,8 +145,7 @@ command like so:
 
 Any number of groups and subcommands and subgroups of other groups can be defined allowing for
 arbitrarily complex command hierarchies. The Typer-style interface builds a TyperCommand class for
-us. **This allows you to optionally accept the self argument in your commands.** We could define
-the above command using the typer interface like this:
+us **that allows you to optionally accept the self argument in your commands.**
 
 .. tabs::
 

@@ -94,7 +94,6 @@ looks like this:
     :replace:
         django_typer.tests.apps.examples.polls.models : polls.models
 
-
 Inherit from :class:`~django_typer.TyperCommand`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -102,11 +101,23 @@ We first need to change the inheritance to :class:`~django_typer.TyperCommand` a
 argument and option definitions from add_arguments into the method signature of handle. A minimal
 conversion may look like this:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1.py
-    :language: python
-    :linenos:
-    :replace:
-        django_typer.tests.apps.examples.polls.models : polls.models
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1_typer.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
 You'll note that we've removed add_arguments entirely and specified the arguments and options as
 parameters to the handle method. django-typer_ will interpret the parameters on the handle() method
@@ -139,12 +150,23 @@ with one of two Typer_ parameter types, either Argument or Option. Arguments_ ar
 parameters and Options_ are named parameters (i.e. `--delete`). In our polls example, the poll_ids
 are arguments and the delete flag is an option. Here is what that would look like:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2.py
-    :language: python
-    :lines: 17-29
-    :replace:
-        django_typer.tests.apps.examples.polls.models : polls.models
+.. tabs::
 
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2.py
+            :language: python
+            :lines: 11-23
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2_typer.py
+            :language: python
+            :lines: 13-23
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
 See that our help text now shows up in the command line interface. Also note, that
 `lazy translations <https://docs.djangoproject.com/en/stable/topics/i18n/translation/>`_ work for
@@ -176,11 +198,19 @@ duplicate our for loop that loads Poll objects from ids, but that wouldn't be ve
 Typer_ allows us to define custom parsers for arbitrary parameter types. Lets see what that would
 look like if we used the Poll class as our type hint:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3.py
-    :language: python
-    :linenos:
-    :lines: 17-58
+.. tabs::
 
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3.py
+            :language: python
+            :lines: 11-53
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3_typer.py
+            :language: python
+            :lines: 11-54
 
 .. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t3.Command:typer_app
     :prog: manage.py closepoll
@@ -254,11 +284,24 @@ When we're using a :class:`~django_typer.parsers.ModelObjectParser` and
 of boiler plate. Let's put everything together and see what our full-featured refactored
 closepoll command looks like:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6.py
-    :language: python
-    :linenos:
-    :replace:
-        django_typer.tests.apps.examples.polls.models : polls.models
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6_typer.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
+
 
 .. only:: html
 

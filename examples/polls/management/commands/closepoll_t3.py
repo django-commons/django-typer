@@ -1,10 +1,4 @@
-import sys
 import typing as t
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 from django.core.management.base import CommandError
 from django.utils.translation import gettext_lazy as _
@@ -26,14 +20,14 @@ def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
 class Command(TyperCommand):
     def handle(
         self,
-        polls: Annotated[
+        polls: t.Annotated[
             t.List[Poll],
             Argument(
                 parser=get_poll_from_id,
                 help=_("The database IDs of the poll(s) to close."),
             ),
         ],
-        delete: Annotated[
+        delete: t.Annotated[
             bool,
             Option(
                 "--delete",  # we can also get rid of that unnecessary --no-delete flag
