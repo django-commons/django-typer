@@ -2,7 +2,8 @@ from .base import *
 from pathlib import Path
 
 INSTALLED_APPS = [
-    "django_typer.tests.apps.examples.extensions.backup",
+    "django_typer.tests.apps.examples.plugins.backup",
+    "django_typer.tests.apps.util",
     "django_typer",
     "django.contrib.admin",
     "django.contrib.auth",

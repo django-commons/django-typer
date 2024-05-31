@@ -126,7 +126,7 @@ from .types import (
 )
 from .utils import (
     _command_context,
-    _load_command_extensions,
+    _load_command_plugins,
     called_from_command_definition,
     called_from_module,
     get_usage_script,
@@ -861,6 +861,50 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     Typer_ apps. This class extends the ``typer.Typer`` class so that we can add
     the additional information necessary to attach this app to the root app
     and other groups specified on the django command.
+
+    :param name: the name of the class being created
+    :param bases: the base classes of the class being created
+    :param attrs: the attributes of the class being created
+    :param cls: The class to use as the core typer group wrapper
+    :param invoke_without_command: whether to invoke the group callback if no command
+        was specified.
+    :param no_args_is_help: whether to show the help if no arguments are provided
+    :param subcommand_metavar: the metavar to use for subcommands in the help output
+    :param chain: whether to chain commands, this allows multiple commands from the group
+        to be specified and run in order sequentially in one call from the command line.
+    :param result_callback: a callback to invoke with the result of the command
+    :param context_settings: the click context settings to use - see
+        `click docs <https://click.palletsprojects.com/api/#context>`_.
+    :param help: the help string to use, defaults to the function docstring, if you need
+        to translate the help you should use the help kwarg instead because docstrings
+        will not be translated.
+    :param epilog: the epilog to use in the help output
+    :param short_help: the short help to use in the help output
+    :param options_metavar: the metavar to use for options in the help output
+    :param add_help_option: whether to add the help option to the command
+    :param hidden: whether to hide this group from the help output
+    :param deprecated: show a deprecation warning
+    :param rich_markup_mode: the rich markup mode to use - if rich is installed
+        this can be used to enable rich markup or Markdown in the help output. Can
+        be "markdown", "rich" or None to disable markup rendering.
+    :param rich_help_panel: the rich help panel to use - if rich is installed
+        this can be used to group commands into panels in the help output.
+    :param pretty_exceptions_enable: whether to enable pretty exceptions - if rich is
+        installed this can be used to enable pretty exception rendering. This will
+        default to on if the traceback configuration settings installs the rich
+        traceback handler. This allows tracebacks to be configured by the user on a
+        per deployment basis in the settings file. We therefore do not advise
+        hardcoding this value.
+    :param pretty_exceptions_show_locals: whether to show local variables in pretty
+        exceptions - if rich is installed. This will default to the 'show_locals'
+        setting in the traceback configuration setting (on by default). This allows
+        tracebacks to be configured by the user on a per deployment basis in the
+        settings file. We therefore do not advise hardcoding this value.
+    :param pretty_exceptions_short: whether to show short tracebacks in pretty
+        exceptions - if rich is installed. This will default to the 'short' setting
+        in the traceback configuration setting (off by default). This allows tracebacks
+        to be configured by the user on a per deployment basis in the settings file. We
+        therefore do not advise hardcoding this value.
     """
 
     parent: t.Optional["Typer"] = None
@@ -1727,12 +1771,9 @@ def _resolve_help(dj_cmd: "TyperCommand"):
     """
     hlp = None
     for cmd_cls in [
-        dj_cmd.__class__,
-        *[
-            c
-            for c in dj_cmd.__class__.__mro__
-            if issubclass(c, TyperCommand) and c is not TyperCommand
-        ],
+        c
+        for c in dj_cmd.__class__.__mro__
+        if issubclass(c, TyperCommand) and c is not TyperCommand
     ]:
         hlp = cmd_cls.__doc__
         if hlp:
@@ -2896,7 +2937,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         **kwargs,
     ):
         assert self.typer_app.info.name
-        _load_command_extensions(self.typer_app.info.name)
+        _load_command_plugins(self.typer_app.info.name)
         _add_common_initializer(self)
         _resolve_help(self)
 

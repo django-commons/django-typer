@@ -23,7 +23,7 @@ __all__ = [
     "traceback_config",
     "get_current_command",
     "with_typehint",
-    "register_command_extensions",
+    "register_command_plugins",
     "called_from_module",
     "called_from_command_definition",
 ]
@@ -102,57 +102,57 @@ def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
     return object  # type: ignore
 
 
-_command_extensions: t.Dict[str, t.List[ModuleType]] = {}
+_command_plugins: t.Dict[str, t.List[ModuleType]] = {}
 
 
-def register_command_extensions(
+def register_command_plugins(
     package: ModuleType, commands: t.Optional[t.List[str]] = None
 ):
     """
-    Register a command extension for the given command within the given package.
+    Register a command plugin for the given command within the given package.
 
     For example, use this in your AppConfig's ready() method:
 
     .. code-block:: python
 
         from django.apps import AppConfig
-        from django_typer.utils import register_command_extensions
+        from django_typer.utils import register_command_plugins
 
 
         class MyAppConfig(AppConfig):
             name = "myapp"
 
             def ready(self):
-                from .management import extensions
+                from .management import plugins
 
-                register_command_extensions(extensions)
+                register_command_plugins(plugins)
 
 
     :param package: The package the command extension module resides in
     :param commands: The names of the commands/modules, if not provided, all modules
-        in the package will be registered as extensions
+        in the package will be registered as plugins
     """
     commands = commands or [
         module[1].split(".")[-1]
         for module in pkgutil.iter_modules(package.__path__, f"{package.__name__}.")
     ]
     for command in commands:
-        _command_extensions.setdefault(command, [])
-        if package not in _command_extensions[command]:
-            _command_extensions[command].append(package)
+        _command_plugins.setdefault(command, [])
+        if package not in _command_plugins[command]:
+            _command_plugins[command].append(package)
 
 
-def _load_command_extensions(command: str) -> int:
+def _load_command_plugins(command: str) -> int:
     """
-    Load any extensions for the given command by loading the registered
+    Load any plugins for the given command by loading the registered
     modules in registration order.
 
     :param command: The name of the command
-    :return: The number of extensions loaded.
+    :return: The number of plugins loaded.
     """
-    extensions = _command_extensions.get(command, [])
-    if extensions:
-        for ext_pkg in reversed(extensions):
+    plugins = _command_plugins.get(command, [])
+    if plugins:
+        for ext_pkg in reversed(plugins):
             try:
                 importlib.import_module(f"{ext_pkg.__name__}.{command}")
             except (ImportError, ModuleNotFoundError) as err:
@@ -160,8 +160,8 @@ def _load_command_extensions(command: str) -> int:
                     f"No extension module was found for command {command} in {ext_pkg.__path__}."
                 ) from err
         # we only want to do this once
-        del _command_extensions[command]
-    return len(extensions)
+        del _command_plugins[command]
+    return len(plugins)
 
 
 def _check_call_frame(frame_name: str) -> bool:

@@ -1,6 +1,6 @@
 .. include:: ./refs.rst
 
-.. _extensions:
+.. _plugins:
 
 ============================
 Tutorial: Extending Commands
@@ -27,31 +27,31 @@ but we anticipate our command being extended so we may also provide default beha
 discover and run every backup routine defined on the command if no specific subroutine is invoked.
 We can `use the context <https://typer.tiangolo.com/tutorial/commands/context/#getting-the-context>`_
 to determine if a subcommand was called in our root initializer callback and we can find
-subroutines added by extensions at runtime using :func:`~django_typer.TyperCommand.get_subcommand`.
+subroutines added by plugins at runtime using :func:`~django_typer.TyperCommand.get_subcommand`.
 Our command might look like this:
 
 .. tabs::
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/backup/management/commands/backup.py
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.extensions.backup : backup
+                django_typer.tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/backup/management/commands/backup_typer.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/backup/management/commands/backup_typer.py
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.extensions.backup : backup
+                django_typer.tests.apps.examples.plugins.backup : backup
 
 
-.. typer:: django_typer.tests.apps.examples.extensions.backup.management.commands.backup.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.plugins.backup.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :show-nested:
@@ -117,23 +117,23 @@ Our backup.py implementation in the media app might look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media1/management/commands/backup.py
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.media1 : media
+                    django_typer.tests.apps.examples.plugins.media1 : media
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media1/management/commands/backup_typer.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media1/management/commands/backup_typer.py
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.media1 : media
+                    django_typer.tests.apps.examples.plugins.media1 : media
 
 Now you'll see we have another command called media available:
 
-.. typer:: django_typer.tests.apps.examples.extensions.media1.management.commands.backup.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :convert-png: latex
@@ -144,7 +144,7 @@ Now you'll see we have another command called media available:
 Now we have a media backup routine that we can run individually or part of the entire
 backup batch:
 
-.. typer:: django_typer.tests.apps.examples.extensions.media1.management.commands.backup.Command:typer_app:media
+.. typer:: django_typer.tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app:media
     :prog: manage.py backup media
     :width: 80
     :convert-png: latex
@@ -193,7 +193,7 @@ directly without overriding it or changing its name. This allows downstream apps
 nothing about each other to add their own behavior to the same command. If there are conflicts
 they are resolved in INSTALLED_APPS order.**
 
-To do this we have to abandon the class based interface and place our extensions in a module other
+To do this we have to abandon the class based interface and place our plugins in a module other
 than ``commands``. Let us suppose we are developing a site that uses the backup and media app from
 upstream and we've implemented most of our custom site functionality in a new app called my_app.
 Because we're now mostly working at the level of our particular site we may want to add more custom
@@ -220,7 +220,7 @@ the upstream backup app. Our app tree now might look like this:
     │   └── management/
     │       ├── __init__.py
     │       ├── commands/
-    │       └── extensions/
+    │       └── plugins/
     │           └── __init__.py
     │           └── backup.py
     └── my_app/
@@ -229,33 +229,33 @@ the upstream backup app. Our app tree now might look like this:
         └── management/
             ├── __init__.py
             ├── commands/
-            └── extensions/
+            └── plugins/
                 └── __init__.py
                 └── backup.py
 
 
-Note that we've added an ``extensions`` directory to the management directory of the media and
+Note that we've added an ``plugins`` directory to the management directory of the media and
 my_app apps. This is where we'll place our extension commands. There is an additional step we must
-take. In the ``apps.py`` file of the media and my_app apps we must register our extensions like
+take. In the ``apps.py`` file of the media and my_app apps we must register our plugins like
 this:
 
 .. code-block:: python
 
     from django.apps import AppConfig
-    from django_typer.utils import register_command_extensions
+    from django_typer.utils import register_command_plugins
 
     class MyAppConfig(AppConfig):
         name = 'my_app'
 
         def ready(self):
-            from .management import extensions
+            from .management import plugins
 
-            register_command_extensions(extensions)
+            register_command_plugins(plugins)
 
 .. note::
 
-    Because we explicitly register our extensions we can call the package whatever we want.
-    django-typer does not require it to be named ``extensions``. It is also important to
+    Because we explicitly register our plugins we can call the package whatever we want.
+    django-typer does not require it to be named ``plugins``. It is also important to
     do this inside ready() because conflicts are resolved in the order in which the extension
     modules are registered and ready() methods are called in INSTALLED_APPS order.
 
@@ -266,19 +266,19 @@ and that would look like this:
 
     .. tab:: django-typer
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media2/management/plugins/backup.py
             :language: python
-            :caption: media/management/extensions/backup.py
+            :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.media2 : media
+                    django_typer.tests.apps.examples.plugins.media2 : media
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/media2/management/extensions/backup_typer.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media2/management/plugins/backup_typer.py
             :language: python
-            :caption: media/management/extensions/backup.py
+            :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.media2 : media
+                    django_typer.tests.apps.examples.plugins.media2 : media
 
 
 
@@ -288,19 +288,19 @@ And our my_app extension might look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/my_app/management/plugins/backup.py
             :language: python
-            :caption: my_app/management/extensions/backup.py
+            :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.my_app : my_app
+                    django_typer.tests.apps.examples.plugins.my_app : my_app
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/extensions/my_app/management/extensions/backup_typer.py
+        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/my_app/management/plugins/backup_typer.py
             :language: python
-            :caption: my_app/management/extensions/backup.py
+            :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.extensions.my_app : my_app
+                    django_typer.tests.apps.examples.plugins.my_app : my_app
 
 Note that we now have a new environment command available:
 
@@ -330,7 +330,7 @@ And the command line parameters to database have been removed:
 
 .. note::
 
-    The extension code is lazily loaded. This means extensions are resolved on command classes
+    The extension code is lazily loaded. This means plugins are resolved on command classes
     the first time an instance of the class is instantiated. This avoids unnecessary code
     execution but does mean that if you are working directly with the ``typer_app`` attribute
     on a :class:`~django_typer.TyperCommand` you will need to make sure at least one instance

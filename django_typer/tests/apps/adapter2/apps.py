@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django_typer.utils import register_command_extensions
+from django_typer.utils import register_command_plugins
 
 
 class Adapter2Config(AppConfig):
@@ -10,4 +10,4 @@ class Adapter2Config(AppConfig):
     def ready(self):
         from .management import adapters
 
-        register_command_extensions(adapters, ["adapted2"])
+        register_command_plugins(adapters, ["adapted2"])

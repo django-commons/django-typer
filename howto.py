@@ -1,0 +1,1 @@
+./django_typer/tests/howto.py

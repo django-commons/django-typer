@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import Error, register
-from django_typer.utils import register_command_extensions
+from django_typer.utils import register_command_plugins
 
 
 @register()
@@ -30,4 +30,4 @@ class TestAppConfig(AppConfig):
 
         from .management import extensions
 
-        register_command_extensions(extensions)
+        register_command_plugins(extensions)

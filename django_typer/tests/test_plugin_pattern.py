@@ -162,7 +162,7 @@ class ResetAppsMixin:
                     for path in [
                         "django_typer.tests.apps.adapter1",
                         "django_typer.tests.apps.adapter2",
-                        "django_typer.tests.apps.test_app2.management.adapters"
+                        "django_typer.tests.apps.test_app.management.commands"
                         "django_typer.tests.apps.adapter0",
                     ]
                 ]
@@ -195,6 +195,55 @@ class UnadaptedTests(TestCase):
 
     def test_adapted_is_compound(self):
         self.assertFalse(get_command("adapted").is_compound_command)
+
+
+class Adapter2InterferenceTests(ResetAppsMixin, TestCase):
+    """
+    A very complicated test that adapts a command that is extended
+    from another complicated command. This also insures adaptations
+    do not unintentionally interfere with upstream base commands.
+    """
+
+    def test_adapted2_baseline(self):
+        self.assertEqual(
+            run_command(
+                "adapted2", "--verbosity", "3", "grp2", "--flag1", "grp2-cmd1", "4"
+            )[0].strip(),
+            "test_app::adapted2(3)::grp2(True)::grp2_cmd1(4)",
+        )
+
+        self.assertEqual(
+            run_command("adapted2", "--verbosity", "2", "grp2", "grp2-cmd2", "arg")[
+                0
+            ].strip(),
+            "test_app::adapted2(2)::grp2(False)::grp2_cmd2(arg)",
+        )
+
+        self.assertEqual(
+            call_command("adapted2", "--verbosity", "4", "grp1", "5", "grp1-ext"),
+            "test_app::adapted2(4)::grp1(5.0)::grp1_ext()",
+        )
+
+        self.assertEqual(
+            call_command("adapted2", "grp2", "grp2-cmd1", "arg"),
+            "test_app::adapted2(1)::grp2(False)::grp2_cmd1(arg)",
+        )
+
+        with self.assertRaises(CommandError):
+            # 6 is out of bounds
+            call_command("adapted2", "--verbosity", "6", "grp1", "5", "grp1-ext")
+
+        with self.assertRaises(CommandError):
+            call_command("adapted2", "top1", "a1", "a2")
+
+        with self.assertRaises(CommandError):
+            call_command("adapted2", "top2")
+
+        with self.assertRaises(CommandError):
+            call_command("adapted2", "grp1", "3", "grp1-adpt1")
+
+        with self.assertRaises(CommandError):
+            call_command("adapted2", "grp1", "4", "subgroup", "subsubgroup", "ssg-cmd")
 
 
 @override_settings(
@@ -318,55 +367,6 @@ class AdapterTests(ResetAppsMixin, TestCase):
             0.99,  # width inconsistences drive this number < 1
         )
         print(f"adapted echo --help similiarity: {sim}")
-
-
-class Adapter2InterferenceTests(ResetAppsMixin, TestCase):
-    """
-    A very complicated test that adapts a command that is extended
-    from another complicated command. This also insures adaptations
-    do not unintentionally interfere with upstream base commands.
-    """
-
-    def test_adapted2_baseline(self):
-        self.assertEqual(
-            run_command(
-                "adapted2", "--verbosity", "3", "grp2", "--flag1", "grp2-cmd1", "4"
-            )[0].strip(),
-            "test_app::adapted2(3)::grp2(True)::grp2_cmd1(4)",
-        )
-
-        self.assertEqual(
-            run_command("adapted2", "--verbosity", "2", "grp2", "grp2-cmd2", "arg")[
-                0
-            ].strip(),
-            "test_app::adapted2(2)::grp2(False)::grp2_cmd2(arg)",
-        )
-
-        self.assertEqual(
-            call_command("adapted2", "--verbosity", "4", "grp1", "5", "grp1-ext"),
-            "test_app::adapted2(4)::grp1(5.0)::grp1_ext()",
-        )
-
-        self.assertEqual(
-            call_command("adapted2", "grp2", "grp2-cmd1", "arg"),
-            "test_app::adapted2(1)::grp2(False)::grp2_cmd1(arg)",
-        )
-
-        with self.assertRaises(CommandError):
-            # 6 is out of bounds
-            call_command("adapted2", "--verbosity", "6", "grp1", "5", "grp1-ext")
-
-        with self.assertRaises(CommandError):
-            call_command("adapted2", "top1", "a1", "a2")
-
-        with self.assertRaises(CommandError):
-            call_command("adapted2", "top2")
-
-        with self.assertRaises(CommandError):
-            call_command("adapted2", "grp1", "3", "grp1-adpt1")
-
-        with self.assertRaises(CommandError):
-            call_command("adapted2", "grp1", "4", "subgroup", "subsubgroup", "ssg-cmd")
 
 
 @override_settings(
