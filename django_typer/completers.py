@@ -30,6 +30,7 @@ from click.core import ParameterSource
 from click.shell_completion import CompletionItem
 from django.apps import apps
 from django.conf import settings
+from django.core.management import get_commands
 from django.db.models import (
     CharField,
     DecimalField,
@@ -43,6 +44,9 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
+
+Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
+Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
 
 
 class ModelObjectCompleter:
@@ -515,7 +519,7 @@ are interpreted relative to the current working directory.
 
 
 def these_strings(
-    strings: t.Union[t.Callable[[], t.Sequence[str]], t.Sequence[str]],
+    strings: t.Union[t.Callable[[], Strings], Strings],
     allow_duplicates: bool = False,
 ):
     """
@@ -545,8 +549,75 @@ def these_strings(
 
 
 # use a function that returns a generator because we should not access settings on import
-databases = these_strings(lambda: settings.DATABASES.keys())
+databases = partial(these_strings, lambda: settings.DATABASES.keys())
 """
-A completer that provides completion logic for the Django database aliases
-configured in settings.DATABASES.
+A completer that completes Django database aliases configured in settings.DATABASES.
+
+:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+:return: A completer function.
 """
+
+commands = partial(these_strings, lambda: get_commands().keys())
+"""
+A completer that completes management command names.
+
+:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+:return: A completer function.
+"""
+
+
+def chain(
+    completer: Completer,
+    *completers: Completer,
+    first_match: bool = False,
+    allow_duplicates: bool = False,
+):
+    """
+    Run through the given completers and return the items from the first one, or all
+    of them if first_match is False.
+
+    .. note::
+
+        This function is also useful for filtering out previously supplied duplicate
+        values for completers that do not natively support that:
+
+        .. code-block:: python
+
+            shell_complete=chain(
+                complete_import_path,
+                allow_duplicates=False
+            )
+
+    :param completer: The first completer to use (must be at least one!)
+    :param completers: The completers to use
+    :param first_match: If true, return only the matches from the first completer that
+        finds completions. Default: False
+    :param allow_duplicates: If False (default) remove completions from previously provided
+        values.
+    """
+
+    def complete(ctx: Context, param: Parameter, incomplete: str):
+        completions = []
+        present = []
+        if (
+            not allow_duplicates
+            and param.name
+            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+        ):
+            present = [value for value in (ctx.params.get(param.name) or [])]
+        for cmpltr in [completer, *completers]:
+            completions.extend(cmpltr(ctx, param, incomplete))
+            if first_match and completions:
+                break
+
+        # eliminate duplicates
+        return list(
+            {
+                ci.value: ci
+                for ci in completions
+                if ci.value
+                if ci.value not in present
+            }.values()
+        )
+
+    return complete

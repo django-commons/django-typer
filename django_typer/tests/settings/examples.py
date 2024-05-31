@@ -1,6 +1,7 @@
 from .base import *
 
 INSTALLED_APPS = [
+    "django_typer.tests.apps.examples.completers",
     "django_typer.tests.apps.examples.basic",
     "django_typer.tests.apps.util",
     "django_typer",

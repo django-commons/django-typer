@@ -121,7 +121,7 @@ class TestShellCompletersAndParsers(TestCase):
             call_command("shellcompletion", "complete", "completion django_typer_tests")
         result = result.getvalue()
         self.assertTrue("django_typer_tests_apps_examples_polls" in result)
-        self.assertTrue("django_typer_tests_apps_test_app" in result)
+        self.assertTrue("django_typer_tests_apps_util" in result)
 
         self.assertEqual(
             json.loads(
@@ -140,7 +140,7 @@ class TestShellCompletersAndParsers(TestCase):
             call_command("completion", "django_typer_tests.polls")
 
         poll_app = apps.get_app_config("django_typer_tests_apps_examples_polls")
-        test_app = apps.get_app_config("django_typer_tests_apps_test_app")
+        test_app = apps.get_app_config("test_app")
         cmd = get_command("completion")
         self.assertEqual(
             json.loads(cmd([poll_app])),
@@ -156,7 +156,7 @@ class TestShellCompletersAndParsers(TestCase):
             json.loads(cmd(django_apps=[poll_app], option=test_app)),
             {
                 "django_apps": ["django_typer_tests_apps_examples_polls"],
-                "option": "django_typer_tests_apps_test_app",
+                "option": "test_app",
             },
         )
 
@@ -170,7 +170,7 @@ class TestShellCompletersAndParsers(TestCase):
             ),
             {
                 "django_apps": ["django_typer_tests_apps_examples_polls"],
-                "option": "django_typer_tests_apps_test_app",
+                "option": "test_app",
             },
         )
 
@@ -179,12 +179,12 @@ class TestShellCompletersAndParsers(TestCase):
                 call_command(
                     "completion",
                     "django_typer_tests_apps_examples_polls",
-                    "--option=django_typer_tests_apps_test_app",
+                    "--option=test_app",
                 )
             ),
             {
                 "django_apps": ["django_typer_tests_apps_examples_polls"],
-                "option": "django_typer_tests_apps_test_app",
+                "option": "test_app",
             },
         )
 
@@ -1314,3 +1314,42 @@ class TestShellCompletersAndParsers(TestCase):
         )[0]
         for s in ["str1", "str2", "ustr"]:
             self.assertIn(f'"{s}"', result)
+
+    def test_chain_and_commands_completer(self):
+        result = run_command("shellcompletion", "complete", "completion --cmd dj")[
+            0
+        ].strip()
+
+        self.assertTrue("django" in result)
+        self.assertTrue("django_typer" in result)
+
+        self.assertTrue("dj_params1" in result)
+        self.assertTrue("dj_params2" in result)
+        self.assertTrue("dj_params3" in result)
+        self.assertTrue("dj_params4" in result)
+
+        result = run_command(
+            "shellcompletion", "complete", "completion --cmd django_typer --cmd dj"
+        )[0].strip()
+
+        self.assertTrue("django" in result)
+        self.assertFalse("django_typer" in result)
+
+        self.assertTrue("dj_params1" in result)
+        self.assertTrue("dj_params2" in result)
+        self.assertTrue("dj_params3" in result)
+        self.assertTrue("dj_params4" in result)
+
+        result = run_command(
+            "shellcompletion",
+            "complete",
+            "completion --cmd-dup django_typer --cmd-dup dj",
+        )[0].strip()
+
+        self.assertTrue("django" in result)
+        self.assertTrue("django_typer" in result)
+
+        self.assertTrue("dj_params1" in result)
+        self.assertTrue("dj_params2" in result)
+        self.assertTrue("dj_params3" in result)
+        self.assertTrue("dj_params4" in result)

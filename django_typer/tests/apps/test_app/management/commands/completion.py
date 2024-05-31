@@ -59,6 +59,28 @@ class Command(TyperCommand):
                 ),
             ),
         ] = None,
+        commands: t.Annotated[
+            t.List[str],
+            typer.Option(
+                "--cmd",
+                help=_("A command by import path or name."),
+                shell_complete=completers.chain(
+                    completers.complete_import_path, completers.commands()
+                ),
+            ),
+        ] = [],
+        command_dups: t.Annotated[
+            t.List[str],
+            typer.Option(
+                "--cmd-dup",
+                help=_("A list of commands by import path or name."),
+                shell_complete=completers.chain(
+                    completers.complete_import_path,
+                    completers.commands(allow_duplicates=True),
+                    allow_duplicates=True,
+                ),
+            ),
+        ] = [],
     ):
         assert self.__class__ is Command
         for app in django_apps:

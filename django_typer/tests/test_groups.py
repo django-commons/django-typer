@@ -497,24 +497,24 @@ class TestCallCommandArgs(TestCase):
         # turns out call_command will also turn options values into strings you've flagged them as required
         # and they're passed in as named parameters
 
-        test_app = apps.get_app_config("django_typer_tests_apps_test_app")
-        test_app2 = apps.get_app_config("django_typer_tests_apps_test_app2")
+        test_app = apps.get_app_config("test_app")
+        test_app2 = apps.get_app_config("test_app2")
 
         out = StringIO()
         call_command(
             "completion",
-            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
+            ["test_app", "test_app2"],
             stdout=out,
         )
         printed_options = json.loads(out.getvalue())
         self.assertEqual(
             printed_options,
-            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
+            ["test_app", "test_app2"],
         )
 
         out = StringIO()
         printed_options = json.loads(get_command("completion")([test_app, test_app2]))
         self.assertEqual(
             printed_options,
-            ["django_typer_tests_apps_test_app", "django_typer_tests_apps_test_app2"],
+            ["test_app", "test_app2"],
         )

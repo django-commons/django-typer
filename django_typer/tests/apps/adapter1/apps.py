@@ -4,7 +4,7 @@ from django_typer.utils import register_command_plugins
 
 class Adapter1Config(AppConfig):
     name = "django_typer.tests.apps.adapter1"
-    label = name.replace(".", "_")
+    label = "adapter1"
     verbose_name = "Adapter 1"
 
     def ready(self):

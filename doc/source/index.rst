@@ -180,7 +180,7 @@ argument in your commands.**
 
    tutorial
    extensions
-   howto
    shell_completion
+   howto
    reference
    changelog

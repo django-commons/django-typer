@@ -2,9 +2,9 @@
 
 .. _plugins:
 
-============================
-Tutorial: Extending Commands
-============================
+===============================
+Tutorial: Inheritance & Plugins
+===============================
 
 You may need to change the behavior of an
 `upstream command <https://en.wikipedia.org/wiki/Upstream_(software_development)>`_ or wish
@@ -38,8 +38,6 @@ Our command might look like this:
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
-            :replace:
-                django_typer.tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
@@ -47,8 +45,6 @@ Our command might look like this:
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
-            :replace:
-                django_typer.tests.apps.examples.plugins.backup : backup
 
 
 .. typer:: django_typer.tests.apps.examples.plugins.backup.management.commands.backup.Command:typer_app
@@ -121,7 +117,7 @@ Our backup.py implementation in the media app might look like this:
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.media1 : media
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
@@ -129,7 +125,7 @@ Our backup.py implementation in the media app might look like this:
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.media1 : media
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
 Now you'll see we have another command called media available:
 
@@ -270,7 +266,7 @@ and that would look like this:
             :language: python
             :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.media2 : media
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
@@ -278,7 +274,7 @@ and that would look like this:
             :language: python
             :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.media2 : media
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
 
 
@@ -292,7 +288,7 @@ And our my_app extension might look like this:
             :language: python
             :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.my_app : my_app
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
@@ -300,7 +296,7 @@ And our my_app extension might look like this:
             :language: python
             :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.my_app : my_app
+                    django_typer.tests.apps.examples.plugins.backup : backup
 
 Note that we now have a new environment command available:
 

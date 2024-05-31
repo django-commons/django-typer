@@ -362,8 +362,8 @@ BaseCommand_ options:
 
 .. _configure:
 
-Configure the Typer_ Application
---------------------------------
+Configure Typer_ Options
+------------------------
 
 Typer_ apps can be configured using a number of parameters. These parameters are usually passed
 to the :class:`~django_typer.Typer` class constructor when the application is created.
@@ -454,6 +454,8 @@ Say we have a command that looks like:
             :language: python
             :linenos:
             :caption: management/commands/downstream.py
+            :replace:
+                from .upstream_typer : from .upstream
 
 
 Notice that if we are adding to a group from the parent class, we have to use the group directly
@@ -464,7 +466,7 @@ present.
 .. note::
 
     For more information on extension patterns see the tutorial on
-    :ref:`Extending Commands <extensions>`.
+    :ref:`Extending Commands <plugins>`.
 
 
 Plugin to Existing Commands
@@ -533,6 +535,8 @@ Now we can add our plugins:
             :language: python
             :linenos:
             :caption: management/plugins/upstream.py
+            :replace:
+                from ..commands.upstream2 : from my_app.management.commands.upstream
 
     .. tab:: Typer-style
 
@@ -540,6 +544,8 @@ Now we can add our plugins:
             :language: python
             :linenos:
             :caption: management/plugins/upstream.py
+            :replace:
+                from ..commands.upstream2_typer : from my_app.management.commands.upstream
 
 The main difference here from normal inheritance is that we do not declare a new class, instead we
 use the classmethod decorators on the class of the command we are extending. These extension
@@ -550,7 +556,7 @@ and if it is not provided the function will be treated as a
 .. note::
 
     **Conflicting extensions are resolved in INSTALLED_APPS order.** For a detailed discussion
-    about the utility of this pattern, see the tutorial on :ref:`Extending Commands <extensions>`.
+    about the utility of this pattern, see the tutorial on :ref:`Extending Commands <plugins>`.
 
 .. warning::
 

@@ -1,11 +1,11 @@
 from ..commands.upstream2_typer import app
 
-# do not create a new app as with inheritance - just
-# work directly with the upstream app.
+# do not create a new app as with inheritance -
+# instead work directly with the upstream app.
 
 
 # override init
-@app.initialize()
+@app.callback()
 def init():
     return "plugin:init"
 

@@ -1,9 +1,12 @@
 import sys
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
+from django_typer import get_command
 from django_typer.tests.utils import run_command
 from django_typer.tests.utils import similarity, rich_installed
+from contextlib import redirect_stdout
+from io import StringIO
 
 import pytest
 
@@ -452,3 +455,67 @@ class ExampleTests(TestCase):
 
 class TyperExampleTests(ExampleTests):
     settings = "django_typer.tests.settings.typer_examples"
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 9), reason="Readme examples only run on python > 3.8"
+)
+@override_settings(
+    INSTALLED_APPS=[
+        "django_typer.tests.apps.examples.completers",
+        "django_typer.tests.apps.examples.basic",
+        "django_typer",
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
+    ]
+)
+class CompleterExampleTests(TestCase):
+    app_labels_cmd = "app_labels"
+
+    def test_app_labels_completer(self):
+        from django_typer.management.commands.shellcompletion import (
+            Command as ShellCompletion,
+            Shells,
+        )
+
+        shellcompletion = get_command("shellcompletion", ShellCompletion)
+
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            shellcompletion.complete(f"{self.app_labels_cmd} ", shell=Shells.zsh)
+
+        completions = stdout.getvalue()
+        self.assertTrue('"contenttypes"' in completions)
+        self.assertTrue('"completers"' in completions)
+        self.assertTrue('"django_typer"' in completions)
+        self.assertTrue('"admin"' in completions)
+        self.assertTrue('"auth"' in completions)
+        self.assertTrue('"sessions"' in completions)
+        self.assertTrue('"messages"' in completions)
+
+        stdout.truncate(0)
+        stdout.seek(0)
+
+        with redirect_stdout(stdout):
+            shellcompletion.complete(f"{self.app_labels_cmd} a", shell=Shells.zsh)
+
+        self.assertTrue('"admin"' in completions)
+        self.assertTrue('"auth"' in completions)
+
+        stdout, stderr, retcode = run_command(
+            self.app_labels_cmd,
+            "--settings",
+            "django_typer.tests.settings.examples",
+            "admin",
+            "auth",
+        )
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertEqual(stdout.strip(), str(["admin", "auth"]))
+
+
+class CompleterTyperExampleTests(CompleterExampleTests):
+    app_labels_cmd = "app_labels_typer"

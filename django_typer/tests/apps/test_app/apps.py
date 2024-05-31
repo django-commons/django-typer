@@ -21,7 +21,7 @@ def test_check(app_configs, **kwargs):
 
 class TestAppConfig(AppConfig):
     name = "django_typer.tests.apps.test_app"
-    label = name.replace(".", "_")
+    label = "test_app"
     verbose_name = "Test App"
 
     def ready(self):

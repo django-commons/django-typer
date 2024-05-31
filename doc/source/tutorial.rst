@@ -1,5 +1,7 @@
 .. include:: ./refs.rst
 
+.. _building_commands:
+
 ===========================
 Tutorial: Building Commands
 ===========================
@@ -86,7 +88,7 @@ looks like this:
     :language: python
     :linenos:
     :replace:
-        django_typer.tests.apps.examples.polls.models : polls.models
+        django_typer.tests.apps.examples.polls : polls
 
 Inherit from :class:`~django_typer.TyperCommand`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

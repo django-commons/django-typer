@@ -2585,7 +2585,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         Override the initializer for this command class after it has been defined.
 
         .. note::
-            See :ref:`extensions` for details on when you might want to use this extension
+            See :ref:`plugins` for details on when you might want to use this extension
             pattern.
 
         .. code-block:: python
@@ -2696,7 +2696,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         use this decorator to add commands to a root command from other Django apps.
 
         .. note::
-            See :ref:`extensions` for details on when you might want to use this extension
+            See :ref:`plugins` for details on when you might want to use this extension
             pattern.
 
         .. code-block:: python
@@ -2794,7 +2794,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         use this decorator to add groups to a root command from other Django apps.
 
         .. note::
-            See :ref:`extensions` for details on when you might want to use this extension
+            See :ref:`plugins` for details on when you might want to use this extension
             pattern.
 
         .. code-block:: python

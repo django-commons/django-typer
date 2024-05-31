@@ -21,18 +21,28 @@ class ExtendedLiteralInclude(LiteralInclude):
             if not replacements:
                 return original_result
 
-            # Modify the content in original_result
-            for node in original_result:
-                if hasattr(node, 'children'):
-                    for child in node.children:
-                        if isinstance(child, literal_block):
-                            content = child.rawsource
-                            for old_text, new_text in replacements.items():
-                                content = content.replace(old_text, new_text)
+            # if 'django_typer.tests.apps.examples.polls' in replacements:
+            #     import ipdb
+            #     ipdb.set_trace()
 
-                            child.rawsource = content
-                            child.children[0] = Text(content)
-                            child.children[0].parent = child
+            # Modify the content in original_result
+            def make_replacements(node):
+                if isinstance(node, literal_block):
+                    content = node.rawsource
+                    for old_text, new_text in replacements.items():
+                        content = content.replace(old_text, new_text)
+
+                    node.rawsource = content
+                    node.children[0] = Text(content)
+                    node.children[0].parent = node
+
+            def walk_nodes(nodes):
+                for node in nodes:
+                    make_replacements(node)
+                    if hasattr(node, 'children'):
+                        walk_nodes(node.children)
+            
+            walk_nodes(original_result)
 
         return original_result
 

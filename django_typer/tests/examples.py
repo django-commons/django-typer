@@ -4,4 +4,4 @@
 from django_typer.tests.manage import main
 
 if __name__ == "__main__":
-    main("django_typer.tests.settings.examples")
+    main("django_typer.tests.settings.adapted1")
