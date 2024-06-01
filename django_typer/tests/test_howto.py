@@ -89,7 +89,7 @@ class TestGroupsHowto(TestCase):
     def test_howto_groups(self):
         stdout = StringIO()
 
-        groups = get_command(self.cmd, TyperCommand, stdout=stdout)
+        groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "groups")
         self.assertEqual(stdout.getvalue().strip(), self.root_help.strip())
@@ -176,7 +176,7 @@ class TestDefaultOptionsHowto(TestCase):
     def test_howto_default_options(self):
         stdout = StringIO()
 
-        groups = get_command(self.cmd, TyperCommand, stdout=stdout)
+        groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "default_options")
         self.assertEqual(stdout.getvalue().strip(), self.cmd_help.strip())

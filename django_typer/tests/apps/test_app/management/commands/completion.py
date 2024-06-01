@@ -59,7 +59,7 @@ class Command(TyperCommand):
                 ),
             ),
         ] = None,
-        commands: t.Annotated[
+        commands: Annotated[
             t.List[str],
             typer.Option(
                 "--cmd",
@@ -69,7 +69,7 @@ class Command(TyperCommand):
                 ),
             ),
         ] = [],
-        command_dups: t.Annotated[
+        command_dups: Annotated[
             t.List[str],
             typer.Option(
                 "--cmd-dup",
