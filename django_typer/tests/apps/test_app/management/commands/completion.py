@@ -93,6 +93,21 @@ class Command(TyperCommand):
                 ),
             ),
         ] = [],
+        app_opt: Annotated[
+            t.List[str],
+            typer.Option(
+                help=_("One or more application labels."),
+                shell_complete=completers.complete_app_label,
+            ),
+        ] = ["test_app"],
+        databases: Annotated[
+            t.List[str],
+            typer.Option(
+                "--db",
+                help=_("One or more database aliases."),
+                shell_complete=completers.databases(),
+            ),
+        ] = [],
     ):
         assert self.__class__ is Command
         for app in django_apps:
