@@ -2,9 +2,9 @@
 
 .. _shellcompletions:
 
-=====================
-Shell Tab-Completions
-=====================
+===============================
+Tutorial: Shell Tab-Completions
+===============================
 
 .. only:: html
 
@@ -30,7 +30,7 @@ django-typer_ augments the upstream functionality of Typer_ and Click_ to provid
 both an easy way to define shell completions for your custom CLI options and arguments
 as well as a way to install them in your shell.
 
-.. note::
+.. tip::
 
     django-typer_ supports shell completion installation for bash_, zsh_, fish_ and
     powershell_.
@@ -136,8 +136,9 @@ Fish_ may not work at all in this mode.
 Integrating with Other CLI Completion Libraries
 -----------------------------------------------
 
-When tab completion is requested for a command that is not a TyperCommand, django-typer_ will delegate
-that request to Django's `autocomplete function <https://github.com/django/django/blob/main/django/core/management/__init__.py#L278>`_
+When tab completion is requested for a command that is not a :class:`~django_typer.TyperCommand`,
+django-typer_ will delegate that request to Django's
+`autocomplete function <https://github.com/django/django/blob/main/django/core/management/__init__.py#L278>`_
 as a fallback. This means that using django-typer_ to install completion scripts will enable
 completions for Django BaseCommands in all supported shells.
 
@@ -164,48 +165,21 @@ parameter in your type hint annotations. django-typer_ comes with a
 completes Django_ app labels and names. We might build a similar completer that only works for
 Django_ app labels like this:
 
-.. code-block:: python
-    :linenos:
+.. tabs::
 
-    import typing as t
-    import typer
-    from click import Context, Parameter
-    from click.shell_completion import CompletionItem
-    from django.apps import apps
+    .. tab:: Django-style
 
-    from django_typer import TyperCommand
+        .. literalinclude:: ../../examples/completers/management/commands/app_labels.py
+            :language: python
+            :linenos:
+            :caption: examples/completers/management/commands/app_labels.py
 
+    .. tab:: Typer-style
 
-    # the completer function signature must match this exactly
-    def complete_app_label(
-        ctx: Context,
-        param: Parameter,
-        incomplete: str
-    ) -> t.List[CompletionItem]:
-
-        # don't offer apps that are already present as completion suggestions
-        present = [app.label for app in (ctx.params.get(param.name or "") or [])]
-        return [
-            CompletionItem(app.label)
-            for app in apps.get_app_configs()
-            if app.label.startswith(incomplete) and app.label not in present
-        ]
-
-
-    class MyCommand(TyperCommand):
-
-        @command()
-        def handle(
-            self,
-            apps: t.Annotated[
-                t.List[str],
-                typer.Argument(
-                    help="The app label",
-                    shell_complete=complete_app_label  # pass the completer function here
-                )
-            ]
-        ):
-            pass
+        .. literalinclude:: ../../examples/completers/management/commands/app_labels_typer.py
+            :language: python
+            :linenos:
+            :caption: examples/completers/management/commands/app_labels_typer.py
 
 .. tip::
 
@@ -231,3 +205,257 @@ command line string that you would like to debug. For example:
 
     ./manage.py shellcompletion complete "mycommand --"
 
+
+Provided Completers
+===================
+
+
+Django Apps
+-----------
+
+* completer: :func:`~django_typer.completers.complete_app_label`
+* parser: :func:`~django_typer.parsers.parse_app_label`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django.apps import AppConfig
+    from django_typer import completers, parsers
+
+    ...
+
+    def handle(
+        self,
+        django_app: t.Annotated[
+            AppConfig,
+            typer.Argument(
+                parser=parsers.parse_app_label,
+                shell_complete=completers.complete_app_label,
+            ),
+        ],
+    )
+
+Constant Strings
+----------------
+* completer: :func:`~django_typer.completers.these_strings`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from enum import StrEnum
+    from django_typer.completers import these_strings
+
+    ...
+
+    class Shells(StrEnum):
+
+        zsh = 'zsh',
+        bash = 'bash'
+        fish = 'fish',
+        powershell = 'pswh'
+
+    def handle(
+        self,
+        shell: t.Annotated[
+            Shells,
+            typer.Argument(
+                shell_complete=these_strings(list(Shells)),
+            ),
+        ],
+    )
+
+Database Aliases
+----------------
+
+* completer: :func:`~django_typer.completers.databases`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django_typer.completers import databases
+
+    ...
+
+    def handle(
+        self,
+        database: t.Annotated[
+            str,
+            typer.Argument(
+                shell_complete=databases,
+            ),
+        ],
+    )
+
+Management Commands
+-------------------
+
+* completer: :func:`~django_typer.completers.commands`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django_typer.completers import commands
+
+    ...
+
+    def handle(
+        self,
+        command: t.Annotated[
+            str,
+            typer.Argument(
+                shell_complete=commands,
+            ),
+        ],
+    )
+
+
+Paths (Files & Directories)
+---------------------------
+
+* completer: :func:`~django_typer.completers.complete_path`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from pathlib import Path
+    from django_typer.completers import complete_path
+
+    ...
+
+    def handle(
+        self,
+        path: t.Annotated[
+            Path,
+            typer.Argument(
+                shell_complete=complete_path,
+            ),
+        ],
+    )
+
+Directories
+-----------
+
+* completer: :func:`~django_typer.completers.complete_directory`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from pathlib import Path
+    from django_typer.completers import complete_directory
+
+    ...
+
+    def handle(
+        self,
+        directory: t.Annotated[
+            Path,
+            typer.Argument(
+                shell_complete=complete_directory,
+            ),
+        ],
+    )
+
+
+Import Paths
+------------
+
+Complete python.import.paths - uses sys.path. This completer is used for --settings
+
+* completer: :func:`~django_typer.completers.complete_import_path`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django_typer.completers import complete_import_path
+
+    ...
+
+    def handle(
+        self,
+        import_path: t.Annotated[
+            str,
+            typer.Argument(
+                shell_complete=complete_import_path,
+            ),
+        ],
+    )
+
+Model Objects
+-------------
+
+* completer: :class:`~django_typer.completers.ModelObjectCompleter`
+* parser: :class:`~django_typer.parsers.ModelObjectParser`
+* convenience: :func:`~django_typer.model_parser_completer`
+
+This completer/parser pairing provides the ability to fetch a model object from one of its fields.
+Most field types are supported. Additionally any other field can be set as the help text that some
+shells support. Refer to the reference documentation and the
+:ref:`polls tutorial <building_commands>` for more information.
+
+.. warning::
+
+    If the model table is large you'll want to make sure the completable field is indexed. When
+    your users hit tab, they'll have to wait to the matching query to complete. The queries
+    have been optimized to take advantage of indexes for each supported field type.
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django_typer import model_parser_completer
+
+    ...
+
+    def handle(
+        self,
+        obj: t.Annotated[
+            ModelClass,
+            typer.Argument(
+                **model_parser_completer(
+                    ModelClass,
+                    'field_name',  # the field that should be matched (defaults to id)
+                    help_field='other_field'  # optionally provide some additional help text
+                ),
+                help=_("Fetch objects by their field_names.")
+            ),
+        ]
+    ):
+        ...
+
+
+Completer Chains
+----------------
+
+Multiple completers can be chained together in a sequence. All completions can
+be returned, or only the first completer that generates matches.
+
+* completer: :func:`~django_typer.completers.chain`
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from django_typer import completers
+
+    ...
+
+    def handle(
+        self,
+        command: t.Annotated[
+            str,
+            typer.Argument(
+                # allow commands to be specified by name or import path
+                shell_complete=completers.chain(
+                    completers.complete_import_path,
+                    completers.commands
+                )
+            ),
+        ],
+    )

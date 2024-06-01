@@ -17,6 +17,8 @@ from django.core.management import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
+from .completers import complete_directory, complete_import_path
+
 COMMON_PANEL = "Django"
 
 
@@ -112,6 +114,7 @@ Settings = Annotated[
             ),
         ),
         rich_help_panel=COMMON_PANEL,
+        shell_complete=complete_import_path,
     ),
 ]
 """
@@ -134,6 +137,7 @@ PythonPath = Annotated[
             ),
         ),
         rich_help_panel=COMMON_PANEL,
+        shell_complete=complete_directory,
     ),
 ]
 """

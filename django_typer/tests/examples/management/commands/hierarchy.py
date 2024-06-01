@@ -1,1 +1,0 @@
-../../../../examples/hierarchy.py

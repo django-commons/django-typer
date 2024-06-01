@@ -6,6 +6,8 @@
 Reference
 =========
 
+.. include:: ./architecture.rst
+
 .. _base:
 
 django_typer
@@ -13,16 +15,19 @@ django_typer
 
 .. automodule:: django_typer
    :members:
-   :exclude-members: TyperCommand, Context
+   :exclude-members: Typer, CommandGroup, TyperCommand, Context, CommandNode
    :show-inheritance:
 
+.. autoclass:: django_typer.Typer
+    :members: callback, initialize, command, group, add_typer
+
 .. autoclass:: django_typer.TyperCommand
+    :members: initialize, callback, command, group, echo, secho, print_help, get_subcommand
+
+.. autoclass:: django_typer.CommandNode
+    :members: name, click_command, context, children, get_command, print_help
 
 .. autoclass:: django_typer.TyperCommandMeta
-
-.. autoclass:: django_typer.GroupFunction
-    :members: group, command
-
 
 .. _types:
 
@@ -54,7 +59,7 @@ utils
 -----
 
 .. automodule:: django_typer.utils
-    :members: traceback_config, get_current_command
+    :members: traceback_config, get_current_command, register_command_plugins, is_method
 
 .. _shellcompletion:
 
@@ -63,3 +68,4 @@ shellcompletion
 
 .. automodule:: django_typer.management.commands.shellcompletion
     :members:
+

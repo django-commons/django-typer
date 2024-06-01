@@ -91,21 +91,41 @@ Define Multiple Subcommands
 
 Commands with a single executable function should simply implement handle(), but if you would
 like have multiple subcommands you can define any number of functions decorated with
-:func:`~django_typer.command`:
+:func:`~django_typer.command` or :func:`~django_typer.Typer.command`:
 
-.. code-block:: python
+.. tabs::
 
-    from django_Typer import TyperCommand, command
+    .. tab:: Django-style
 
-    class Command(TyperCommand):
+        .. code-block:: python
 
-        @command()
-        def subcommand1(self):
-            ...
+            from django_typer import TyperCommand, command
 
-        @command()
-        def subcommand2(self):
-            ...
+            class Command(TyperCommand):
+
+                @command()
+                def subcommand1(self):
+                    ...
+
+                @command()
+                def subcommand2(self):
+                    ...
+
+    .. tab:: Typer-style
+
+        .. code-block:: python
+
+            from django_typer import Typer
+
+            app = Typer()
+
+            @app.command()
+            def subcommand1():
+                ...
+
+            @app.command()
+            def subcommand2():
+                ...
 
 .. note::
 
@@ -123,7 +143,7 @@ like have multiple subcommands you can define any number of functions decorated 
         command() # this will raise an error
 
 
-.. _multi_with_defaults:
+.. _default_cmd:
 
 Define Multiple Subcommands w/ a Default
 -----------------------------------------
@@ -132,24 +152,19 @@ We can also implement a default subcommand by defining a handle() method, and we
 whatever we want the command to be. For example to define three subcommands but have one as the
 default we can do this:
 
+.. tabs::
 
-.. code-block:: python
+    .. tab:: Django-style
 
-    from django_typer import TyperCommand, command
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_cmd.py
+            :language: python
+            :linenos:
 
-    class Command(TyperCommand):
+    .. tab:: Typer-style
 
-        @command(name='subcommand1')
-        def handle(self):
-            ...
-
-        @command()
-        def subcommand2(self):
-            ...
-
-        @command()
-        def subcommand3(self):
-            ...
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_cmd_typer.py
+            :language: python
+            :linenos:
 
 
 .. code-block:: python
@@ -157,63 +172,54 @@ default we can do this:
     from django_typer import get_command
 
     command = get_command("mycommand")
-    command.subcommand2()
-    command.subcommand3()
+    assert command.subcommand2() == 'subcommand2'
+    assert command.subcommand3() == 'subcommand3'
 
-    command() # this will invoke handle (i.e. subcommand1)
+    # this will invoke handle (i.e. subcommand1)
+    assert command() == 'handle'
+    command()
 
     # note - we *cannot* do this:
     command.handle()
 
-    # or this:
-    command.subcommand1()
+    # but we can do this!
+    assert command.subcommand1() == 'handle'
 
 
 Lets look at the help output:
 
-.. typer:: django_typer.tests.test_app.management.commands.howto2.Command:typer_app
+.. typer:: django_typer.tests.apps.howto.management.commands.default_cmd.Command:typer_app
     :width: 80
 
+.. _groups:
 
 Define Groups of Commands
 -------------------------
 
-Any depth of command tree can be defined. Use the :func:`~django_typer.group` decorator to define
-a group of subcommands:
+Any depth of command tree can be defined. Use the :func:`~django_typer.group` or
+:meth:`~django_typer.Typer.add_typer` decorator to define a group of subcommands:
 
-.. code-block:: python
 
-    from django_Typer import TyperCommand, command, group
+.. tabs::
 
-    class Command(TyperCommand):
+    .. tab:: Django-style
 
-        @group()
-        def group1(self, common_option: bool = False):
-            # you can define common options that will be available to all subcommands of
-            # the group, and implement common initialization logic here.
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/groups.py
+            :language: python
+            :linenos:
 
-        @group()
-        def group2(self):
-            ...
+    .. tab:: Typer-style
 
-        # attach subcommands to groups by using the command decorator on the group function
-        @group1.command()
-        def grp1_subcommand1(self):
-            ...
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/groups_typer.py
+            :language: python
+            :linenos:
 
-        @group1.command()
-        def grp1_subcommand1(self):
-            ...
+The hierarchy of groups and commands from the above example looks like this:
 
-        # groups can have subgroups!
-        @group1.group()
-        def subgroup1(self):
-            ...
+.. image:: /_static/img/howto_groups_app_tree.png
+    :align: center
 
-        @subgroup1.command()
-        def subgrp_command(self):
-            ...
-
+.. _initializer:
 
 Define an Initialization Callback
 ---------------------------------
@@ -223,30 +229,40 @@ before your handle() command or subcommands using the :func:`~django_typer.initi
 This is like defining a group at the command root and is an extension of the
 `typer callback mechanism <https://typer.tiangolo.com/tutorial/commands/callback/>`_.
 
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/initializer.py
+            :language: python
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/initializer_typer.py
+            :language: python
+            :linenos:
+
+.. code-block:: console
+
+    $> ./manage initializer --common-option subcommand1
+    True
+    $> ./manage.py initializer --no-common-option subcommand2
+    False
+
 .. code-block:: python
 
-    from django_Typer import TyperCommand, initialize, command
+    from django_typer import get_command
 
-    class Command(TyperCommand):
+    command = get_command("initializer")
+    command.init(common_option=True)
+    assert command.subcommand1()
+    command.init(False)
+    assert not command.subcommand2()
 
-        @initialize()
-        def init(self, common_option: bool = False):
-            # you can define common options that will be available to all subcommands of
-            # the command, and implement common initialization logic here. This will be
-            # invoked before the chosen command
-            ...
-
-        @command()
-        def subcommand1(self):
-            ...
-
-        @command()
-        def subcommand2(self):
-            ...
-
-
-Call TyperCommands from Code
-----------------------------
+Call Commands from Code
+-----------------------
 
 There are two options for invoking a :class:`~django_typer.TyperCommand` from code without spawning
 off a subprocess. The first is to use Django_'s builtin call_command_ function. This function will
@@ -275,7 +291,7 @@ Say we have this command, called ``mycommand``:
     call_command("mycommand", count=10)
     call_command("mycommand", '--count=10')  # this will work too
 
-    # or we can use the get_command function to get the command instance and invoke it directly
+    # or we can use the get_command function to get a command instance and invoke it directly
     mycommand = get_command("mycommand")
     mycommand(count=10)
     mycommand(10) # this will work too
@@ -284,17 +300,37 @@ Say we have this command, called ``mycommand``:
     assert mycommand(10) == 10
 
 
-The rule of them is this:
+The rule of thumb is this:
 
     - Use call_command_ if your options and arguments need parsing.
     - Use :func:`~django_typer.get_command` and invoke the command functions directly if your
       options and arguments are already of the correct type.
 
+If the second argument is a type, static type checking will assume the return value of get_command
+to be of that type:
+
+.. code-block:: python
+
+    from django_typer import get_command
+    from myapp.management.commands.math import Command as Math
+
+    math = get_command("math", Math)
+    math.add(10, 5)  # type checkers will resolve add parameters correctly
+
+You may also fetch a subcommand function directly by passing its path:
+
+.. code-block:: python
+
+    get_command("math", "add")(10, 5)
+
 .. tip::
 
-    Also refer to the :func:`~django_typer.get_command` docs and :ref:`here <multi_with_defaults>`
+    Also refer to the :func:`~django_typer.get_command` docs and :ref:`here <default_cmd>`
     and :ref:`here <multi_commands>` for the nuances of calling commands when handle() is and is
     not implemented.
+
+
+.. _default_options:
 
 Change Default Django Options
 -----------------------------
@@ -309,43 +345,62 @@ setting ``suppressed_base_arguments`` to an empty list. If you want to use verbo
 simply redefine it or use one of django-typer_'s :ref:`provided type hints <types>` for the default
 BaseCommand_ options:
 
-.. code-block:: python
+.. tabs::
 
-    from django_typer import TyperCommand
-    from django_typer.types import Verbosity
+    .. tab:: Django-style
 
-    class Command(TyperCommand):
-
-        suppressed_base_arguments = ['--settings']  # remove the --settings option
-
-        def handle(self, verbosity: Verbosity=1):
-            ...
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_options.py
+            :language: python
+            :linenos:
 
 
-Configure the Typer_ Application
---------------------------------
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_options_typer.py
+            :language: python
+            :linenos:
+
+.. _configure:
+
+Configure Typer_ Options
+------------------------
 
 Typer_ apps can be configured using a number of parameters. These parameters are usually passed
-to the Typer class constructor when the application is created. django-typer_ provides a way to
-pass these options upstream to Typer_ by supplying them as keyword arguments to the
-:class:`~django_typer.TyperCommand` class inheritance:
+to the :class:`~django_typer.Typer` class constructor when the application is created.
+django-typer_ provides a way to pass these options upstream to Typer_ by supplying them as keyword
+arguments to the :class:`~django_typer.TyperCommand` class inheritance:
 
-.. code-block:: python
+.. tabs::
 
-    from django_typer import TyperCommand
+    .. tab:: Django-style
 
-    class Command(TyperCommand, chain=True):
-        # here we pass chain=True to typer telling it to allow invocation of
-        # multiple subcommands
-        ...
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/configure.py
+            :language: python
+            :linenos:
+            :caption: configure.py
 
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/configure_typer.py
+            :language: python
+            :linenos:
+            :caption: configure.py
+
+.. code-block:: console
+
+    $> ./manage.py configure cmd1 cmd2
+    cmd1
+    cmd2
+
+    $> ./manage.py configure cmd2 cmd1
+    cmd2
+    cmd1
 
 .. tip::
 
-    See :class:`~django_typer.TyperCommandMeta` for a list of available parameters. Also refer to
-    the `Typer docs <https://typer.tiangolo.com>`_ for more details. Note that not all of these
-    parameters make sense in the context of a Django management command, so behavior for some
-    is undefined.
+    See :class:`~django_typer.TyperCommandMeta` or :class:`~django_typer.Typer` for a list of
+    available parameters. Also refer to the `Typer docs <https://typer.tiangolo.com>`_ for more
+    details.
 
 
 Define Shell Tab Completions for Parameters
@@ -360,14 +415,153 @@ Debug Shell Tab Completers
 See the section on :ref:`debugging shell completers.<debug-shellcompletions>`
 
 
-Extend/Override TyperCommands
------------------------------
+Inherit/Override Commands
+-------------------------
 
-You can extend typer commands simply by subclassing them. All of the normal inheritance rules
-apply. You can either subclass an existing command from an upstream app and leave its module the
-same name to extend and override the command or you can subclass and rename the module to provide
-an adapted version of the upstream command with a different name.
+You can extend typer commands by subclassing them. All of the normal inheritance rules apply. You
+can either subclass an existing command from an upstream app and leave its module the same name to
+override the command or you can subclass and rename the module to provide an adapted version of the
+upstream command with a different name. For example:
 
+Say we have a command that looks like:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/upstream.py
+            :language: python
+            :linenos:
+            :caption: management/commands/upstream.py
+
+        We can inherit and override or add additional commands and groups like so:
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/downstream.py
+            :language: python
+            :linenos:
+            :caption: management/commands/downstream.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/upstream_typer.py
+            :language: python
+            :linenos:
+            :caption: management/commands/upstream.py
+
+        We can inherit and override or add additional commands and groups like so:
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/downstream_typer.py
+            :language: python
+            :linenos:
+            :caption: management/commands/downstream.py
+            :replace:
+                from .upstream_typer : from .upstream
+
+
+Notice that if we are adding to a group from the parent class, we have to use the group directly
+(i.e. @ParentClass.group_name). Since we named our command downstream it does not override
+upstream. upstream is not affected and may be invoked in the same way as if downstream was not
+present.
+
+.. note::
+
+    For more information on extension patterns see the tutorial on
+    :ref:`Extending Commands <plugins>`.
+
+
+Plugin to Existing Commands
+---------------------------
+
+You may add additional subcommands and command groups to existing commands by using django-typer_'s
+plugin pattern. This allows apps that do not know anything about each other to attach additional
+CLI behavior to an upstream command and can be convenient for grouping loosely related behavior
+into a single command namespace.
+
+To use our example from above, lets add and override the same behavior of upstream we did in
+downstream using this pattern instead:
+
+First in other_app we need to create a new package under management. It can be called anything, but
+for clarity lets call it plugins:
+
+.. code-block:: text
+
+    site/
+    ├── my_app/
+    │   ├── __init__.py
+    │   ├── apps.py
+    │   ├── management/
+    │   │   ├── __init__.py
+    │   │   └── commands/
+    │   │       ├── __init__.py
+    │   │       └── upstream.py
+    └── other_app/
+        ├── __init__.py
+        ├── apps.py
+        └── management/
+            ├── __init__.py
+            ├── plugins/
+            │   ├── __init__.py
+            │   └── upstream.py <---- put your plugins to upstream here
+            └── commands/
+                └── __init__.py
+
+Now we need to make sure our plugins are loaded. We do this by using the provided
+:func:`~django_typer.utils.register_command_plugins` convenience function in
+our app's ready() method:
+
+.. code-block:: python
+    :caption: other_app/apps.py
+
+    from django.apps import AppConfig
+    from django_typer.utils import register_command_plugins
+
+
+    class OtherAppConfig(AppConfig):
+        name = "other_app"
+
+        def ready(self):
+            from .management import plugins
+
+            register_command_plugins(extensions)
+
+
+Now we can add our plugins:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/plugins/upstream2.py
+            :language: python
+            :linenos:
+            :caption: management/plugins/upstream.py
+            :replace:
+                from ..commands.upstream2 : from my_app.management.commands.upstream
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/plugins/upstream2_typer.py
+            :language: python
+            :linenos:
+            :caption: management/plugins/upstream.py
+            :replace:
+                from ..commands.upstream2_typer : from my_app.management.commands.upstream
+
+The main difference here from normal inheritance is that we do not declare a new class, instead we
+use the classmethod decorators on the class of the command we are extending. These extension
+functions will also be added to the class. The self argument is always optional in django-typer_
+and if it is not provided the function will be treated as a
+`staticmethod <https://docs.python.org/3/library/functions.html#staticmethod>`_.
+
+.. note::
+
+    **Conflicting extensions are resolved in INSTALLED_APPS order.** For a detailed discussion
+    about the utility of this pattern, see the tutorial on :ref:`Extending Commands <plugins>`.
+
+.. warning::
+
+    Take care not to import any extension code during or before Django's bootstrap procedure. This
+    may result in conflict override behavior that does not honor INSTALLED_APPS order.
 
 .. _configure-rich-exception-tracebacks:
 
@@ -422,27 +616,47 @@ not be translated.
 
 The precedence order, for a simple command is as follows:
 
-    .. code-block:: python
+.. tabs::
 
-        from django_typer import TyperCommand, command
-        from django.utils.translation import gettext_lazy as _
+    .. tab:: Django-style
 
-        class Command(TyperCommand, help=_('2')):
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/help.py
+            :language: python
+            :linenos:
 
-            help = _("3")
+    .. tab:: Typer-style
 
-            @command(help=_("1"))
-            def handle(self):
-                """
-                Docstring is last priority and is not subject to translation.
-                """
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/help_typer.py
+            :language: python
+            :linenos:
+
+
+The rule for how helps are resolved when inheriting from other commands is that higher precedence
+helps in base classes will be chosen over lower priority helps in deriving classes. However, if
+you would like to use a docstring as the help in a derived class instead of the high priority
+help in a base class you can set the equivalent priority help in the deriving class to a falsy
+value:
+
+.. code-block:: python
+
+    class Command(TyperCommand, help=_("High precedence help defined in base class.")):
+        ...
+
+    ...
+
+    from upstream.management.commands.command import Command as BaseCommand
+    class Command(BaseCommand, help=None):
+        """
+        Docstring will be used as help.
+        """
+
 
 
 Document Commands w/Sphinx
 --------------------------
 
-Checkout `this Sphinx extension <https://github.com/sphinx-contrib/typer>`_ that can be used to
-render your rich helps to Sphinx docs.
+sphinxcontrib-typer_ can be used to render your rich helps to Sphinx docs and is used extensively
+in this documentation.
 
 For example, to document a :class:`~django_typer.TyperCommand` with sphinxcontrib-typer, you would
 do something like this:
@@ -474,3 +688,39 @@ You'll also need to make sure that Django is bootstrapped in your conf.py file:
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'path.to.your.settings')
     django.setup()
+
+.. _printing:
+
+print, self.stdout and typer.echo
+---------------------------------
+
+There are no unbreakable rules about how you should print output from your commands.
+You could use loggers, normal print statements or the BaseCommand_ stdout and
+stderr output wrappers. Django advises the use of ``self.stdout.write`` because the
+stdout and stderr streams can be configured by calls to call_command_ or
+:func:`~django_tyoer.get_command` which allows you to easily grab output from your
+commands for testing. Using the command's configured stdout and stderr
+output wrappers also means output will respect the ``--force-color`` and ``--no-color``
+parameters.
+
+Typer_ and click_ provide `echo and secho <https://typer.tiangolo.com/tutorial/printing/>`_
+functions that automatically handle byte to string conversions and offer simple styling
+support. :class:`~django_typer.TyperCommand` provides :meth:`~django_typer.TyperCommand.echo` and
+:meth:`~django_typer.TyperCommand.secho` wrapper functions for the Typer_ echo/secho
+functions. If you wish to use Typer_'s echo you should use these wrapper functions because
+they honor the command's ``--force-color`` and ``--no-color`` flags and the configured stdout/stderr
+streams:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/printing.py
+            :language: python
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/printing_typer.py
+            :language: python
+            :linenos:

@@ -49,8 +49,10 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure, detect_shell
 from typer import Argument, Option, echo
-from typer.completion import Shells  # type: ignore
-from typer.completion import completion_init  # type: ignore
+from typer.completion import (  # type: ignore
+    Shells,  # pyright: ignore[reportPrivateImportUsage]
+    completion_init,  # pyright: ignore[reportPrivateImportUsage]
+)
 
 from django_typer import TyperCommand, command, get_command
 from django_typer.utils import get_usage_script
@@ -253,9 +255,7 @@ class Command(TyperCommand):
             assert shell in [
                 Shells.pwsh,
                 Shells.powershell,
-            ], gettext(
-                "Unsupported shell: {shell}"
-            ).format(shell=shell.value)
+            ], gettext("Unsupported shell: {shell}").format(shell=shell.value)
             script = replace(
                 typer_scripts.COMPLETION_SCRIPT_POWER_SHELL,
                 "%(prog_name)s",
@@ -589,7 +589,7 @@ class Command(TyperCommand):
                                 cmd_str=cmd_str
                             )
                         ) from err
-                    raise  # otherwise nowhere to go - just error out
+                    return  # otherwise nowhere to go
 
                 if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
                     # this will exit out so no return is needed here

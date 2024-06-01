@@ -28,7 +28,7 @@ from uuid import UUID
 from click import Context, Parameter, ParamType
 from django.apps import AppConfig, apps
 from django.core.management import CommandError
-from django.db.models import Field, ForeignObjectRel, Model, UUIDField
+from django.db import models
 from django.utils.translation import gettext as _
 
 from django_typer.completers import ModelObjectCompleter
@@ -70,22 +70,37 @@ class ModelObjectParser(ParamType):
         If not provided, a CommandError will be raised.
     """
 
-    error_handler = t.Callable[[t.Type[Model], str, Exception], None]
+    error_handler = t.Callable[[t.Type[models.Model], str, Exception], None]
 
-    model_cls: t.Type[Model]
+    model_cls: t.Type[models.Model]
     lookup_field: str
     case_insensitive: bool = False
     on_error: t.Optional[error_handler] = None
 
     _lookup: str = ""
-    _field: Field
+    _field: models.Field
     _completer: ModelObjectCompleter
 
     __name__: str = "MODEL"  # typer internals expect this
 
+    def _get_metavar(self) -> str:
+        if isinstance(self._field, models.IntegerField):
+            return "INT"
+        elif isinstance(self._field, models.EmailField):
+            return "EMAIL"
+        elif isinstance(self._field, models.URLField):
+            return "URL"
+        elif isinstance(self._field, models.GenericIPAddressField):
+            return "[IPv4|IPv6]"
+        elif isinstance(self._field, models.UUIDField):
+            return "UUID"
+        elif isinstance(self._field, (models.FloatField, models.DecimalField)):
+            return "FLOAT"
+        return "TXT"
+
     def __init__(
         self,
-        model_cls: t.Type[Model],
+        model_cls: t.Type[models.Model],
         lookup_field: t.Optional[str] = None,
         case_insensitive: bool = case_insensitive,
         on_error: t.Optional[error_handler] = on_error,
@@ -99,17 +114,13 @@ class ModelObjectParser(ParamType):
         self.on_error = on_error
         self.case_insensitive = case_insensitive
         field = self.model_cls._meta.get_field(self.lookup_field)
-        assert not isinstance(field, (ForeignObjectRel, GenericForeignKey)), _(
+        assert not isinstance(field, (models.ForeignObjectRel, GenericForeignKey)), _(
             "{cls} is not a supported lookup field."
         ).format(cls=self._field.__class__.__name__)
         self._field = field
         if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
-        self.__name__ = (
-            str(self.model_cls._meta.verbose_name)
-            if self.model_cls._meta.verbose_name
-            else self.model_cls.__name__
-        )
+        self.__name__ = self._get_metavar()
 
     def convert(
         self, value: t.Any, param: t.Optional[Parameter], ctx: t.Optional[Context]
@@ -130,7 +141,7 @@ class ModelObjectParser(ParamType):
         try:
             if isinstance(value, self.model_cls):
                 return value
-            if isinstance(self._field, UUIDField):
+            if isinstance(self._field, models.UUIDField):
                 uuid = ""
                 for char in value:
                     if char.isalnum():

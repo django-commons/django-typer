@@ -16,18 +16,27 @@ types:
 
 # pylint: disable=line-too-long
 
+import os
+import pkgutil
+import sys
 import typing as t
+from functools import partial
+from pathlib import Path
 from types import MethodType
 from uuid import UUID
 
 from click import Context, Parameter
+from click.core import ParameterSource
 from click.shell_completion import CompletionItem
 from django.apps import apps
+from django.conf import settings
+from django.core.management import get_commands
 from django.db.models import (
     CharField,
     DecimalField,
     Field,
     FloatField,
+    GenericIPAddressField,
     IntegerField,
     Max,
     Model,
@@ -35,6 +44,9 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
+
+Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
+Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
 
 
 class ModelObjectCompleter:
@@ -60,6 +72,7 @@ class ModelObjectCompleter:
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
+        - `GenericIPAddressField <https://docs.djangoproject.com/en/stable/ref/models/fields/#genericipaddressfield>`_
 
     The completer query logic is pluggable, but the defaults cover most use cases. The
     limit field is important. It defaults to 50 meaning if more than 50 potential completions
@@ -130,6 +143,9 @@ class ModelObjectCompleter:
     _offset: int = 0
 
     _field: Field
+
+    def to_str(self, obj: t.Any) -> str:
+        return str(obj)
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
@@ -263,17 +279,15 @@ class ModelObjectCompleter:
         self.case_insensitive = case_insensitive
         self.distinct = distinct
 
-        self._field = (
-            self.model_cls._meta.get_field(  # pylint: disable=protected-access
-                self.lookup_field
-            )
+        self._field = self.model_cls._meta.get_field(  # pylint: disable=protected-access
+            self.lookup_field
         )
         if query:
             self.query = MethodType(query, self)
         else:
             if isinstance(self._field, IntegerField):
                 self.query = self.int_query
-            elif isinstance(self._field, (CharField, TextField)):
+            elif isinstance(self._field, (CharField, TextField, GenericIPAddressField)):
                 self.query = self.text_query
             elif isinstance(self._field, UUIDField):
                 self.query = self.uuid_query
@@ -312,14 +326,19 @@ class ModelObjectCompleter:
                 return []
 
         excluded: t.List[t.Type[Model]] = []
-        if self.distinct and parameter.name:
+        if (
+            self.distinct
+            and parameter.name
+            and context.get_parameter_source(parameter.name)
+            is not ParameterSource.DEFAULT
+        ):
             excluded = context.params.get(parameter.name, []) or []
 
         return [
             CompletionItem(
                 # use the incomplete string prefix incase this was a case insensitive match
                 value=incomplete
-                + str(getattr(obj, self.lookup_field))[
+                + self.to_str(getattr(obj, self.lookup_field))[
                     len(incomplete) + self._offset :
                 ],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
@@ -329,7 +348,7 @@ class ModelObjectCompleter:
             .distinct()[0 : self.limit]
             if (
                 getattr(obj, self.lookup_field) is not None
-                and str(getattr(obj, self.lookup_field))
+                and self.to_str(getattr(obj, self.lookup_field))
                 and obj not in excluded
             )
         ]
@@ -371,7 +390,12 @@ def complete_app_label(
     :return: A list of matching app labels or names. Labels already present for the
         parameter on the command line will be filtered out.
     """
-    present = [app.label for app in (ctx.params.get(param.name or "") or [])]
+    present = []
+    if (
+        param.name
+        and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+    ):
+        present = [app.label for app in (ctx.params.get(param.name) or [])]
     ret = [
         CompletionItem(app.label)
         for app in apps.get_app_configs()
@@ -386,3 +410,214 @@ def complete_app_label(
             and app.label not in present
         ]
     return ret
+
+
+def complete_import_path(
+    ctx: Context, param: Parameter, incomplete: str
+) -> t.List[CompletionItem]:
+    """
+    A completer that completes a python dot import path string based on sys.path.
+
+    :param ctx: The click context.
+    :param param: The click parameter.
+    :param incomplete: The incomplete string.
+    :return: A list of available matching import paths
+    """
+    incomplete = incomplete.strip()
+    completions = []
+    packages = [pkg for pkg in incomplete.split(".") if pkg]
+    pkg_complete = not incomplete or incomplete.endswith(".")
+    module_import = ".".join(packages) if pkg_complete else ".".join(packages[:-1])
+    module_path = Path(module_import.replace(".", "/"))
+    search_paths = []
+    for pth in sys.path:
+        if (Path(pth) / module_path).exists():
+            search_paths.append(str(Path(pth) / module_path))
+
+    prefix = "" if pkg_complete else packages[-1]
+    for module in pkgutil.iter_modules(path=search_paths):
+        if module.name.startswith(prefix):
+            completions.append(
+                CompletionItem(
+                    f'{module_import}{"." if module_import else ""}{module.name}',
+                    type="dir",
+                )
+            )
+    if len(completions) == 1 and not completions[0].value.endswith("."):
+        return (
+            complete_import_path(ctx, param, f"{completions[0].value}.") or completions
+        )
+    return completions
+
+
+def complete_path(
+    ctx: Context, param: Parameter, incomplete: str, dir_only: t.Optional[bool] = None
+) -> t.List[CompletionItem]:
+    """
+    A completer that completes a path. Relative incomplete paths are interpreted relative to
+    the current working directory.
+
+    :param ctx: The click context.
+    :param param: The click parameter.
+    :param incomplete: The incomplete string.
+    :param dir_only: Restrict completions to paths to directories only, otherwise complete
+        directories or files.
+    :return: A list of available matching directories
+    """
+
+    def exists(pth: Path) -> bool:
+        if dir_only:
+            return pth.is_dir()
+        return pth.exists() or pth.is_symlink()
+
+    completions = []
+    incomplete_path = Path(incomplete)
+    partial_dir = ""
+    if not exists(incomplete_path) and not incomplete.endswith(os.sep):
+        partial_dir = incomplete_path.name
+        incomplete_path = incomplete_path.parent
+    elif incomplete_path.is_file() and not dir_only:
+        return [CompletionItem(incomplete, type="file")]
+    if incomplete_path.is_dir():
+        for child in os.listdir(incomplete_path):
+            if not exists(incomplete_path / child):
+                continue
+            if child.startswith(partial_dir):
+                to_complete = incomplete[0 : (-len(partial_dir) or None)]
+                completions.append(
+                    CompletionItem(
+                        f"{to_complete}"
+                        f"{'' if not to_complete or to_complete.endswith(os.sep) else os.sep}"
+                        f"{child}",
+                        type="dir" if (incomplete_path / child).is_dir() else "file",
+                    )
+                )
+    if (
+        len(completions) == 1
+        and Path(completions[0].value).is_dir()
+        and [
+            child
+            for child in os.listdir(completions[0].value)
+            if exists(Path(completions[0].value) / child)
+        ]
+    ):
+        # recurse because we can go futher
+        return complete_path(ctx, param, completions[0].value, dir_only=dir_only)
+    return completions
+
+
+complete_directory = partial(complete_path, dir_only=True)
+"""
+A completer that completes a directory path (but not files). Relative incomplete paths
+are interpreted relative to the current working directory.
+
+:param ctx: The click context.
+:param param: The click parameter.
+:param incomplete: The incomplete string.
+:return: A list of available matching directories
+"""
+
+
+def these_strings(
+    strings: t.Union[t.Callable[[], Strings], Strings],
+    allow_duplicates: bool = False,
+):
+    """
+    Get a completer that provides completion logic that matches the allowed strings.
+
+    :param strings: A sequence of allowed strings or a callable that generates a sequence of
+        allowed strings.
+    :param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+    :return: A completer function.
+    """
+
+    def complete(ctx: Context, param: Parameter, incomplete: str):
+        present = []
+        if (
+            not allow_duplicates
+            and param.name
+            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+        ):
+            present = [value for value in (ctx.params.get(param.name) or [])]
+        return [
+            CompletionItem(item)
+            for item in (strings() if callable(strings) else strings)
+            if item.startswith(incomplete) and item not in present
+        ]
+
+    return complete
+
+
+# use a function that returns a generator because we should not access settings on import
+databases = partial(these_strings, lambda: settings.DATABASES.keys())
+"""
+A completer that completes Django database aliases configured in settings.DATABASES.
+
+:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+:return: A completer function.
+"""
+
+commands = partial(these_strings, lambda: get_commands().keys())
+"""
+A completer that completes management command names.
+
+:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+:return: A completer function.
+"""
+
+
+def chain(
+    completer: Completer,
+    *completers: Completer,
+    first_match: bool = False,
+    allow_duplicates: bool = False,
+):
+    """
+    Run through the given completers and return the items from the first one, or all
+    of them if first_match is False.
+
+    .. note::
+
+        This function is also useful for filtering out previously supplied duplicate
+        values for completers that do not natively support that:
+
+        .. code-block:: python
+
+            shell_complete=chain(
+                complete_import_path,
+                allow_duplicates=False
+            )
+
+    :param completer: The first completer to use (must be at least one!)
+    :param completers: The completers to use
+    :param first_match: If true, return only the matches from the first completer that
+        finds completions. Default: False
+    :param allow_duplicates: If False (default) remove completions from previously provided
+        values.
+    """
+
+    def complete(ctx: Context, param: Parameter, incomplete: str):
+        completions = []
+        present = []
+        if (
+            not allow_duplicates
+            and param.name
+            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
+        ):
+            present = [value for value in (ctx.params.get(param.name) or [])]
+        for cmpltr in [completer, *completers]:
+            completions.extend(cmpltr(ctx, param, incomplete))
+            if first_match and completions:
+                break
+
+        # eliminate duplicates
+        return list(
+            {
+                ci.value: ci
+                for ci in completions
+                if ci.value
+                if ci.value not in present
+            }.values()
+        )
+
+    return complete

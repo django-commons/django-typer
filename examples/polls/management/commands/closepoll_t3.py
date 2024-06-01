@@ -1,0 +1,52 @@
+import typing as t
+
+from django.core.management.base import CommandError
+from django.utils.translation import gettext_lazy as _
+from typer import Argument, Option
+
+from django_typer import TyperCommand
+from django_typer.tests.apps.examples.polls.models import Question as Poll
+
+
+def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
+    if isinstance(poll, Poll):
+        return poll
+    try:
+        return Poll.objects.get(pk=int(poll))
+    except Poll.DoesNotExist:
+        raise CommandError(f'Poll "{poll}" does not exist')
+
+
+class Command(TyperCommand, rich_markup_mode="markdown"):
+    def handle(
+        self,
+        polls: t.Annotated[
+            t.List[Poll],
+            Argument(
+                parser=get_poll_from_id,
+                help=_("The database IDs of the poll(s) to close."),
+            ),
+        ],
+        delete: t.Annotated[
+            bool,
+            Option(
+                # we can also get rid of that unnecessary --no-delete flag
+                "--delete",
+                help=_("Delete poll instead of closing it."),
+            ),
+        ] = False,
+    ):
+        """
+        :sparkles: As mentioned in the last section, helps can also be set in
+        the docstring and rendered using either
+        [rich](https://rich.readthedocs.io/en/stable/markup.html)
+        or [markdown](https://www.markdownguide.org/) :sparkles:
+        """
+        for poll in polls:
+            poll.opened = False
+            poll.save()
+            self.stdout.write(
+                self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
+            )
+            if delete:
+                poll.delete()

@@ -1,8 +1,10 @@
 .. include:: ./refs.rst
 
-========
-Tutorial
-========
+.. _building_commands:
+
+===========================
+Tutorial: Building Commands
+===========================
 
 Using the :class:`~django_typer.TyperCommand` class is very similar to using the BaseCommand_
 class. The main difference is that we use Typer_'s decorators, classes and type annotations
@@ -60,12 +62,6 @@ Install django-typer_
     rich_ is a powerful library for rich text and beautiful formatting in the terminal.
     It is not required, but highly recommended for the best experience:
 
-    .. note::
-
-        If you install rich_, `traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_
-        will be enabled by default. Refer to the :ref:`how-to <configure-rich-exception-tracebacks>` if
-        you would like to disable it.
-
 
 2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
 
@@ -80,7 +76,7 @@ Install django-typer_
 
         Adding django_typer to INSTALLED_APPS is not strictly necessary if you do not wish to use shell
         tab completions or configure `rich traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_.
-
+        Refer to the :ref:`how-to <configure-rich-exception-tracebacks>` if you would like to disable it.
 
 Convert the closepoll command to a :class:`~django_typer.TyperCommand`
 ----------------------------------------------------------------------
@@ -88,42 +84,11 @@ Convert the closepoll command to a :class:`~django_typer.TyperCommand`
 Recall our closepoll command from the `polls Tutorial in the Django documentation <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#module-django.core.management>`_
 looks like this:
 
-.. code-block:: python
+.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_django.py
+    :language: python
     :linenos:
-
-    from django.core.management.base import BaseCommand, CommandError
-    from polls.models import Question as Poll
-
-
-    class Command(BaseCommand):
-        help = "Closes the specified poll for voting"
-
-        def add_arguments(self, parser):
-            parser.add_argument("poll_ids", nargs="+", type=int)
-
-            # Named (optional) arguments
-            parser.add_argument(
-                "--delete",
-                action="store_true",
-                help="Delete poll instead of closing it",
-            )
-
-        def handle(self, *args, **options):
-            for poll_id in options["poll_ids"]:
-                try:
-                    poll = Poll.objects.get(pk=poll_id)
-                except Poll.DoesNotExist:
-                    raise CommandError(f'Poll "{poll_id}" does not exist')
-
-                poll.opened = False
-                poll.save()
-
-                self.stdout.write(
-                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
-                )
-
-                if options["delete"]:
-                    poll.delete()
+    :replace:
+        django_typer.tests.apps.examples.polls : polls
 
 Inherit from :class:`~django_typer.TyperCommand`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,38 +97,23 @@ We first need to change the inheritance to :class:`~django_typer.TyperCommand` a
 argument and option definitions from add_arguments into the method signature of handle. A minimal
 conversion may look like this:
 
-.. code-block:: python
-    :linenos:
+.. tabs::
 
-    import typing as t
+    .. tab:: Django-style
 
-    from django_typer import TyperCommand
-    from django.core.management.base import CommandError
-    from polls.models import Question as Poll
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
-    class Command(TyperCommand):
-        help = "Closes the specified poll for voting"
+    .. tab:: Typer-style
 
-        def handle(
-            self,
-            poll_ids: t.List[int],
-            delete: bool = False,
-        ):
-            for poll_id in poll_ids:
-                try:
-                    poll = Poll.objects.get(pk=poll_id)
-                except Poll.DoesNotExist:
-                    raise CommandError(f'Poll "{poll_id}" does not exist')
-
-                poll.opened = False
-                poll.save()
-
-                self.stdout.write(
-                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
-                )
-
-                if delete:
-                    poll.delete()
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1_typer.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
 You'll note that we've removed add_arguments entirely and specified the arguments and options as
 parameters to the handle method. django-typer_ will interpret the parameters on the handle() method
@@ -171,7 +121,7 @@ as the command line interface for the command. If we have rich_ installed the he
 closepoll command will look like this:
 
 
-.. typer:: django_typer.examples.tutorial.step1.closepoll.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t1.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -196,40 +146,32 @@ with one of two Typer_ parameter types, either Argument or Option. Arguments_ ar
 parameters and Options_ are named parameters (i.e. `--delete`). In our polls example, the poll_ids
 are arguments and the delete flag is an option. Here is what that would look like:
 
-.. code-block:: python
-    :linenos:
+.. tabs::
 
-    import typing as t
+    .. tab:: Django-style
 
-    from django.core.management.base import CommandError
-    from django.utils.translation import gettext_lazy as _
-    from typer import Argument, Option
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2.py
+            :language: python
+            :lines: 11-23
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
-    from django_typer import TyperCommand
-    from polls.models import Question as Poll
+    .. tab:: Typer-style
 
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2_typer.py
+            :language: python
+            :lines: 13-23
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
-    class Command(TyperCommand):
-        help = "Closes the specified poll for voting"
+See that our help text now shows up in the command line interface. Also note, that
+`lazy translations <https://docs.djangoproject.com/en/stable/topics/i18n/translation/>`_ work for
+the help strings. Typer_ also allows us to specify our help text in the docstrings of the command
+function or class, in this case either Command or handle() - but docstrings are not available to
+the translation system. If translation is not necessary and your help text is extensive or contains
+markup the docstring may be the more appropriate place to put it.
 
-        def handle(
-            self,
-            poll_ids: t.Annotated[
-                t.List[int], Argument(help=_("The database IDs of the poll(s) to close."))
-            ],
-            delete: t.Annotated[
-                bool, Option(help=_("Delete poll instead of closing it."))
-            ] = False,
-        ):
-            # ...
-
-See that our help text now shows up in the command line interface. Also note, that lazy translations
-work for the help strings. Typer_ also allows us to specify our help text in the docstrings of the
-command function or class, in this case either Command or handle() - but docstrings are not
-available to the translation system. If translation is not necessary and your help text is extensive
-or contains markup the docstring may be the more appropriate place to put it.
-
-.. typer:: django_typer.examples.tutorial.step2.closepoll.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t2.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -248,66 +190,25 @@ Defining custom and reusable parameter types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We may have other commands that need to operate on Poll objects from given poll ids. We could
-duplicate our for loop that loads Poll objects from ids, but that wouldn't be very DRY. Instead,
+duplicate our for loop that loads Poll objects from ids, but that wouldn't be very DRY_. Instead,
 Typer_ allows us to define custom parsers for arbitrary parameter types. Lets see what that would
 look like if we used the Poll class as our type hint:
 
-.. code-block:: python
-    :linenos:
+.. tabs::
 
-    import typing as t
+    .. tab:: Django-style
 
-    # ...
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3.py
+            :language: python
+            :lines: 11-52
 
-    def get_poll_from_id(poll: t.Union[str, Poll]) -> Poll:
-        # our parser may be passed a Poll object depending on how
-        # users might call our command from code - so we must check
-        # to be sure we have something to parse at all!
-        if isinstance(poll, Poll):
-            return poll
-        try:
-            return Poll.objects.get(pk=int(poll))
-        except Poll.DoesNotExist:
-            raise CommandError(f'Poll "{poll_id}" does not exist')
+    .. tab:: Typer-style
 
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3_typer.py
+            :language: python
+            :lines: 11-54
 
-    class Command(TyperCommand):
-
-        def handle(
-            self,
-            polls: t.Annotated[
-                t.List[Poll],  # change our type hint to a list of Polls!
-                Argument(
-                    parser=get_poll_from_id,  # pass our parser to the Argument!
-                    help=_("The database IDs of the poll(s) to close."),
-                ),
-            ],
-            delete: t.Annotated[
-                bool,
-                Option(
-                    "--delete",  # we can also get rid of that unnecessary --no-delete flag
-                    help=_("Delete poll instead of closing it."),
-                ),
-            ] = False,
-        ):
-            """
-            Closes the specified poll for voting.
-
-            As mentioned in the last section, helps can also
-            be set in the docstring
-            """
-            for poll in polls:
-                poll.opened = False
-                poll.save()
-                self.stdout.write(
-                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
-                )
-                if delete:
-                    poll.delete()
-
-
-
-.. typer:: django_typer.examples.tutorial.step3.closepoll.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t3.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -379,42 +280,23 @@ When we're using a :class:`~django_typer.parsers.ModelObjectParser` and
 of boiler plate. Let's put everything together and see what our full-featured refactored
 closepoll command looks like:
 
-.. code-block:: python
-    :linenos:
+.. tabs::
 
-    import typing as t
+    .. tab:: Django-style
 
-    from django.utils.translation import gettext_lazy as _
-    from typer import Argument, Option
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
-    from django_typer import TyperCommand, model_parser_completer
-    from polls.models import Question as Poll
+    .. tab:: Typer-style
 
-
-    class Command(TyperCommand):
-        help = _("Closes the specified poll for voting.")
-
-        def handle(
-            self,
-            polls: Annotated[
-                t.List[Poll],
-                Argument(
-                    **model_parser_completer(Poll, help_field="question_text"),
-                    help=_("The database IDs of the poll(s) to close."),
-                ),
-            ],
-            delete: Annotated[
-                bool, Option(help=_("Delete poll instead of closing it.")),
-            ] = False,
-        ):
-            for poll in polls:
-                poll.opened = False
-                poll.save()
-                self.stdout.write(
-                    self.style.SUCCESS(f'Successfully closed poll "{poll.id}"')
-                )
-                if delete:
-                    poll.delete()
+        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6_typer.py
+            :language: python
+            :linenos:
+            :replace:
+                django_typer.tests.apps.examples.polls.models : polls.models
 
 
 .. only:: html

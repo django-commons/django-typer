@@ -2,6 +2,31 @@
 Change Log
 ==========
 
+v2.0.0
+======
+
+This major version release, includes an extensive internal refactor, numerous bug fixes and the
+addition of a plugin-based extension pattern.
+
+* Fixed `Stack trace produced when attempted to tab-complete a non-existent management command. <https://github.com/bckohan/django-typer/issues/75>`_
+* Fixed `Overriding handle() in inherited commands results in multiple commands. <https://github.com/bckohan/django-typer/issues/74>`_
+* Implemented `Support subgroup name overloads. <https://github.com/bckohan/django-typer/issues/70>`_
+* Fixed `Helps from class docstrings and TyperCommand class parameters are not inherited. <https://github.com/bckohan/django-typer/issues/69>`_
+* Implemented `Allow callback and initialize to be aliases of each other. <https://github.com/bckohan/django-typer/issues/66>`_
+* Implemented `Shell completion for --pythonpath <https://github.com/bckohan/django-typer/issues/65>`_
+* Implemented `Shell completion for --settings <https://github.com/bckohan/django-typer/issues/64>`_
+* Fixed `An intelligible exception should be thrown when a command is invoked that has no implementation. <https://github.com/bckohan/django-typer/issues/63>`_
+* Implemented `TyperCommand class docstring should be used as the help as a last resort. <https://github.com/bckohan/django-typer/issues/62>`_
+* Implemented `Adapter pattern that allows commands and groups to be added without extension by apps further up the app stack. <https://github.com/bckohan/django-typer/issues/61>`_
+* Fixed `ModelObjectParser should use a metavar appropriate to the field type. <https://github.com/bckohan/django-typer/issues/60>`_
+* Implemented `Switch to ruff for linting and formatting. <https://github.com/bckohan/django-typer/issues/56>`_
+* Implemented `Add a wrapper for typer's echo/secho <https://github.com/bckohan/django-typer/issues/55>`_
+* Implemented `Support a native typer-like interface. <https://github.com/bckohan/django-typer/issues/53>`_
+* Fixed `@group type hint does not carry over the parameter spec of the wrapped function <https://github.com/bckohan/django-typer/issues/38>`_
+* Implemented `Better test organization. <https://github.com/bckohan/django-typer/issues/34>`_
+* Implemented `Add completer/parser for GenericIPAddressField. <https://github.com/bckohan/django-typer/issues/12>`_
+
+
 v1.1.2
 ======
 

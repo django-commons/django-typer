@@ -5,12 +5,14 @@ from pathlib import Path
 from sphinx.ext.autodoc import between
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings.base')
 django.setup()
 
-sys.path.append(str(Path(__file__).parent / 'django_typer' / 'examples'))
-sys.path.append(str(Path(__file__).parent / 'django_typer' / 'tests'))
+sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'examples'))
+sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'tests'))
+sys.path.append(str(Path(__file__).parent / 'ext'))
 import django_typer
+from literalinclude import ExtendedLiteralInclude
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -48,7 +50,8 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinxcontrib.typer'
+    'sphinxcontrib.typer',
+    'sphinx_tabs.tabs'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -80,6 +83,10 @@ todo_include_todos = True
 
 latex_engine = "xelatex"
 
+suppress_warnings = [
+    'app.add_directive'
+]
+
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
@@ -88,4 +95,6 @@ def setup(app):
         between('^.*[*]{79}.*$', exclude=True)
     )
     # app.connect('html-page-context', add_page_class)
+
+    app.add_directive("literalinclude", ExtendedLiteralInclude)
     return app

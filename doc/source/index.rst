@@ -5,23 +5,28 @@
 Django Typer
 ============
 
-Use Typer_ to define the CLI for your Django_ management commands. Provides a TyperCommand class
-that inherits from BaseCommand_ and allows typer-style annotated parameter types. All of the
-BaseCommand functionality is preserved, so that TyperCommand can be a drop in replacement.
+Use static typing to define the CLI for your Django_ management commands with Typer_. Optionally
+use the provided :class:`~django_typer.TyperCommand` class that inherits from BaseCommand_. This
+class maps the Typer_ interface onto a class based interface that Django developers will be
+familiar with. All of the BaseCommand_ functionality is preserved, so that
+:class:`~django_typer.TyperCommand` can be a drop in replacement.
 
 **django-typer makes it easy to:**
 
     * Define your command CLI interface in a clear, DRY and safe way using type hints
-    * Create subcommand and group command hierarchies.
-    * Use the full power of Typer's parameter types to validate and parse command line inputs.
+    * Create subcommands and hierarchical groups of commands.
+    * Use the full power of Typer_'s parameter types to validate and parse command line inputs.
     * Create beautiful and information dense help outputs.
-    * Configure the rendering of exception stack traces using rich.
-    * :ref:`Install shell tab-completion support <shellcompletions>` for TyperCommands and normal
-      Django_ commands for bash_, zsh_, fish_ and powershell_.
+    * Configure the rendering of exception stack traces using rich_.
+    * :ref:`Install shell tab-completion support <shellcompletions>` for bash_, zsh_, fish_ and
+      powershell_.
     * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
       <define-shellcompletions>`
-    * Refactor existing management commands into TyperCommands because TyperCommand is interface
-      compatible with BaseCommand.
+    * Port existing commands (:class:`~django_typer.TyperCommand` is interface compatible
+      with BaseCommand_).
+    * Use either a Django-style class-based interface or the Typer-style interface to define
+      commands.
+    * Add plugins to upstream commands.
 
 
 :big:`Installation`
@@ -40,7 +45,7 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
         pip install "django-typer[rich]"
 
 
-2. Add ``django_typer`` to your ``INSTALLED_APPS`` setting:
+2. Optionally add ``django_typer`` to your ``INSTALLED_APPS`` setting:
 
     .. code:: python
 
@@ -51,43 +56,76 @@ BaseCommand functionality is preserved, so that TyperCommand can be a drop in re
 
    *You only need to install django_typer as an app if you want to use the shellcompletion command
    to enable tab-completion or if you would like django-typer to install*
-   :ref:`rich traceback rendering <configure-rich-exception-tracebacks>` *for you - which it does by
-   default if rich is also installed.*
+   :ref:`rich traceback rendering <configure-rich-exception-tracebacks>` *for you - which it does
+   by default if rich is also installed.*
+
+.. note::
+
+    This documentation shows all examples using both the function oriented Typer-style interface
+    and the class based Django-style interface in separate tabs. Each interface is functionally
+    equivalent so the choice of which to use is a matter of preference and familiarity. All
+    django-typer commands are instances of :class:`~django_typer.TyperCommand`, including commands
+    defined in the Typer-style interface. **This means you may always specify a self argument to
+    receive the instance of the command in your functions.**
 
 :big:`Basic Example`
 
-For example TyperCommands can be a very simple drop in replacement for BaseCommands. All of the
-documented features of BaseCommand_ work!
+:class:`~django_typer.TyperCommand` is a very simple drop in replacement for BaseCommand_. All of
+the documented features of BaseCommand_ work the same way! Or, you may also use an interface
+identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/basic.py
+            :language: python
+            :caption: management/commands/basic.py
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/basic.py
+            :language: python
+            :caption: management/commands/basic.py
+            :linenos:
 
 
-.. literalinclude:: ../../django_typer/examples/basic.py
-   :language: python
-   :caption: A Basic Command
-   :linenos:
-
-
-.. typer:: django_typer.examples.basic.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.basic.Command:typer_app
     :prog: ./manage.py basic
     :width: 80
     :convert-png: latex
+    :theme: dark
 
 |
 
 :big:`Multiple Subcommands Example`
 
-Or commands with multiple subcommands can be defined:
+Commands with multiple subcommands can be defined:
 
-.. literalinclude:: ../../django_typer/examples/multi.py
-   :language: python
-   :caption: A Command w/Subcommands
-   :linenos:
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/multi.py
+            :language: python
+            :caption: management/commands/multi.py
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/multi.py
+            :language: python
+            :caption: management/commands/multi.py
+            :linenos:
 
 
-.. typer:: django_typer.examples.multi.Command:typer_app
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.multi.Command:typer_app
     :prog: ./manage.py multi
     :width: 80
     :show-nested:
     :convert-png: latex
+    :theme: dark
 
 |
 
@@ -106,20 +144,33 @@ command like so:
     ./manage.py hierarchy math multiply 10 2
     20.00
 
-Any number of groups and subcommands and subgroups of other groups can be defined allowing
-for arbitrarily complex command hierarchies.
+Any number of groups and subcommands and subgroups of other groups can be defined allowing for
+arbitrarily complex command hierarchies. The Typer-style interface builds a
+:class:`~django_typer.TyperCommand` class for us **that allows you to optionally accept the self
+argument in your commands.**
 
-.. literalinclude:: ../../django_typer/examples/hierarchy.py
-   :language: python
-   :caption: A Command w/Grouping Hierarchy
-   :linenos:
+.. tabs::
 
+    .. tab:: Django-style
 
-.. typer:: django_typer.examples.hierarchy.Command:typer_app
+        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/hierarchy.py
+            :language: python
+            :caption: management/commands/hierarchy.py
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/hierarchy.py
+            :language: python
+            :caption: management/commands/hierarchy.py
+            :linenos:
+
+.. typer:: django_typer.tests.apps.examples.basic.management.commands.hierarchy.Command:typer_app
     :prog: ./manage.py hierarchy
     :width: 80
     :show-nested:
     :convert-png: latex
+    :theme: dark
 
 |
 
@@ -128,7 +179,8 @@ for arbitrarily complex command hierarchies.
    :caption: Contents:
 
    tutorial
-   howto
+   extensions
    shell_completion
+   howto
    reference
    changelog

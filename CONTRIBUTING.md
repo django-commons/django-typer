@@ -46,21 +46,20 @@ poetry run make html
 
 ## Static Analysis
 
-`django-typer` uses [Pylint](https://www.pylint.org/) for Python linting and [mypy](http://mypy-lang.org/) and [pyright](https://github.com/microsoft/pyright) for static type
-checking. Header imports are also standardized using [isort](https://pycqa.github.io/isort/) and formatting is
-done with [black](https://black.readthedocs.io/en/stable/). Before any PR is accepted the following must be run, and
-static analysis tools should not produce any errors or warnings. Disabling
-certain errors or warnings where justified is acceptable:
+`django-typer` uses [ruff](https://docs.astral.sh/ruff/) for Python linting, header import
+standardization and code formatting. [mypy](http://mypy-lang.org/) and
+[pyright](https://github.com/microsoft/pyright) are used for static type checking. Before any PR
+is accepted the following must be run, and static analysis tools should not produce any errors or
+warnings. Disabling certain errors or warnings where justified is acceptable:
 
 ```bash
-poetry run isort django_typer
-poetry run black django_typer
-poetry run pylint django_typer
-poetry run mypy django_typer
-pyright
-poetry check
-poetry run pip check
-poetry run python -m readme_renderer ./README.md
+./check.sh
+```
+
+To run static analysis without automated fixing you can run:
+
+```bash
+./check.sh --no-fix
 ```
 
 ## Running Tests
