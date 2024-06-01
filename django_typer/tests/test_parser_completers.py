@@ -124,6 +124,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "completion --app-opt ")
+        result = result.getvalue()
+        self.assertTrue("test_app" in result)
+        self.assertTrue("django_typer_tests_apps_util" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion", "complete", "completion django_typer.tests."
             )
@@ -1380,3 +1387,10 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("dj_params2" in result)
         self.assertFalse("dj_params3" in result)
         self.assertFalse("dj_params4" in result)
+
+    def test_databases_completer(self):
+        result = run_command("shellcompletion", "complete", "completion --db ")[
+            0
+        ].strip()
+
+        self.assertTrue("default" in result)

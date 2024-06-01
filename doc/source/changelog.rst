@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.0.1
+======
+
+* Fixed `Readme images are broken. <https://github.com/bckohan/django-typer/issues/77>`_
+
 v2.0.0
 ======
 
