@@ -81,6 +81,18 @@ class Command(TyperCommand):
                 ),
             ),
         ] = [],
+        command_first: Annotated[
+            t.List[str],
+            typer.Option(
+                "--cmd-first",
+                help=_("A list of commands by import path or name."),
+                shell_complete=completers.chain(
+                    completers.complete_import_path,
+                    completers.commands(allow_duplicates=True),
+                    first_match=True,
+                ),
+            ),
+        ] = [],
     ):
         assert self.__class__ is Command
         for app in django_apps:

@@ -27,8 +27,8 @@ following:
   commands they plugin to directly.
 * The group/command tree on instantiated commands must be walkable using attributes from the
   command instance itself to support subgroup name overloads.
-* Common django options should appear on a common initializer for compound commands with multiple
-  groups or commands and should appear directly on the command for non-compound commands.
+* Common django options should appear on the initializer for compound commands and should be
+  directly on the command for non-compound commands.
 
 During all of this, the correct self must be passed if the function accepts it, but all of the
 registered functions are not registered as methods because they enter the Typer_ app tree as

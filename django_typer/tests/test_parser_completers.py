@@ -109,6 +109,21 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "completion ")
+        result = result.getvalue()
+        self.assertTrue("test_app" in result)
+        self.assertTrue("django_typer_tests_apps_util" in result)
+        self.assertTrue("django_typer" in result)
+        self.assertTrue("django_typer_tests_apps_examples_polls" in result)
+        self.assertTrue("admin" in result)
+        self.assertTrue("auth" in result)
+        self.assertTrue("contenttypes" in result)
+        self.assertTrue("sessions" in result)
+        self.assertTrue("messages" in result)
+        self.assertTrue("staticfiles" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion", "complete", "completion django_typer.tests."
             )
@@ -1353,3 +1368,15 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("dj_params2" in result)
         self.assertTrue("dj_params3" in result)
         self.assertTrue("dj_params4" in result)
+
+        result = run_command(
+            "shellcompletion", "complete", "completion --cmd-first dj"
+        )[0].strip()
+
+        self.assertTrue("django" in result)
+        self.assertTrue("django_typer" in result)
+
+        self.assertFalse("dj_params1" in result)
+        self.assertFalse("dj_params2" in result)
+        self.assertFalse("dj_params3" in result)
+        self.assertFalse("dj_params4" in result)
