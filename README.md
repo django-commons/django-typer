@@ -84,7 +84,7 @@ def main(arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
    """
 ```
 
-![Basic Example](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/basic.svg)
+![Basic Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/basic.svg)
 
 ## Multiple Subcommands Example
 
@@ -153,9 +153,10 @@ def delete(
    """
 ```
 
-![Multiple Subcommands Example](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi.svg)
-![Multiple Subcommands Example - create](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi_create.svg)
-![Multiple Subcommands Example - delete](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/multi_delete.svg)
+![Multiple Subcommands Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi.svg)
+![Multiple Subcommands Example - create](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi_create.svg)
+![Multiple Subcommands Example - delete](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi_delete.svg)
+
 
 ## Grouping and Hierarchies Example
 
@@ -275,7 +276,7 @@ def divide(
    return f"{numerator / denominator:.{self.precision}f}"
 ```
 
-![Grouping and Hierarchies Example](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy.svg)
-![Grouping and Hierarchies Example - math](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math.svg)
-![Grouping and Hierarchies Example - math multiply](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math_multiply.svg)
-![Grouping and Hierarchies Example - math divide](https://raw.githubusercontent.com/bckohan/django-typer/main/django_typer/examples/helps/hierarchy_math_divide.svg)
+![Grouping and Hierarchies Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy.svg)
+![Grouping and Hierarchies Example - math](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math.svg)
+![Grouping and Hierarchies Example - math multiply](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math_multiply.svg)
+![Grouping and Hierarchies Example - math divide](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math_divide.svg)

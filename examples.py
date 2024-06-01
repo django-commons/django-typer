@@ -1,1 +1,0 @@
-./django_typer/tests/examples.py
