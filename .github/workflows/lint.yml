@@ -52,6 +52,7 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry run pip install --upgrade pip
           poetry install -E rich
+          poetry run pip install colorama
           poetry run pip install -U "django~=${{ matrix.django-version }}"
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'on' }}
