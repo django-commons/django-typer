@@ -3,6 +3,7 @@ import sys
 import os
 from pathlib import Path
 from sphinx.ext.autodoc import between
+import shutil
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings.base')
@@ -97,4 +98,8 @@ def setup(app):
     # app.connect('html-page-context', add_page_class)
 
     app.add_directive("literalinclude", ExtendedLiteralInclude)
+    
+    # https://sphinxcontrib-typer.readthedocs.io/en/latest/howto.html#build-to-multiple-formats
+    if Path(app.doctreedir).exists():
+        shutil.rmtree(app.doctreedir)
     return app
