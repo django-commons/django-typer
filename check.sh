@@ -20,10 +20,14 @@ cd ./doc
 poetry run doc8 --ignore-path build --max-line-length 100 -q
 # check for broken links in the docs ############
 set +e
-poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./source ./build > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    cat ./build/output.txt | grep broken
-    exit 1
+
+# do not run this in CI - too spurious
+if [ "$1" != "--no-fix" ]; then
+    poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./source ./build > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        cat ./build/output.txt | grep broken
+        exit 1
+    fi
 fi
 #################################################
 cd ..
