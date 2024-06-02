@@ -19,6 +19,7 @@ poetry run pip check
 cd ./doc
 poetry run doc8 --ignore-path build --max-line-length 100 -q
 # check for broken links in the docs ############
+set +e
 poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./source ./build > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     cat ./build/output.txt
