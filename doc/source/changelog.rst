@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.0.2
+======
+
+* Fixed `class help attribute should be type hinted to allow a lazy translation string. <https://github.com/bckohan/django-typer/issues/85>`_
+
+
 v2.0.1
 ======
 
