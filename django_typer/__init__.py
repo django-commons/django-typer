@@ -96,7 +96,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.core.management.color import Style as ColorStyle
 from django.db.models import Model
-from django.utils.functional import classproperty
+from django.utils.functional import Promise, classproperty
 from django.utils.translation import gettext as _
 
 from django_typer import patch
@@ -141,7 +141,7 @@ else:
     from typing import ParamSpec
 
 
-VERSION = (2, 0, 1)
+VERSION = (2, 0, 2)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -741,14 +741,14 @@ def _cache_initializer(
     callback: t.Callable[..., t.Any],
     common_init: bool,
     name: t.Optional[str] = Default(None),
-    help: t.Optional[str] = Default(None),
+    help: t.Optional[t.Union[str, Promise]] = Default(None),
     cls: t.Type[DTGroup] = DTGroup,
     **kwargs,
 ):
     def register(
         cmd: "TyperCommand",
         _name: t.Optional[str] = Default(None),
-        _help: t.Optional[str] = Default(None),
+        _help: t.Optional[t.Union[str, Promise]] = Default(None),
         **extra,
     ):
         return cmd.typer_app.callback(
@@ -769,14 +769,14 @@ def _cache_initializer(
 def _cache_command(
     callback: t.Callable[..., t.Any],
     name: t.Optional[str] = None,
-    help: t.Optional[str] = None,
+    help: t.Optional[t.Union[str, Promise]] = None,
     cls: t.Type[DTCommand] = DTCommand,
     **kwargs,
 ):
     def register(
         cmd: "TyperCommand",
         _name: t.Optional[str] = None,
-        _help: t.Optional[str] = None,
+        _help: t.Optional[t.Union[str, Promise]] = None,
         **extra,
     ):
         return cmd.typer_app.command(
@@ -973,9 +973,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
         callback: t.Optional[t.Callable[P, R]] = Default(None),
-        help: t.Optional[str] = Default(None),
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -1012,9 +1012,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             result_callback=result_callback,
             context_settings=context_settings,
             callback=callback,
-            help=help,
+            help=t.cast(str, help),
             epilog=epilog,
-            short_help=short_help,
+            short_help=t.cast(str, short_help),
             options_metavar=options_metavar,
             add_help_option=add_help_option,
             hidden=hidden,
@@ -1053,9 +1053,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -1088,9 +1088,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 result_callback=result_callback,
                 context_settings=context_settings,
                 callback=func,
-                help=help,
+                help=t.cast(str, help),
                 epilog=epilog,
-                short_help=short_help,
+                short_help=t.cast(str, short_help),
                 options_metavar=options_metavar,
                 add_help_option=add_help_option,
                 hidden=hidden,
@@ -1110,9 +1110,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         *,
         cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[str] = None,
+        help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
-        short_help: t.Optional[str] = None,
+        short_help: t.Optional[t.Union[str, Promise]] = None,
         options_metavar: str = "[OPTIONS]",
         add_help_option: bool = True,
         no_args_is_help: bool = False,
@@ -1178,9 +1178,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                         "_Command", (cls,), {"django_command": self.django_command}
                     ),
                     context_settings=context_settings,
-                    help=help,
+                    help=t.cast(str, help),
                     epilog=epilog,
-                    short_help=short_help,
+                    short_help=t.cast(str, short_help),
                     options_metavar=options_metavar,
                     add_help_option=add_help_option,
                     no_args_is_help=no_args_is_help,
@@ -1207,9 +1207,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
         callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -1232,9 +1232,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             result_callback=result_callback,
             context_settings=context_settings,
             callback=_strip_static(callback),
-            help=help,
+            help=t.cast(str, help),
             epilog=epilog,
-            short_help=short_help,
+            short_help=t.cast(str, short_help),
             options_metavar=options_metavar,
             add_help_option=add_help_option,
             hidden=hidden,
@@ -1254,9 +1254,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -1392,9 +1392,9 @@ def initialize(
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = Default(None),
-    short_help: t.Optional[str] = Default(None),
+    short_help: t.Optional[t.Union[str, Promise]] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
@@ -1531,9 +1531,9 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     *,
     cls: t.Type[DTCommand] = DTCommand,
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-    help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = None,  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = None,
-    short_help: t.Optional[str] = None,
+    short_help: t.Optional[t.Union[str, Promise]] = None,
     options_metavar: str = "[OPTIONS]",
     add_help_option: bool = True,
     no_args_is_help: bool = False,
@@ -1633,9 +1633,9 @@ def group(
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
     epilog: t.Optional[str] = Default(None),
-    short_help: t.Optional[str] = Default(None),
+    short_help: t.Optional[t.Union[str, Promise]] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
@@ -1950,9 +1950,9 @@ class TyperCommandMeta(type):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
         callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -2539,7 +2539,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     _help_kwarg: t.Optional[str] = Default(None)
     _defined_groups: t.Dict[str, Typer] = {}
 
-    help: t.Optional[t.Union[DefaultPlaceholder, str]] = Default(None)  # type: ignore
+    help: t.Optional[t.Union[DefaultPlaceholder, str, Promise]] = Default(None)  # type: ignore
 
     # allow deriving commands to override handle() from BaseCommand
     # without triggering static type checking complaints
@@ -2570,9 +2570,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -2679,9 +2679,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         *,
         cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[str] = None,  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = None,  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = None,
-        short_help: t.Optional[str] = None,
+        short_help: t.Optional[t.Union[str, Promise]] = None,
         options_metavar: str = "[OPTIONS]",
         add_help_option: bool = True,
         no_args_is_help: bool = False,
@@ -2778,9 +2778,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[str] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
         epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[str] = Default(None),
+        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
