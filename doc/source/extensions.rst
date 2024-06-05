@@ -34,20 +34,20 @@ Our command might look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/backup/management/commands/backup.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/backup/management/commands/backup.py
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/backup/management/commands/backup_typer.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/backup/management/commands/backup_typer.py
             :language: python
             :caption: backup/management/commands/backup.py
             :linenos:
 
 
-.. typer:: django_typer.tests.apps.examples.plugins.backup.management.commands.backup.Command:typer_app
+.. typer:: tests.apps.examples.plugins.backup.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :show-nested:
@@ -113,23 +113,23 @@ Our backup.py implementation in the media app might look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media1/management/commands/backup.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/media1/management/commands/backup.py
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media1/management/commands/backup_typer.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/media1/management/commands/backup_typer.py
             :language: python
             :caption: media/management/commands/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
 Now you'll see we have another command called media available:
 
-.. typer:: django_typer.tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app
+.. typer:: tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app
     :prog: manage.py backup
     :width: 80
     :convert-png: latex
@@ -140,7 +140,7 @@ Now you'll see we have another command called media available:
 Now we have a media backup routine that we can run individually or part of the entire
 backup batch:
 
-.. typer:: django_typer.tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app:media
+.. typer:: tests.apps.examples.plugins.media1.management.commands.backup.Command:typer_app:media
     :prog: manage.py backup media
     :width: 80
     :convert-png: latex
@@ -262,19 +262,19 @@ and that would look like this:
 
     .. tab:: django-typer
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media2/management/plugins/backup.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/media2/management/plugins/backup.py
             :language: python
             :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/media2/management/plugins/backup_typer.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/media2/management/plugins/backup_typer.py
             :language: python
             :caption: media/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
 
 
@@ -284,19 +284,19 @@ And our my_app extension might look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/my_app/management/plugins/backup.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/my_app/management/plugins/backup.py
             :language: python
             :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/plugins/my_app/management/plugins/backup_typer.py
+        .. literalinclude:: ../../tests/apps/examples/plugins/my_app/management/plugins/backup_typer.py
             :language: python
             :caption: my_app/management/plugins/backup.py
             :replace:
-                    django_typer.tests.apps.examples.plugins.backup : backup
+                    tests.apps.examples.plugins.backup : backup
 
 Note that we now have a new environment command available:
 

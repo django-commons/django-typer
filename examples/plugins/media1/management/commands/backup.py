@@ -6,7 +6,7 @@ import typer
 from django.conf import settings
 
 from django_typer import command
-from django_typer.tests.apps.examples.plugins.backup.management.commands.backup import (
+from tests.apps.examples.plugins.backup.management.commands.backup import (
     Command as Backup,
 )
 

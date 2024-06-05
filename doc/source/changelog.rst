@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.1.0
+======
+
+* Implemented `Move tests into top level dir. <https://github.com/bckohan/django-typer/issues/87>`_
+
+
 v2.0.2
 ======
 

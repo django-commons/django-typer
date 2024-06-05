@@ -6,7 +6,7 @@ import typer
 from django.conf import settings
 
 from django_typer import Typer
-from django_typer.tests.apps.examples.plugins.backup.management.commands import (
+from tests.apps.examples.plugins.backup.management.commands import (
     backup_typer,
 )
 

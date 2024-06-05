@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
 from django_typer import Typer
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from tests.apps.examples.polls.models import Question as Poll
 
 app = Typer(help="Closes the specified poll for voting")
 

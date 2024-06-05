@@ -2487,7 +2487,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     We can see that our help renders like so:
 
-    .. typer:: django_typer.tests.apps.test_app.management.commands.chain.Command:typer_app
+    .. typer:: tests.apps.test_app.management.commands.chain.Command:typer_app
         :prog: ./manage.py chain
         :width: 80
         :convert-png: latex

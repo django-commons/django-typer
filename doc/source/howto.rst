@@ -156,13 +156,13 @@ default we can do this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_cmd.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/default_cmd.py
             :language: python
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_cmd_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/default_cmd_typer.py
             :language: python
             :linenos:
 
@@ -188,7 +188,7 @@ default we can do this:
 
 Lets look at the help output:
 
-.. typer:: django_typer.tests.apps.howto.management.commands.default_cmd.Command:typer_app
+.. typer:: tests.apps.howto.management.commands.default_cmd.Command:typer_app
     :width: 80
 
 .. _groups:
@@ -204,13 +204,13 @@ Any depth of command tree can be defined. Use the :func:`~django_typer.group` or
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/groups.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/groups.py
             :language: python
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/groups_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/groups_typer.py
             :language: python
             :linenos:
 
@@ -234,13 +234,13 @@ This is like defining a group at the command root and is an extension of the
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/initializer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/initializer.py
             :language: python
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/initializer_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/initializer_typer.py
             :language: python
             :linenos:
 
@@ -349,14 +349,14 @@ BaseCommand_ options:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_options.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/default_options.py
             :language: python
             :linenos:
 
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/default_options_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/default_options_typer.py
             :language: python
             :linenos:
 
@@ -374,14 +374,14 @@ arguments to the :class:`~django_typer.TyperCommand` class inheritance:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/configure.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/configure.py
             :language: python
             :linenos:
             :caption: configure.py
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/configure_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/configure_typer.py
             :language: python
             :linenos:
             :caption: configure.py
@@ -429,28 +429,28 @@ Say we have a command that looks like:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/upstream.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/upstream.py
             :language: python
             :linenos:
             :caption: management/commands/upstream.py
 
         We can inherit and override or add additional commands and groups like so:
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/downstream.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/downstream.py
             :language: python
             :linenos:
             :caption: management/commands/downstream.py
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/upstream_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/upstream_typer.py
             :language: python
             :linenos:
             :caption: management/commands/upstream.py
 
         We can inherit and override or add additional commands and groups like so:
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/downstream_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/downstream_typer.py
             :language: python
             :linenos:
             :caption: management/commands/downstream.py
@@ -531,7 +531,7 @@ Now we can add our plugins:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/plugins/upstream2.py
+        .. literalinclude:: ../../tests/apps/howto/management/plugins/upstream2.py
             :language: python
             :linenos:
             :caption: management/plugins/upstream.py
@@ -540,7 +540,7 @@ Now we can add our plugins:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/plugins/upstream2_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/plugins/upstream2_typer.py
             :language: python
             :linenos:
             :caption: management/plugins/upstream.py
@@ -620,13 +620,13 @@ The precedence order, for a simple command is as follows:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/help.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/help.py
             :language: python
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/help_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/help_typer.py
             :language: python
             :linenos:
 
@@ -715,12 +715,12 @@ streams:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/printing.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/printing.py
             :language: python
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/howto/management/commands/printing_typer.py
+        .. literalinclude:: ../../tests/apps/howto/management/commands/printing_typer.py
             :language: python
             :linenos:

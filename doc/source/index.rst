@@ -78,20 +78,20 @@ identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/basic.py
+        .. literalinclude:: ../../tests/apps/examples/basic/management/commands/basic.py
             :language: python
             :caption: management/commands/basic.py
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/basic.py
+        .. literalinclude:: ../../tests/apps/examples/typer/management/commands/basic.py
             :language: python
             :caption: management/commands/basic.py
             :linenos:
 
 
-.. typer:: django_typer.tests.apps.examples.basic.management.commands.basic.Command:typer_app
+.. typer:: tests.apps.examples.basic.management.commands.basic.Command:typer_app
     :prog: ./manage.py basic
     :width: 80
     :convert-png: latex
@@ -107,20 +107,20 @@ Commands with multiple subcommands can be defined:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/multi.py
+        .. literalinclude:: ../../tests/apps/examples/basic/management/commands/multi.py
             :language: python
             :caption: management/commands/multi.py
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/multi.py
+        .. literalinclude:: ../../tests/apps/examples/typer/management/commands/multi.py
             :language: python
             :caption: management/commands/multi.py
             :linenos:
 
 
-.. typer:: django_typer.tests.apps.examples.basic.management.commands.multi.Command:typer_app
+.. typer:: tests.apps.examples.basic.management.commands.multi.Command:typer_app
     :prog: ./manage.py multi
     :width: 80
     :show-nested:
@@ -153,19 +153,19 @@ argument in your commands.**
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/basic/management/commands/hierarchy.py
+        .. literalinclude:: ../../tests/apps/examples/basic/management/commands/hierarchy.py
             :language: python
             :caption: management/commands/hierarchy.py
             :linenos:
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/typer/management/commands/hierarchy.py
+        .. literalinclude:: ../../tests/apps/examples/typer/management/commands/hierarchy.py
             :language: python
             :caption: management/commands/hierarchy.py
             :linenos:
 
-.. typer:: django_typer.tests.apps.examples.basic.management.commands.hierarchy.Command:typer_app
+.. typer:: tests.apps.examples.basic.management.commands.hierarchy.Command:typer_app
     :prog: ./manage.py hierarchy
     :width: 80
     :show-nested:

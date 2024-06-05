@@ -37,7 +37,7 @@ classifiers = [
 packages = [
     { include = "django_typer" }
 ]
-exclude = ["django_typer/tests", "django_typer/examples", "django_typer/locale"]
+exclude = ["django_typer/locale"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
@@ -125,7 +125,7 @@ sphinx = true
 
 [tool.pytest.ini_options]
 # py.test options:
-DJANGO_SETTINGS_MODULE = "django_typer.tests.settings.base"
+DJANGO_SETTINGS_MODULE = "tests.settings.base"
 python_files = "test_*.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__ shellcompletion"
 env = [
@@ -140,7 +140,6 @@ addopts = [
 ]
 
 [tool.coverage.run]
-omit = ["django_typer/tests/**/*.py"]
 branch = true
 source = ["django_typer"]
 concurrency = ["multiprocessing"]
@@ -179,7 +178,7 @@ disable = [
 ]
 
 [tool.pyright]
-exclude = ["django_typer/tests/**/*"]
+exclude = ["tests/**/*"]
 include = [
     "django_typer"
 ]
@@ -194,5 +193,5 @@ exclude = [
 
 [tool.ruff.lint]
 exclude = [
-    "django_typer/tests/**/*"
+    "tests/**/*"
 ]

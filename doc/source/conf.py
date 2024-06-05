@@ -6,12 +6,13 @@ from sphinx.ext.autodoc import between
 import shutil
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_typer.tests.settings.base')
+sys.path.append(str(Path(__file__).parent.parent / 'tests'))
+sys.path.append(str(Path(__file__).parent.parent / 'examples'))
+sys.path.append(str(Path(__file__).parent / 'ext'))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings.base')
 django.setup()
 
-sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'examples'))
-sys.path.append(str(Path(__file__).parent.parent / 'django_typer' / 'tests'))
-sys.path.append(str(Path(__file__).parent / 'ext'))
 import django_typer
 from literalinclude import ExtendedLiteralInclude
 
@@ -73,20 +74,14 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [
-    '_static',
-]
-html_css_files = [
-    'style.css',
-]
+html_static_path = ['_static']
+html_css_files = ['style.css']
 
 todo_include_todos = True
 
 latex_engine = "xelatex"
 
-suppress_warnings = [
-    'app.add_directive'
-]
+suppress_warnings = ['app.add_directive']
 
 linkcheck_ignore = [
     r'https://github.com/django/django/blob/main/django/core/management/__init__.py#L278',  # Ignore exact match

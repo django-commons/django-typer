@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from django_typer import TyperCommand
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from tests.apps.examples.polls.models import Question as Poll
 
 
 class Command(TyperCommand):

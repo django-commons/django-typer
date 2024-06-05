@@ -9,7 +9,7 @@ else:
 from typer import Option
 
 from django_typer import TyperCommand, model_parser_completer
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from tests.apps.examples.polls.models import Question as Poll
 
 
 class Command(TyperCommand):
