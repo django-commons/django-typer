@@ -12,7 +12,7 @@ from django_typer.utils import get_current_command
 
 class BasicTests(TestCase):
     def test_common_options_function(self):
-        from django_typer import _common_options
+        from django_typer.management import _common_options
 
         self.assertIsNone(_common_options())
 

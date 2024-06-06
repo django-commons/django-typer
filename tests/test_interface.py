@@ -144,7 +144,7 @@ class InterfaceTests(TestCase):
         self.assertTrue(initialize is callback)
 
     def test_typercommandmeta_interface_matches(self):
-        from django_typer import TyperCommandMeta
+        from django_typer.management import TyperCommandMeta
 
         typer_command_params = set(get_named_arguments(TyperCommandMeta.__new__))
         typer_params = set(get_named_arguments(typer.Typer.__init__))
@@ -282,7 +282,7 @@ class InterfaceTests(TestCase):
             pass
 
     def test_proxied_property(self):
-        from django_typer import BoundProxy
+        from django_typer.management import BoundProxy
         from tests.apps.test_app.management.commands.basic import (
             Command as Basic,
         )
@@ -305,7 +305,7 @@ class InterfaceTests(TestCase):
                     pass
 
     def test_attribute_access_outside_of_definition(self):
-        from django_typer import TyperCommand, TyperCommandMeta
+        from django_typer.management import TyperCommand, TyperCommandMeta
         from tests.apps.test_app.management.commands.native import app
 
         with self.assertRaises(AttributeError):

@@ -156,3 +156,42 @@ present. This is ok, the ones added last will be used.
   @grp2.command()
   def cmd2():
       pass
+
+
+Notes on BaseCommand_
+~~~~~~~~~~~~~~~~~~~~~
+
+There are a number of encumbrances in the Django management command design that make our
+implementation more difficult than it need be. We document them here mostly to keep track of them
+for potential future core Django work.
+
+  1) BaseCommand::execute() prints results to stdout without attempting to convert them
+     to strings. This means you've gotta do weird stuff to get a return object out of
+     call_command()
+
+  2) call_command() converts arguments to strings. There is no official way to pass
+     previously parsed arguments through call_command(). This makes it a bit awkward to
+     use management commands as callable functions in django code which you should be able
+     to easily do. django-typer allows you to invoke the command and group functions
+     directly so you can work around this, but it would be nice if call_command() supported
+     a general interface that all command libraries could easily implement to.
+
+  3) terminal autocompletion is not pluggable. As of this writing (Django<=5)
+     autocomplete is implemented for bash only and has no mechanism for passing the buck
+     down to command implementations. The result of this in django-typer is that we wrap
+     django's autocomplete and pass the buck to it instead of the other way around. This is
+     fine but it will be awkward if two django command line apps with their own autocomplete
+     infrastructure are used together. Django should be the central coordinating point for
+     this. This is the reason for the pluggable --fallback awkwardness in shellcompletion.
+
+  4) Too much of the BaseCommand implementation is built assuming argparse. A more
+     generalized abstraction of this interface is in order. Right now BaseCommand is doing
+     double duty both as a base class and a protocol.
+
+  5) There is an awkwardness to how parse_args flattens all the arguments and options
+     into a single dictionary. This means that when mapping a library like Typer onto the
+     BaseCommand interface you cannot allow arguments at different levels
+     (e.g. in initialize()) or group() functions above the command to have the same names as
+     the command's options. You can work around this by using a different name for the
+     option in the command and supplying the desired name in the annotation, but its an odd
+     quirk imposed by the base class for users to be aware of.
