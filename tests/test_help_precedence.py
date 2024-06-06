@@ -178,3 +178,23 @@ class TestHelpPrecedence(TestCase):
             self.assertIn(f"Usage: {manage_py}", stdout)
         finally:
             os.chdir(cwd)
+
+
+class TestNativeHelpPrecedence(TestCase):
+    def test_help_precedence_native1(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence_native1", no_color=True, stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence_native1")
+        self.assertIn("1: Command help", buffer.getvalue())
+
+    def test_help_precedence_native2(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence_native2", no_color=True, stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence_native2")
+        self.assertIn("2: App help", buffer.getvalue())
+
+    def test_help_precedence_native3(self):
+        buffer = StringIO()
+        cmd = get_command("help_precedence_native3", no_color=True, stdout=buffer)
+        cmd.print_help("./manage.py", "help_precedence_native3")
+        self.assertIn("3: Docstring help", buffer.getvalue())

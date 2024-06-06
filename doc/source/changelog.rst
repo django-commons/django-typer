@@ -7,7 +7,7 @@ v2.1.0
 
 * Implemented `Move tests into top level dir. <https://github.com/bckohan/django-typer/issues/87>`_
 * Implemented `Move core code out of __init__.py into management/__init__.py <https://github.com/bckohan/django-typer/issues/81>`_
-
+* Fixed `Typer(help="") doesnt work. <https://github.com/bckohan/django-typer/issues/78>`_
 
 v2.0.2
 ======
