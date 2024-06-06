@@ -3,7 +3,7 @@ import typing as t
 from django.utils.translation import gettext_lazy as _
 from typer import Argument
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 class Command(TyperCommand):

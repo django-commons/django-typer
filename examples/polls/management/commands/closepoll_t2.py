@@ -4,8 +4,8 @@ from django.core.management.base import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import TyperCommand
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from django_typer.management import TyperCommand
+from tests.apps.examples.polls.models import Question as Poll
 
 
 class Command(TyperCommand):

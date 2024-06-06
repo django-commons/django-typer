@@ -84,11 +84,11 @@ Convert the closepoll command to a :class:`~django_typer.TyperCommand`
 Recall our closepoll command from the `polls Tutorial in the Django documentation <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#module-django.core.management>`_
 looks like this:
 
-.. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_django.py
+.. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_django.py
     :language: python
     :linenos:
     :replace:
-        django_typer.tests.apps.examples.polls : polls
+        tests.apps.examples.polls : polls
 
 Inherit from :class:`~django_typer.TyperCommand`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,19 +101,19 @@ conversion may look like this:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t1.py
             :language: python
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t1_typer.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t1_typer.py
             :language: python
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
 You'll note that we've removed add_arguments entirely and specified the arguments and options as
 parameters to the handle method. django-typer_ will interpret the parameters on the handle() method
@@ -121,7 +121,7 @@ as the command line interface for the command. If we have rich_ installed the he
 closepoll command will look like this:
 
 
-.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t1.Command:typer_app
+.. typer:: tests.apps.examples.polls.management.commands.closepoll_t1.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -150,19 +150,19 @@ are arguments and the delete flag is an option. Here is what that would look lik
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t2.py
             :language: python
             :lines: 11-23
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t2_typer.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t2_typer.py
             :language: python
             :lines: 13-23
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
 See that our help text now shows up in the command line interface. Also note, that
 `lazy translations <https://docs.djangoproject.com/en/stable/topics/i18n/translation/>`_ work for
@@ -171,7 +171,7 @@ function or class, in this case either Command or handle() - but docstrings are 
 the translation system. If translation is not necessary and your help text is extensive or contains
 markup the docstring may be the more appropriate place to put it.
 
-.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t2.Command:typer_app
+.. typer:: tests.apps.examples.polls.management.commands.closepoll_t2.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -198,17 +198,17 @@ look like if we used the Poll class as our type hint:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t3.py
             :language: python
             :lines: 11-52
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t3_typer.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t3_typer.py
             :language: python
             :lines: 11-54
 
-.. typer:: django_typer.tests.apps.examples.polls.management.commands.closepoll_t3.Command:typer_app
+.. typer:: tests.apps.examples.polls.management.commands.closepoll_t3.Command:typer_app
     :prog: manage.py closepoll
     :width: 80
     :show-nested:
@@ -284,19 +284,19 @@ closepoll command looks like:
 
     .. tab:: Django-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t6.py
             :language: python
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
     .. tab:: Typer-style
 
-        .. literalinclude:: ../../django_typer/tests/apps/examples/polls/management/commands/closepoll_t6_typer.py
+        .. literalinclude:: ../../tests/apps/examples/polls/management/commands/closepoll_t6_typer.py
             :language: python
             :linenos:
             :replace:
-                django_typer.tests.apps.examples.polls.models : polls.models
+                tests.apps.examples.polls.models : polls.models
 
 
 .. only:: html

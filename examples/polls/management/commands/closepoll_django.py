@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from tests.apps.examples.polls.models import Question as Poll
 
 
 class Command(BaseCommand):

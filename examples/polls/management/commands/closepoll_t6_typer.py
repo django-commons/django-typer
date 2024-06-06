@@ -3,8 +3,8 @@ import typing as t
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import Typer, model_parser_completer
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from django_typer.management import Typer, model_parser_completer
+from tests.apps.examples.polls.models import Question as Poll
 
 
 app = Typer(help=_("Closes the specified poll for voting."))

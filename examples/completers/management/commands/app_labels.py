@@ -4,7 +4,7 @@ from click import Context, Parameter
 from click.shell_completion import CompletionItem
 from django.apps import apps
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 # the completer function signature must match this exactly

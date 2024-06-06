@@ -125,7 +125,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pytest django_typer/tests/shellcompletion/*
+        poetry run pytest tests/shellcompletion/*
         mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -209,7 +209,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        poetry run pytest django_typer/tests/shellcompletion/test_zsh.py || exit 1
+        poetry run pytest tests/shellcompletion/test_zsh.py || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -256,7 +256,7 @@ jobs:
   #     shell: powershell
   #   - name: Run Unit Tests
   #     run: |
-  #       poetry run pytest django_typer/tests/completion_tests.py::PowerShellTests
+  #       poetry run pytest tests/completion_tests.py::PowerShellTests
   #       mv .coverage windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
   #     shell: powershell
   #   - name: Store coverage files

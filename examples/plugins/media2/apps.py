@@ -4,7 +4,7 @@ from django_typer.utils import register_command_plugins
 
 
 class MediaConfig(AppConfig):
-    name = "django_typer.tests.apps.examples.plugins.media2"
+    name = "tests.apps.examples.plugins.media2"
     label = name.replace(".", "_")
 
     def ready(self):

@@ -2,8 +2,8 @@ import typing as t
 
 from django.core.management.base import CommandError
 
-from django_typer import TyperCommand
-from django_typer.tests.apps.examples.polls.models import Question as Poll
+from django_typer.management import TyperCommand
+from tests.apps.examples.polls.models import Question as Poll
 
 
 class Command(TyperCommand):

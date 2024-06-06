@@ -5,8 +5,8 @@ from pathlib import Path
 import typer
 from django.conf import settings
 
-from django_typer import command
-from django_typer.tests.apps.examples.plugins.backup.management.commands.backup import (
+from django_typer.management import command
+from tests.apps.examples.plugins.backup.management.commands.backup import (
     Command as Backup,
 )
 

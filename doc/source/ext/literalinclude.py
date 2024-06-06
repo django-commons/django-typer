@@ -21,10 +21,6 @@ class ExtendedLiteralInclude(LiteralInclude):
             if not replacements:
                 return original_result
 
-            # if 'django_typer.tests.apps.examples.polls' in replacements:
-            #     import ipdb
-            #     ipdb.set_trace()
-
             # Modify the content in original_result
             def make_replacements(node):
                 if isinstance(node, literal_block):

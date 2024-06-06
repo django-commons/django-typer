@@ -170,7 +170,7 @@ def parse_app_label(label: t.Union[str, AppConfig]):
 
         import typing as t
         import typer
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
         from django_typer.parsers import parse_app_label
 
         class Command(TyperCommand):

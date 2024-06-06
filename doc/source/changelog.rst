@@ -2,6 +2,27 @@
 Change Log
 ==========
 
+v2.1.0
+======
+
+.. warning::
+
+    **Imports from** ``django_typer`` **have been deprecated and will be removed in 3.0!** Imports
+    have moved to ``django_typer.management``:
+
+    .. code-block::
+
+        # old way
+        from django_typer import TyperCommand, command, group, initialize, Typer
+
+        # new way!
+        from django_typer.management import TyperCommand, command, group, initialize, Typer
+
+* Implemented `Only attempt to import rich and typer if settings has not disabled tracebacks. <https://github.com/bckohan/django-typer/issues/88>`_
+* Implemented `Move tests into top level dir. <https://github.com/bckohan/django-typer/issues/87>`_
+* Implemented `Move core code out of __init__.py into management/__init__.py <https://github.com/bckohan/django-typer/issues/81>`_
+* Fixed `Typer(help="") doesnt work. <https://github.com/bckohan/django-typer/issues/78>`_
+
 v2.0.2
 ======
 

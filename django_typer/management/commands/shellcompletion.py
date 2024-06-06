@@ -54,7 +54,7 @@ from typer.completion import (  # type: ignore
     completion_init,  # pyright: ignore[reportPrivateImportUsage]
 )
 
-from django_typer import TyperCommand, command, get_command
+from django_typer.management import TyperCommand, command, get_command
 from django_typer.utils import get_usage_script
 
 DETECTED_SHELL = None
