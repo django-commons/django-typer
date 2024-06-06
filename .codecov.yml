@@ -2,3 +2,4 @@
 coverage:
   fixes:
     - "__init__.py::django_typer/__init__.py"
+    - "__init__.py::django_typer/management/__init__.py"
