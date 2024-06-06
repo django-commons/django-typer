@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.1.1
+======
+
+* Fixed `handle = None does not work for mypy to silence type checkers <https://github.com/bckohan/django-typer/issues/90>`_
+
 v2.1.0
 ======
 
