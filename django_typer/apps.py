@@ -5,8 +5,8 @@ installation logic.
 
 import inspect
 import os
+import sys
 import typing as t
-from types import ModuleType
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -14,29 +14,24 @@ from django.core.checks import CheckMessage, register
 from django.core.checks import Warning as CheckWarning
 from django.utils.translation import gettext as _
 
-from django_typer import patch
-from django_typer.utils import traceback_config
+from .config import traceback_config
 
-patch.apply()
+tb_config = traceback_config()
+try_install = isinstance(tb_config, dict) and not tb_config.get("no_install", False)
 
-rich: t.Optional[ModuleType]
-traceback: t.Optional[ModuleType]
+if try_install:
+    try:
+        import rich
+        from rich import traceback
 
-try:
-    import sys
+        from django_typer import patch
 
-    import rich
-    from rich import traceback
-    from typer import main as typer_main
+        patch.apply()
 
-    tb_config = traceback_config()
-    if (
-        rich
-        and traceback
-        and isinstance(tb_config, dict)
-        and not tb_config.get("no_install", False)
-    ):
+        from typer import main as typer_main
+
         # install rich tracebacks if we've been configured to do so (default)
+        assert isinstance(tb_config, dict)
         no_color = "NO_COLOR" in os.environ
         force_color = "FORCE_COLOR" in os.environ
         traceback.install(
@@ -64,9 +59,9 @@ try:
         # on when typer was imported it may have the original fallback system hook or our
         # installed rich one - we patch it here to make sure!
         typer_main._original_except_hook = sys.excepthook
-except ImportError:
-    rich = None
-    traceback = None
+
+    except ImportError:
+        pass
 
 
 @register("settings")
@@ -76,15 +71,17 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
     contains only the expected parameters.
     """
     warnings: t.List[CheckMessage] = []
-    tb_cfg = traceback_config()
-    if isinstance(tb_cfg, dict):
-        if rich and traceback:
+    if try_install:
+        assert isinstance(tb_config, dict)
+        try:
+            from rich import traceback
+
             expected = {
                 "no_install",
                 "short",
                 *inspect.signature(traceback.install).parameters.keys(),
             }
-            unexpected = set(tb_cfg.keys()) - expected
+            unexpected = set(tb_config.keys()) - expected
             if unexpected:
                 warnings.append(
                     CheckWarning(
@@ -96,6 +93,8 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
                         id="django_typer.W001",
                     )
                 )
+        except ImportError:
+            pass
     return warnings
 
 

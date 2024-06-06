@@ -31,6 +31,16 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 
 ![django-typer example](https://raw.githubusercontent.com/bckohan/django-typer/main/doc/source/_static/img/closepoll_example.gif)
 
+**Imports from ``django_typer`` **have been deprecated and will be removed in 3.0! Imports have moved to ``django_typer.management``:**
+
+```python
+   # old way
+   from django_typer import TyperCommand, command, group, initialize, Typer
+
+   # new way!
+   from django_typer.management import TyperCommand, command, group, initialize, Typer
+```
+
 ## Installation
 
 1. Clone django-typer from GitHub or install a release off [PyPI](https://pypi.org/project/django-typer/):

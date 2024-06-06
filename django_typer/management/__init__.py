@@ -32,6 +32,7 @@ from typer.models import Context as TyperContext  # noqa: E402
 from typer.models import Default, DefaultPlaceholder  # noqa: E402
 
 from ..completers import ModelObjectCompleter  # noqa: E402
+from ..config import traceback_config  # noqa: E402
 from ..parsers import ModelObjectParser  # noqa: E402
 from ..types import (  # noqa: E402
     ForceColor,
@@ -50,7 +51,6 @@ from ..utils import (  # noqa: E402
     called_from_module,
     get_usage_script,
     is_method,
-    traceback_config,
     with_typehint,
 )
 

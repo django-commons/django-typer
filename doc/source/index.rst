@@ -28,6 +28,18 @@ familiar with. All of the BaseCommand_ functionality is preserved, so that
       commands.
     * Add plugins to upstream commands.
 
+.. warning::
+
+    **Imports from** ``django_typer`` **have been deprecated and will be removed in 3.0!** Imports
+    have moved to ``django_typer.management``:
+
+    .. code-block::
+
+        # old way
+        from django_typer import TyperCommand, command, group, initialize, Typer
+
+        # new way!
+        from django_typer.management import TyperCommand, command, group, initialize, Typer
 
 :big:`Installation`
 
