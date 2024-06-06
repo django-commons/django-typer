@@ -152,31 +152,6 @@ source = [
     "django_typer"
 ]
 
-[pylint]
-output-format = "colorized"
-max-line-length = 88
-
-[tool.pylint.'DESIGN']
-max-args=30
-max-locals=30  # there are lots of options!
-max-module-lines=2000
-max-attributes=20
-max-statements=100
-
-[tool.pylint.'MASTER']
-ignore="tests"
-
-[tool.pylint.'MESSAGES CONTROL']
-disable = [
-    'R0903', # too few public methods - seriously?
-    'W0613', # unused argument - unavoidable in generic base interfaces
-    'W0212', # access to a protected member of a client class - lots of monkey patches required here
-    'C0415', # imports outside top level. I put them where they need to be!
-    'C0413', # wrong import order. I put them where they need to be!
-    'C0411', # wrong import order. I put them where they need to be!
-    'W0603', # Using the global statement
-]
-
 [tool.pyright]
 exclude = ["tests/**/*"]
 include = [

@@ -2462,7 +2462,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     # allow deriving commands to override handle() from BaseCommand
     # without triggering static type checking complaints
-    handle = None  # type: ignore
+    handle: t.Callable[..., t.Any]
 
     @property
     def command_tree(self) -> CommandNode:
