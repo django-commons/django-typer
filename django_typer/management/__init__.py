@@ -1708,6 +1708,7 @@ def _resolve_help(dj_cmd: "TyperCommand"):
     elif (
         dj_cmd.typer_app.info.help
         and not dj_cmd.is_compound_command
+        and dj_cmd.typer_app.registered_commands
         and not dj_cmd.typer_app.registered_commands[0].help
     ):
         dj_cmd.typer_app.registered_commands[0].help = dj_cmd.typer_app.info.help
