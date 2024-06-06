@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 class Command(TyperCommand, help=_("2")):

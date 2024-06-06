@@ -11,13 +11,13 @@ else:
 import typer
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import (
+from django_typer.management import (
     TyperCommand,
     command,
     initialize,
     model_parser_completer,
-    types,
 )
+from django_typer import types
 from django_typer.completers import ModelObjectCompleter
 from tests.apps.test_app.models import ShellCompleteTester
 

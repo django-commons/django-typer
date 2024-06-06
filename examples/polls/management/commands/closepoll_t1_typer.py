@@ -2,7 +2,7 @@ import typing as t
 
 from django.core.management.base import CommandError
 
-from django_typer import Typer
+from django_typer.management import Typer
 from tests.apps.examples.polls.models import Question as Poll
 
 app = Typer(help="Closes the specified poll for voting")

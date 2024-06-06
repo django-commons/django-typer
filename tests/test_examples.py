@@ -5,7 +5,7 @@ from io import StringIO
 import pytest
 from django.test import TestCase, override_settings
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import rich_installed, run_command, similarity
 
 basic_help = """

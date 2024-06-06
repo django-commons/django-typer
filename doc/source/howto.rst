@@ -99,7 +99,7 @@ like have multiple subcommands you can define any number of functions decorated 
 
         .. code-block:: python
 
-            from django_typer import TyperCommand, command
+            from django_typer.management importTyperCommand, command
 
             class Command(TyperCommand):
 
@@ -115,7 +115,7 @@ like have multiple subcommands you can define any number of functions decorated 
 
         .. code-block:: python
 
-            from django_typer import Typer
+            from django_typer.management import Typer
 
             app = Typer()
 
@@ -134,7 +134,7 @@ like have multiple subcommands you can define any number of functions decorated 
 
     .. code-block:: python
 
-        from django_typer import get_command
+        from django_typer.management import get_command
 
         command = get_command("mycommand")
         command.subcommand1()
@@ -169,7 +169,7 @@ default we can do this:
 
 .. code-block:: python
 
-    from django_typer import get_command
+    from django_typer.management import get_command
 
     command = get_command("mycommand")
     assert command.subcommand2() == 'subcommand2'
@@ -253,7 +253,7 @@ This is like defining a group at the command root and is an extension of the
 
 .. code-block:: python
 
-    from django_typer import get_command
+    from django_typer.management import get_command
 
     command = get_command("initializer")
     command.init(common_option=True)
@@ -274,7 +274,7 @@ Say we have this command, called ``mycommand``:
 
 .. code-block:: python
 
-    from django_typer import TyperCommand, command
+    from django_typer.management import TyperCommand, command
 
     class Command(TyperCommand):
 
@@ -285,7 +285,7 @@ Say we have this command, called ``mycommand``:
 .. code-block:: python
 
     from django.core.management import call_command
-    from django_typer import get_command
+    from django_typer.management import get_command
 
     # we can use use call_command like with any Django command
     call_command("mycommand", count=10)
@@ -311,7 +311,7 @@ to be of that type:
 
 .. code-block:: python
 
-    from django_typer import get_command
+    from django_typer.management import get_command
     from myapp.management.commands.math import Command as Math
 
     math = get_command("math", Math)

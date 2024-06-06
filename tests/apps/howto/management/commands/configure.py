@@ -1,4 +1,4 @@
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 # here we pass chain=True to typer telling it to allow invocation of

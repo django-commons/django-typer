@@ -409,7 +409,7 @@ shells support. Refer to the reference documentation and the
 
     import typing as t
     import typer
-    from django_typer import model_parser_completer
+    from django_typer.management import model_parser_completer
 
     ...
 

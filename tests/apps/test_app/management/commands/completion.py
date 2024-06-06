@@ -12,7 +12,8 @@ import typer
 from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, completers, parsers
+from django_typer.management import TyperCommand
+from django_typer import completers, parsers
 
 
 class Command(TyperCommand):

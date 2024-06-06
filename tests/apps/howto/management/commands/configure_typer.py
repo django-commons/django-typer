@@ -1,4 +1,4 @@
-from django_typer import Typer
+from django_typer.management import Typer
 
 # here we pass chain=True to typer telling it to allow invocation of
 # multiple subcommands

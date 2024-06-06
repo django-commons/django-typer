@@ -7,7 +7,8 @@ import typer.core
 from django.apps import AppConfig, apps
 from django.core.management.base import CommandError
 
-from django_typer import Typer, TyperCommand, completers, get_command, parsers, utils
+from django_typer.management import Typer, TyperCommand, get_command
+from django_typer import completers, parsers, utils
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated

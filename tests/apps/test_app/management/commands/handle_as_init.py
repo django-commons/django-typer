@@ -1,6 +1,6 @@
 from click import get_current_context
 
-from django_typer import TyperCommand, command, initialize
+from django_typer.management import TyperCommand, command, initialize
 
 
 class Command(TyperCommand):

@@ -10,7 +10,7 @@ from django import __version__ as DJANGO_VERSION
 from django.core.management import call_command
 from django.test import TestCase
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import rich_installed, run_command, similarity
 
 native_help_rich = """                                              

@@ -5,7 +5,7 @@ from io import StringIO
 import pytest
 from django.test import TestCase
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import manage_py, run_command
 
 

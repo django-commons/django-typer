@@ -1,6 +1,7 @@
 import sys
 
-from django_typer import group, initialize, types
+from django_typer.management import group, initialize
+from django_typer import types
 
 from .interference import Command as Interference
 

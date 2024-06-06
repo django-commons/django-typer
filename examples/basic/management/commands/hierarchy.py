@@ -4,7 +4,7 @@ from functools import reduce
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import TyperCommand, group
+from django_typer.management import TyperCommand, group
 
 
 class Command(TyperCommand):

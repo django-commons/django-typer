@@ -1,6 +1,6 @@
 import sys
 
-from django_typer import TyperCommand
+from django_typer.management import TyperCommand
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated

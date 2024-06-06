@@ -1,6 +1,6 @@
 import json
 
-from django_typer import TyperCommand, callback, command
+from django_typer.management import TyperCommand, callback, command
 
 
 class Command(TyperCommand, invoke_without_command=True):

@@ -2,7 +2,7 @@ import json
 
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import TyperCommand, command, initialize
+from django_typer.management import TyperCommand, command, initialize
 
 
 class Command(TyperCommand):

@@ -7,13 +7,13 @@ import typer
 from django.conf import settings
 from django.core.management import CommandError, call_command
 
-from django_typer import (
+from django_typer.management import (
     CommandNode,
     TyperCommand,
     command,
-    completers,
     initialize,
 )
+from django_typer import completers
 
 
 class Command(TyperCommand):

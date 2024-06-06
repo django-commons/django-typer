@@ -13,7 +13,7 @@ from pathlib import Path
 
 from shellingham import detect_shell
 
-from django_typer import get_command
+from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
 
 default_shell = None

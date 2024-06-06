@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import Typer
+from django_typer.management import Typer
 
 # typer style commands use the Typer help precedence
 app = Typer(help=_("2"))

@@ -10,7 +10,7 @@ from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import TESTS_DIR, manage_py, run_command, similarity
 
 

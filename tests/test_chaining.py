@@ -4,7 +4,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.test import TestCase
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import run_command
 
 

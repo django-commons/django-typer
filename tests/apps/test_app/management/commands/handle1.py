@@ -1,4 +1,4 @@
-from django_typer import command
+from django_typer.management import command
 
 from .handle import Command as Handle
 

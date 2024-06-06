@@ -61,7 +61,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) is a very simple drop in replacement for [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). All of the documented features of [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) work the same way!
 
 ```python
-from django_typer import TyperCommand
+from django_typer.management import TyperCommand
 
 class Command(TyperCommand):
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
@@ -73,7 +73,7 @@ class Command(TyperCommand):
 Or, you may also use an interface identical to [Typer](https://typer.tiangolo.com/)'s. Simply import [Typer](https://typer.tiangolo.com/) from django_typer instead of typer.
 
 ```python
-from django_typer import Typer
+from django_typer.management import Typer
 
 app = Typer()
 
@@ -98,7 +98,7 @@ Commands with multiple subcommands can be defined:
    from django.utils.translation import gettext_lazy as _
    from typer import Argument
 
-   from django_typer import TyperCommand, command
+   from django_typer.management import TyperCommand, command
 
 
    class Command(TyperCommand):
@@ -128,7 +128,7 @@ Commands with multiple subcommands can be defined:
 Or using the typer-style interface this could be written:
 
 ```python
-from django_typer import Typer
+from django_typer.management import Typer
 import typing as t
 
 from django.utils.translation import gettext_lazy as _
@@ -176,7 +176,7 @@ Using the class-based interface we could define the command like this:
    from django.utils.translation import gettext_lazy as _
    from typer import Argument, Option
 
-   from django_typer import TyperCommand, group
+   from django_typer.management import TyperCommand, group
 
 
    class Command(TyperCommand):
@@ -232,7 +232,7 @@ from functools import reduce
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import Typer
+from django_typer.management import Typer
 
 
 app = Typer(help=_("A more complex command that defines a hierarchy of subcommands."))

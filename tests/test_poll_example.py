@@ -7,7 +7,7 @@ from django.core.management import call_command
 from django.test import SimpleTestCase
 from django.utils import timezone
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
 from tests.utils import run_command
 

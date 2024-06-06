@@ -1,6 +1,6 @@
 import typer
 
-from django_typer import TyperCommand
+from django_typer.management import TyperCommand
 
 
 class Command(TyperCommand):

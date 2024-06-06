@@ -365,7 +365,7 @@ def complete_app_label(
 
         import typing as t
         import typer
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
         from django_typer.parsers import parse_app_label
         from django_typer.completers import complete_app_label
 

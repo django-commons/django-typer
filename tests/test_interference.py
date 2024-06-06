@@ -1,7 +1,7 @@
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import run_command
 
 
@@ -212,7 +212,7 @@ class InterferenceTests(TestCase):
         )
 
     def test_initialize_classmethod_direct(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
 
         command = get_command("interference_ext_init", TyperCommand)
         self.assertEqual(command.init(), "test_app2::interference_ext_init::init(5)")
@@ -250,7 +250,7 @@ class InterferenceTests(TestCase):
         )
 
     def test_command_classmethod_direct(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
 
         command = get_command("method_override", TyperCommand)
         self.assertEqual(command.cmd1(), "adapter0::cmd1()")

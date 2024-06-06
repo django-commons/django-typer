@@ -4,7 +4,7 @@ import pytest
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 
-from django_typer import TyperCommand, get_command
+from django_typer.management import TyperCommand, get_command
 from tests.utils import rich_installed
 
 

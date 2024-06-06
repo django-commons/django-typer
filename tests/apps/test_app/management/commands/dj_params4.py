@@ -8,7 +8,8 @@ else:
 from django.core.management import CommandError
 from typer import Option
 
-from django_typer import TyperCommand, command, types
+from django_typer.management import TyperCommand, command
+from django_typer import types
 from tests.utils import log_django_parameters
 
 

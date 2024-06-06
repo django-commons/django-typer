@@ -1,4 +1,4 @@
-from django_typer import TyperCommand, group
+from django_typer.management import TyperCommand, group
 
 
 class Command(TyperCommand):

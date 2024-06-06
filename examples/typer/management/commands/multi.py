@@ -3,7 +3,7 @@ import typing as t
 from django.utils.translation import gettext_lazy as _
 from typer import Argument
 
-from django_typer import Typer
+from django_typer.management import Typer
 
 app = Typer(help="A command that defines subcommands.")
 

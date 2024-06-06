@@ -3,7 +3,7 @@ import sys
 import click
 from django.core.management.base import CommandError
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 class Command(TyperCommand):

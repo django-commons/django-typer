@@ -1,4 +1,4 @@
-from django_typer import command, group, initialize
+from django_typer.management import command, group, initialize
 from tests.apps.test_app.management.commands.interference import (
     Command as Interference,
 )

@@ -3,7 +3,7 @@ import typing as t
 
 from django.conf import settings
 
-from django_typer import TyperCommand, initialize
+from django_typer.management import TyperCommand, initialize
 
 if sys.version_info < (3, 9):
     pass

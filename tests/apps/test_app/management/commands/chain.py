@@ -1,6 +1,6 @@
 import typing as t
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 class Command(TyperCommand, rich_markup_mode="markdown", chain=True):

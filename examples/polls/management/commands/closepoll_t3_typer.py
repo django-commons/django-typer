@@ -4,7 +4,7 @@ from django.core.management.base import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import Typer
+from django_typer.management import Typer
 from tests.apps.examples.polls.models import Question as Poll
 
 

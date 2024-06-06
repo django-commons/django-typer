@@ -1,7 +1,7 @@
 import typer
 from django.test import TestCase
 
-from django_typer import (
+from django_typer.management import (
     Typer,
     command,
     get_command,
@@ -130,7 +130,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_initialize_interface_matches(self):
-        from django_typer import callback
+        from django_typer.management import callback
 
         initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
@@ -176,7 +176,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_typer_group_interface_matches(self):
-        from django_typer import Typer
+        from django_typer.management import Typer
 
         typer_command_params = set(get_named_arguments(Typer.group))
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
@@ -190,7 +190,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_base_class_command_interface_matches(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
 
         command_params = set(get_named_arguments(TyperCommand.command))
         typer_params = set(get_named_arguments(typer.Typer.command))
@@ -204,7 +204,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_base_class_initialize_interface_matches(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
 
         command_params = set(get_named_arguments(TyperCommand.initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
@@ -220,7 +220,7 @@ class InterfaceTests(TestCase):
         self.assertEqual(TyperCommand.initialize, TyperCommand.callback)
 
     def test_base_class_group_interface_matches(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
 
         command_params = set(get_named_arguments(TyperCommand.group))
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
@@ -257,7 +257,7 @@ class InterfaceTests(TestCase):
         self.assertEqual(multi_parser._actions[8].nargs, 0)
 
     def test_cmd_getattr(self):
-        from django_typer import TyperCommand
+        from django_typer.management import TyperCommand
         from tests.apps.test_app.management.commands.groups import (
             Command as Groups,
         )

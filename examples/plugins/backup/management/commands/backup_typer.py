@@ -7,7 +7,8 @@ import typer
 from django.conf import settings
 from django.core.management import CommandError, call_command
 
-from django_typer import CommandNode, Typer, completers
+from django_typer.management import CommandNode, Typer
+from django_typer import completers
 
 app = Typer()
 

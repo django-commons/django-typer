@@ -9,7 +9,8 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
-from django_typer import command, group, initialize, types
+from django_typer.management import command, group, initialize
+from django_typer import types
 from tests.apps.test_app.management.commands.groups import (
     Command as GroupsCommand,
 )

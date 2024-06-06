@@ -1,4 +1,4 @@
-from django_typer import command, initialize
+from django_typer.management import command, initialize
 
 from .upstream import Command as Upstream
 

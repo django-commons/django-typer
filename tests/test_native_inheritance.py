@@ -4,7 +4,7 @@ Tests for the typer-native style interface.
 
 from django.core.management import call_command
 
-from django_typer import get_command
+from django_typer.management import get_command
 from tests.utils import run_command
 
 from . import test_native

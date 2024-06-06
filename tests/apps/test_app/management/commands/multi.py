@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from django_typer import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
 class Command(TyperCommand):

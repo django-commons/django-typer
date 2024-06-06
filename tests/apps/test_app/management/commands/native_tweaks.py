@@ -1,4 +1,4 @@
-from django_typer import Typer, TyperCommand
+from django_typer.management import Typer, TyperCommand
 
 Command: TyperCommand
 

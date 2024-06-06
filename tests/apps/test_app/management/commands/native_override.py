@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from django_typer import Typer, TyperCommand
+from django_typer.management import Typer, TyperCommand
 
 from . import native_groups
 
