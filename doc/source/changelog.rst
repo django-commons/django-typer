@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.1.2
+======
+
+* Fixed `Type hint kwargs to silence pylance warnings about partially unknown types <https://github.com/bckohan/django-typer/issues/93>`_
+
 v2.1.1
 ======
 

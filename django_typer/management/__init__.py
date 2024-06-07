@@ -179,7 +179,7 @@ def get_command(  # type: ignore[overload-overlap]
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
-    **kwargs,
+    **kwargs: t.Any,
 ) -> BaseCommand: ...
 
 
@@ -192,7 +192,7 @@ def get_command(
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
-    **kwargs,
+    **kwargs: t.Any,
 ) -> C: ...
 
 
@@ -205,7 +205,7 @@ def get_command(
     stderr: t.Optional[t.IO[str]] = None,
     no_color: bool = False,
     force_color: bool = False,
-    **kwargs,
+    **kwargs: t.Any,
 ) -> MethodType: ...
 
 
@@ -216,7 +216,7 @@ def get_command(
     stderr=None,
     no_color: bool = False,
     force_color: bool = False,
-    **kwargs,
+    **kwargs: t.Any,
 ):
     """
     Get a Django_ command by its name and instantiate it with the provided options. This
@@ -335,13 +335,13 @@ COMMON_DEFAULTS = {
 }
 
 
-class _ParsedArgs(SimpleNamespace):  # pylint: disable=too-few-public-methods
+class _ParsedArgs(SimpleNamespace):
     """
     Emulate the argparse.Namespace class so that we can pass the parsed arguments
     into the BaseCommand infrastructure in the way it expects.
     """
 
-    def __init__(self, args: t.Sequence[t.Any], **kwargs):
+    def __init__(self, args: t.Sequence[t.Any], **kwargs: t.Any):
         super().__init__(**kwargs)
         self.args = args
         self.traceback = kwargs.get("traceback", TyperCommand._traceback)
@@ -393,11 +393,11 @@ class Context(TyperContext):
 
     def __init__(
         self,
-        command: click.Command,  # pylint: disable=redefined-outer-name
+        command: click.Command,
         parent: t.Optional["Context"] = None,
         django_command: t.Optional["TyperCommand"] = None,
         supplied_params: t.Optional[t.Dict[str, t.Any]] = None,
-        **kwargs,
+        **kwargs: t.Any,
     ):
         super().__init__(command, parent=parent, **kwargs)
         if supplied_params:
@@ -518,7 +518,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         *args,
         callback: t.Optional[t.Callable[..., t.Any]],
         params: t.Optional[t.List[click.Parameter]] = None,
-        **kwargs,
+        **kwargs: t.Any,
     ):
         params = params or []
         self._callback = callback
@@ -655,7 +655,7 @@ def _cache_initializer(
     name: t.Optional[str] = Default(None),
     help: t.Optional[t.Union[str, Promise]] = Default(None),
     cls: t.Type[DTGroup] = DTGroup,
-    **kwargs,
+    **kwargs: t.Any,
 ):
     def register(
         cmd: "TyperCommand",
@@ -683,7 +683,7 @@ def _cache_command(
     name: t.Optional[str] = None,
     help: t.Optional[t.Union[str, Promise]] = None,
     cls: t.Type[DTCommand] = DTCommand,
-    **kwargs,
+    **kwargs: t.Any,
 ):
     def register(
         cmd: "TyperCommand",
@@ -737,7 +737,7 @@ class AppFactory(type):
     the Typer-like functional interface is used.
     """
 
-    def __call__(self, *args, **kwargs) -> "Typer":
+    def __call__(self, *args, **kwargs: t.Any) -> "Typer":
         if called_from_module():
             frame = inspect.currentframe()
             cmd_module = inspect.getmodule(frame.f_back) if frame else None
@@ -901,7 +901,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         pretty_exceptions_short: bool = True,
         parent: t.Optional["Typer"] = None,
         django_command: t.Optional[t.Type["TyperCommand"]] = None,
-        **kwargs,
+        **kwargs: t.Any,
     ):
         assert not args  # should have been removed by metaclass
         self.parent = parent
@@ -974,7 +974,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[
         [typer.models.CommandFunctionType], typer.models.CommandFunctionType
     ]:
@@ -1032,7 +1032,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
         """
         A function decorator that creates a new command and attaches it to this group.
@@ -1082,9 +1082,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
         def make_command(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
             return _check_static(
-                super(  # pylint: disable=super-with-arguments
-                    Typer, self
-                ).command(
+                super(Typer, self).command(
                     name=name,
                     cls=type(
                         "_Command", (cls,), {"django_command": self.django_command}
@@ -1128,7 +1126,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> None:
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
@@ -1166,7 +1164,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -1175,7 +1173,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P2, R2]], "Typer[P2, R2]"]:
         """
         Create a new subgroup and attach it to this group. This is like creating a new
@@ -1304,7 +1302,7 @@ def initialize(
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = Default(None),
     epilog: t.Optional[str] = Default(None),
     short_help: t.Optional[t.Union[str, Promise]] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
@@ -1313,7 +1311,7 @@ def initialize(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
+    **kwargs: t.Any,
 ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
     """
     A function decorator that creates a Typer_
@@ -1438,12 +1436,12 @@ def initialize(
 callback = initialize  # allow callback as an alias
 
 
-def command(  # pylint: disable=keyword-arg-before-vararg
+def command(
     name: t.Optional[str] = None,
     *,
     cls: t.Type[DTCommand] = DTCommand,
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-    help: t.Optional[t.Union[str, Promise]] = None,  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = None,
     epilog: t.Optional[str] = None,
     short_help: t.Optional[t.Union[str, Promise]] = None,
     options_metavar: str = "[OPTIONS]",
@@ -1453,7 +1451,7 @@ def command(  # pylint: disable=keyword-arg-before-vararg
     deprecated: bool = False,
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
+    **kwargs: t.Any,
 ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
     A function decorator that creates a new command and attaches it to the root
@@ -1545,7 +1543,7 @@ def group(
     result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
     # Command
     context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+    help: t.Optional[t.Union[str, Promise]] = Default(None),
     epilog: t.Optional[str] = Default(None),
     short_help: t.Optional[t.Union[str, Promise]] = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
@@ -1554,7 +1552,7 @@ def group(
     deprecated: bool = Default(False),
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
-    **kwargs,
+    **kwargs: t.Any,
 ) -> t.Callable[[t.Callable[P, R]], Typer[P, R]]:
     """
     A function decorator that creates a new subgroup and attaches it to the root
@@ -1869,7 +1867,7 @@ class TyperCommandMeta(type):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
         callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -1883,7 +1881,7 @@ class TyperCommandMeta(type):
             True
         ),
         pretty_exceptions_short: t.Union[DefaultPlaceholder, bool] = Default(True),
-        **kwargs,
+        **kwargs: t.Any,
     ):
         """
         This method is called when a new class is created.
@@ -2489,7 +2487,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -2498,7 +2496,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
         Override the initializer for this command class after it has been defined.
@@ -2598,7 +2596,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         *,
         cls: t.Type[DTCommand] = DTCommand,
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[t.Union[str, Promise]] = None,  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
         short_help: t.Optional[t.Union[str, Promise]] = None,
         options_metavar: str = "[OPTIONS]",
@@ -2608,7 +2606,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
         Add a command to this command class after it has been defined. You can
@@ -2697,7 +2695,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),  # pylint: disable=redefined-builtin
+        help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
@@ -2706,7 +2704,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
-        **kwargs,
+        **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P, R]], Typer[P, R]]:
         """
         Add a group to this command class after it has been defined. You can
@@ -2853,7 +2851,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         stderr: t.Optional[t.TextIO] = None,
         no_color: bool = no_color,
         force_color: bool = force_color,
-        **kwargs,
+        **kwargs: t.Any,
     ):
         assert self.typer_app.info.name
         _load_command_plugins(self.typer_app.info.name)
