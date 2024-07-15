@@ -136,7 +136,7 @@ Fish_ may not work at all in this mode.
 Integrating with Other CLI Completion Libraries
 -----------------------------------------------
 
-When tab completion is requested for a command that is not a :class:`~django_typer.TyperCommand`,
+When tab completion is requested for a command that is not a :class:`~django_typer.management.TyperCommand`,
 django-typer_ will delegate that request to Django's
 `autocomplete function <https://github.com/django/django/blob/main/django/core/management/__init__.py#L278>`_
 as a fallback. This means that using django-typer_ to install completion scripts will enable

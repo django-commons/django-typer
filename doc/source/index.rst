@@ -6,10 +6,10 @@ Django Typer
 ============
 
 Use static typing to define the CLI for your Django_ management commands with Typer_. Optionally
-use the provided :class:`~django_typer.TyperCommand` class that inherits from BaseCommand_. This
-class maps the Typer_ interface onto a class based interface that Django developers will be
-familiar with. All of the BaseCommand_ functionality is preserved, so that
-:class:`~django_typer.TyperCommand` can be a drop in replacement.
+use the provided :class:`~django_typer.management.TyperCommand` class that inherits from
+BaseCommand_. This class maps the Typer_ interface onto a class based interface that Django
+developers will be familiar with. All of the BaseCommand_ functionality is preserved, so that
+:class:`~django_typer.management.TyperCommand` can be a drop in replacement.
 
 **django-typer makes it easy to:**
 
@@ -22,7 +22,7 @@ familiar with. All of the BaseCommand_ functionality is preserved, so that
       powershell_.
     * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
       <define-shellcompletions>`
-    * Port existing commands (:class:`~django_typer.TyperCommand` is interface compatible
+    * Port existing commands (:class:`~django_typer.management.TyperCommand` is interface compatible
       with BaseCommand_).
     * Use either a Django-style class-based interface or the Typer-style interface to define
       commands.
@@ -76,15 +76,15 @@ familiar with. All of the BaseCommand_ functionality is preserved, so that
     This documentation shows all examples using both the function oriented Typer-style interface
     and the class based Django-style interface in separate tabs. Each interface is functionally
     equivalent so the choice of which to use is a matter of preference and familiarity. All
-    django-typer commands are instances of :class:`~django_typer.TyperCommand`, including commands
-    defined in the Typer-style interface. **This means you may always specify a self argument to
-    receive the instance of the command in your functions.**
+    django-typer commands are instances of :class:`~django_typer.management.TyperCommand`,
+    including commands defined in the Typer-style interface. **This means you may always specify a
+    self argument to receive the instance of the command in your functions.**
 
 :big:`Basic Example`
 
-:class:`~django_typer.TyperCommand` is a very simple drop in replacement for BaseCommand_. All of
-the documented features of BaseCommand_ work the same way! Or, you may also use an interface
-identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
+:class:`~django_typer.management.TyperCommand` is a very simple drop in replacement for
+BaseCommand_. All of the documented features of BaseCommand_ work the same way! Or, you may also
+use an interface identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
 
 .. tabs::
 
@@ -158,8 +158,8 @@ command like so:
 
 Any number of groups and subcommands and subgroups of other groups can be defined allowing for
 arbitrarily complex command hierarchies. The Typer-style interface builds a
-:class:`~django_typer.TyperCommand` class for us **that allows you to optionally accept the self
-argument in your commands.**
+:class:`~django_typer.management.TyperCommand` class for us **that allows you to optionally accept
+the self argument in your commands.**
 
 .. tabs::
 

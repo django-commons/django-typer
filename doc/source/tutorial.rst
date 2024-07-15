@@ -6,9 +6,10 @@
 Tutorial: Building Commands
 ===========================
 
-Using the :class:`~django_typer.TyperCommand` class is very similar to using the BaseCommand_
-class. The main difference is that we use Typer_'s decorators, classes and type annotations
-to define the command's command line interface instead of argparse_ as BaseCommand_ expects.
+Using the :class:`~django_typer.management.TyperCommand` class is very similar to using the
+BaseCommand_ class. The main difference is that we use Typer_'s decorators, classes and type
+annotations to define the command's command line interface instead of argparse_ as
+BaseCommand_ expects.
 
 Upstream Libraries
 ------------------
@@ -78,8 +79,8 @@ Install django-typer_
         tab completions or configure `rich traceback rendering <https://rich.readthedocs.io/en/stable/traceback.html>`_.
         Refer to the :ref:`how-to <configure-rich-exception-tracebacks>` if you would like to disable it.
 
-Convert the closepoll command to a :class:`~django_typer.TyperCommand`
-----------------------------------------------------------------------
+Convert the closepoll command to a :class:`~django_typer.management.TyperCommand`
+---------------------------------------------------------------------------------
 
 Recall our closepoll command from the `polls Tutorial in the Django documentation <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#module-django.core.management>`_
 looks like this:
@@ -90,12 +91,12 @@ looks like this:
     :replace:
         tests.apps.examples.polls : polls
 
-Inherit from :class:`~django_typer.TyperCommand`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Inherit from :class:`~django_typer.management.TyperCommand`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We first need to change the inheritance to :class:`~django_typer.TyperCommand` and then move the
-argument and option definitions from add_arguments into the method signature of handle. A minimal
-conversion may look like this:
+We first need to change the inheritance to :class:`~django_typer.management.TyperCommand` and then
+move the argument and option definitions from add_arguments into the method signature of handle. A
+minimal conversion may look like this:
 
 .. tabs::
 
@@ -132,7 +133,7 @@ closepoll command will look like this:
 
 .. note::
 
-    :class:`~django_typer.TyperCommand` adds the standard set of default options to the command
+    :class:`~django_typer.management.TyperCommand` adds the standard set of default options to the command
     line interface, with the exception of verbosity.
 
 

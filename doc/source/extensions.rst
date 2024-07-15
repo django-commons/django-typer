@@ -9,12 +9,12 @@ Tutorial: Inheritance & Plugins
 You may need to change the behavior of an
 `upstream command <https://en.wikipedia.org/wiki/Upstream_(software_development)>`_ or wish
 you could add an additional subcommand or group to it. django-typer_ offers two patterns for
-changing or extending the behavior of commands. :class:`~django_typer.TyperCommand` classes
-:ref:`support inheritance <inheritance>`, even multiple inheritance. This can be a way to override
-or add additional commands to a command implemented elsewhere. You can then use Django's built in
-command override precedence (INSTALLED_APPS) to ensure your command is used instead of the upstream
-command or give it a different name if you would like the upstream command to still be available.
-The :ref:`plugin pattern <plugin>` allows commands and groups to be added or overridden
+changing or extending the behavior of commands. :class:`~django_typer.management.TyperCommand`
+classes :ref:`support inheritance <inheritance>`, even multiple inheritance. This can be a way to
+override or add additional commands to a command implemented elsewhere. You can then use Django's
+built in command override precedence (INSTALLED_APPS) to ensure your command is used instead of the
+upstream command or give it a different name if you would like the upstream command to still be
+available. The :ref:`plugin pattern <plugin>` allows commands and groups to be added or overridden
 directly on upstream commands without inheritance. This mechanism is useful when you might expect
 other apps to also modify the original command. Conflicts are resolved in INSTALLED_APPS order.
 
@@ -27,8 +27,8 @@ but we anticipate our command being extended so we may also provide default beha
 discover and run every backup routine defined on the command if no specific subroutine is invoked.
 We can `use the context <https://typer.tiangolo.com/tutorial/commands/context/#getting-the-context>`_
 to determine if a subcommand was called in our root initializer callback and we can find
-subroutines added by plugins at runtime using :func:`~django_typer.TyperCommand.get_subcommand`.
-Our command might look like this:
+subroutines added by plugins at runtime using
+:func:`~django_typer.management.TyperCommand.get_subcommand`. Our command might look like this:
 
 .. tabs::
 
@@ -329,8 +329,8 @@ And the command line parameters to database have been removed:
     The extension code is lazily loaded. This means plugins are resolved on command classes
     the first time an instance of the class is instantiated. This avoids unnecessary code
     execution but does mean that if you are working directly with the ``typer_app`` attribute
-    on a :class:`~django_typer.TyperCommand` you will need to make sure at least one instance
-    has been instantiated.
+    on a :class:`~django_typer.management.TyperCommand` you will need to make sure at least one
+    instance has been instantiated.
 
 
 Overriding Groups
@@ -432,7 +432,8 @@ Plugins can be used to group like behavior together under a common root command.
 thought of as a way to namespace CLI tools or easily share significant code between tools that have
 common initialization logic. Moreover it allows you to do this safely and in a way that can be
 deterministically controlled in settings. Most use cases are not this complex and even our backup
-example could probably better be implemented as a batch of commands.
+example could probably better be implemented as a
+`batch of commands <https://github.com/bckohan/django-routines>`_.
 
 Django apps are great for forcing separation of concerns on your code base. In large self contained
 projects its often a good idea to break your code into apps that are as self contained as possible.

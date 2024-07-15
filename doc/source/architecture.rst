@@ -11,11 +11,11 @@ command callbacks as methods or static functions. Supporting dynamic command/gro
 attributes on command instances also requires careful usage of advanced Python features.
 
 The Typer_ app tree defines the layers of groups and commands that define the CLI. Each
-:class:`~django_typer.TyperCommand` maintains its own app tree defined by a root
-:class:`~django_typer.Typer` node. When other classes inherit from a base command class, that app
-tree is copied and the new class can modify it without affecting the base class's tree. We extend
-Typer_'s Typer type with our own :class:`~django_typer.Typer` class that adds additional
-bookkeeping and attribute resolution features we need.
+:class:`~django_typer.management.TyperCommand` maintains its own app tree defined by a root
+:class:`~django_typer.management.Typer` node. When other classes inherit from a base command class,
+that app tree is copied and the new class can modify it without affecting the base class's tree.
+We extend Typer_'s Typer type with our own :class:`~django_typer.management.Typer` class that adds
+additional bookkeeping and attribute resolution features we need.
 
 django-typer_ must behave intuitively as expected and therefore it must support all of the
 following:
@@ -37,8 +37,9 @@ method and if so, bind it to the correct class and pass the correct self instanc
 test is :func:`~django_typer.utils.is_method` and simply checks to see if the function accepts
 a first positional argument named `self`.
 
-django-typer_ uses metaclasses to build the typer app tree when :class:`~django_typer.TyperCommand`
-classes are instantiated. The logic flow proceeds this way:
+django-typer_ uses metaclasses to build the typer app tree when
+:class:`~django_typer.management.TyperCommand` classes are instantiated. The logic flow proceeds
+this way:
 
 - Class definition is read and @initialize/@callback, @group, @command decorators label and store
   typer config and registration logic onto the function objects for processing later once the root
@@ -50,9 +51,9 @@ classes are instantiated. The logic flow proceeds this way:
   included during this registration because they do not appear as attributes on the base classes.
   This keeps inheritance pure while allowing plugins to not interfere. The exception to this is
   when using the Typer-style interface where all commands and groups are registered dynamically.
-  A :class:`~django_typer.Typer` instance is passed as an argument to the
-  :class:`~django_typer.Typer` constructor and when this happens, the commands and groups will
-  be copied.
+  A :class:`~django_typer.management.Typer` instance is passed as an argument to the
+  :class:`~django_typer.management.Typer` constructor and when this happens, the commands and
+  groups will be copied.
 - Metaclass __init__ sets the newly created Command class into the typer app tree and determines
   if a common initializer needs to be added containing the default unsupressed django options.
 - Command __init__ loads any registered plugins (this is a one time opperation that will happen
@@ -60,8 +61,8 @@ classes are instantiated. The logic flow proceeds this way:
   of any plugins should necessitate the addition of a common initializer and makes some last
   attempts to pick the correct help from __doc__ if no help is present.
 
-Below you can see that the backup inhertiance example :class:`~django_typer.Typer` tree. Each
-command class has its own completely separate tree.
+Below you can see that the backup inhertiance example :class:`~django_typer.management.Typer` tree.
+Each command class has its own completely separate tree.
 
 .. image:: /_static/img/inheritance_tree.png
     :align: center
