@@ -91,7 +91,7 @@ Define Multiple Subcommands
 
 Commands with a single executable function should simply implement handle(), but if you would
 like have multiple subcommands you can define any number of functions decorated with
-:func:`~django_typer.command` or :func:`~django_typer.Typer.command`:
+:func:`~django_typer.management.command` or :func:`~django_typer.management.Typer.command`:
 
 .. tabs::
 
@@ -196,8 +196,8 @@ Lets look at the help output:
 Define Groups of Commands
 -------------------------
 
-Any depth of command tree can be defined. Use the :func:`~django_typer.group` or
-:meth:`~django_typer.Typer.add_typer` decorator to define a group of subcommands:
+Any depth of command tree can be defined. Use the :func:`~django_typer.management.group` or
+:meth:`~django_typer.management.Typer.add_typer` decorator to define a group of subcommands:
 
 
 .. tabs::
@@ -225,8 +225,8 @@ Define an Initialization Callback
 ---------------------------------
 
 You can define an initializer function that takes arguments_ and options_ that will be invoked
-before your handle() command or subcommands using the :func:`~django_typer.initialize` decorator.
-This is like defining a group at the command root and is an extension of the
+before your handle() command or subcommands using the :func:`~django_typer.management.initialize`
+decorator. This is like defining a group at the command root and is an extension of the
 `typer callback mechanism <https://typer.tiangolo.com/tutorial/commands/callback/>`_.
 
 
@@ -264,11 +264,11 @@ This is like defining a group at the command root and is an extension of the
 Call Commands from Code
 -----------------------
 
-There are two options for invoking a :class:`~django_typer.TyperCommand` from code without spawning
-off a subprocess. The first is to use Django_'s builtin call_command_ function. This function will
-work exactly as it does for normal BaseCommand_ derived commands. django-typer_ however adds
-another mechanism that can be more efficient, especially if your options and arguments are already
-of the correct type and require no parsing:
+There are two options for invoking a :class:`~django_typer.management.TyperCommand` from code
+without spawning off a subprocess. The first is to use Django_'s builtin call_command_ function.
+This function will work exactly as it does for normal BaseCommand_ derived commands. django-typer_
+however adds another mechanism that can be more efficient, especially if your options and
+arguments are already of the correct type and require no parsing:
 
 Say we have this command, called ``mycommand``:
 
@@ -303,8 +303,8 @@ Say we have this command, called ``mycommand``:
 The rule of thumb is this:
 
     - Use call_command_ if your options and arguments need parsing.
-    - Use :func:`~django_typer.get_command` and invoke the command functions directly if your
-      options and arguments are already of the correct type.
+    - Use :func:`~django_typer.management.get_command` and invoke the command functions directly if
+      your options and arguments are already of the correct type.
 
 If the second argument is a type, static type checking will assume the return value of get_command
 to be of that type:
@@ -325,7 +325,7 @@ You may also fetch a subcommand function directly by passing its path:
 
 .. tip::
 
-    Also refer to the :func:`~django_typer.get_command` docs and :ref:`here <default_cmd>`
+    Also refer to the :func:`~django_typer.management.get_command` docs and :ref:`here <default_cmd>`
     and :ref:`here <multi_commands>` for the nuances of calling commands when handle() is and is
     not implemented.
 
@@ -335,15 +335,15 @@ You may also fetch a subcommand function directly by passing its path:
 Change Default Django Options
 -----------------------------
 
-:class:`~django_typer.TyperCommand` classes preserve all of the functionality of BaseCommand_ derivatives.
+:class:`~django_typer.management.TyperCommand` classes preserve all of the functionality of BaseCommand_ derivatives.
 This means that you can still use class members like `suppressed_base_arguments
 <https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand.suppressed_base_arguments>`_
 to suppress default options.
 
-By default :class:`~django_typer.TyperCommand` suppresses ``--verbosity``. You can add it back by
-setting ``suppressed_base_arguments`` to an empty list. If you want to use verbosity you can
-simply redefine it or use one of django-typer_'s :ref:`provided type hints <types>` for the default
-BaseCommand_ options:
+By default :class:`~django_typer.management.TyperCommand` suppresses ``--verbosity``. You can add
+it back by setting ``suppressed_base_arguments`` to an empty list. If you want to use verbosity you
+can simply redefine it or use one of django-typer_'s :ref:`provided type hints <types>` for the
+default BaseCommand_ options:
 
 .. tabs::
 
@@ -366,9 +366,9 @@ Configure Typer_ Options
 ------------------------
 
 Typer_ apps can be configured using a number of parameters. These parameters are usually passed
-to the :class:`~django_typer.Typer` class constructor when the application is created.
+to the :class:`~django_typer.management.Typer` class constructor when the application is created.
 django-typer_ provides a way to pass these options upstream to Typer_ by supplying them as keyword
-arguments to the :class:`~django_typer.TyperCommand` class inheritance:
+arguments to the :class:`~django_typer.management.TyperCommand` class inheritance:
 
 .. tabs::
 
@@ -398,9 +398,9 @@ arguments to the :class:`~django_typer.TyperCommand` class inheritance:
 
 .. tip::
 
-    See :class:`~django_typer.TyperCommandMeta` or :class:`~django_typer.Typer` for a list of
-    available parameters. Also refer to the `Typer docs <https://typer.tiangolo.com>`_ for more
-    details.
+    See :class:`~django_typer.management.TyperCommandMeta` or
+    :class:`~django_typer.management.Typer` for a list of available parameters. Also refer to the
+    `Typer docs <https://typer.tiangolo.com>`_ for more details.
 
 
 Define Shell Tab Completions for Parameters
@@ -658,8 +658,8 @@ Document Commands w/Sphinx
 sphinxcontrib-typer_ can be used to render your rich helps to Sphinx docs and is used extensively
 in this documentation.
 
-For example, to document a :class:`~django_typer.TyperCommand` with sphinxcontrib-typer, you would
-do something like this:
+For example, to document a :class:`~django_typer.management.TyperCommand` with sphinxcontrib-typer,
+you would do something like this:
 
 .. code-block:: rst
 
@@ -698,17 +698,18 @@ There are no unbreakable rules about how you should print output from your comma
 You could use loggers, normal print statements or the BaseCommand_ stdout and
 stderr output wrappers. Django advises the use of ``self.stdout.write`` because the
 stdout and stderr streams can be configured by calls to call_command_ or
-:func:`~django_tyoer.get_command` which allows you to easily grab output from your
+:func:`~django_typer.management.get_command` which allows you to easily grab output from your
 commands for testing. Using the command's configured stdout and stderr
 output wrappers also means output will respect the ``--force-color`` and ``--no-color``
 parameters.
 
 Typer_ and click_ provide `echo and secho <https://typer.tiangolo.com/tutorial/printing/>`_
 functions that automatically handle byte to string conversions and offer simple styling
-support. :class:`~django_typer.TyperCommand` provides :meth:`~django_typer.TyperCommand.echo` and
-:meth:`~django_typer.TyperCommand.secho` wrapper functions for the Typer_ echo/secho
-functions. If you wish to use Typer_'s echo you should use these wrapper functions because
-they honor the command's ``--force-color`` and ``--no-color`` flags and the configured stdout/stderr
+support. :class:`~django_typer.management.TyperCommand` provides
+:meth:`~django_typer.management.TyperCommand.echo` and
+:meth:`~django_typer.management.TyperCommand.secho` wrapper functions for the Typer_ echo/secho
+functions. If you wish to use Typer_'s echo you should use these wrapper functions because they
+honor the command's ``--force-color`` and ``--no-color`` flags and the configured stdout/stderr
 streams:
 
 .. tabs::

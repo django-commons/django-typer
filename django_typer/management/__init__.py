@@ -2678,7 +2678,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 # Rich settings
                 rich_help_panel=rich_help_panel,
                 **kwargs,
-            )(_strip_static(func))
+            )(_strip_static(func))  # pyright: ignore[reportCallIssue, reportArgumentType]
             return func
 
         return make_command
