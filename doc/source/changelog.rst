@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.1.3
+======
+
+* Fixed `Move from django_typer to django_typer.management broke doc reference links. <https://github.com/bckohan/django-typer/issues/98>`_
+* Implemented `Support Django 5.1 <https://github.com/bckohan/django-typer/issues/97>`_
+
 v2.1.2
 ======
 
