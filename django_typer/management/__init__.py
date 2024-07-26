@@ -173,7 +173,7 @@ def model_parser_completer(
 
 
 @t.overload  # pragma: no cover
-def get_command(  # type: ignore[overload-overlap]
+def get_command(
     command_name: str,
     stdout: t.Optional[t.IO[str]] = None,
     stderr: t.Optional[t.IO[str]] = None,
