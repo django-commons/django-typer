@@ -15,18 +15,32 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated
 
-from enum import StrEnum
 from pathlib import Path
 
 import graphviz
 import typer
 
 
-class Format(StrEnum):
-    png = "png"
-    svg = "svg"
-    pdf = "pdf"
-    dot = "dot"
+try:
+    from enum import StrEnum
+
+    class Format(StrEnum):
+        png = "png"
+        svg = "svg"
+        pdf = "pdf"
+        dot = "dot"
+
+except ImportError:
+    from enum import Enum
+
+    class Format(str, Enum):
+        png = "png"
+        svg = "svg"
+        pdf = "pdf"
+        dot = "dot"
+
+        def __str__(self):
+            return self.value
 
 
 class Command(TyperCommand):
