@@ -468,6 +468,77 @@ class TestShellCompletersAndParsers(TestCase):
             },
         )
 
+    def test_filtered_text_field(self):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command("shellcompletion", "complete", "model_fields test --filtered ")
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertTrue("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion", "complete", "model_fields test --filtered ch"
+            )
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertTrue("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertFalse("pink" in result)
+        self.assertTrue("chum" in result)
+
+        # distinct completions by default
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "complete",
+                "model_fields test --filtered coho --filtered chinook --filtered ",
+            )
+        result = result.getvalue()
+        self.assertFalse("sockeye" in result)
+        self.assertFalse("chinook" in result)
+        self.assertFalse("steelhead" in result)
+        self.assertFalse("coho" in result)
+        self.assertFalse("atlantic" in result)
+        self.assertTrue("pink" in result)
+        self.assertTrue("chum" in result)
+
+        self.assertEqual(
+            json.loads(
+                call_command(
+                    "model_fields",
+                    "test",
+                    "--filtered",
+                    "coho",
+                    "--filtered",
+                    "chinook",
+                )
+            ),
+            {
+                "filtered": [
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="coho").pk
+                        ): "coho"
+                    },
+                    {
+                        str(
+                            ShellCompleteTester.objects.get(text_field="chinook").pk
+                        ): "chinook"
+                    },
+                ]
+            },
+        )
+
     def test_uuid_field(self):
         from uuid import UUID
 
@@ -1387,3 +1458,12 @@ class TestShellCompletersAndParsers(TestCase):
         ].strip()
 
         self.assertTrue("default" in result)
+
+    def test_model_completer_argument_test(self):
+        from django_typer.completers import ModelObjectCompleter
+
+        class NotAModel:
+            pass
+
+        with self.assertRaises(ValueError):
+            ModelObjectCompleter(NotAModel, "char_field", "test")

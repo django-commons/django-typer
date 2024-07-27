@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.2.0 (26-JUL-2024)
+====================
+
+* Implemented `ModelObjectCompleter should optionally accept a QuerySet in place of a Model class. <https://github.com/bckohan/django-typer/issues/96>`_
+
 v2.1.3 (15-JUL-2024)
 ====================
 

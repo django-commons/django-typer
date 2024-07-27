@@ -15,6 +15,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.core.management.color import Style as ColorStyle
 from django.db.models import Model
+from django.db.models.query import QuerySet
 from django.utils.functional import Promise, classproperty
 from django.utils.translation import gettext as _
 
@@ -109,7 +110,7 @@ if sys.version_info < (3, 10):
 
 
 def model_parser_completer(
-    model_cls: t.Type[Model],
+    model_or_qry: t.Union[t.Type[Model], QuerySet],
     lookup_field: t.Optional[str] = None,
     case_insensitive: bool = False,
     help_field: t.Optional[str] = ModelObjectCompleter.help_field,
@@ -139,7 +140,7 @@ def model_parser_completer(
             ...
 
 
-    :param model_cls: the model class to use for lookup
+    :param model_or_qry: the model class or QuerySet to use for lookup
     :param lookup_field: the field to use for lookup, by default the primary key
     :param case_insensitive: whether to perform case insensitive lookups and
         completions, default: False
@@ -155,13 +156,13 @@ def model_parser_completer(
     """
     return {
         "parser": ModelObjectParser(
-            model_cls,
+            model_or_qry if inspect.isclass(model_or_qry) else model_or_qry.model,  # type: ignore
             lookup_field,
             case_insensitive=case_insensitive,
             on_error=on_error,
         ),
         "shell_complete": ModelObjectCompleter(
-            model_cls,
+            model_or_qry,
             lookup_field,
             case_insensitive=case_insensitive,
             help_field=help_field,

@@ -392,7 +392,7 @@ Model Objects
 
 * completer: :class:`~django_typer.completers.ModelObjectCompleter`
 * parser: :class:`~django_typer.parsers.ModelObjectParser`
-* convenience: :func:`~django_typer.model_parser_completer`
+* convenience: :func:`~django_typer.management.model_parser_completer`
 
 This completer/parser pairing provides the ability to fetch a model object from one of its fields.
 Most field types are supported. Additionally any other field can be set as the help text that some
@@ -419,7 +419,7 @@ shells support. Refer to the reference documentation and the
             ModelClass,
             typer.Argument(
                 **model_parser_completer(
-                    ModelClass,
+                    ModelClass,  # may also accept a QuerySet for pre-filtering
                     'field_name',  # the field that should be matched (defaults to id)
                     help_field='other_field'  # optionally provide some additional help text
                 ),

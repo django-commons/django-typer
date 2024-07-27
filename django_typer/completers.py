@@ -16,6 +16,7 @@ types:
 
 # pylint: disable=line-too-long
 
+import inspect
 import os
 import pkgutil
 import sys
@@ -38,12 +39,15 @@ from django.db.models import (
     FloatField,
     GenericIPAddressField,
     IntegerField,
+    Manager,
     Max,
     Model,
     Q,
     TextField,
     UUIDField,
 )
+from django.db.models.query import QuerySet
+from django.utils.translation import gettext as _
 
 Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
 Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
@@ -107,7 +111,7 @@ class ModelObjectCompleter:
         function that returns a configured parser and completer for a model object
         and helps reduce boilerplate.
 
-    :param model_cls: The Django model class to query.
+    :param model_or_qry: The Django model class or a queryset to filter against.
     :param lookup_field: The name of the model field to use for lookup.
     :param help_field: The name of the model field to use for help text or None if
         no help text should be provided.
@@ -130,6 +134,7 @@ class ModelObjectCompleter:
     QueryBuilder = t.Callable[["ModelObjectCompleter", Context, Parameter, str], Q]
 
     model_cls: t.Type[Model]
+    _queryset: t.Optional[QuerySet] = None
     lookup_field: str
     help_field: t.Optional[str] = None
     query: t.Callable[[Context, Parameter, str], Q]
@@ -143,6 +148,10 @@ class ModelObjectCompleter:
     _offset: int = 0
 
     _field: Field
+
+    @property
+    def queryset(self) -> t.Union[QuerySet, Manager[Model]]:
+        return self._queryset or self.model_cls.objects
 
     def to_str(self, obj: t.Any) -> str:
         return str(obj)
@@ -253,7 +262,11 @@ class ModelObjectCompleter:
             self._offset += 1
 
         if len(uuid) > 32:
-            raise ValueError(f"Too many UUID characters: {incomplete}")
+            raise ValueError(
+                _("Too many UUID characters: {incomplete}").format(
+                    incomplete=incomplete
+                )
+            )
         min_uuid = UUID(uuid + "0" * (32 - len(uuid)))
         max_uuid = UUID(uuid + "f" * (32 - len(uuid)))
         return Q(**{f"{self.lookup_field}__gte": min_uuid}) & Q(
@@ -262,7 +275,7 @@ class ModelObjectCompleter:
 
     def __init__(
         self,
-        model_cls: t.Type[Model],
+        model_or_qry: t.Union[t.Type[Model], QuerySet],
         lookup_field: t.Optional[str] = None,
         help_field: t.Optional[str] = help_field,
         query: t.Optional[QueryBuilder] = None,
@@ -270,7 +283,15 @@ class ModelObjectCompleter:
         case_insensitive: bool = case_insensitive,
         distinct: bool = distinct,
     ):
-        self.model_cls = model_cls
+        if inspect.isclass(model_or_qry) and issubclass(model_or_qry, Model):
+            self.model_cls = model_or_qry
+        elif isinstance(model_or_qry, QuerySet):  # type: ignore
+            self.model_cls = model_or_qry.model
+            self._queryset = model_or_qry
+        else:
+            raise ValueError(
+                _("ModelObjectCompleter requires a Django model class or queryset.")
+            )
         self.lookup_field = str(
             lookup_field or getattr(self.model_cls._meta.pk, "name", "id")
         )
@@ -295,7 +316,9 @@ class ModelObjectCompleter:
                 self.query = self.float_query
             else:
                 raise ValueError(
-                    f"Unsupported lookup field class: {self._field.__class__.__name__}"
+                    _("Unsupported lookup field class: {cls}").format(
+                        cls=self._field.__class__.__name__
+                    )
                 )
 
     def __call__(
@@ -343,9 +366,7 @@ class ModelObjectCompleter:
                 ],
                 help=getattr(obj, self.help_field, None) if self.help_field else "",
             )
-            for obj in getattr(self.model_cls, "objects")
-            .filter(completion_qry)
-            .distinct()[0 : self.limit]
+            for obj in self.queryset.filter(completion_qry).distinct()[0 : self.limit]
             if (
                 getattr(obj, self.lookup_field) is not None
                 and self.to_str(getattr(obj, self.lookup_field))

@@ -47,7 +47,7 @@ from .management import (
     model_parser_completer,  # noqa: F401
 )
 
-VERSION = (2, 1, 3)
+VERSION = (2, 2, 0)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
