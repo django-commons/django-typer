@@ -10,6 +10,7 @@ else:
 
 import typer
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 
 from django_typer.management import (
     TyperCommand,
@@ -55,7 +56,7 @@ class Command(TyperCommand):
             ),
         ] = None,
         text: Annotated[
-            t.List[ShellCompleteTester],
+            t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(
                     ShellCompleteTester,
@@ -66,7 +67,7 @@ class Command(TyperCommand):
             ),
         ] = None,
         itext: Annotated[
-            t.List[ShellCompleteTester],
+            t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(
                     ShellCompleteTester,
@@ -113,24 +114,39 @@ class Command(TyperCommand):
             ),
         ] = None,
         ip: Annotated[
-            t.List[ShellCompleteTester],
+            t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "ip_field"),
                 help=_("Fetch objects by their IP address fields."),
             ),
         ] = None,
         email: Annotated[
-            t.List[ShellCompleteTester],
+            t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "email_field"),
                 help=_("Fetch objects by their email fields."),
             ),
         ] = None,
         url: Annotated[
-            t.List[ShellCompleteTester],
+            t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "url_field"),
                 help=_("Fetch objects by their url fields."),
+            ),
+        ] = None,
+        filtered: Annotated[
+            t.Optional[t.List[ShellCompleteTester]],
+            typer.Option(
+                **model_parser_completer(
+                    ShellCompleteTester.objects.filter(
+                        ~(
+                            Q(text_field__istartswith="a")
+                            | Q(text_field__istartswith="s")
+                        )
+                    ),
+                    "text_field",
+                ),
+                help=_("Fetch objects by their text fields."),
             ),
         ] = None,
     ):
@@ -166,4 +182,8 @@ class Command(TyperCommand):
             for addr in ip:
                 assert isinstance(addr, ShellCompleteTester)
             objects["ip"] = [{addr.id: addr.ip_field} for addr in ip]
+        if filtered is not None:
+            for txt in filtered:
+                assert isinstance(txt, ShellCompleteTester)
+            objects["filtered"] = [{txt.id: txt.text_field} for txt in filtered]
         return json.dumps(objects)
