@@ -35,7 +35,7 @@ from literalinclude import ExtendedLiteralInclude
 
 # -- Project information -----------------------------------------------------
 
-project = 'django_typer'
+project = 'django-typer'
 copyright = f'2023-{datetime.now().year}, Brian Kohan'
 author = 'Brian Kohan'
 
@@ -69,7 +69,14 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
+html_theme_options = {
+    "source_repository": "https://github.com/bckohan/django-typer/",
+    "source_branch": "main",
+    "source_directory": "doc/source",
+}
+html_title = f"{project} {release}"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
