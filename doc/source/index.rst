@@ -141,7 +141,6 @@ Commands with multiple subcommands can be defined:
 
 |
 
-
 :big:`Grouping and Hierarchies Example`
 
 Or more complex groups and subcommand hierarchies can be defined. For example this command

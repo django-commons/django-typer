@@ -91,6 +91,7 @@ pyright = "^1.1.357"
 ruff = "^0.4.1"
 graphviz = "^0.20.3"
 sphinx-tabs = "^3.4.5"
+furo = "^2024.7.18"
 
 [tool.poetry.extras]
 rich = ["rich"]

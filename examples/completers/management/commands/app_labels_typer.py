@@ -28,7 +28,8 @@ def handle(
         t.List[str],
         typer.Argument(
             help="The app label",
-            shell_complete=complete_app_label,  # pass the completer function here
+            # pass the completer function here
+            shell_complete=complete_app_label,
         ),
     ],
 ):
