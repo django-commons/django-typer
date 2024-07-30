@@ -4,8 +4,9 @@ from django_typer.management import TyperCommand, group
 class Command(TyperCommand):
     @group()
     def group1(self, common_option: bool = False):
-        # you can define common options that will be available to all subcommands
-        # of the group, and implement common initialization logic here.
+        # you can define common options that will be available to all
+        # subcommands of the group, and implement common initialization
+        # logic here.
         ...
 
     @group()
