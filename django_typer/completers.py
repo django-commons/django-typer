@@ -285,7 +285,7 @@ class ModelObjectCompleter:
     ):
         if inspect.isclass(model_or_qry) and issubclass(model_or_qry, Model):
             self.model_cls = model_or_qry
-        elif isinstance(model_or_qry, QuerySet):  # type: ignore
+        elif isinstance(model_or_qry, QuerySet):
             self.model_cls = model_or_qry.model
             self._queryset = model_or_qry
         else:

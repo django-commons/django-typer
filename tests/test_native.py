@@ -177,7 +177,7 @@ class TestNative(TestCase):
             str({"name": "Brian"}),
         )
         self.assertEqual(
-            run_command(self.command, *self.settings, "--version")[0].strip(),
+            str(run_command(self.command, *self.settings, "--version")[0]).strip(),
             DJANGO_VERSION,
         )
 
