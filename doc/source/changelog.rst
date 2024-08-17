@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.2.1 (17-AUG-2024)
+====================
+
+* Fixed `Remove shell_complete monkey patch when upstream PR is merged. <https://github.com/bckohan/django-typer/issues/66>`_
+
 v2.2.0 (26-JUL-2024)
 ====================
 

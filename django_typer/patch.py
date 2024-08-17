@@ -127,33 +127,3 @@ def apply() -> None:
 
     strip_ansi = _compat.strip_ansi
     _compat.strip_ansi = lambda value: strip_ansi(str(value))
-
-
-from typer import __version__ as typer_version  # noqa: E402
-
-if (0, 4, 0) <= tuple(int(v) for v in typer_version.split(".")) < (0, 13, 0):
-    from typer import main as typer_main
-    from typer.models import ParamMeta
-
-    upstream_get_click_param = typer_main.get_click_param
-
-    def patched_get_click_param(
-        param: ParamMeta,
-    ) -> t.Tuple[t.Union[click.Argument, click.Option], t.Any]:
-        """
-        Patch this bug: https://github.com/tiangolo/typer/issues/334
-
-        This gets shell completions working for arguments. As of 0.9.0 I have
-        an open PR to fix this problem upstream, but it is enough of an issue
-        that its worth patching here until it gets merged.
-        """
-        click_param = upstream_get_click_param(param)
-        if isinstance(click_param[0], click.Argument) and getattr(
-            param.default, "shell_complete", None
-        ):
-            click_param[0]._custom_shell_complete = param.default.shell_complete
-        return click_param
-
-    typer_main.get_click_param = patched_get_click_param
-else:  # pragma: no cover
-    pass
