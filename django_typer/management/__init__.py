@@ -24,7 +24,7 @@ from django_typer import patch
 patch.apply()
 
 import typer  # noqa: E402
-from typer.core import MarkupMode  # noqa: E402
+import typer.core  # noqa: E402
 from typer.core import TyperCommand as CoreTyperCommand  # noqa: E402
 from typer.core import TyperGroup as CoreTyperGroup  # noqa: E402
 from typer.main import get_command as get_typer_command  # noqa: E402
@@ -59,6 +59,9 @@ if sys.version_info < (3, 10):
     from typing_extensions import ParamSpec
 else:
     from typing import ParamSpec
+
+
+DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
 
 
 __all__ = [
@@ -895,7 +898,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = Default(False),
         add_completion: bool = True,
         # Rich settings
-        rich_markup_mode: MarkupMode = None,
+        rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: bool = True,
         pretty_exceptions_show_locals: bool = True,
@@ -1875,7 +1878,7 @@ class TyperCommandMeta(type):
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
-        rich_markup_mode: MarkupMode = None,
+        rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
         pretty_exceptions_show_locals: t.Union[DefaultPlaceholder, bool] = Default(

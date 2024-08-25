@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.2.2 (25-AUG-2024)
+====================
+
+* Fixed `typer > 0.12.5 toggles rich help renderings off by default <https://github.com/bckohan/django-typer/issues/108>`_
+
 v2.2.1 (17-AUG-2024)
 ====================
 

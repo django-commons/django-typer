@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-typer"
-version = "2.2.1"
+version = "2.2.2"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
@@ -73,7 +73,7 @@ mypy = "^1.0"
 doc8 = "^1.1.1"
 aiohttp = "^3.9.1"
 readme-renderer = {extras = ["md"], version = ">=42,<44"}
-sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.3.0", markers="python_version >= '3.9'"}
+sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.5.0", markers="python_version >= '3.9'"}
 scikit-learn = "^1.0.0"
 pytest-env = "^1.0.0"
 numpy = [

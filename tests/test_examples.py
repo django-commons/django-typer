@@ -308,6 +308,8 @@ class ExampleTests(TestCase):
         observed_help = run_command(
             "basic", "--settings", self.settings, "--no-color", "--help"
         )[0].strip()
+        # import ipdb
+        # ipdb.set_trace()
         self.assertGreater(
             similarity(
                 observed_help, basic_help if rich_installed else basic_help_no_rich
