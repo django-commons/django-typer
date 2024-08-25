@@ -29,6 +29,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Site Management",
     "Topic :: Software Development :: Libraries",
@@ -48,7 +49,7 @@ click = "^8.1.0"
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer
 # version very strictly to bug fix releases for specific minor lines.
-typer-slim = ">=0.12.4,<0.13.0"
+typer-slim = ">=0.12.5,<0.13.0"
 
 # this should track typer's rich dependency, so long as our console
 # patches still work - so be sure to test on the low end of the range
@@ -61,36 +62,26 @@ typing-extensions = { version = ">=3.7.4.3", markers = "python_version < '3.10'"
 
 
 [tool.poetry.group.dev.dependencies]
-ipdb = "^0.13.13"
-pytest-django = "^4.7.0"
-pytest-cov = "^4.1.0"
-Sphinx = [
-    { version = "^7.2.0", markers = "python_version > '3.8'" },
-    { version = "^7.0.0", markers = "python_version <= '3.8'" },
-]
-sphinx-rtd-theme = "^2.0.0"
-mypy = "^1.0"
-doc8 = "^1.1.1"
-aiohttp = "^3.9.1"
+ipdb = ">=0.13.13"
+pytest-django = ">=4.8.0"
+pytest-cov = ">=5.0.0"
+Sphinx = ">=7.0"
+mypy = ">=1.0"
+doc8 = ">=1.1.1"
+aiohttp = ">=3.9.1"
 readme-renderer = {extras = ["md"], version = ">=42,<44"}
-sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.5.0", markers="python_version >= '3.9'"}
-scikit-learn = "^1.0.0"
-pytest-env = "^1.0.0"
-numpy = [
-    { version = ">=1.26", markers = "python_version > '3.8'" },
-    { version = "<=1.24", markers = "python_version <= '3.8'" },
-]
-scipy = [
-    { version = ">=1.11", markers = "python_version > '3.8'" },
-    { version = "<=1.10", markers = "python_version <= '3.8'" },
-]
+sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = ">=0.5.0", markers="python_version >= '3.9'"}
+scikit-learn = ">=1.0.0"
+pytest-env = ">=1.0.0"
+numpy = ">=1.24"
+scipy = ">=1.0"
 django-stubs = ">=4.2.7"
-pexpect = "^4.9.0"
-pyright = "^1.1.357"
-ruff = "^0.4.1"
-graphviz = "^0.20.3"
-sphinx-tabs = "^3.4.5"
-furo = "^2024.7.18"
+pexpect = ">=4.9.0"
+pyright = ">=1.1.357"
+ruff = ">=0.4.1"
+graphviz = ">=0.20.3"
+sphinx-tabs = ">=3.4.5"
+furo = ">=2024.7.18"
 
 [tool.poetry.extras]
 rich = ["rich"]
