@@ -57,7 +57,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Install libopenblas-dev
-      if: matrix.python-version == '3.13.0-rc1'
+      if: matrix.python-version == '3.13.0-rc.1'
       run: sudo apt-get install libopenblas-dev
     - name: Install Release Dependencies
       run: |
