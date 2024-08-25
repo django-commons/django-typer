@@ -98,10 +98,10 @@ jobs:
         python-version: ['3.8', '3.12']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.0' # April 2025
+          - '5.1' # December 2025
         exclude:
           - python-version: '3.8'
-            django-version: '5.0'
+            django-version: '5.1'
           - python-version: '3.12'
             django-version: '3.2'
 
@@ -155,10 +155,10 @@ jobs:
         python-version: ['3.8', '3.12']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.0' # April 2025
+          - '5.1' # December 2025
         exclude:
           - python-version: '3.8'
-            django-version: '5.0'
+            django-version: '5.1'
           - python-version: '3.12'
             django-version: '3.2'
 
