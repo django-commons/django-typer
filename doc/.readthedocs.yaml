@@ -13,9 +13,8 @@ build:
   jobs:
     post_create_environment:
       - pip install poetry
-      - poetry config virtualenvs.create false
     post_install:
-      - poetry install -E rich
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH python -m poetry install -E rich
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
