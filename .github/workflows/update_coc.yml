@@ -1,8 +1,7 @@
 name: Update Code of Conduct
 
 on:
-    # push:
-    # pull_request:
+    workflow_dispatch:
     # Run every Sunday at midnight UTC (00:00) - triggered by webhook?
     schedule:
         - cron: '0 0 * * 0'
