@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout
+        uses: actions/checkout@v4
 
       - name: Fetch CODE_OF_CONDUCT.md from django-commons
         run: |
@@ -49,7 +49,7 @@ jobs:
       # Step 5: Create a pull request to merge the changes into the main branch
       - name: Create Pull Request
         if: steps.check_changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request
+        uses: peter-evans/create-pull-request@v7
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
             branch: update-code-of-conduct
