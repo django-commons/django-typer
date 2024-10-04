@@ -63,7 +63,7 @@ class Command(TyperCommand):
             t.List[str],
             typer.Argument(
                 help="Import path(s) to the command to graph, or simply the name of the command.",
-                shell_complete=completers.chain(
+                autocompletion=completers.chain(
                     completers.complete_import_path,
                     completers.commands(allow_duplicates=True),
                     allow_duplicates=True,

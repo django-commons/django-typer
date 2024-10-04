@@ -164,7 +164,7 @@ def model_parser_completer(
             case_insensitive=case_insensitive,
             on_error=on_error,
         ),
-        "shell_complete": ModelObjectCompleter(
+        "autocompletion": ModelObjectCompleter(
             model_or_qry,
             lookup_field,
             case_insensitive=case_insensitive,
