@@ -9,8 +9,8 @@
 [![PyPI status](https://img.shields.io/pypi/status/django-typer.svg)](https://pypi.python.org/pypi/django-typer)
 [![Documentation Status](https://readthedocs.org/projects/django-typer/badge/?version=latest)](http://django-typer.readthedocs.io/?badge=latest/)
 [![Code Cov](https://codecov.io/gh/bckohan/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/bckohan/django-typer)
-[![Test Status](https://github.com/bckohan/django-typer/workflows/test/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/test.yml)
-[![Lint Status](https://github.com/bckohan/django-typer/workflows/lint/badge.svg)](https://github.com/bckohan/django-typer/actions/workflows/lint.yml)
+[![Test Status](https://github.com/bckohan/django-typer/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bckohan/django-typer/actions/workflows/test.yml?query=branch:main)
+[![Lint Status](https://github.com/bckohan/django-typer/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/bckohan/django-typer/actions/workflows/lint.yml?query=branch:main)
 
 Use static typing to define the CLI for your [Django](https://www.djangoproject.com/) management commands with [Typer](https://typer.tiangolo.com/). Optionally use the provided [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). This class maps the [Typer](https://typer.tiangolo.com/) interface onto a class based interface that Django developers will be familiar with. All of the [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) functionality is preserved, so that [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) can be a drop in replacement.
 
