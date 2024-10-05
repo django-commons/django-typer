@@ -1,20 +1,8 @@
-[Poetry]: https://python-poetry.org/
-[Pylint]: https://www.pylint.org/
-[isort]: https://pycqa.github.io/isort/
-[mypy]: http://mypy-lang.org/
-[django-pytest]: https://pytest-django.readthedocs.io/en/latest/
-[pytest]: https://docs.pytest.org/en/stable/
-[Sphinx]: https://www.sphinx-doc.org/en/master/
-[readthedocs]: https://readthedocs.org/
-[me]: https://github.com/bckohan
-[black]: https://black.readthedocs.io/en/stable/
-[pyright]: https://github.com/microsoft/pyright
-
 # Contributing
 
 Contributions are encouraged! Please use the issue page to submit feature requests or bug reports. Issues with attached PRs will be given priority and have a much higher likelihood of acceptance. Please also open an issue and associate it with any submitted PRs. That said, the aim is to keep this library as lightweight as possible. Only features with broad-based use cases will be considered.
 
-We are actively seeking additional maintainers. If you're interested, please [contact me](https://github.com/bckohan).
+We are actively seeking additional maintainers. If you're interested, please open an issue or [contact me](https://github.com/bckohan).
 
 ## Installation
 
@@ -26,7 +14,7 @@ poetry install
 
 ## Documentation
 
-`django-typer` documentation is generated using [Sphinx](https://www.sphinx-doc.org/en/master/) with the [readthedocs](https://readthedocs.org/) theme. Any new feature PRs must provide updated documentation for the features added. To build the docs run doc8 to check for formatting issues then run Sphinx:
+`django-typer` documentation is generated using [Sphinx](https://www.sphinx-doc.org) with the [furo](https://github.com/pradyunsg/furo) theme. Any new feature PRs must provide updated documentation for the features added. To build the docs run doc8 to check for formatting issues then run Sphinx:
 
 ```bash
 cd ./doc
@@ -50,7 +38,7 @@ To run static analysis without automated fixing you can run:
 
 ## Running Tests
 
-`django-typer` is set up to use [pytest](https://docs.pytest.org/en/stable/) to run unit tests. All the tests are housed in `tests/tests.py`. Before a PR is accepted, all tests must be passing and the code coverage must be at 100%. A small number of exempted error handling branches are acceptable.
+`django-typer` is set up to use [pytest](https://docs.pytest.org) to run unit tests. All the tests are housed in `tests`. Before a PR is accepted, all tests must be passing and the code coverage must be at 100%. A small number of exempted error handling branches are acceptable.
 
 To run the full suite:
 
@@ -67,6 +55,6 @@ poetry run pytest <path_to_tests_file>::ClassName::FunctionName
 For instance, to run all tests in BasicTests, and then just the test_call_command test you would do:
 
 ```shell
-poetry run pytest tests/tests.py::BasicTests
-poetry run pytest tests/tests.py::BasicTests::test_call_command
+poetry run pytest tests/test_basics.py::BasicTests
+poetry run pytest tests/test_basics.py::BasicTests::test_call_command
 ```
