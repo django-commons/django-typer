@@ -14,13 +14,14 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 
-permissions:
-    contents: write
-    issues: write
-    pull-requests: write
 
 jobs:
   update_code_of_conduct:
+    permissions:
+     contents: write
+     issues: write
+     pull-requests: write
+
     runs-on: ubuntu-latest
 
     steps:
@@ -59,9 +60,9 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            branch: update-coc
+            branch: bot-update-coc
             add-paths: |
                 CODE_OF_CONDUCT.md
-            title: "Update Code of Conduct"
+            title: "🤖 Update Code of Conduct 🤖"
             body: "Update the Code of Conduct with the latest version from the django-commons repository."
             commit-message: "Update CODE_OF_CONDUCT.md from django-commons"
