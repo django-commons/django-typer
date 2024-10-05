@@ -6,9 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       debug:
-        description: 'Set to on, to open ssh debug session.'
+        description: 'Open ssh debug session.'
         required: true
-        default: 'off'
+        default: false
+        type: boolean
 
 jobs:
 
@@ -60,11 +61,11 @@ jobs:
           poetry run pip install colorama
           poetry run pip install -U "django~=${{ matrix.django-version }}"
       - name: Install Emacs
-        if: ${{ github.event.inputs.debug == 'on' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           sudo apt install emacs
       - name: Setup tmate session
-        if: ${{ github.event.inputs.debug == 'on' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@v3
         with:
           detached: true
