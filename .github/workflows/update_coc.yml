@@ -14,10 +14,10 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 
-# permissions:
-#     contents: write
-#     issues: write
-#     pull-requests: write
+permissions:
+    contents: write
+    issues: write
+    pull-requests: write
 
 jobs:
   update_code_of_conduct:
