@@ -1,7 +1,6 @@
 name: Update Code of Conduct
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       debug:
