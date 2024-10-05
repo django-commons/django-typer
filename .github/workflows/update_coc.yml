@@ -47,10 +47,10 @@ jobs:
           if cmp -s fetched_code_of_conduct.md CODE_OF_CONDUCT.md; then
             echo "No changes in CODE_OF_CONDUCT.md"
             echo "changed=false" >> $GITHUB_OUTPUT
-            cp fetched_code_of_conduct.md CODE_OF_CONDUCT.md
           else
             echo "CODE_OF_CONDUCT.md has changed"
             echo "changed=true" >> $GITHUB_OUTPUT
+            cp fetched_code_of_conduct.md CODE_OF_CONDUCT.md
           fi
 
       # Create a pull request to merge the changes into the main branch
