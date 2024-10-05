@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions are encouraged! Please use the issue page to submit feature requests or bug reports. Issues with attached PRs will be given priority and have a much higher likelihood of acceptance. Please also open an issue and associate it with any submitted PRs. That said, the aim is to keep this library as lightweight as possible. Only features with broad-based use cases will be considered.
+Contributions are encouraged! Please use the issue page to submit feature requests or bug reports. Issues with attached PRs will be given priority and have a much higher likelihood of acceptance. Please also open an issue and associate it with any submitted PRs.
 
 We are actively seeking additional maintainers. If you're interested, please open an issue or [contact me](https://github.com/bckohan).
 
@@ -58,3 +58,7 @@ For instance, to run all tests in BasicTests, and then just the test_call_comman
 poetry run pytest tests/test_basics.py::BasicTests
 poetry run pytest tests/test_basics.py::BasicTests::test_call_command
 ```
+
+## Versioning
+
+django-typer strictly adheres to [semantic versioning](https://semver.org).
