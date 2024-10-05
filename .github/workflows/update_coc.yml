@@ -63,5 +63,4 @@ jobs:
                 CODE_OF_CONDUCT.md
             title: "Update Code of Conduct"
             body: "Update the Code of Conduct with the latest version from the django-commons repository."
-            base: main
             commit-message: "Update CODE_OF_CONDUCT.md from django-commons"
