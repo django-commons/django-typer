@@ -6,9 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       debug:
-        description: 'Set to on, to open ssh debug session.'
+        description: 'Open ssh debug session.'
         required: true
-        default: 'off'
+        default: false
+        type: boolean
   schedule:
     - cron: '0 13 * * *'  # Runs at 6 am pacific every day
 
@@ -18,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-rc.1']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-rc.2']
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
@@ -37,11 +38,11 @@ jobs:
             django-version: '5.1'
           - python-version: '3.9'
             django-version: '5.1'
-          - python-version: '3.13.0-rc.1'
+          - python-version: '3.13.0-rc.2'
             django-version: '3.2'
-          - python-version: '3.13.0-rc.1'
+          - python-version: '3.13.0-rc.2'
             django-version: '4.2'
-          - python-version: '3.13.0-rc.1'
+          - python-version: '3.13.0-rc.2'
             django-version: '5.0'
 
     steps:
@@ -57,7 +58,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Install libopenblas-dev
-      if: matrix.python-version == '3.13.0-rc.1'
+      if: matrix.python-version == '3.13.0-rc.2'
       run: sudo apt-get install libopenblas-dev
     - name: Install Release Dependencies
       run: |
@@ -66,11 +67,11 @@ jobs:
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Install Emacs
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         sudo apt install emacs
     - name: Setup tmate session
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
@@ -128,11 +129,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y fish
     - name: Install Emacs
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         sudo apt install emacs
     - name: Setup tmate session
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
@@ -199,7 +200,7 @@ jobs:
     #     brew install sbt
     #     brew install fish
     - name: Install Emacs
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         brew install emacs
     - name: Install Poetry
@@ -215,7 +216,7 @@ jobs:
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Setup tmate session
-      if: ${{ github.event.inputs.debug == 'on' }}
+      if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
@@ -285,11 +286,11 @@ jobs:
 
     steps:
       - name: Install Emacs
-        if: ${{ github.event.inputs.debug == 'on' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           sudo apt install emacs
       - name: Setup tmate session
-        if: ${{ github.event.inputs.debug == 'on' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@v3
         with:
           detached: true

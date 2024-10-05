@@ -2,39 +2,39 @@
 Change Log
 ==========
 
-v2.2.2 (25-AUG-2024)
+v2.2.2 (2024-08-25)
 ====================
 
 * Implemented `Support python 3.13 <https://github.com/bckohan/django-typer/issues/109>`_
 * Fixed `typer > 0.12.5 toggles rich help renderings off by default <https://github.com/bckohan/django-typer/issues/108>`_
 
-v2.2.1 (17-AUG-2024)
+v2.2.1 (2024-08-17)
 ====================
 
 * Fixed `Remove shell_complete monkey patch when upstream PR is merged. <https://github.com/bckohan/django-typer/issues/66>`_
 
-v2.2.0 (26-JUL-2024)
+v2.2.0 (2024-07-26)
 ====================
 
 * Implemented `ModelObjectCompleter should optionally accept a QuerySet in place of a Model class. <https://github.com/bckohan/django-typer/issues/96>`_
 
-v2.1.3 (15-JUL-2024)
+v2.1.3 (2024-07-15)
 ====================
 
 * Fixed `Move from django_typer to django_typer.management broke doc reference links. <https://github.com/bckohan/django-typer/issues/98>`_
 * Implemented `Support Django 5.1 <https://github.com/bckohan/django-typer/issues/97>`_
 
-v2.1.2 (07-JUN-2024)
+v2.1.2 (2024-06-07)
 ====================
 
 * Fixed `Type hint kwargs to silence pylance warnings about partially unknown types <https://github.com/bckohan/django-typer/issues/93>`_
 
-v2.1.1 (06-JUN-2024)
+v2.1.1 (2024-06-06)
 ====================
 
 * Fixed `handle = None does not work for mypy to silence type checkers <https://github.com/bckohan/django-typer/issues/90>`_
 
-v2.1.0 (05-JUN-2024)
+v2.1.0 (2024-06-05)
 ====================
 
 .. warning::
@@ -55,18 +55,18 @@ v2.1.0 (05-JUN-2024)
 * Implemented `Move core code out of __init__.py into management/__init__.py <https://github.com/bckohan/django-typer/issues/81>`_
 * Fixed `Typer(help="") doesnt work. <https://github.com/bckohan/django-typer/issues/78>`_
 
-v2.0.2 (03-JUN-2024)
+v2.0.2 (2024-06-03)
 ====================
 
 * Fixed `class help attribute should be type hinted to allow a lazy translation string. <https://github.com/bckohan/django-typer/issues/85>`_
 
 
-v2.0.1 (31-MAY-2024)
+v2.0.1 (2024-05-31)
 ====================
 
 * Fixed `Readme images are broken. <https://github.com/bckohan/django-typer/issues/77>`_
 
-v2.0.0 (31-MAY-2024)
+v2.0.0 (2024-05-31)
 ====================
 
 This major version release, includes an extensive internal refactor, numerous bug fixes and the
@@ -91,18 +91,18 @@ addition of a plugin-based extension pattern.
 * Implemented `Add completer/parser for GenericIPAddressField. <https://github.com/bckohan/django-typer/issues/12>`_
 
 
-v1.1.2 (22-APR-2024)
+v1.1.2 (2024-04-22)
 ====================
 
 * Fixed `Overridden common Django arguments fail to pass through when passed through call_command <https://github.com/bckohan/django-typer/issues/54>`_
 
-v1.1.1 (11-APR-2024)
+v1.1.1 (2024-04-11)
 ====================
 
 * Implemented `Fix pyright type checking and add to CI <https://github.com/bckohan/django-typer/issues/51>`_
 * Implemented `Convert CONTRIBUTING.rst to markdown <https://github.com/bckohan/django-typer/issues/50>`_
 
-v1.1.0 (03-APR-2024)
+v1.1.0 (2024-04-03)
 ====================
 
 * Implemented `Convert readme to markdown. <https://github.com/bckohan/django-typer/issues/48>`_
@@ -114,40 +114,40 @@ v1.0.9 (yanked)
 
 * Fixed `Support typer 0.12.0 <https://github.com/bckohan/django-typer/issues/46>`_
 
-v1.0.8 (26-MAR-2024)
+v1.0.8 (2024-03-26)
 ====================
 
 * Fixed `Support typer 0.10 and 0.11 <https://github.com/bckohan/django-typer/issues/45>`_
 
-v1.0.7 (17-MAR-2024)
+v1.0.7 (2024-03-17)
 ====================
 
 * Fixed `Helps throw an exception when invoked from an absolute path that is not relative to the getcwd() <https://github.com/bckohan/django-typer/issues/44>`_
 
-v1.0.6 (14-MAR-2024)
+v1.0.6 (2024-03-14)
 ====================
 
 * Fixed `prompt options on groups still prompt when given as named parameters on call_command <https://github.com/bckohan/django-typer/issues/43>`_
 
 
-v1.0.5 (14-MAR-2024)
+v1.0.5 (2024-03-14)
 ====================
 
 * Fixed `Options with prompt=True are prompted twice <https://github.com/bckohan/django-typer/issues/42>`_
 
 
-v1.0.4 (13-MAR-2024)
+v1.0.4 (2024-03-13)
 ====================
 
 * Fixed `Help sometimes shows full script path in Usage: when it shouldnt. <https://github.com/bckohan/django-typer/issues/40>`_
 * Fixed `METAVAR when ModelObjectParser supplied should default to model name <https://github.com/bckohan/django-typer/issues/39>`_
 
-v1.0.3 (08-MAR-2024)
+v1.0.3 (2024-03-08)
 ====================
 
 * Fixed `Incomplete typing info for @command decorator <https://github.com/bckohan/django-typer/issues/33>`_
 
-v1.0.2 (05-MAR-2024)
+v1.0.2 (2024-03-05)
 ====================
 
 * Fixed `name property on TyperCommand is too generic and should be private. <https://github.com/bckohan/django-typer/issues/37>`_
@@ -159,50 +159,50 @@ v1.0.2 (05-MAR-2024)
 * Fixed `Missing subcommand produces stack trace without --traceback. <https://github.com/bckohan/django-typer/issues/27>`_
 * Fixed `Allow handle() to be an initializer. <https://github.com/bckohan/django-typer/issues/24>`_
 
-v1.0.1 (29-FEB-2024)
+v1.0.1 (2024-02-29)
 ====================
 
 * Fixed `shell_completion broken for click < 8.1 <https://github.com/bckohan/django-typer/issues/21>`_
 
-v1.0.0 (26-FEB-2024)
+v1.0.0 (2024-02-26)
 ====================
 
 * Initial production/stable release.
 
-v0.6.1b (24-FEB-2024)
+v0.6.1b (2024-02-24)
 =====================
 
 * Incremental beta release - this is also the second release candidate for version 1.
 * Peg typer version to 0.9.x
 
-v0.6.0b (23-FEB-2024)
+v0.6.0b (2024-02-23)
 =====================
 
 * Incremental beta release - this is also the first release candidate for version 1.
 
 
-v0.5.0b (31-JAN-2024)
+v0.5.0b (2024-01-31)
 =====================
 
 * Incremental Beta Release
 
-v0.4.0b (08-JAN-2024)
+v0.4.0b (2024-01-08)
 =====================
 
 * Incremental Beta Release
 
-v0.3.0b (06-JAN-2024)
+v0.3.0b (2024-01-06)
 =====================
 
 * Incremental Beta Release
 
-v0.2.0b (04-JAN-2024)
+v0.2.0b (2024-01-04)
 =====================
 
 * Incremental Beta Release
 
 
-v0.1.0b (05-DEC-2023)
+v0.1.0b (2023-12-05)
 =====================
 
 * Initial Release (Beta)

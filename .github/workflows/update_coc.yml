@@ -1,0 +1,66 @@
+name: Update Code of Conduct
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Open ssh debug session.'
+        required: true
+        default: false
+        type: boolean
+  # Run every Sunday at midnight UTC (00:00) - triggered by webhook?
+  schedule:
+    - cron: '0 0 * * 0'
+
+
+jobs:
+  update_code_of_conduct:
+    permissions:
+     contents: write
+     issues: write
+     pull-requests: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Emacs
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          sudo apt install emacs
+      - name: Setup tmate session
+        if: ${{ github.event.inputs.debug == 'true' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+        timeout-minutes: 60
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch CODE_OF_CONDUCT.md from django-commons
+        run: |
+          curl -o fetched_code_of_conduct.md https://raw.githubusercontent.com/django-commons/membership/main/CODE_OF_CONDUCT.md
+
+      - name: Check if CODE_OF_CONDUCT.md has changed
+        id: check_changes
+        run: |
+          if cmp -s fetched_code_of_conduct.md CODE_OF_CONDUCT.md; then
+            echo "No changes in CODE_OF_CONDUCT.md"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "CODE_OF_CONDUCT.md has changed"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            cp fetched_code_of_conduct.md CODE_OF_CONDUCT.md
+          fi
+
+      # Create a pull request to merge the changes into the main branch
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            branch: bot-update-coc
+            add-paths: |
+                CODE_OF_CONDUCT.md
+            title: "🤖 Update Code of Conduct 🤖"
+            body: "Update the Code of Conduct with the latest version from the django-commons repository."
+            commit-message: "Update CODE_OF_CONDUCT.md from django-commons"
