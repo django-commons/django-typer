@@ -2,6 +2,13 @@
 Change Log
 ==========
 
+v2.2.3 (2024-10-xx)
+===================
+
+* Completed `Open up vulnerability reporting and add security policy. <https://github.com/bckohan/django-typer/issues/124>`_
+* Completed `Move architecture in docs to ARCHITECTURE.md <https://github.com/bckohan/django-typer/issues/121>`_
+
+
 v2.2.2 (2024-08-25)
 ====================
 
