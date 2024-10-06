@@ -6,8 +6,6 @@
 Reference
 =========
 
-.. include:: ./architecture.rst
-
 .. _base:
 
 django_typer
