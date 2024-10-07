@@ -8,6 +8,10 @@ readme = "README.md"
 repository = "https://github.com/bckohan/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
+packages = [
+    { include = "django_typer" }
+]
+exclude = ["django_typer/locale"]
 classifiers = [
     "Environment :: Console",
     "Framework :: Django",
@@ -45,10 +49,6 @@ Issues = "https://github.com/bckohan/django-typer/issues"
 Changelog = "https://django-typer.readthedocs.io/en/latest/changelog.html"
 Code_of_Conduct = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
-packages = [
-    { include = "django_typer" }
-]
-exclude = ["django_typer/locale"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
