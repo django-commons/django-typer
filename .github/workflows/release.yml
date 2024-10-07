@@ -1,12 +1,15 @@
+##
+# Derived from:
+#  https://github.com/django-commons/django-commons-playground/blob/main/.github/workflows/release.yml
+#
+
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on: push
 
 env:
-  # Change these for your project's URLs
   PYPI_URL: https://pypi.org/p/django-typer
-  # Eventually add back the test release, see example at
-  # https://github.com/django-commons/django-commons-playground/blob/main/.github/workflows/release.yml
+  PYPI_TEST_URL: https://test.pypi.org/project/django-typer
 
 jobs:
 
@@ -94,3 +97,28 @@ jobs:
         gh release upload
         '${{ github.ref_name }}' dist/**
         --repo '${{ github.repository }}'
+
+  publish-to-testpypi:
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: ${{ env.PYPI_TEST_URL }}
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1.10
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
