@@ -3,7 +3,7 @@ name = "django-typer"
 version = "2.2.2"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
-license = "MIT"
+license = {text = "MIT License"}
 readme = "README.md"
 repository = "https://github.com/bckohan/django-typer"
 homepage = "https://django-typer.readthedocs.io"
