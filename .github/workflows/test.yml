@@ -57,9 +57,6 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
-    - name: Install libopenblas-dev
-      if: matrix.python-version == '3.13'
-      run: sudo apt-get install libopenblas-dev
     - name: Install Release Dependencies
       run: |
         poetry config virtualenvs.in-project true

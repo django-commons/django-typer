@@ -5,11 +5,12 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Tuple
-
+import re
+import math
+import re
+from collections import Counter
 import pexpect
 from django.core.management.color import no_style
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 try:
     import rich
@@ -22,6 +23,26 @@ except ImportError:
 TESTS_DIR = Path(__file__).parent
 DJANGO_PARAMETER_LOG_FILE = TESTS_DIR / "dj_params.json"
 manage_py = TESTS_DIR.parent / "manage.py"
+WORD = re.compile(r"\w+")
+
+
+def get_cosine(vec1, vec2):
+    intersection = set(vec1.keys()) & set(vec2.keys())
+    numerator = sum([vec1[x] * vec2[x] for x in intersection])
+
+    sum1 = sum([vec1[x] ** 2 for x in list(vec1.keys())])
+    sum2 = sum([vec2[x] ** 2 for x in list(vec2.keys())])
+    denominator = math.sqrt(sum1) * math.sqrt(sum2)
+
+    if not denominator:
+        return 0.0
+    else:
+        return float(numerator) / denominator
+
+
+def text_to_vector(text):
+    words = WORD.findall(text)
+    return Counter(words)
 
 
 def similarity(text1, text2):
@@ -31,10 +52,10 @@ def similarity(text1, text2):
 
     We use this to lazily evaluate the output of --help to our
     renderings.
-    """
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([text1, text2])
-    return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+    #"""
+    vector1 = text_to_vector(text1)
+    vector2 = text_to_vector(text2)
+    return get_cosine(vector1, vector2)
 
 
 def get_named_arguments(function):
