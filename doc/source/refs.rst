@@ -1,6 +1,6 @@
 
 .. _Django: https://www.djangoproject.com/
-.. _GitHub: https://github.com/bckohan/django-typer
+.. _GitHub: https://github.com/django-commons/django-typer
 .. _PyPI: https://pypi.python.org/pypi/django-typer
 .. _Typer: https://typer.tiangolo.com/
 .. _click: https://click.palletsprojects.com/

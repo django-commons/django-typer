@@ -56,7 +56,7 @@ the shell. This process has two phases:
 The goal of this guide is not to be an exhaustive list of how to enable completions for each
 supported shell on all possible platforms, but rather to provide general guidance on how to
 enable completions for the most common platforms and environments. If you encounter issues
-or have solutions, please `report them on our issues page <https://github.com/bckohan/django-typer>`_
+or have solutions, please `report them on our issues page <https://github.com/django-commons/django-typer/issues>`_
 
 Windows
 -------
@@ -146,7 +146,7 @@ However, if you are using a separate package to define custom tab completions fo
 you may use the --fallback parameter to supply a separate fallback hook that will invoke the
 appropriate completion function for your commands. If there are other popular completion libraries
 please consider `letting us know or submitting a PR
-<https://github.com/bckohan/django-typer/issues>`_ to support these libraries as a fallback out of
+<https://github.com/django-commons/django-typer/issues>`_ to support these libraries as a fallback out of
 the box.
 
 

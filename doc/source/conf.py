@@ -71,7 +71,7 @@ exclude_patterns = []
 # html_theme = 'sphinx_rtd_theme'
 html_theme = 'furo'
 html_theme_options = {
-    "source_repository": "https://github.com/bckohan/django-typer/",
+    "source_repository": "https://github.com/django-commons/django-typer/",
     "source_branch": "main",
     "source_directory": "doc/source",
 }

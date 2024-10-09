@@ -41,7 +41,7 @@ class TestGroups(TestCase):
         directories get included because their relative paths dont resolve in the
         coverage output for this test. VERY ANNOYING - not sure how to fix?
 
-        https://github.com/bckohan/django-typer/issues/44
+        https://github.com/django-commons/django-typer/issues/44
         """
         # change dir to the first dir that is not a parent
         cwd = Path(os.getcwd())

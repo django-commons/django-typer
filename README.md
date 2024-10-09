@@ -8,9 +8,9 @@
 [![PyPI djversions](https://img.shields.io/pypi/djversions/django-typer.svg)](https://pypi.org/project/django-typer/)
 [![PyPI status](https://img.shields.io/pypi/status/django-typer.svg)](https://pypi.python.org/pypi/django-typer)
 [![Documentation Status](https://readthedocs.org/projects/django-typer/badge/?version=latest)](http://django-typer.readthedocs.io/?badge=latest/)
-[![Code Cov](https://codecov.io/gh/bckohan/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/bckohan/django-typer)
-[![Test Status](https://github.com/bckohan/django-typer/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bckohan/django-typer/actions/workflows/test.yml?query=branch:main)
-[![Lint Status](https://github.com/bckohan/django-typer/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/bckohan/django-typer/actions/workflows/lint.yml?query=branch:main)
+[![Code Cov](https://codecov.io/gh/django-commons/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/django-commons/django-typer)
+[![Test Status](https://github.com/django-commons/django-typer/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/test.yml?query=branch:main)
+[![Lint Status](https://github.com/django-commons/django-typer/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/lint.yml?query=branch:main)
 [![Published on Django Packages](https://img.shields.io/badge/Published%20on-Django%20Packages-0c3c26)](https://djangopackages.org/packages/p/django-typer/)
 
 Use static typing to define the CLI for your [Django](https://www.djangoproject.com/) management commands with [Typer](https://typer.tiangolo.com/). Optionally use the provided [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) class that inherits from [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). This class maps the [Typer](https://typer.tiangolo.com/) interface onto a class based interface that Django developers will be familiar with. All of the [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) functionality is preserved, so that [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) can be a drop in replacement.
@@ -30,7 +30,7 @@ Use static typing to define the CLI for your [Django](https://www.djangoproject.
 
 Please refer to the [full documentation](https://django-typer.readthedocs.io/) for more information.
 
-![django-typer example](https://raw.githubusercontent.com/bckohan/django-typer/main/doc/source/_static/img/closepoll_example.gif)
+![django-typer example](https://raw.githubusercontent.com/django-commons/django-typer/main/doc/source/_static/img/closepoll_example.gif)
 
 ## 🚨 Deprecation Notice
 
@@ -97,7 +97,7 @@ def main(arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
    """
 ```
 
-![Basic Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/basic.svg)
+![Basic Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/basic.svg)
 
 ## Multiple Subcommands Example
 
@@ -166,9 +166,9 @@ def delete(
    """
 ```
 
-![Multiple Subcommands Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi.svg)
-![Multiple Subcommands Example - create](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi_create.svg)
-![Multiple Subcommands Example - delete](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/multi_delete.svg)
+![Multiple Subcommands Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/multi.svg)
+![Multiple Subcommands Example - create](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/multi_create.svg)
+![Multiple Subcommands Example - delete](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/multi_delete.svg)
 
 
 ## Grouping and Hierarchies Example
@@ -289,7 +289,7 @@ def divide(
    return f"{numerator / denominator:.{self.precision}f}"
 ```
 
-![Grouping and Hierarchies Example](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy.svg)
-![Grouping and Hierarchies Example - math](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math.svg)
-![Grouping and Hierarchies Example - math multiply](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math_multiply.svg)
-![Grouping and Hierarchies Example - math divide](https://raw.githubusercontent.com/bckohan/django-typer/main/examples/helps/hierarchy_math_divide.svg)
+![Grouping and Hierarchies Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/hierarchy.svg)
+![Grouping and Hierarchies Example - math](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/hierarchy_math.svg)
+![Grouping and Hierarchies Example - math multiply](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/hierarchy_math_multiply.svg)
+![Grouping and Hierarchies Example - math divide](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/hierarchy_math_divide.svg)

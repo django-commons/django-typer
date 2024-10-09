@@ -847,7 +847,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     # todo - this results in type hinting expecting self to be passed explicitly
     # when this is called as a callable
-    # https://github.com/bckohan/django-typer/issues/73
+    # https://github.com/django-commons/django-typer/issues/73
     def __get__(self, obj, _=None) -> "Typer[P, R]":
         """
         Our Typer app wrapper also doubles as a descriptor, so when
