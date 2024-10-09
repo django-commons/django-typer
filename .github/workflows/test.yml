@@ -93,14 +93,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.8', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '5.1' # December 2025
         exclude:
           - python-version: '3.8'
             django-version: '5.1'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '3.2'
 
     steps:
@@ -150,14 +150,14 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.8', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '5.1' # December 2025
         exclude:
           - python-version: '3.8'
             django-version: '5.1'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '3.2'
 
     steps:
@@ -234,14 +234,14 @@ jobs:
   #   runs-on: windows-latest
   #   strategy:
   #     matrix:
-  #       python-version: ['3.8', '3.12']
+  #       python-version: ['3.8', '3.13']
   #       django-version:
   #         - '3.2' # LTS April 2024
   #         - '5.0' # April 2025
   #       exclude:
   #         - python-version: '3.8'
   #           django-version: '5.0'
-  #         - python-version: '3.12'
+  #         - python-version: '3.13'
   #           django-version: '3.2'
 
   #   steps:
@@ -294,9 +294,6 @@ jobs:
         timeout-minutes: 60
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:

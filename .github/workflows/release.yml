@@ -3,7 +3,7 @@
 #  https://github.com/django-commons/django-commons-playground/blob/main/.github/workflows/release.yml
 #
 
-name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
+name: Publish to PyPI
 
 on: push
 
