@@ -1,13 +1,23 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "django-typer"
 version = "2.2.2"
 description = "Use Typer to define the CLI for your Django management commands."
-authors = ["Brian Kohan <bckohan@gmail.com>"]
+authors = [
+    "Brian Kohan <bckohan@gmail.com>",
+]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/bckohan/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
+packages = [
+    { include = "django_typer" }
+]
+exclude = ["django_typer/locale"]
 classifiers = [
     "Environment :: Console",
     "Framework :: Django",
@@ -37,18 +47,14 @@ classifiers = [
 ]
 
 
-[project.urls]
-Homepage = "https://django-typer.readthedocs.io"
-Documentation = "https://django-typer.readthedocs.io"
-Repository = "https://github.com/bckohan/django-typer"
-Issues = "https://github.com/bckohan/django-typer/issues"
-Changelog = "https://django-typer.readthedocs.io/en/latest/changelog.html"
-Code_of_Conduct = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
+[tool.poetry.urls]
+"Homepage" = "https://django-typer.readthedocs.io"
+"Documentation" = "https://django-typer.readthedocs.io"
+"Repository" = "https://github.com/bckohan/django-typer"
+"Issues" = "https://github.com/bckohan/django-typer/issues"
+"Changelog" = "https://django-typer.readthedocs.io/en/latest/changelog.html"
+"Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
-packages = [
-    { include = "django_typer" }
-]
-exclude = ["django_typer/locale"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
