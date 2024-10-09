@@ -73,7 +73,7 @@ class TestGroups(TestCase):
                                 TESTS_DIR / "apps" / "test_app" / "helps" / "groups.txt"
                             ).read_text(),
                         ),
-                        0.96,  # width inconsistences drive this number < 1
+                        0.99,  # width inconsistences drive this number < 1
                     )
                     return
         finally:
@@ -127,7 +127,7 @@ class TestGroups(TestCase):
                             TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
                         ).read_text(),
                     ),
-                    0.96,  # width inconsistences drive this number < 1
+                    0.99,  # width inconsistences drive this number < 1
                 )
             except AssertionError:
                 raise

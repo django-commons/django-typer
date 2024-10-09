@@ -6,7 +6,7 @@
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    number1      FLOAT       The first number. [required]                   │
 │ *    number2      FLOAT       The second number. [required]                  │
-│ *    numbers      NUMBERS...  The list of numbers to multiple:               │
+│ *    numbers      NUMBERS...  The list of numbers to multiply:               │
 │                               n1*n2*n3*...*nN.                               │
 │                               [required]                                     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
