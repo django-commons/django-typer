@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
-        python-version: [ '3.8', '3.10', '3.12' ]
+        python-version: [ '3.8', '3.10', '3.13' ]
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
@@ -27,9 +27,9 @@ jobs:
         exclude:
           - python-version: '3.8'
             django-version: '4.2'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '4.2'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '3.2'
           - python-version: '3.10'
             django-version: '3.2'

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-rc.2']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
@@ -38,11 +38,11 @@ jobs:
             django-version: '5.1'
           - python-version: '3.9'
             django-version: '5.1'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '3.2'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '4.2'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '5.0'
 
     steps:
@@ -58,7 +58,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
     - name: Install libopenblas-dev
-      if: matrix.python-version == '3.13.0-rc.2'
+      if: matrix.python-version == '3.13'
       run: sudo apt-get install libopenblas-dev
     - name: Install Release Dependencies
       run: |
