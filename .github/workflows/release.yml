@@ -3,7 +3,7 @@
 #  https://github.com/django-commons/django-commons-playground/blob/main/.github/workflows/release.yml
 #
 
-name: Publish to PyPI
+name: Publish Release
 
 on:
   push:
