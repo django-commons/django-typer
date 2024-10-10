@@ -5,6 +5,8 @@ Change Log
 v2.2.3 (2024-10-xx)
 ===================
 
+* Implemented `Command help order should respect definition order for class based commands. <https://github.com/django-commons/django-typer/issues/129>`_
+* Fixed `Overriding the command group class does not work. <https://github.com/django-commons/django-typer/issues/128>`_
 * Completed `Add project to test PyPI <https://github.com/django-commons/django-typer/issues/126>`_
 * Completed `Open up vulnerability reporting and add security policy. <https://github.com/django-commons/django-typer/issues/124>`_
 * Completed `Move architecture in docs to ARCHITECTURE.md <https://github.com/django-commons/django-typer/issues/121>`_
