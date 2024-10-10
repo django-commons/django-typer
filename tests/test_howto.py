@@ -307,3 +307,23 @@ class TestPrintingHowto(TestCase):
 
 class TestPrintingTyperHowto(TestPrintingHowto):
     cmd = "printing_typer"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestOrderHowTo(TestCase):
+    cmd = "order"
+
+    def test_howto_order(self):
+        from tests.apps.howto.management.commands.order import (
+            Command as OrderCommand,
+            ReverseAlphaCommands,
+        )
+
+        stdout = StringIO()
+        order_cmd = get_command(self.cmd, OrderCommand, stdout=stdout, no_color=True)
+
+        self.assertTrue(issubclass(order_cmd.typer_app.info.cls, ReverseAlphaCommands))
+        self.assertTrue(issubclass(order_cmd.d.info.cls, ReverseAlphaCommands))
+
+        # import ipdb
+        # ipdb.set_trace()

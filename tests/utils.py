@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Tuple
 import re
 import math
-import re
 from collections import Counter
 import pexpect
 from django.core.management.color import no_style

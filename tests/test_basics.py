@@ -125,3 +125,99 @@ class BasicTests(TestCase):
         self.assertEqual(
             get_command("base")(*args, **kwargs), f"base({args}, {kwargs})"
         )
+
+    def test_cmd_help_order(self):
+        buffer = StringIO()
+        cmd = get_command("order", TyperCommand, stdout=buffer, no_color=True)
+
+        cmd.print_help("./manage.py", "order")
+        hlp = buffer.getvalue()
+
+        self.assertTrue(
+            """
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ order                                                                        │
+│ b                                                                            │
+│ a                                                                            │
+│ d                                                                            │
+│ c                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+        """.strip()
+            in hlp
+        )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd.print_help("./manage.py", "order", "d")
+        hlp = buffer.getvalue()
+
+        self.assertTrue(
+            """
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ g                                                                            │
+│ e                                                                            │
+│ f                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+        """.strip()
+            in hlp
+        )
+
+        cmd2 = get_command("order2", TyperCommand, stdout=buffer, no_color=True)
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2")
+        hlp = buffer.getvalue()
+
+        self.assertTrue(
+            """
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ order2   Override handle                                                     │
+│ b                                                                            │
+│ a                                                                            │
+│ d                                                                            │
+│ c                                                                            │
+│ bb                                                                           │
+│ aa                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+        """.strip()
+            in hlp
+        )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2", "d")
+        hlp = buffer.getvalue()
+
+        self.assertTrue(
+            """
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ g                                                                            │
+│ e                                                                            │
+│ f                                                                            │
+│ i                                                                            │
+│ h                                                                            │
+│ x                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+        """.strip()
+            in hlp
+        )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2", "d", "x")
+        hlp = buffer.getvalue()
+
+        self.assertTrue(
+            """
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ z                                                                            │
+│ y                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────╯
+        """.strip()
+            in hlp
+        )
