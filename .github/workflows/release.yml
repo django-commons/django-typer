@@ -34,8 +34,7 @@ env:
 jobs:
 
   build:
-    name: Build distribution 📦
-    if: startsWith(github.ref, 'refs/tags/')  # only publish on tag pushes
+    name: Build Package
     runs-on: ubuntu-latest
 
     steps:
@@ -56,10 +55,8 @@ jobs:
         path: dist/
 
   publish-to-pypi:
-    name: >-
-      Publish Python 🐍 distribution 📦 to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish on tag pushes
-    #if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.pypi == 'true') || github.event_name != 'workflow_dispatch' }}
+    name: Publish to PyPI
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.pypi == 'true') || github.event_name != 'workflow_dispatch' }}
     needs:
     - build
     runs-on: ubuntu-latest
@@ -78,9 +75,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1.10
 
   github-release:
-    name: >-
-      Sign the Python 🐍 distribution 📦 with Sigstore
-      and upload them to GitHub Release
+    name: Publish GitHub Release
     if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.github == 'true') || github.event_name != 'workflow_dispatch' }}
     needs:
     - publish-to-pypi
@@ -122,7 +117,7 @@ jobs:
         --repo '${{ github.repository }}'
 
   publish-to-testpypi:
-    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    name: Publish to TestPyPI
     if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.testpypi == 'true') || github.event_name != 'workflow_dispatch' }}
     needs:
     - build
