@@ -181,12 +181,6 @@ markup the docstring may be the more appropriate place to put it.
 
 |
 
-.. note::
-
-    On Python <=3.8 you will need to import Annotated from typing_extensions_ instead of the standard
-    library.
-
-
 Defining custom and reusable parameter types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

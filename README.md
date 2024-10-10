@@ -71,7 +71,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 
 ## Basic Example
 
-[TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) is a very simple drop in replacement for [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). All of the documented features of [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) work the same way!
+[TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) is a drop in extension to [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand). All of the documented features of [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand) work the same way!
 
 ```python
 from django_typer.management import TyperCommand

@@ -82,9 +82,9 @@ developers will be familiar with. All of the BaseCommand_ functionality is prese
 
 :big:`Basic Example`
 
-:class:`~django_typer.management.TyperCommand` is a very simple drop in replacement for
-BaseCommand_. All of the documented features of BaseCommand_ work the same way! Or, you may also
-use an interface identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
+:class:`~django_typer.management.TyperCommand` is a drop in extension to BaseCommand_. All of the
+documented features of BaseCommand_ work the same way! Or, you may also use an interface identical
+to Typer_'s. Simply import Typer_ from django_typer instead of typer.
 
 .. tabs::
 

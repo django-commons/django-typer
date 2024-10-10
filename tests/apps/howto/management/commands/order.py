@@ -1,9 +1,10 @@
+import typing as t
 from django_typer.management import TyperCommand, DTGroup, command, group
 from click import Context
 
 
 class ReverseAlphaCommands(DTGroup):
-    def list_commands(self, ctx: Context) -> list[str]:
+    def list_commands(self, ctx: Context) -> t.List[str]:
         return list(sorted(self.commands.keys(), reverse=True))
 
 

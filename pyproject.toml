@@ -34,7 +34,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -57,7 +56,7 @@ classifiers = [
 
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
 click = "^8.1.0"
 
@@ -72,7 +71,7 @@ rich = { version = ">=10.11.0,<14.0.0", optional = true }
 
 shellingham = ">=1.5.4"
 
-# we need this on 3.8 for Annotated types and 3.9 for ParamSpec
+# we need this on 3.9 for ParamSpec
 typing-extensions = { version = ">=3.7.4.3", markers = "python_version < '3.10'" }
 
 

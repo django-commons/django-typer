@@ -1,11 +1,4 @@
-import sys
-
 from django_typer.management import TyperCommand
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 import typing as t
 from enum import Enum
@@ -25,9 +18,11 @@ class Command(TyperCommand):
 
     def handle(
         self,
-        settings: Annotated[Path, Argument(help="Override default settings argument.")],
-        optional_arg: Annotated[int, Argument(help="An optional argument.")] = 0,
-        version: Annotated[
+        settings: t.Annotated[
+            Path, Argument(help="Override default settings argument.")
+        ],
+        optional_arg: t.Annotated[int, Argument(help="An optional argument.")] = 0,
+        version: t.Annotated[
             t.Optional[VersionEnum],
             Option("--version", help="Override default version argument."),
         ] = None,

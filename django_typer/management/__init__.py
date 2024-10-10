@@ -775,11 +775,6 @@ class AppFactory(type):
             else:
                 return Typer(**kwargs)
 
-        if sys.version_info < (3, 9):
-            # this is a workaround for a bug in python 3.8 that causes multiple
-            # values for cls error. 3.8 support is sun setting soon so we just punt
-            # on this one - REMOVE when 3.8 support is dropped
-            kwargs.pop("cls", None)
         return super().__call__(*args, **kwargs)
 
 
@@ -1875,7 +1870,7 @@ class TyperCommandMeta(type):
         bases,
         attrs,
         name: t.Optional[str] = Default(None),
-        # cls: t.Optional[t.Type[DTGroup]] = DTGroup,
+        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1941,7 +1936,7 @@ class TyperCommandMeta(type):
 
             typer_app = Typer(
                 name=name or attrs.get("__module__", "").rsplit(".", maxsplit=1)[-1],
-                cls=kwargs.pop("cls", DTGroup),
+                cls=cls,
                 help=help or attr_help,  # pyright: ignore[reportArgumentType]
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,

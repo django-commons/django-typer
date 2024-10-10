@@ -1,10 +1,4 @@
-import sys
 import typing as t
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
@@ -37,13 +31,13 @@ class Command(TyperCommand):
     @math.command()
     def multiply(
         self,
-        number1: Annotated[
+        number1: t.Annotated[
             float, Argument(help=_("The first number."), show_default=False)
         ],
-        number2: Annotated[
+        number2: t.Annotated[
             float, Argument(help=_("The second number."), show_default=False)
         ],
-        numbers: Annotated[
+        numbers: t.Annotated[
             t.List[float],
             Argument(
                 help=_("The list of numbers to multiply: n1*n2*n3*...*nN. "),
@@ -63,13 +57,13 @@ class Command(TyperCommand):
     @math.command()
     def divide(
         self,
-        number1: Annotated[
+        number1: t.Annotated[
             float, Argument(help=_("The numerator."), show_default=False)
         ],
-        number2: Annotated[
+        number2: t.Annotated[
             float, Argument(help=_("The denominator."), show_default=False)
         ],
-        numbers: Annotated[
+        numbers: t.Annotated[
             t.List[float],
             Argument(
                 help=_("Additional denominators: n1/n2/n3/.../nN."), show_default=False
@@ -88,7 +82,7 @@ class Command(TyperCommand):
     @group()
     def string(
         self,
-        string: Annotated[
+        string: t.Annotated[
             str, Argument(help=_("The string to operate on."), show_default=False)
         ],
     ):
@@ -108,10 +102,10 @@ class Command(TyperCommand):
     @case.command()
     def upper(
         self,
-        begin: Annotated[
+        begin: t.Annotated[
             int, Argument(help=_("The starting index of the string to operate on."))
         ] = 0,
-        end: Annotated[
+        end: t.Annotated[
             t.Optional[int],
             Argument(help=_("The ending index of the string to operate on.")),
         ] = None,
@@ -125,10 +119,10 @@ class Command(TyperCommand):
     @case.command()
     def lower(
         self,
-        begin: Annotated[
+        begin: t.Annotated[
             int, Option(help=_("The starting index of the string to operate on."))
         ] = 0,
-        end: Annotated[
+        end: t.Annotated[
             t.Optional[int],
             Option(help=_("The ending index of the string to operate on.")),
         ] = None,

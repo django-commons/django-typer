@@ -6,12 +6,7 @@ Common types for command line argument specification.
 
 import sys
 from pathlib import Path
-from typing import Optional, cast
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
+from typing import Annotated, Optional, cast
 
 from django.core.management import CommandError
 from django.utils.translation import gettext_lazy as _
