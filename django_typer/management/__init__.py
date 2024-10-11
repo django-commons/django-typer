@@ -588,6 +588,10 @@ class DTCommand(DjangoTyperMixin, CoreTyperCommand):
             @command(cls=CustomCommand)
             def handle(self):
                 ...
+
+
+    See `click commands api <https://click.palletsprojects.com/en/latest/api/#commands>`_
+    for more information.
     """
 
 
@@ -610,6 +614,10 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
             @group(cls=CustomGroup)
             def grp(self):
                 ...
+
+    See `click docs on custom groups <https://click.palletsprojects.com/en/latest/commands/#custom-groups>`_
+    and `advanced patterns <https://click.palletsprojects.com/en/latest/advanced/>`_ for more
+    information.
     """
 
     def list_commands(self, ctx: click.Context) -> t.List[str]:

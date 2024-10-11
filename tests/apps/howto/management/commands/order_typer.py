@@ -1,21 +1,17 @@
 from django_typer.management import Typer, DTGroup
 from click import Context
+import typing as t
 
 
-class ReverseAlphaCommands(DTGroup):
-    def list_commands(self, ctx: Context) -> list[str]:
-        return list(sorted(self.commands.keys(), reverse=True))
+class AlphabetizeCommands(DTGroup):
+    def list_commands(self, ctx: Context) -> t.List[str]:
+        return list(sorted(self.commands.keys()))
 
 
-app = Typer(cls=ReverseAlphaCommands)
+app = Typer(cls=AlphabetizeCommands)
 
-d_app = Typer(cls=ReverseAlphaCommands)
+d_app = Typer(cls=AlphabetizeCommands)
 app.add_typer(d_app)
-
-
-@app.command()
-def a():
-    print("a")
 
 
 @app.command()
@@ -24,13 +20,18 @@ def b():
 
 
 @app.command()
-def c():
-    print("c")
+def a():
+    print("a")
 
 
-@d_app.callback(cls=ReverseAlphaCommands)
+@d_app.callback()
 def d():
     print("d")
+
+
+@d_app.command()
+def f():
+    print("f")
 
 
 @d_app.command()
@@ -38,6 +39,6 @@ def e():
     print("e")
 
 
-@d_app.command()
-def f():
-    print("f")
+@app.command()
+def c():
+    print("c")

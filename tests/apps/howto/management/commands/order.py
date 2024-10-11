@@ -3,32 +3,32 @@ from django_typer.management import TyperCommand, DTGroup, command, group
 from click import Context
 
 
-class ReverseAlphaCommands(DTGroup):
+class AlphabetizeCommands(DTGroup):
     def list_commands(self, ctx: Context) -> t.List[str]:
-        return list(sorted(self.commands.keys(), reverse=True))
+        return list(sorted(self.commands.keys()))
 
 
-class Command(TyperCommand, cls=ReverseAlphaCommands):
-    @command()
-    def a(self):
-        print("a")
-
+class Command(TyperCommand, cls=AlphabetizeCommands):
     @command()
     def b(self):
         print("b")
 
     @command()
-    def c(self):
-        print("c")
+    def a(self):
+        print("a")
 
-    @group(cls=ReverseAlphaCommands)
+    @group(cls=AlphabetizeCommands)
     def d(self):
         print("d")
+
+    @d.command()
+    def f(self):
+        print("f")
 
     @d.command()
     def e(self):
         print("e")
 
-    @d.command()
-    def f(self):
-        print("f")
+    @command()
+    def c(self):
+        print("c")

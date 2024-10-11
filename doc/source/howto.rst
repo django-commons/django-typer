@@ -650,7 +650,43 @@ value:
         Docstring will be used as help.
         """
 
+Order Commands in Help Text
+---------------------------
 
+**By default commands are listed in the order they appear in the class**. You can override
+this by
+`using a custom click group <https://click.palletsprojects.com/en/latest/commands/#custom-groups>`_.
+
+For example, to change the order of commands to be in reverse alphabetical order you could define
+a custom group and override the ``list_commands`` method. Custom group and command classes may be
+provided like below, but they must extend from django-typer's classes:
+
+* For groups: :class:`~django_typer.management.DTGroup`
+* For commands: :class:`~django_typer.management.DTCommand`
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/order.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/order_typer.py
+
+.. tabs::
+
+    .. tab:: Default Order
+
+        .. typer:: tests.apps.howto.management.commands.order_default.Command:typer_app
+            :prog: ./manage.py order
+            :width: 80
+
+    .. tab:: Alphabetized
+
+        .. typer:: tests.apps.howto.management.commands.order.Command:typer_app
+            :prog: ./manage.py order
+            :width: 80
 
 Document Commands w/Sphinx
 --------------------------

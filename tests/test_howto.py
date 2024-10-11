@@ -313,9 +313,9 @@ class TestPrintingTyperHowto(TestPrintingHowto):
 class TestOrderHowTo(TestCase):
     cmd = "order"
 
-    from tests.apps.howto.management.commands.order import ReverseAlphaCommands
+    from tests.apps.howto.management.commands.order import AlphabetizeCommands
 
-    grp_cls = ReverseAlphaCommands
+    grp_cls = AlphabetizeCommands
 
     def test_howto_order(self):
         from tests.apps.howto.management.commands.order import Command as OrderCommand
@@ -331,18 +331,18 @@ class TestOrderHowTo(TestCase):
 
         if rich_installed:
             self.assertTrue(
-                hlp.index("│ d")
-                < hlp.index("│ c")
+                hlp.index("│ a")
                 < hlp.index("│ b")
-                < hlp.index("│ a")
+                < hlp.index("│ c")
+                < hlp.index("│ d")
             )
         else:
             cmd_idx = hlp.index("Commands")
             self.assertTrue(
-                hlp.index(" d", cmd_idx)
-                < hlp.index(" c", cmd_idx)
+                hlp.index(" a", cmd_idx)
                 < hlp.index(" b", cmd_idx)
-                < hlp.index(" a", cmd_idx)
+                < hlp.index(" c", cmd_idx)
+                < hlp.index(" d", cmd_idx)
             )
 
         buffer.seek(0)
@@ -352,15 +352,15 @@ class TestOrderHowTo(TestCase):
         hlp = buffer.getvalue()
 
         if rich_installed:
-            self.assertTrue(hlp.index("│ f") < hlp.index("│ e"))
+            self.assertTrue(hlp.index("│ e") < hlp.index("│ f"))
         else:
             cmd_idx = hlp.index("Commands")
-            self.assertTrue(hlp.index(" f", cmd_idx) < hlp.index(" e", cmd_idx))
+            self.assertTrue(hlp.index(" e", cmd_idx) < hlp.index(" f", cmd_idx))
 
 
 class TestPrintingTyperHowto(TestOrderHowTo):
     cmd = "order_typer"
 
-    from tests.apps.howto.management.commands.order_typer import ReverseAlphaCommands
+    from tests.apps.howto.management.commands.order_typer import AlphabetizeCommands
 
-    grp_cls = ReverseAlphaCommands
+    grp_cls = AlphabetizeCommands

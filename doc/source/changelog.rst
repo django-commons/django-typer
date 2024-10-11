@@ -12,6 +12,7 @@ v2.2.3 (2024-10-xx)
 * Completed `Open up vulnerability reporting and add security policy. <https://github.com/django-commons/django-typer/issues/124>`_
 * Completed `Move architecture in docs to ARCHITECTURE.md <https://github.com/django-commons/django-typer/issues/121>`_
 * Completed `Transfer to django-commons <https://github.com/django-commons/django-typer/issues/117>`_
+* Completed `Add howto for how to change the display order of commands in help. <https://github.com/django-commons/django-typer/issues/116>`_
 
 v2.2.2 (2024-08-25)
 ====================
