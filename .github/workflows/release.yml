@@ -104,7 +104,7 @@ jobs:
         gh release create
         '${{ github.ref_name }}'
         --repo '${{ github.repository }}'
-        --notes ""
+        --generate-notes
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -141,3 +141,13 @@ jobs:
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
+
+  notify-django-packages:
+    name: Notify Django Packages
+    runs-on: ubuntu-latest
+    needs:
+    - publish-to-pypi
+    steps:
+    - name: Notify Django Packages
+      run:
+        curl -X GET "https://djangopackages.org/packages/django-typer/fetch-data/"
