@@ -1121,10 +1121,10 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         *,
         name: t.Optional[str] = Default(None),
         cls: t.Type[DTGroup] = Default(DTGroup),
-        invoke_without_command: t.Union[bool, DefaultPlaceholder] = Default(False),
-        no_args_is_help: t.Union[bool, DefaultPlaceholder] = Default(False),
+        invoke_without_command: bool = Default(False),
+        no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
-        chain: t.Union[bool, DefaultPlaceholder] = Default(False),
+        chain: bool = Default(False),
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
@@ -1133,9 +1133,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
-        add_help_option: t.Union[bool, DefaultPlaceholder] = Default(True),
-        hidden: t.Union[bool, DefaultPlaceholder] = Default(False),
-        deprecated: t.Union[bool, DefaultPlaceholder] = Default(False),
+        add_help_option: bool = Default(True),
+        hidden: bool = Default(False),
+        deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,
@@ -1143,67 +1143,37 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
 
-        # there is some disconnect between how typer resolves these parameters when used
-        # natively and how they're resolved when used in the django-typer interface. The
-        # typer interface uses the info object as a fallback for default parameters without
-        # manually doing the check in add_typer, but we have to do it here to make this work
-        # with the django-typer interface. Not sure why.
+        assert cls  # cls must be interface compatible with DTGroup
+
+        group_class = (
+            type(
+                "_DTGroup",
+                (cls,),
+                {"django_command": self.django_command},
+            )
+            if not isinstance(cls, DefaultPlaceholder)
+            else typer_instance.info.cls
+        )
+
         return super().add_typer(
             typer_instance=typer_instance,
-            name=name
-            if not isinstance(name, DefaultPlaceholder)
-            else typer_instance.info.name,
-            cls=type("_DTGroup", (cls,), {"django_command": self.django_command})
-            if not isinstance(cls, DefaultPlaceholder)
-            else typer_instance.info.cls,
-            invoke_without_command=invoke_without_command
-            if not isinstance(invoke_without_command, DefaultPlaceholder)
-            else typer_instance.info.invoke_without_command,
-            no_args_is_help=no_args_is_help
-            if not isinstance(no_args_is_help, DefaultPlaceholder)
-            else typer_instance.info.no_args_is_help,
-            subcommand_metavar=subcommand_metavar
-            if not isinstance(subcommand_metavar, DefaultPlaceholder)
-            else typer_instance.info.subcommand_metavar,
-            chain=chain
-            if not isinstance(chain, DefaultPlaceholder)
-            else typer_instance.info.chain,
-            result_callback=result_callback
-            if not isinstance(result_callback, DefaultPlaceholder)
-            else typer_instance.info.result_callback,
-            context_settings=context_settings
-            if not isinstance(context_settings, DefaultPlaceholder)
-            else typer_instance.info.context_settings,
-            callback=_strip_static(callback)
-            if not isinstance(callback, DefaultPlaceholder)
-            else typer_instance.info.callback,
-            help=t.cast(str, help)
-            if not isinstance(help, DefaultPlaceholder)
-            else typer_instance.info.help,
-            epilog=epilog
-            if not isinstance(epilog, DefaultPlaceholder)
-            else typer_instance.info.epilog,
-            short_help=t.cast(
-                str,
-                short_help
-                if not isinstance(short_help, DefaultPlaceholder)
-                else typer_instance.info.short_help,
-            ),
-            options_metavar=options_metavar
-            if not isinstance(options_metavar, DefaultPlaceholder)
-            else typer_instance.info.options_metavar,
-            add_help_option=add_help_option
-            if not isinstance(add_help_option, DefaultPlaceholder)
-            else typer_instance.info.add_help_option,
-            hidden=hidden
-            if not isinstance(hidden, DefaultPlaceholder)
-            else typer_instance.info.hidden,
-            deprecated=deprecated
-            if not isinstance(deprecated, DefaultPlaceholder)
-            else typer_instance.info.deprecated,
-            rich_help_panel=rich_help_panel
-            if not isinstance(rich_help_panel, DefaultPlaceholder)
-            else typer_instance.info.rich_help_panel,
+            name=name,
+            cls=group_class,
+            invoke_without_command=invoke_without_command,
+            no_args_is_help=no_args_is_help,
+            subcommand_metavar=subcommand_metavar,
+            chain=chain,
+            result_callback=result_callback,
+            context_settings=context_settings,
+            callback=_strip_static(callback),
+            help=t.cast(str, help),
+            epilog=epilog,
+            short_help=t.cast(str, short_help),
+            options_metavar=options_metavar,
+            add_help_option=add_help_option,
+            hidden=hidden,
+            deprecated=deprecated,
+            rich_help_panel=rich_help_panel,
             **kwargs,
         )
 
