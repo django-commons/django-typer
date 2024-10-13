@@ -5,10 +5,6 @@ from django.conf import settings
 
 from django_typer.management import TyperCommand, initialize
 
-if sys.version_info < (3, 9):
-    pass
-else:
-    pass
 
 COMMAND_TMPL = """
 def {routine}(self, {flag_args}):

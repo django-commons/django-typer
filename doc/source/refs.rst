@@ -17,3 +17,5 @@
 .. _Options: https://typer.tiangolo.com/tutorial/options/
 .. _call_command: https://docs.djangoproject.com/en/5.0/ref/django-admin/#running-management-commands-from-your-code
 .. _sphinxcontrib-typer: https://pypi.org/project/sphinxcontrib-typer/
+.. _pluggy: https://pluggy.readthedocs.io/
+.. _CLI: https://en.wikipedia.org/wiki/Command-line_interface

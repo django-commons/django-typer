@@ -2,7 +2,7 @@
 Change Log
 ==========
 
-v2.2.3 (2024-10-xx)
+v2.3.0 (2024-10-xx)
 ===================
 
 * Implemented `Drop python 3.8 support. <https://github.com/django-commons/django-typer/issues/130>`_
@@ -10,6 +10,7 @@ v2.2.3 (2024-10-xx)
 * Fixed `Overriding the command group class does not work. <https://github.com/django-commons/django-typer/issues/128>`_
 * Completed `Add project to test PyPI <https://github.com/django-commons/django-typer/issues/126>`_
 * Completed `Open up vulnerability reporting and add security policy. <https://github.com/django-commons/django-typer/issues/124>`_
+* Completed `Add example of custom plugin logic to plugins tutorial. <https://github.com/django-commons/django-typer/issues/122>`_
 * Completed `Move architecture in docs to ARCHITECTURE.md <https://github.com/django-commons/django-typer/issues/121>`_
 * Completed `Transfer to django-commons <https://github.com/django-commons/django-typer/issues/117>`_
 * Completed `Add howto for how to change the display order of commands in help. <https://github.com/django-commons/django-typer/issues/116>`_

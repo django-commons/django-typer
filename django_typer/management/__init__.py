@@ -1951,6 +1951,7 @@ class TyperCommandMeta(type):
                         attr_help = base.help
 
             def command_bases() -> t.Generator[t.Type[TyperCommand], None, None]:
+                # the mro is not yet resolved so we have to do it manually
                 seen = set()
                 for first_level in reversed(bases):
                     for base in reversed(first_level.__mro__):

@@ -12,6 +12,10 @@ from django_typer import completers
 
 app = Typer()
 
+# these two lines are not necessary but will make your type checker happy
+assert app.django_command
+Command = app.django_command
+
 Command.suppressed_base_arguments = {"verbosity", "skip_checks"}
 Command.requires_migrations_checks = False
 Command.requires_system_checks = []
