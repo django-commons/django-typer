@@ -483,7 +483,7 @@ backup their own files. Let's:
             :caption: backup_files/management/commands/backup.py
             :linenos:
             :replace:
-                tests.apps.examples.plugins.media1: media 
+                tests.apps.examples.plugins.media1: media
 
     .. tab:: Typer-style
 
