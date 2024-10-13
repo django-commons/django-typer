@@ -682,10 +682,18 @@ like below, but they must extend from django-typer's classes:
             :prog: ./manage.py order
             :width: 80
 
+        .. typer:: tests.apps.howto.management.commands.order_default.Command:typer_app:d
+            :prog: ./manage.py order d
+            :width: 80
+
     .. tab:: Alphabetized
 
         .. typer:: tests.apps.howto.management.commands.order.Command:typer_app
             :prog: ./manage.py order
+            :width: 80
+
+        .. typer:: tests.apps.howto.management.commands.order.Command:typer_app:d
+            :prog: ./manage.py order d
             :width: 80
 
 Document Commands w/Sphinx
