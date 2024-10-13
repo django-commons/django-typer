@@ -8,7 +8,7 @@ Django Typer
 Use static typing to define the CLI for your Django_ management commands with Typer_. Optionally
 use the provided :class:`~django_typer.management.TyperCommand` class that inherits from
 BaseCommand_. This class maps the Typer_ interface onto a class based interface that Django
-developers will be familiar with. All of the BaseCommand_ functionality is preserved, so that
+developers will be familiar with. All of the BaseCommand_ functionality is inherited, so that
 :class:`~django_typer.management.TyperCommand` can be a drop in replacement.
 
 **django-typer makes it easy to:**

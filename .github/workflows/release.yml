@@ -77,8 +77,6 @@ jobs:
   github-release:
     name: Publish GitHub Release
     if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.github == 'true') || github.event_name != 'workflow_dispatch' }}
-    needs:
-    - publish-to-pypi
     runs-on: ubuntu-latest
 
     permissions:
@@ -142,12 +140,13 @@ jobs:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
 
-  notify-django-packages:
-    name: Notify Django Packages
-    runs-on: ubuntu-latest
-    needs:
-    - publish-to-pypi
-    steps:
-    - name: Notify Django Packages
-      run:
-        curl -X GET "https://djangopackages.org/packages/django-typer/fetch-data/"
+  # TODO fetch-data requires login
+  # notify-django-packages:
+  #   name: Notify Django Packages
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - publish-to-pypi
+  #   steps:
+  #     - name: Notify Django Packages
+  #       run:
+  #         curl -X GET "https://djangopackages.org/packages/django-typer/fetch-data/"
