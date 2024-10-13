@@ -5,6 +5,7 @@ Change Log
 v2.3.0 (2024-10-xx)
 ===================
 
+* Fixed `Inheritance more than one level deep of TyperCommands does not work. <https://github.com/django-commons/django-typer/issues/131>`_
 * Implemented `Drop python 3.8 support. <https://github.com/django-commons/django-typer/issues/130>`_
 * Implemented `Command help order should respect definition order for class based commands. <https://github.com/django-commons/django-typer/issues/129>`_
 * Fixed `Overriding the command group class does not work. <https://github.com/django-commons/django-typer/issues/128>`_
