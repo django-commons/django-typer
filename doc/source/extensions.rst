@@ -7,8 +7,8 @@ Tutorial: Inheritance & Plugins
 ===============================
 
 Adding to, or altering the behavior of, commands from upstream Django_ apps is a common use case.
-Doing so allows you to keep your CLI_ stable while adding additional behaviors through your site's
-configuration settings files. There are three main extension patterns you may wish to employ:
+Doing so allows you to keep your CLI_ stable while adding additional behaviors by installing new
+apps in ``INSTALLED_APPS``. There are three main extension patterns you may wish to employ:
 
     1. Override the behavior of a command in an upstream app.
     2. Add additional subcommands or groups to a command in an upstream app.
