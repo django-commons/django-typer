@@ -1,13 +1,7 @@
-import sys
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
-
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
+import typing as t
 
 from django_typer.management import command, group, initialize
 from django_typer import types
@@ -38,7 +32,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
     def echo(
         self,
         message: str,
-        echoes: Annotated[
+        echoes: t.Annotated[
             int, Argument(help="Number of times to echo the message.")
         ] = 1,
     ):
@@ -62,7 +56,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
 
     @group()
     def setting(
-        self, setting: Annotated[str, Argument(help=_("The setting variable name."))]
+        self, setting: t.Annotated[str, Argument(help=_("The setting variable name."))]
     ):
         """
         Get or set Django settings.
@@ -73,7 +67,7 @@ class Command(GroupsCommand, epilog="Overridden from test_app."):
     @setting.command()
     def print(
         self,
-        safe: Annotated[bool, Option(help=_("Do not assume the setting exists."))],
+        safe: t.Annotated[bool, Option(help=_("Do not assume the setting exists."))],
     ):
         """
         Print the setting value.

@@ -163,3 +163,4 @@ poetry.lock
 .vscode
 django_typer/tests/dj_params.json
 **/.DS_Store
+.ruff_cache

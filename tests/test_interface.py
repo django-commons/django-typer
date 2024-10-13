@@ -28,7 +28,7 @@ class InterfaceTests(TestCase):
         if "cls" in params:
             params.remove(
                 "cls"
-            )  # cls default is always purposefully overriden in django-typer interfaces
+            )  # cls default is always purposefully overridden in django-typer interfaces
         # sanity
         self.assertGreater(len(params), 0)
         dt_defaults = get_named_defaults(dt_function)
@@ -149,7 +149,6 @@ class InterfaceTests(TestCase):
         typer_command_params = set(get_named_arguments(TyperCommandMeta.__new__))
         typer_params = set(get_named_arguments(typer.Typer.__init__))
         typer_params.remove("add_completion")
-        typer_params.remove("cls")
         self.assertFalse(typer_command_params.symmetric_difference(typer_params))
 
         typer_command_params.remove("pretty_exceptions_enable")

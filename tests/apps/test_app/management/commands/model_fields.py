@@ -1,11 +1,7 @@
 import json
 import sys
 import typing as t
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
+from typing import Annotated
 
 
 import typer

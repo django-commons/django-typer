@@ -1,14 +1,9 @@
-import sys
-
 from django_typer.management import group, initialize
 from django_typer import types
 
 from .interference import Command as Interference
 
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
+from typing import Annotated
 
 import typer
 

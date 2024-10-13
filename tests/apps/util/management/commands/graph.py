@@ -1,6 +1,5 @@
 import importlib
 import inspect
-import sys
 import typing as t
 
 import typer.core
@@ -9,11 +8,6 @@ from django.core.management.base import CommandError
 
 from django_typer.management import Typer, TyperCommand, get_command
 from django_typer import completers, parsers, utils
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 from pathlib import Path
 
@@ -59,7 +53,7 @@ class Command(TyperCommand):
 
     def handle(
         self,
-        commands: Annotated[
+        commands: t.Annotated[
             t.List[str],
             typer.Argument(
                 help="Import path(s) to the command to graph, or simply the name of the command.",
@@ -70,7 +64,7 @@ class Command(TyperCommand):
                 ),
             ),
         ],
-        output: Annotated[
+        output: t.Annotated[
             Path,
             typer.Option(
                 "-o",
@@ -79,7 +73,7 @@ class Command(TyperCommand):
                 shell_complete=completers.complete_path,
             ),
         ] = Path("{command}_app_tree"),
-        format: Annotated[
+        format: t.Annotated[
             Format,
             typer.Option(
                 "-f",
@@ -88,14 +82,14 @@ class Command(TyperCommand):
                 shell_complete=completers.these_strings(list(Format)),
             ),
         ] = Format.png,
-        show_ids: Annotated[
+        show_ids: t.Annotated[
             bool, typer.Option(help="Show the object identifiers.")
         ] = show_ids,
-        instantiate: Annotated[
+        instantiate: t.Annotated[
             bool,
             typer.Option(help="Instantiate the command before graphing the app tree."),
         ] = True,
-        load_order: Annotated[
+        load_order: t.Annotated[
             t.List[AppConfig],
             typer.Option(
                 "-l",

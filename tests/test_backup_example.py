@@ -12,7 +12,6 @@ from tests.utils import run_command
 BACKUP_DIRECTORY = Path(__file__).parent / "_test_archive"
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
 class TestBackupExample(SimpleTestCase):
     databases = {"default"}
 
@@ -116,7 +115,39 @@ class TestBackupExample(SimpleTestCase):
         self.assertTrue((BACKUP_DIRECTORY / "requirements.txt").exists())
         self.assertTrue(len(os.listdir(BACKUP_DIRECTORY)) == 3)
 
+    def test_backup_pluggy(self):
+        stdout, stderr, retcode = run_command(
+            f"backup{self.typer}",
+            "--no-color",
+            "--settings",
+            "tests.settings.backup_pluggy",
+            "list",
+        )
+        self.assertEqual(retcode, 0, msg=stderr)
+        lines = [line.strip() for line in stdout.strip().splitlines()[1:]]
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(
+            "database(filename={database}.json, databases=['default'])" in lines
+        )
+        self.assertTrue("media(filename=media.tar.gz)" in lines)
+        self.assertTrue("files()" in lines)
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
+        stdout, stderr, retcode = run_command(
+            f"backup{self.typer}",
+            "--settings",
+            "tests.settings.backup_pluggy",
+            "-o",
+            str(BACKUP_DIRECTORY),
+        )
+        self.assertEqual(retcode, 0, msg=stderr)
+        self.assertTrue(BACKUP_DIRECTORY.exists())
+        self.assertTrue((BACKUP_DIRECTORY / "default.json").exists())
+        self.assertTrue((BACKUP_DIRECTORY / "media.tar.gz").exists())
+        self.assertTrue(len(os.listdir(BACKUP_DIRECTORY)) == 2)
+
+        self.assertTrue("files1.tar.gz" in stdout)
+        self.assertTrue("files2.zip" in stdout)
+
+
 class TestBackupTyperExample(TestBackupExample):
     typer = "_typer"

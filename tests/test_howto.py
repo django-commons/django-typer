@@ -307,3 +307,60 @@ class TestPrintingHowto(TestCase):
 
 class TestPrintingTyperHowto(TestPrintingHowto):
     cmd = "printing_typer"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestOrderHowTo(TestCase):
+    cmd = "order"
+
+    from tests.apps.howto.management.commands.order import AlphabetizeCommands
+
+    grp_cls = AlphabetizeCommands
+
+    def test_howto_order(self):
+        from tests.apps.howto.management.commands.order import Command as OrderCommand
+
+        buffer = StringIO()
+        order_cmd = get_command(self.cmd, OrderCommand, stdout=buffer, no_color=True)
+
+        self.assertTrue(issubclass(order_cmd.typer_app.info.cls, self.grp_cls))
+        self.assertTrue(issubclass(order_cmd.d.info.cls, self.grp_cls))
+
+        order_cmd.print_help("./manage.py", self.cmd)
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(
+                hlp.index("│ a")
+                < hlp.index("│ b")
+                < hlp.index("│ c")
+                < hlp.index("│ d")
+            )
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(
+                hlp.index(" a", cmd_idx)
+                < hlp.index(" b", cmd_idx)
+                < hlp.index(" c", cmd_idx)
+                < hlp.index(" d", cmd_idx)
+            )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        order_cmd.print_help("./manage.py", self.cmd, "d")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(hlp.index("│ e") < hlp.index("│ f"))
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(hlp.index(" e", cmd_idx) < hlp.index(" f", cmd_idx))
+
+
+class TestPrintingTyperHowto(TestOrderHowTo):
+    cmd = "order_typer"
+
+    from tests.apps.howto.management.commands.order_typer import AlphabetizeCommands
+
+    grp_cls = AlphabetizeCommands

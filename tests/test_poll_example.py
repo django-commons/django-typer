@@ -19,7 +19,6 @@ SHELLS = [
 ]
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python 3.9+")
 class TestPollExample(SimpleTestCase):
     q1 = None
     q2 = None
@@ -115,6 +114,5 @@ class TestPollExample(SimpleTestCase):
         self.assertTrue("Successfully closed poll" in result[0])
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python 3.9+")
 class TestPollExampleTyper(SimpleTestCase):
     typer = "_typer"

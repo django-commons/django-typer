@@ -1,10 +1,4 @@
-import sys
 import typing as t
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
 
 from typer import Option
 
@@ -17,14 +11,14 @@ class Command(TyperCommand):
 
     def handle(
         self,
-        polls: Annotated[
+        polls: t.Annotated[
             t.List[Poll],
             Option(
                 **model_parser_completer(Poll, help_field="question_text"),
                 metavar="POLL",
             ),
         ],
-        delete: Annotated[
+        delete: t.Annotated[
             bool, Option(help="Delete poll instead of closing it.")
         ] = False,
     ):

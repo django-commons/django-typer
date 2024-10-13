@@ -588,6 +588,10 @@ class DTCommand(DjangoTyperMixin, CoreTyperCommand):
             @command(cls=CustomCommand)
             def handle(self):
                 ...
+
+
+    See `click commands api <https://click.palletsprojects.com/en/latest/api/#commands>`_
+    for more information.
     """
 
 
@@ -610,7 +614,23 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
             @group(cls=CustomGroup)
             def grp(self):
                 ...
+
+    See `click docs on custom groups <https://click.palletsprojects.com/en/latest/commands/#custom-groups>`_
+    and `advanced patterns <https://click.palletsprojects.com/en/latest/advanced/>`_ for more
+    information.
     """
+
+    def list_commands(self, ctx: click.Context) -> t.List[str]:
+        """
+        Do our best to list commands in definition order.
+        """
+        cmds = list(self.commands.keys())
+        ordered = []
+        for defined in getattr(self.django_command, "_defined_order", []):
+            if defined in cmds:
+                ordered.append(defined)
+                cmds.remove(defined)
+        return ordered + cmds
 
 
 # staticmethod objects are not picklable which causes problems with deepcopy
@@ -763,11 +783,6 @@ class AppFactory(type):
             else:
                 return Typer(**kwargs)
 
-        if sys.version_info < (3, 9):
-            # this is a workaround for a bug in python 3.8 that causes multiple
-            # values for cls error. 3.8 support is sun setting soon so we just punt
-            # on this one - REMOVE when 3.8 support is dropped
-            kwargs.pop("cls", None)
         return super().__call__(*args, **kwargs)
 
 
@@ -847,7 +862,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     # todo - this results in type hinting expecting self to be passed explicitly
     # when this is called as a callable
-    # https://github.com/bckohan/django-typer/issues/73
+    # https://github.com/django-commons/django-typer/issues/73
     def __get__(self, obj, _=None) -> "Typer[P, R]":
         """
         Our Typer app wrapper also doubles as a descriptor, so when
@@ -916,6 +931,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         if callback:
             self.name = callback.__name__
             self.is_method = is_method(callback)
+
         super().__init__(
             name=name,
             cls=type(
@@ -1112,7 +1128,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         typer_instance: "Typer",
         *,
         name: t.Optional[str] = Default(None),
-        cls: t.Type[DTGroup] = DTGroup,
+        cls: t.Type[DTGroup] = Default(DTGroup),
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1135,10 +1151,22 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
 
+        assert cls  # cls must be interface compatible with DTGroup
+
+        group_class = (
+            type(
+                "_DTGroup",
+                (cls,),
+                {"django_command": self.django_command},
+            )
+            if not isinstance(cls, DefaultPlaceholder)
+            else typer_instance.info.cls
+        )
+
         return super().add_typer(
             typer_instance=typer_instance,
             name=name,
-            cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
+            cls=group_class,
             invoke_without_command=invoke_without_command,
             no_args_is_help=no_args_is_help,
             subcommand_metavar=subcommand_metavar,
@@ -1663,9 +1691,9 @@ def _add_common_initializer(
     """
     if cmd.is_compound_command and not cmd.typer_app.registered_callback:
         cmd.typer_app.callback(
-            cls=type(
+            cls=type(  # pyright: ignore[reportArgumentType]
                 "_Initializer",
-                (DTGroup,),
+                (cmd.typer_app.info.cls or DTGroup,),
                 {
                     "django_command": cmd,
                     "_callback_is_method": False,
@@ -1863,7 +1891,7 @@ class TyperCommandMeta(type):
         bases,
         attrs,
         name: t.Optional[str] = Default(None),
-        # cls: t.Optional[t.Type[DTGroup]] = DTGroup,
+        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
         subcommand_metavar: t.Optional[str] = Default(None),
@@ -1923,13 +1951,18 @@ class TyperCommandMeta(type):
                         attr_help = base.help
 
             def command_bases() -> t.Generator[t.Type[TyperCommand], None, None]:
-                for base in reversed(bases):
-                    if issubclass(base, TyperCommand) and base is not TyperCommand:
-                        yield base
+                # the mro is not yet resolved so we have to do it manually
+                seen = set()
+                for first_level in reversed(bases):
+                    for base in reversed(first_level.__mro__):
+                        if issubclass(base, TyperCommand) and base is not TyperCommand:
+                            if base not in seen:
+                                seen.add(base)
+                                yield base
 
             typer_app = Typer(
                 name=name or attrs.get("__module__", "").rsplit(".", maxsplit=1)[-1],
-                cls=kwargs.pop("cls", DTGroup),
+                cls=cls,
                 help=help or attr_help,  # pyright: ignore[reportArgumentType]
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
@@ -1966,10 +1999,16 @@ class TyperCommandMeta(type):
             to_remove = []
             to_register = []
             local_handle = attrs.pop("handle", None)
+            defined_order = []
             for cmd_cls, cls_attrs in [
                 *[(base, vars(base)) for base in command_bases()],
                 (None, attrs),
             ]:
+                defined_order += [
+                    cmd
+                    for cmd in getattr(cmd_cls, "_defined_order", [])
+                    if cmd not in defined_order
+                ]
                 for name, attr in list(cls_attrs.items()):
                     if name == "_handle":
                         continue
@@ -1980,8 +2019,12 @@ class TyperCommandMeta(type):
                         assert name
                         to_remove.append(name)
                         _defined_groups[name] = attr
+                        if cmd_cls is None and name not in defined_order:
+                            defined_order.append(name)
                     elif register := get_ctor(attr):
                         to_register.append(register)
+                        if cmd_cls is None and name not in defined_order:
+                            defined_order.append(name)
 
                 handle = getattr(cmd_cls, "_handle", handle)
 
@@ -2002,6 +2045,7 @@ class TyperCommandMeta(type):
 
             if handle:
                 ctor = get_ctor(handle)
+                defined_order.insert(0, typer_app.info.name)
                 if ctor:
                     to_register.append(
                         lambda cmd_cls: ctor(
@@ -2019,6 +2063,7 @@ class TyperCommandMeta(type):
                     )
 
             attrs = {
+                "_defined_order": defined_order,
                 **attrs,
                 "_handle": handle,
                 "_to_register": to_register,
@@ -2034,20 +2079,20 @@ class TyperCommandMeta(type):
 
         return super().__new__(mcs, cls_name, bases, attrs)
 
-    def __init__(cls, cls_name, bases, attrs, **kwargs):
+    def __init__(self, cls_name, bases, attrs, **kwargs):
         """
         This method is called after a new class is created.
         """
-        cls = t.cast(t.Type["TyperCommand"], cls)
-        if getattr(cls, "typer_app", None):
-            cls.typer_app.django_command = cls
-            cls.typer_app.info.name = (
-                cls.typer_app.info.name or cls.__module__.rsplit(".", maxsplit=1)[-1]
+        self = t.cast(t.Type["TyperCommand"], self)
+        if getattr(self, "typer_app", None):
+            self.typer_app.django_command = self
+            self.typer_app.info.name = (
+                self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
             )
-            for cmd in getattr(cls, "_to_register", []):
-                cmd(cls)
+            for cmd in getattr(self, "_to_register", []):
+                cmd(self)
 
-            _add_common_initializer(cls)
+            _add_common_initializer(self)
 
         super().__init__(cls_name, bases, attrs, **kwargs)
 

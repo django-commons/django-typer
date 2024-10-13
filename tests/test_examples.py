@@ -317,9 +317,6 @@ class ExampleTests(TestCase):
             0.99,
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9), reason="Readme examples only run on python > 3.8"
-    )
     def test_multi(self):
         observed_help = run_command(
             "multi", "--settings", self.settings, "--no-color", "--help"
@@ -353,9 +350,6 @@ class ExampleTests(TestCase):
             0.99,
         )
 
-    @pytest.mark.skipif(
-        sys.version_info < (3, 9), reason="Readme examples only run on python > 3.8"
-    )
     def test_hierarchy(self):
         observed_help = run_command(
             "hierarchy", "--settings", self.settings, "--no-color", "--help"
@@ -456,9 +450,6 @@ class TyperExampleTests(ExampleTests):
     settings = "tests.settings.typer_examples"
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 9), reason="Readme examples only run on python > 3.8"
-)
 @override_settings(
     INSTALLED_APPS=[
         "tests.apps.examples.completers",

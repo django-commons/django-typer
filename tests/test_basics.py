@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from django_typer.management import TyperCommand, get_command
-from tests.utils import run_command
+from tests.utils import run_command, rich_installed
 from django_typer.utils import get_current_command
 
 
@@ -125,3 +125,112 @@ class BasicTests(TestCase):
         self.assertEqual(
             get_command("base")(*args, **kwargs), f"base({args}, {kwargs})"
         )
+
+    def test_cmd_help_order(self):
+        buffer = StringIO()
+        cmd = get_command("order", TyperCommand, stdout=buffer, no_color=True)
+
+        cmd.print_help("./manage.py", "order")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(
+                hlp.index("│ order")
+                < hlp.index("│ b")
+                < hlp.index("│ a")
+                < hlp.index("│ d")
+                < hlp.index("│ c")
+            )
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(
+                hlp.index(" order", cmd_idx)
+                < hlp.index(" b", cmd_idx)
+                < hlp.index(" a", cmd_idx)
+                < hlp.index(" d", cmd_idx)
+                < hlp.index(" c", cmd_idx)
+            )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd.print_help("./manage.py", "order", "d")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(hlp.index("│ g") < hlp.index("│ e") < hlp.index("│ f"))
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(
+                hlp.index(" g", cmd_idx)
+                < hlp.index(" e", cmd_idx)
+                < hlp.index(" f", cmd_idx)
+            )
+
+        cmd2 = get_command("order2", TyperCommand, stdout=buffer, no_color=True)
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(
+                hlp.index("│ order2")
+                < hlp.index("│ b")
+                < hlp.index("│ a ")
+                < hlp.index("│ d")
+                < hlp.index("│ c")
+                < hlp.index("│ bb")
+                < hlp.index("│ aa")
+            )
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(
+                hlp.index(" order2", cmd_idx)
+                < hlp.index(" b", cmd_idx)
+                < hlp.index(" a", cmd_idx)
+                < hlp.index(" d", cmd_idx)
+                < hlp.index(" c", cmd_idx)
+                < hlp.index(" bb", cmd_idx)
+                < hlp.index(" aa", cmd_idx)
+            )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2", "d")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(
+                hlp.index("│ g")
+                < hlp.index("│ e")
+                < hlp.index("│ f")
+                < hlp.index("│ i")
+                < hlp.index("│ h")
+                < hlp.index("│ x")
+            )
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(
+                hlp.index(" g", cmd_idx)
+                < hlp.index(" e", cmd_idx)
+                < hlp.index(" f", cmd_idx)
+                < hlp.index(" i", cmd_idx)
+                < hlp.index(" h", cmd_idx)
+                < hlp.index(" x", cmd_idx)
+            )
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        cmd2.print_help("./manage.py", "order2", "d", "x")
+        hlp = buffer.getvalue()
+
+        if rich_installed:
+            self.assertTrue(hlp.index("│ z") < hlp.index("│ y"))
+        else:
+            cmd_idx = hlp.index("Commands")
+            self.assertTrue(hlp.index(" z", cmd_idx) < hlp.index(" y", cmd_idx))

@@ -28,14 +28,8 @@ import io
 import os
 import sys
 import typing as t
-from pathlib import Path
-
-if sys.version_info < (3, 9):
-    from typing_extensions import Annotated
-else:
-    from typing import Annotated
-
 from functools import cached_property
+from pathlib import Path
 
 from click.parser import split_arg_string
 from click.shell_completion import (
@@ -270,7 +264,7 @@ class Command(TyperCommand):
     )
     def install(
         self,
-        shell: Annotated[
+        shell: t.Annotated[
             t.Optional[Shells],
             Argument(
                 help=t.cast(
@@ -278,7 +272,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = DETECTED_SHELL,
-        manage_script: Annotated[
+        manage_script: t.Annotated[
             t.Optional[str],
             Option(
                 help=t.cast(
@@ -290,7 +284,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = None,
-        fallback: Annotated[
+        fallback: t.Annotated[
             t.Optional[str],
             Option(
                 help=t.cast(
@@ -337,7 +331,7 @@ class Command(TyperCommand):
     )
     def remove(
         self,
-        shell: Annotated[
+        shell: t.Annotated[
             t.Optional[Shells],
             Argument(
                 help=t.cast(
@@ -346,7 +340,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = DETECTED_SHELL,
-        manage_script: Annotated[
+        manage_script: t.Annotated[
             t.Optional[str],
             Option(
                 help=t.cast(
@@ -444,7 +438,7 @@ class Command(TyperCommand):
     )
     def complete(
         self,
-        cmd_str: Annotated[
+        cmd_str: t.Annotated[
             t.Optional[str],
             Argument(
                 metavar="command",
@@ -453,7 +447,7 @@ class Command(TyperCommand):
                 ),
             ),
         ] = None,
-        shell: Annotated[
+        shell: t.Annotated[
             t.Optional[Shells],
             Option(
                 help=t.cast(
@@ -464,7 +458,7 @@ class Command(TyperCommand):
                 )
             ),
         ] = None,
-        fallback: Annotated[
+        fallback: t.Annotated[
             t.Optional[str],
             Option(
                 help=t.cast(

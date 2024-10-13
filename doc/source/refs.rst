@@ -1,6 +1,6 @@
 
 .. _Django: https://www.djangoproject.com/
-.. _GitHub: https://github.com/bckohan/django-typer
+.. _GitHub: https://github.com/django-commons/django-typer
 .. _PyPI: https://pypi.python.org/pypi/django-typer
 .. _Typer: https://typer.tiangolo.com/
 .. _click: https://click.palletsprojects.com/
@@ -13,8 +13,9 @@
 .. _fish: https://fishshell.com/
 .. _zsh: https://www.zsh.org/
 .. _bash: https://www.gnu.org/software/bash/
-.. _typing_extensions: https://pypi.org/project/typing-extensions/
 .. _Arguments: https://typer.tiangolo.com/tutorial/arguments/
 .. _Options: https://typer.tiangolo.com/tutorial/options/
 .. _call_command: https://docs.djangoproject.com/en/5.0/ref/django-admin/#running-management-commands-from-your-code
 .. _sphinxcontrib-typer: https://pypi.org/project/sphinxcontrib-typer/
+.. _pluggy: https://pluggy.readthedocs.io/
+.. _CLI: https://en.wikipedia.org/wiki/Command-line_interface

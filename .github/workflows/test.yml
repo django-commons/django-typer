@@ -1,4 +1,4 @@
-name: test
+name: Test
 
 on:
   push:
@@ -19,30 +19,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-rc.2']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
           - '5.0' # April 2025
           - '5.1' # December 2025
         exclude:
-          - python-version: '3.8'
-            django-version: '5.0'
           - python-version: '3.9'
             django-version: '5.0'
           - python-version: '3.11'
             django-version: '3.2'
           - python-version: '3.12'
             django-version: '3.2'
-          - python-version: '3.8'
-            django-version: '5.1'
           - python-version: '3.9'
             django-version: '5.1'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '3.2'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '4.2'
-          - python-version: '3.13.0-rc.2'
+          - python-version: '3.13'
             django-version: '5.0'
 
     steps:
@@ -57,9 +53,6 @@ jobs:
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
-    - name: Install libopenblas-dev
-      if: matrix.python-version == '3.13.0-rc.2'
-      run: sudo apt-get install libopenblas-dev
     - name: Install Release Dependencies
       run: |
         poetry config virtualenvs.in-project true
@@ -96,14 +89,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '5.1' # December 2025
         exclude:
-          - python-version: '3.8'
+          - python-version: '3.9'
             django-version: '5.1'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '3.2'
 
     steps:
@@ -153,14 +146,14 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
           - '5.1' # December 2025
         exclude:
-          - python-version: '3.8'
+          - python-version: '3.9'
             django-version: '5.1'
-          - python-version: '3.12'
+          - python-version: '3.13'
             django-version: '3.2'
 
     steps:
@@ -237,14 +230,14 @@ jobs:
   #   runs-on: windows-latest
   #   strategy:
   #     matrix:
-  #       python-version: ['3.8', '3.12']
+  #       python-version: ['3.9', '3.13']
   #       django-version:
   #         - '3.2' # LTS April 2024
   #         - '5.0' # April 2025
   #       exclude:
-  #         - python-version: '3.8'
+  #         - python-version: '3.9'
   #           django-version: '5.0'
-  #         - python-version: '3.12'
+  #         - python-version: '3.13'
   #           django-version: '3.2'
 
   #   steps:
@@ -297,9 +290,6 @@ jobs:
         timeout-minutes: 60
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
