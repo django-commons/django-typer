@@ -2,7 +2,7 @@
 Change Log
 ==========
 
-v2.3.0 (2024-10-xx)
+v2.3.0 (2024-10-13)
 ===================
 
 * Fixed `Inheritance more than one level deep of TyperCommands does not work. <https://github.com/django-commons/django-typer/issues/131>`_

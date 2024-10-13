@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "django-typer"
-version = "2.2.2"
+version = "2.3.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
     "Brian Kohan <bckohan@gmail.com>",
