@@ -657,9 +657,9 @@ Order Commands in Help Text
 this by
 `using a custom click group <https://click.palletsprojects.com/en/latest/commands/#custom-groups>`_.
 
-For example, to change the order of commands to be in reverse alphabetical order you could define
-a custom group and override the ``list_commands`` method. Custom group and command classes may be
-provided like below, but they must extend from django-typer's classes:
+For example, to change the order of commands to be in alphabetical order you could define a custom
+group and override the ``list_commands`` method. Custom group and command classes may be provided
+like below, but they must extend from django-typer's classes:
 
 * For groups: :class:`~django_typer.management.DTGroup`
 * For commands: :class:`~django_typer.management.DTCommand`
