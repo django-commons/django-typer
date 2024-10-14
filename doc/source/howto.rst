@@ -190,6 +190,7 @@ Lets look at the help output:
 
 .. typer:: tests.apps.howto.management.commands.default_cmd.Command:typer_app
     :width: 80
+    :convert-png: latex
 
 .. _groups:
 
@@ -679,22 +680,26 @@ like below, but they must extend from django-typer's classes:
     .. tab:: Default Order
 
         .. typer:: tests.apps.howto.management.commands.order_default.Command:typer_app
-            :prog: ./manage.py order
+            :prog: manage.py order
             :width: 80
+            :convert-png: latex
 
         .. typer:: tests.apps.howto.management.commands.order_default.Command:typer_app:d
-            :prog: ./manage.py order d
+            :prog: manage.py order d
+            :convert-png: latex
             :width: 80
 
     .. tab:: Alphabetized
 
         .. typer:: tests.apps.howto.management.commands.order.Command:typer_app
-            :prog: ./manage.py order
+            :prog: manage.py order
+            :convert-png: latex
             :width: 80
 
         .. typer:: tests.apps.howto.management.commands.order.Command:typer_app:d
-            :prog: ./manage.py order d
+            :prog: manage.py order d
             :width: 80
+            :convert-png: latex
 
 Document Commands w/Sphinx
 --------------------------
