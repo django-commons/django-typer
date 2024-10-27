@@ -553,7 +553,7 @@ class Command(TyperCommand):
         def call_fallback(fb: t.Optional[str]) -> None:
             fallback = import_string(fb) if fb else self.django_fallback
             if cmd_str and inspect.signature(fallback).parameters:
-                fallback(cmd_str)  # pyright: ignore[reportCallIssue]
+                fallback(cmd_str)  # type: ignore
             else:
                 fallback()
 

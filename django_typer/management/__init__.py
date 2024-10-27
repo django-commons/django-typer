@@ -1921,7 +1921,7 @@ class TyperCommandMeta(type):
         try:
             # avoid unnecessary work creating the TyperCommand class
             # is there a less weird way to do this?
-            is_base_init = not TyperCommand
+            is_base_init = not TyperCommand  # type: ignore[truthy-function]
         except NameError:
             is_base_init = True
         typer_app = None
