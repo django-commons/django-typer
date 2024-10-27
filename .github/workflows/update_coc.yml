@@ -10,7 +10,7 @@ on:
         type: boolean
   # Run every Sunday at midnight UTC (00:00) - triggered by webhook?
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: '0 0 * * SUN'
 
 
 jobs:
