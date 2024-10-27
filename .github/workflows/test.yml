@@ -11,7 +11,7 @@ on:
         default: false
         type: boolean
   schedule:
-    - cron: '0 13 * * *'  # Runs at 6 am pacific every day
+    - cron: '0 13 * * SUN'  # Runs at 6 am pacific every sunday
 
 jobs:
 
