@@ -99,7 +99,7 @@ like have multiple subcommands you can define any number of functions decorated 
 
         .. code-block:: python
 
-            from django_typer.management importTyperCommand, command
+            from django_typer.management import TyperCommand, command
 
             class Command(TyperCommand):
 
@@ -590,8 +590,8 @@ This provides a common hook for configuring rich_ that you can control on a per-
         "theme": None,                     # predefined themes
         "word_wrap": False,                # default is False
         "show_locals": True,               # rich default is False, but we turn this on
-        "locals_max_length":               # default is 10
-        "locals_max_string":               # default is 80
+        "locals_max_length": 10            # default is 10
+        "locals_max_string": 80            # default is 80
         "locals_hide_dunder": True,        # default is True
         "locals_hide_sunder": False,       # default is None
         "indent_guides": True,             # default is True
