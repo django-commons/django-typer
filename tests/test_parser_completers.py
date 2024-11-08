@@ -251,14 +251,14 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --ip ")
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in self.field_values["ip_field"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --ip 2001:")
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["2001::1"]:
             self.assertTrue(ip in result)
 
@@ -274,7 +274,7 @@ class TestShellCompletersAndParsers(TestCase):
             call_command(
                 "shellcompletion", "complete", "model_fields test --ip 2a02:42"
             )
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["2a02:42fe::4", "2a02:42ae::4"]:
             self.assertTrue(ip in result)
 
@@ -283,28 +283,28 @@ class TestShellCompletersAndParsers(TestCase):
             call_command(
                 "shellcompletion", "complete", "model_fields test --ip 2a02:42f"
             )
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["2a02:42fe::4"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --ip 192.")
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["192.168.1.1", "192.0.2.30"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --ip 192.1")
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["192.168.1.1"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "model_fields test --ip :")
-        result = result.getvalue()
+        result = result.getvalue().replace("\\", "")
         for ip in ["::ffff:10.10.10.10"]:
             self.assertTrue(ip in result)
 
