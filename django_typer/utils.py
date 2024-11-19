@@ -182,10 +182,6 @@ def is_method(
     :return: True if the function should be considered a method, False if not and None
         if undetermined.
     """
-    ##############
-    # Remove when python 3.8 support is dropped
-    func_or_params = getattr(func_or_params, "__func__", func_or_params)
-    ##############
     if func_or_params:
         params = (
             list(inspect.signature(func_or_params).parameters)
