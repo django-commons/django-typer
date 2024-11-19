@@ -196,3 +196,24 @@ def is_method(
             return params[0] == "self"
         return isinstance(func_or_params, MethodType)
     return None
+
+
+def accepts_var_kwargs(func: t.Callable[..., t.Any]) -> bool:
+    """
+    Determines if the given function accepts variable keyword arguments.
+    """
+    for param in reversed(inspect.signature(func).parameters.values()):
+        return param.kind is inspect.Parameter.VAR_KEYWORD
+    return False
+
+
+def accepted_kwargs(
+    func: t.Callable[..., t.Any], kwargs: t.Dict[str, t.Any]
+) -> t.Dict[str, t.Any]:
+    """
+    Return the named keyword arguments that are accepted by the given function.
+    """
+    if accepts_var_kwargs(func):
+        return kwargs
+    param_names = set(inspect.signature(func).parameters.keys())
+    return {k: v for k, v in kwargs.items() if k in param_names}

@@ -172,10 +172,9 @@ class TestNative(TestCase):
         self.assertEqual(native.main("Brian"), {"name": "Brian"})
 
     def test_native_cli(self):
-        self.assertEqual(
-            run_command(self.command, *self.settings, "Brian")[0].strip(),
-            str({"name": "Brian"}),
-        )
+        stdout, stderr, retcode = run_command(self.command, *self.settings, "Brian")
+        self.assertEqual(retcode, 0, stderr)
+        self.assertEqual(stdout.strip(), str({"name": "Brian"}))
         self.assertEqual(
             str(run_command(self.command, *self.settings, "--version")[0]).strip(),
             DJANGO_VERSION,

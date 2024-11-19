@@ -227,3 +227,93 @@ class TestDefaultParamOverrides(TestCase):
                 "optional_arg": 1,
             },
         )
+
+    def test_no_suppression(self):
+        self.assertEqual(run_command("dj_params_none_suppressed")[2], 0)
+        call_command("dj_params_none_suppressed")
+
+    def test_all_suppressed(self):
+        self.assertEqual(run_command("dj_params_all_suppressed")[2], 0)
+        call_command("dj_params_all_suppressed")
+
+    def test_all_suppressed_init(self):
+        self.assertEqual(run_command("dj_params_all_suppressed_init", "cmd")[2], 0)
+        call_command("dj_params_all_suppressed_init", "cmd")
+
+    def test_some_suppressed(self):
+        stdout, _, retcode = run_command("dj_params_some_suppressed")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "traceback=True")
+
+        self.assertEqual(call_command("dj_params_some_suppressed"), "traceback=True")
+
+        stdout, _, retcode = run_command("dj_params_some_suppressed", "--no-traceback")
+        self.assertEqual(retcode, 0)
+        self.assertEqual(stdout.strip(), "traceback=False")
+
+        self.assertEqual(
+            call_command("dj_params_some_suppressed", "--no-traceback"),
+            "traceback=False",
+        )
+        self.assertEqual(
+            call_command("dj_params_some_suppressed", traceback=False),
+            "traceback=False",
+        )
+
+    def test_some_suppressed_init(self, command_name="dj_params_some_suppressed_init"):
+        stdout, _, retcode = run_command(command_name)
+        self.assertEqual(retcode, 0)
+        self.assertTrue("traceback=True" in stdout.strip())
+
+        stdout, _, retcode = run_command(command_name, "cmd")
+        self.assertEqual(retcode, 0)
+        self.assertTrue("traceback=True" in stdout.strip())
+
+        self.assertTrue("traceback=True" in call_command(command_name))
+        self.assertTrue("traceback=True" in call_command(command_name, "cmd"))
+
+        stdout, _, retcode = run_command(command_name, "--no-traceback")
+        self.assertEqual(retcode, 0)
+        self.assertTrue("traceback=False" in stdout.strip())
+
+        self.assertTrue(
+            "traceback=False" in call_command(command_name, "--no-traceback")
+        )
+        self.assertTrue(
+            "traceback=False" in call_command(command_name, traceback=False), "False"
+        )
+
+        stdout, _, retcode = run_command(command_name, "--no-traceback", "cmd")
+        self.assertEqual(retcode, 0)
+        self.assertTrue("traceback=False" in stdout.strip())
+
+        self.assertTrue(
+            "traceback=False" in call_command(command_name, "--no-traceback", "cmd")
+        )
+        self.assertTrue(
+            "traceback=False" in call_command(command_name, "cmd", traceback=False)
+        )
+
+    def test_some_suppressed_inherit(self):
+        self.test_some_suppressed_init("dj_params_inherit")
+
+    def test_some_suppressed_subgroups(self):
+        self.test_some_suppressed_init("dj_params_subgroups")
+        stdout, _, retcode = run_command(
+            "dj_params_subgroups", "--no-traceback", "subgroup", "--no-skip-checks"
+        )
+        self.assertEqual(retcode, 0)
+        self.assertTrue("traceback=False, skipchecks=False" in stdout.strip())
+
+        self.assertTrue(
+            "traceback=True, skipchecks=True"
+            in call_command(
+                "dj_params_subgroups", "--traceback", "subgroup", "--skip-checks"
+            )
+        )
+        self.assertTrue(
+            "traceback=False, skipchecks=True"
+            in call_command(
+                "dj_params_subgroups", "subgroup", traceback=False, skip_checks=True
+            )
+        )
