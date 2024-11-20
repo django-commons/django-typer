@@ -52,7 +52,7 @@ def apply() -> None:
         # are not attached to ttys. Upstream Django should change the init
         # call to a just_fix_windows_console - we undo this and redo the right
         # thing here.
-        import colorama
+        import colorama  # pyright: ignore[reportMissingModuleSource]
 
         colorama.deinit()
         colorama.just_fix_windows_console()

@@ -9,9 +9,9 @@ class Command(TyperCommand, chain=True):
         return "finalized: {}".format(result)
 
     @command()
-    def cmd1(self):
-        return "cmd1"
+    def cmd1(self, arg1: int = 1):
+        return "cmd1 {}".format(arg1)
 
     @command()
-    def cmd2(self):
-        return "cmd2"
+    def cmd2(self, arg2: int):
+        return "cmd2 {}".format(arg2)

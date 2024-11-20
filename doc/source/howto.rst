@@ -262,6 +262,16 @@ decorator. This is like defining a group at the command root and is an extension
     command.init(False)
     assert not command.subcommand2()
 
+
+.. _howto_finalizer:
+
+Collect and Finalize Results
+----------------------------
+
+.. TODO::
+
+    This section is not yet implemented.
+
 Call Commands from Code
 -----------------------
 

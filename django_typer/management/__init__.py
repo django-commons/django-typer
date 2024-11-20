@@ -688,6 +688,10 @@ class Finalizer(t.Generic[P, R]):
     finalizer: t.Callable[P, R]
     is_method: bool
 
+    @property
+    def name(self):
+        return self.finalizer.__name__
+
     def __init__(self, finalizer: t.Callable[P, R]):
         self.finalizer = finalizer
         self.is_method = bool(is_method(finalizer))
@@ -1361,6 +1365,21 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
         return create_app
 
+    def finalize(self):
+        """
+        Add a finalizer callback to collect the results of all commands run as part of this
+        command group. This is analogous to the ``result_callback`` on ``Typer.add_typer`` but
+        works seamlessly for methods. See :ref:`howto_finalizers` for more information.
+        """
+
+        def create_finalizer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
+            func = _strip_static(func)
+            # TODO not this easy: setattr(self, func.__name__, func)
+            self.info.result_callback = Finalizer(func)
+            return func
+
+        return create_finalizer
+
 
 class BoundProxy(t.Generic[P, R]):
     """
@@ -1369,7 +1388,7 @@ class BoundProxy(t.Generic[P, R]):
     """
 
     command: "TyperCommand"
-    proxied: TyperFunction
+    proxied: t.Union[TyperFunction, Finalizer]
 
     def __init__(self, command: "TyperCommand", proxied: TyperFunction):
         self.command = command
@@ -1379,6 +1398,8 @@ class BoundProxy(t.Generic[P, R]):
         if isinstance(self.proxied, Typer) and not self.proxied.parent:
             # if we're calling a top level Typer app we need invoke Typer's call
             return self.proxied(*args, **kwargs)
+        elif isinstance(self.proxied, Finalizer):
+            return self.proxied(*args, _command=self.command, **kwargs)
         return _get_direct_function(self.command, self.proxied)(*args, **kwargs)
 
     def __getattr__(self, name: str) -> t.Any:
@@ -1393,6 +1414,10 @@ class BoundProxy(t.Generic[P, R]):
             if isinstance(attr, (Typer, typer.models.CommandInfo)):
                 return BoundProxy(self.command, attr)
             return attr
+        elif isinstance(self.proxied, Typer) and isinstance(
+            self.proxied.info.result_callback, Finalizer
+        ):
+            return BoundProxy(self.command, self.proxied.info.result_callback)
 
         raise AttributeError(
             "{cls} object has no attribute {name}".format(
@@ -1548,7 +1573,36 @@ callback = initialize  # allow callback as an alias
 
 def finalize() -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
     """
-    TODO
+    Attach a callback function that collects and finalizes results returned
+    from any invoked subcommands. This is a wrapper around typer's result_callback that
+    extends it to work as a method and for non-compound commands.
+
+    .. code-block:: python
+
+        class Command(TyperCommand, chain=True):
+
+            @finalize()
+            def collect(self, results: t.List[str]):
+                return ", ".join(results)
+
+            @command()
+            def cmd1(self):
+                return "result1"
+
+            @command()
+            def cmd2(self):
+                return "result2"
+
+    .. code-block:: bash
+
+        $ ./manage.py command cmd1 cmd2
+        result1, result2
+
+    The callback must at minimum accept a single argument that is either a list of
+    results or a singular result if the command is not compound. The callback may
+    optionally accept named arguments that correspond to parameters at the given
+    command group scope. These parameters will also be available on the current
+    context.
     """
 
     def make_finalizer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
@@ -1839,7 +1893,7 @@ def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.List[str]:
     """
     For a command or group, get a list of attribute name and its CLI name.
 
-    This annoyingly lives in difference places depending on how the command
+    This annoyingly lives in different places depending on how the command
     or group was defined. This logic is sensitive to typer internals.
     """
     names = []
@@ -1858,7 +1912,7 @@ def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.List[str]:
 
 def _bfs_match(
     app: Typer, name: str
-) -> t.Optional[t.Union[typer.models.CommandInfo, Typer]]:
+) -> t.Optional[t.Union[typer.models.CommandInfo, Typer, Finalizer]]:
     """
     Perform a breadth first search for a command or group by name.
 
@@ -1869,12 +1923,18 @@ def _bfs_match(
 
     def find_at_level(
         lvl: Typer,
-    ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer]]:
+    ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer, Finalizer]]:
         for cmd in reversed(lvl.registered_commands):
             if name in _names(cmd):
                 return cmd
         if name in _names(lvl):
             return lvl
+
+        if (
+            isinstance(lvl.info.result_callback, Finalizer)
+            and lvl.info.result_callback.name == name
+        ):
+            return lvl.info.result_callback
         return None
 
     # fast exit out if at top level (most searches - avoid building BFS)
@@ -2191,7 +2251,7 @@ class TyperCommandMeta(type):
     def __getattr__(cls, name: str) -> t.Any:
         """
         Fall back breadth first search of the typer app tree to resolve attribute accesses of the type:
-            Command.sub_grp or Command.sub_cmd
+            Command.sub_grp or Command.sub_cmd or Command.finalizer
         """
         if name != "typer_app":
             if called_from_command_definition():
@@ -2739,6 +2799,33 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         return make_initializer
 
     callback = initialize
+
+    @classmethod
+    def finalize(cls) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
+        """
+        Override the finalizer for this command class after it has been defined.
+
+        .. note::
+            See :ref:`plugins` for details on when you might want to use this extension
+            pattern.
+
+        .. code-block:: python
+
+            from your_app.management.commands.your_command import Command as YourCommand
+
+            @YourCommand.finalize()
+            def collect(self, ...):
+                # implement your command result collection logic here
+        """
+        if called_from_command_definition():
+            return finalize()
+
+        def make_finalizer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
+            setattr(cls, func.__name__, func)
+            cls.typer_app.info.result_callback = Finalizer(_strip_static(func))
+            return func
+
+        return make_finalizer
 
     @classmethod
     def command(
