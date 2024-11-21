@@ -475,12 +475,10 @@ class CompleterExampleTests(TestCase):
         )
 
         shellcompletion = get_command("shellcompletion", ShellCompletion)
+        completions = shellcompletion.complete(
+            f"{self.app_labels_cmd} ", shell=Shells.zsh
+        )
 
-        stdout = StringIO()
-        with redirect_stdout(stdout):
-            shellcompletion.complete(f"{self.app_labels_cmd} ", shell=Shells.zsh)
-
-        completions = stdout.getvalue()
         self.assertTrue('"contenttypes"' in completions)
         self.assertTrue('"completers"' in completions)
         self.assertTrue('"django_typer"' in completions)
@@ -489,11 +487,9 @@ class CompleterExampleTests(TestCase):
         self.assertTrue('"sessions"' in completions)
         self.assertTrue('"messages"' in completions)
 
-        stdout.truncate(0)
-        stdout.seek(0)
-
-        with redirect_stdout(stdout):
-            shellcompletion.complete(f"{self.app_labels_cmd} a", shell=Shells.zsh)
+        completions = shellcompletion.complete(
+            f"{self.app_labels_cmd} a", shell=Shells.zsh
+        )
 
         self.assertTrue('"admin"' in completions)
         self.assertTrue('"auth"' in completions)

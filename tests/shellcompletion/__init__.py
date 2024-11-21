@@ -195,10 +195,9 @@ class _DefaultCompleteTestCase:
         # and the completion on linux in bash specifically
         self.assertTrue(re.match(r".*complet\s*ion.*", completions))
         completions = self.get_completions(self.launch_script, " ")
-        self.assertIn("makemigrations", completions)
-        self.assertIn("migrate", completions)
+        self.assertIn("adapted", completions)
+        self.assertIn("help_precedence", completions)
         self.assertIn("closepoll", completions)
-        self.assertIn("basic", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):

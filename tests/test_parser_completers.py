@@ -104,6 +104,24 @@ class TestShellCompletersAndParsers(TestCase):
         poll_app = apps.get_app_config("tests_apps_examples_polls")
         self.assertEqual(parse_app_label(poll_app), poll_app)
 
+    def test_shellcompletion_stdout(self):
+        from django_typer.management.commands.shellcompletion import (
+            Command as ShellCompletion,
+        )
+
+        shellcompletion = get_command("shellcompletion", ShellCompletion)
+        result = shellcompletion.complete("completion ")
+        self.assertTrue("test_app" in result)
+        self.assertTrue("tests_apps_util" in result)
+        self.assertTrue("django_typer" in result)
+
+        result2 = StringIO()
+        call_command("shellcompletion", "complete", "completion ", stdout=result2)
+        stdout_result = result2.getvalue().strip()
+        self.assertTrue("test_app" in stdout_result)
+        self.assertTrue("tests_apps_util" in stdout_result)
+        self.assertTrue("django_typer" in stdout_result)
+
     def test_app_label_parser_completers(self):
         from django.apps import apps
 

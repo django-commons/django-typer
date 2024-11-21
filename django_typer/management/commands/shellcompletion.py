@@ -599,11 +599,22 @@ class Command(TyperCommand):
                     )
                 call_fallback(fallback)
 
+        buffer = io.StringIO()
         try:
-            get_completion()
+            with contextlib.redirect_stdout(buffer):
+                # typer's internal behavior is to print and exit, we need
+                # to intercept this workflow to do our post processing and
+                # honor the configured stdout
+                get_completion()
+
+            # leave this in, incase the interface changes to not exit
+            return buffer.getvalue()  # pragma: no cover
         except SystemExit:
+            completion_str = buffer.getvalue()
+            if completion_str:
+                return completion_str
             if cmd_str:
-                return
+                return ""
             raise
 
     def django_fallback(self):
