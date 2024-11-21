@@ -378,7 +378,7 @@ class TestFinalize(TestCase):
         stdout, _, _ = run_command("finalize_subgroups_inherit", "grp2", "cmd4", "cmd3")
         self.assertEqual(
             stdout.strip(),
-            "root_final: grp2_final: ['cmd4', 'cmd3'] | g2_opt=True | init_opt=False",
+            "root_final: grp2_collect: grp2_final: ['cmd4', 'cmd3'] | g2_opt=True | init_opt=False",
         )
 
         stdout, _, _ = run_command(
@@ -386,7 +386,7 @@ class TestFinalize(TestCase):
         )
         self.assertEqual(
             stdout.strip(),
-            "root_final: grp2_final: ['cmd3'] | g2_opt=False | init_opt=True",
+            "root_final: grp2_collect: grp2_final: ['cmd3'] | g2_opt=False | init_opt=True",
         )
 
         stdout, _, _ = run_command(
@@ -420,7 +420,7 @@ class TestFinalize(TestCase):
         )
         self.assertEqual(
             out.getvalue().strip(),
-            "root_final: grp2_final: ['cmd4', 'cmd3'] | g2_opt=True | init_opt=False",
+            "root_final: grp2_collect: grp2_final: ['cmd4', 'cmd3'] | g2_opt=True | init_opt=False",
         )
 
         out = StringIO()
@@ -435,7 +435,7 @@ class TestFinalize(TestCase):
         )
         self.assertEqual(
             out.getvalue().strip(),
-            "root_final: grp2_final: ['cmd3'] | g2_opt=False | init_opt=True",
+            "root_final: grp2_collect: grp2_final: ['cmd3'] | g2_opt=False | init_opt=True",
         )
 
         out = StringIO()
@@ -521,5 +521,5 @@ class TestFinalize(TestCase):
                 ],
                 init_opt=False,
             ).strip(),
-            "root_final: [\"grp2_final: ['cmd3', 'cmd4'] | g2_opt=False\"] | init_opt=False",
+            "root_final: [\"grp2_collect: grp2_final: ['cmd3', 'cmd4'] | g2_opt=False\"] | init_opt=False",
         )

@@ -10,6 +10,11 @@ def grp1_collect(self, result, **kwargs):
     return f"grp1_collect: {self.grp1_final(result, **kwargs)}"
 
 
+@FinalizeSubgroupsInherit.grp2.finalize()
+def grp2_collect(result, **kwargs):
+    return f"grp2_collect: {FinalizeSubgroupsInherit.grp2_final(result, **kwargs)}"
+
+
 @FinalizeSubgroupsInherit.grp1.command()
 def cmd5(self):
     return "cmd5"

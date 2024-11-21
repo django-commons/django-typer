@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 
 from django_typer.management import TyperCommand, get_command
-from tests.utils import rich_installed
+from tests.utils import rich_installed, run_command
 
 
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
@@ -364,3 +364,124 @@ class TestPrintingTyperHowto(TestOrderHowTo):
     from tests.apps.howto.management.commands.order_typer import AlphabetizeCommands
 
     grp_cls = AlphabetizeCommands
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestFinalizerHowto(TestCase):
+    command = "finalize"
+
+    def test_howto_finalizer_run(self):
+        self.assertEqual(
+            run_command(
+                self.command,
+                "--settings",
+                "tests.settings.howto",
+                "cmd1",
+                "cmd1",
+                "cmd2",
+            )[0].strip(),
+            "result1, result1, result2",
+        )
+
+    def test_howto_finalizer_call(self):
+        self.assertEqual(
+            call_command(self.command, "cmd1", "cmd1", "cmd2"),
+            "result1, result1, result2",
+        )
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize import Command
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            command.to_csv([command.cmd1(), command.cmd1(), command.cmd2()]),
+            "result1, result1, result2",
+        )
+
+
+class TestFinalizerTyperHowto(TestFinalizerHowto):
+    command = "finalize_typer"
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_typer import Command, to_csv
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            to_csv([command.cmd1(), command.cmd1(), command.cmd2()]),
+            "result1, result1, result2",
+        )
+
+
+class TestFinalizerTyperExtHowto(TestFinalizerHowto):
+    command = "finalize_typer_ext"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestFinalizerGroupHowto(TestCase):
+    command = "finalize_group"
+
+    def test_howto_finalizer_run(self):
+        self.assertEqual(
+            run_command(
+                self.command,
+                "--settings",
+                "tests.settings.howto",
+                "cmd1",
+                "cmd1",
+                "cmd2",
+                "grp",
+                "cmd4",
+                "cmd3",
+            )[0].strip(),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+    def test_howto_finalizer_call(self):
+        self.assertEqual(
+            call_command(self.command, "cmd1", "cmd1", "cmd2", "grp", "cmd4", "cmd3"),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_group import Command
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            command.to_csv(
+                [
+                    command.cmd1(),
+                    command.cmd1(),
+                    command.cmd2(),
+                    command.grp.to_upper_csv([command.grp.cmd4(), command.grp.cmd3()]),
+                ]
+            ),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+
+class TestFinalizerGroupTyperHowto(TestFinalizerGroupHowto):
+    command = "finalize_group_typer"
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_group_typer import (
+            Command,
+            to_csv,
+            to_upper_csv,
+        )
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            to_csv(
+                [
+                    command.cmd1(),
+                    command.cmd1(),
+                    command.cmd2(),
+                    to_upper_csv([command.cmd4(), command.cmd3()]),
+                ]
+            ),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+
+class TestFinalizerGroupTyperExtHowto(TestFinalizerGroupHowto):
+    command = "finalize_group_typer_ext"

@@ -263,14 +263,79 @@ decorator. This is like defining a group at the command root and is an extension
     assert not command.subcommand2()
 
 
-.. _howto_finalizer:
+.. _howto_finalizers:
 
-Collect and Finalize Results
-----------------------------
+Collect Results with @finalize
+------------------------------
 
-.. TODO::
+Typer_ and Click_ have a ``results_callback`` mechanism on ``MultiCommands`` that allow a function
+hook to be registered to operate on the results of subroutines before the command exits. You may
+use this same ``results_callback`` mechanism directly through the Typer_ interface, but
+django-typer_ offers a more convenient class-aware way to do this with the
+:func:`~django_typer.management.finalize` decorator.
 
-    This section is not yet implemented.
+For example lets say we have two subcommands that return strings, we could turn them into a csv
+string by registering a callback with :func:`~django_typer.management.finalize`:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_typer.py
+
+
+    .. tab:: Typer-style w/finalize
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_typer_ext.py
+
+
+.. code-block:: console
+
+        $> ./manage.py finalizer cmd1 cmd1 cmd2
+        result1, result2, result3
+
+.. tip::
+
+    @finalize() wrapped callbacks will be passed the CLI parameters on the current context
+    if the function signature accepts them. While convenient, we recommend using command state to
+    track these parameters instead. This will be more amenable to direct invocations of command
+    object functions.
+
+Use @finalize on groups
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finalizers are hierarchical. The :func:`~django_typer.management.finalize` decorator is available
+for use on subgroups. When used on a group, the callback will be invoked after the group's
+subcommands have been executed and the return value of the finalizer will be passed up to any
+finalizers at higher levels in the command hierarchy.
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group_typer.py
+
+    .. tab:: Typer-style w/finalize
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group_typer_ext.py
+
+.. code-block:: console
+
+        $> ./manage.py finalizer cmd1 cmd1 cmd2 grp cmd4 cmd3
+        result1, result2, result3, RESULT4, RESULT3
+
+.. tip::
+
+    Finalizers can be overridden just like groups and initializers using the :ref:`plugin pattern. <plugins>`
+
 
 Call Commands from Code
 -----------------------
