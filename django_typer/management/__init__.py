@@ -76,6 +76,7 @@ __all__ = [
     "DTGroup",
     "Context",
     "initialize",
+    "finalize",
     "callback",
     "command",
     "group",
