@@ -405,3 +405,8 @@ class TestNativeTweaks(TestNative):
 
     native_help_rich = native_tweaks_help_rich
     native_help_no_rich = native_tweaks_help_no_rich
+
+
+class TestBug145(TestCase):
+    def test_bug_145(self):
+        self.assertEqual(call_command("bug_145", "grp", "cmd"), "grp:cmd")

@@ -7,7 +7,7 @@ class Command(TyperCommand, chain=True):
     Show that finalizers are hierarchical and results are collected and
     passed to the finalizer of the parent group if one exists.
     """
-    
+
     @finalize()
     def to_csv(self, results: t.List[str]):
         return ", ".join(results)

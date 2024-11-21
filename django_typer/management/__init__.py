@@ -573,7 +573,8 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         ]
 
         def call_with_self(*args, **kwargs):
-            assert callback
+            if not callback:
+                return
             ctx = t.cast(Context, click.get_current_context())
             return callback(
                 *args,

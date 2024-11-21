@@ -2,6 +2,7 @@ from django_typer.management import Typer
 
 # use native Typer interface to achieve the same result
 
+
 def to_csv(results, **_):
     return ", ".join(results)
 
