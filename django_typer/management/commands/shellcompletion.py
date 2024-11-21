@@ -244,7 +244,7 @@ class Command(TyperCommand):
             )
         elif shell in [Shells.bash, Shells.zsh, Shells.fish]:
             typer_scripts._completion_scripts[shell.value] = render(shell, **context)
-        else:
+        else:  # pragma: no cover
             raise NotImplementedError(
                 gettext("Unsupported shell: {shell}").format(shell=shell.value)
             )
