@@ -26,9 +26,11 @@ import contextlib
 import inspect
 import io
 import os
+import re
 import sys
 import typing as t
 from functools import cached_property
+from importlib.resources import files
 from pathlib import Path
 
 from click.parser import split_arg_string
@@ -38,6 +40,7 @@ from click.shell_completion import (
     get_completion_class,
 )
 from django.core.management import CommandError, ManagementUtility
+from django.template import Context, Engine
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -48,7 +51,8 @@ from typer.completion import (  # type: ignore
     completion_init,  # pyright: ignore[reportPrivateImportUsage]
 )
 
-from django_typer.management import TyperCommand, command, get_command
+from django_typer.management import TyperCommand, command, get_command, initialize
+from django_typer.types import COMMON_PANEL
 from django_typer.utils import get_usage_script
 
 DETECTED_SHELL = None
@@ -94,14 +98,37 @@ class Command(TyperCommand):
     suppressed_base_arguments = {
         "version",
         "skip_checks",
-        "no_color",
-        "force_color",
         "verbosity",
     }
+
+    no_color: t.Optional[bool] = None  # type: ignore
 
     _shell: Shells
 
     COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
+
+    ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+    SHELL_COLOR_SUPPORT = {
+        Shells.bash: False,
+        Shells.zsh: True,
+        Shells.fish: True,
+        Shells.powershell: True,
+        Shells.pwsh: True,
+    }
+
+    @cached_property
+    def template_engine(self):
+        """
+        Django template engine that will find and render completer script templates.
+        """
+        return Engine(
+            dirs=[str(files("django_typer").joinpath("scripts"))],
+            libraries={
+                "default": "django.template.defaulttags",
+                "filter": "django.template.defaultfilters",
+            },
+        )
 
     @cached_property
     def manage_script(self) -> t.Union[str, Path]:
@@ -198,66 +225,43 @@ class Command(TyperCommand):
 
         fallback = f" --fallback {fallback}" if fallback else ""
 
-        def replace(s: str, old: str, new: str, occurrences: t.List[int]) -> str:
-            """
-            :param s: The string to modify
-            :param old: The string to replace
-            :param new: The string to replace with
-            :param occurrences: A list of occurrences of the old string to replace with the
-                new string, where the occurrence number is the zero-based count of the old
-                strings appearance in the string when counting from the front.
-            """
-            count = 0
-            result = ""
-            start = 0
+        def render(shell: Shells, **context) -> str:
+            template = self.template_engine.get_template(f"{shell.value}.tmpl")
+            return template.render(Context(context))
 
-            for end in range(len(s)):
-                if s[start : end + 1].endswith(old):
-                    if count in occurrences:
-                        result += f"{s[start:end+1-len(old)]}{new}"
-                        start = end + 1
-                    else:
-                        result += s[start : end + 1]
-                        start = end + 1
-                    count += 1
-
-            result += s[start:]
-            return result
-
-        if shell is Shells.bash:
-            typer_scripts._completion_scripts[Shells.bash.value] = replace(
-                typer_scripts.COMPLETION_SCRIPT_BASH,
-                "$1",
-                f"$1 {DJANGO_COMMAND} complete",
-                [0],
+        context = {
+            "manage_script": self.manage_script,
+            "django_command": DJANGO_COMMAND,
+            "color": "--no-color"
+            if self.no_color
+            else "--force-color"
+            if self.force_color
+            else "",
+        }
+        if shell in [Shells.powershell, Shells.pwsh]:
+            typer_scripts._completion_scripts[shell.value] = render(
+                Shells.powershell, **context
             )
-        elif shell is Shells.zsh:
-            typer_scripts._completion_scripts[Shells.zsh.value] = replace(
-                typer_scripts.COMPLETION_SCRIPT_ZSH,
-                "%(prog_name)s",
-                f"${{words[0,1]}} {DJANGO_COMMAND} complete",
-                [1],
-            )
-        elif shell is Shells.fish:
-            typer_scripts._completion_scripts[Shells.fish.value] = replace(
-                typer_scripts.COMPLETION_SCRIPT_FISH,
-                "%(prog_name)s",
-                f"{self.manage_script} {DJANGO_COMMAND} complete",
-                [1, 2],
-            )
+        elif shell in [Shells.bash, Shells.zsh, Shells.fish]:
+            typer_scripts._completion_scripts[shell.value] = render(shell, **context)
         else:
-            assert shell in [
-                Shells.pwsh,
-                Shells.powershell,
-            ], gettext("Unsupported shell: {shell}").format(shell=shell.value)
-            script = replace(
-                typer_scripts.COMPLETION_SCRIPT_POWER_SHELL,
-                "%(prog_name)s",
-                f"{self.manage_script} {DJANGO_COMMAND} complete",
-                [0],
+            raise NotImplementedError(
+                gettext("Unsupported shell: {shell}").format(shell=shell.value)
             )
-            typer_scripts._completion_scripts[Shells.powershell.value] = script
-            typer_scripts._completion_scripts[Shells.pwsh.value] = script
+
+    @initialize()
+    def init(
+        self,
+        no_color: t.Annotated[
+            t.Optional[bool],
+            Option(
+                "--no-color",
+                help=t.cast(str, _("Filter color codes out of completion text.")),
+                rich_help_panel=COMMON_PANEL,
+            ),
+        ] = None,
+    ):
+        self.no_color = no_color  # pyright: ignore[reportAttributeAccessIssue]
 
     @command(
         help=t.cast(str, _("Install autocompletion for the current or given shell."))
@@ -312,6 +316,12 @@ class Command(TyperCommand):
         from typer._completion_shared import install
 
         self.shell = shell  # type: ignore
+        assert self.shell
+        self.no_color = (  # pyright: ignore[reportIncompatibleVariableOverride]
+            not self.SHELL_COLOR_SUPPORT.get(self.shell, False)
+            if self.no_color is None
+            else self.no_color
+        )
         self.patch_script(fallback=fallback)
         install_path = install(
             shell=self.shell.value,
@@ -599,6 +609,14 @@ class Command(TyperCommand):
                     )
                 call_fallback(fallback)
 
+        def strip_color(text: str) -> str:
+            """
+            Strip ANSI color codes from a string.
+            """
+            if self.no_color:
+                return self.ANSI_ESCAPE_RE.sub("", text)
+            return text
+
         buffer = io.StringIO()
         try:
             with contextlib.redirect_stdout(buffer):
@@ -608,11 +626,11 @@ class Command(TyperCommand):
                 get_completion()
 
             # leave this in, incase the interface changes to not exit
-            return buffer.getvalue()  # pragma: no cover
+            return strip_color(buffer.getvalue())  # pragma: no cover
         except SystemExit:
             completion_str = buffer.getvalue()
             if completion_str:
-                return completion_str
+                return strip_color(completion_str)
             if cmd_str:
                 return ""
             raise

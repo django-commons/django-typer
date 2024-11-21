@@ -1,0 +1,10 @@
+%(complete_func)s() {
+    local IFS=$'
+'
+    COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
+                   COMP_CWORD=$COMP_CWORD \
+                   %(autocomplete_var)s=complete_bash $1 {{ django_command }} {{ color }} complete ) )
+    return 0
+}
+
+complete -o default -F %(complete_func)s %(prog_name)s

@@ -673,6 +673,7 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--no-color",
                 "complete",
                 "model_fields test --uuid 123456&78-^56785678f234---A",
             )
@@ -940,7 +941,9 @@ class TestShellCompletersAndParsers(TestCase):
     def test_option_complete(self):
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test ")
+            call_command(
+                "shellcompletion", "--no-color", "complete", "model_fields test "
+            )
         result = result.getvalue()
         self.assertTrue("--char" in result)
         self.assertTrue("--ichar" in result)

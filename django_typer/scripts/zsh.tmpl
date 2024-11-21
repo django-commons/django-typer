@@ -1,0 +1,7 @@
+#compdef %(prog_name)s
+
+%(complete_func)s() {
+  eval $(env _TYPER_COMPLETE_ARGS="${words[1,$CURRENT]}" %(autocomplete_var)s=complete_zsh ${words[0,1]} {{ django_command }} {{ color }} complete)
+}
+
+compdef %(complete_func)s %(prog_name)s
