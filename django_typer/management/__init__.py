@@ -58,9 +58,9 @@ from ..utils import (  # noqa: E402
 )
 
 if sys.version_info < (3, 10):
-    from typing_extensions import ParamSpec
+    from typing_extensions import Concatenate, ParamSpec
 else:
-    from typing import ParamSpec
+    from typing import Concatenate, ParamSpec
 
 
 DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
@@ -89,6 +89,7 @@ P2 = ParamSpec("P2")
 R = t.TypeVar("R")
 R2 = t.TypeVar("R2")
 C = t.TypeVar("C", bound=BaseCommand)
+TC = t.TypeVar("TC", bound="TyperCommand")
 
 _CACHE_KEY = "_register_typer"
 
@@ -947,9 +948,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
         self._django_command = cmd
 
-    # todo - this results in type hinting expecting self to be passed explicitly
-    # when this is called as a callable
-    # https://github.com/django-commons/django-typer/issues/73
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        return super().__call__(*args, **kwargs)
+
     def __get__(self, obj, _=None) -> "Typer[P, R]":
         """
         Our Typer app wrapper also doubles as a descriptor, so when
@@ -990,7 +991,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        callback: t.Optional[t.Callable[P, R]] = Default(None),
+        callback: t.Optional[t.Callable[Concatenate[TC, P], R]] = Default(None),
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
@@ -1272,6 +1273,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             **kwargs,
         )
 
+    @t.no_type_check
     def group(
         self,
         name: t.Optional[str] = Default(None),
@@ -1293,7 +1295,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,
-    ) -> t.Callable[[t.Callable[P2, R2]], "Typer[P2, R2]"]:
+    ) -> t.Callable[[t.Callable[Concatenate[TC, P2], R2]], "Typer[P2, R2]"]:  # pyright: ignore[reportInvalidTypeVarUse]
         """
         Create a new subgroup and attach it to this group. This is like creating a new
         Typer app and adding it to a parent Typer app. The kwargs are passed through
@@ -1340,7 +1342,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             this can be used to group commands into panels in the help output.
         """
 
-        def create_app(func: t.Callable[P2, R2]) -> Typer[P2, R2]:
+        def create_app(
+            func: t.Callable[Concatenate[TC, P2], R2],
+        ) -> Typer[P2, R2]:
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
                 name=name,
                 cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
@@ -1732,7 +1736,7 @@ def group(
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
     **kwargs: t.Any,
-) -> t.Callable[[t.Callable[P, R]], Typer[P, R]]:
+) -> t.Callable[[t.Callable[Concatenate[TC, P], R]], Typer[P, R]]:  # pyright: ignore[reportInvalidTypeVarUse]
     """
     A function decorator that creates a new subgroup and attaches it to the root
     command group. This is like creating a new Typer_ app and adding it to a parent
@@ -1797,7 +1801,9 @@ def group(
         this can be used to group commands into panels in the help output.
     """
 
-    def create_app(func: t.Callable[P, R]) -> Typer[P, R]:
+    def create_app(
+        func: t.Callable[Concatenate[TC, P], R],
+    ) -> Typer[P, R]:
         grp = Typer(
             name=name,
             cls=cls,
@@ -2945,7 +2951,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,
-    ) -> t.Callable[[t.Callable[P, R]], Typer[P, R]]:
+    ) -> t.Callable[[t.Callable[Concatenate[TC, P], R]], Typer[P, R]]:  # pyright: ignore[reportInvalidTypeVarUse]
         """
         Add a group to this command class after it has been defined. You can
         use this decorator to add groups to a root command from other Django apps.
@@ -3010,7 +3016,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 **kwargs,
             )
 
-        def create_app(func: t.Callable[P, R]) -> Typer[P, R]:
+        def create_app(
+            func: t.Callable[Concatenate[TC, P], R],
+        ) -> Typer[P, R]:
             grp: Typer[P, R] = Typer(
                 name=name,
                 cls=cls,
