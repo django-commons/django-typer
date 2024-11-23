@@ -12,6 +12,14 @@ We are actively seeking additional maintainers. If you're interested, please ope
 poetry install
 ```
 
+### Windows
+
+There is a symbolic link to the top level examples directory in tests. On Windows to make sure this link is created you need to be in [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) and to configure git to allow symbolic links:
+
+```console
+git config --global core.symlinks true
+```
+
 ## Documentation
 
 `django-typer` documentation is generated using [Sphinx](https://www.sphinx-doc.org) with the [furo](https://github.com/pradyunsg/furo) theme. Any new feature PRs must provide updated documentation for the features added. To build the docs run doc8 to check for formatting issues then run Sphinx:
