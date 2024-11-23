@@ -14,10 +14,10 @@ poetry install
 
 ### Windows
 
-There is a symbolic link to the top level examples directory in tests. On Windows to make sure this link is created you need to be in developer mode and to configure git to allow symbolic links:
+There is a symbolic link to the top level examples directory in tests. On Windows to make sure this link is created you need to be in [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) and to configure git to allow symbolic links:
 
 ```console
-git config core.symlinks true
+git config --global core.symlinks true
 ```
 
 ## Documentation
