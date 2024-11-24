@@ -11,6 +11,7 @@ v3.0.0 (202X-XX-XX)
 * Implemented `Add showcase of commands using django-typer to docs <https://github.com/django-commons/django-typer/issues/142>`_
 * Implemented `Add a @finalize decorator for functions to collect/operate on subroutine results. <https://github.com/django-commons/django-typer/issues/140>`_
 * Fixed `Remove management imports in django_typer/__init__.py <https://github.com/django-commons/django-typer/issues/95>`_
+* Fixed `ParamSpec includes self for group methods <https://github.com/django-commons/django-typer/issues/73>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
 
 v2.4.0 (2024-11-07)
