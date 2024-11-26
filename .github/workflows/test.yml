@@ -105,12 +105,14 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Release Dependencies
+    - name: Install Poetry
       run: |
         pip install pipx
         pipx install poetry
         poetry config virtualenvs.create true
         poetry config virtualenvs.in-project true
+    - name: Install Release Dependencies
+      run: |
         poetry run pip install --upgrade pip
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
