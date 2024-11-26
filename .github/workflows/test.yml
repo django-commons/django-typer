@@ -113,6 +113,7 @@ jobs:
         poetry config virtualenvs.in-project true
     - name: Install Release Dependencies
       run: |
+        poetry env use python
         poetry run pip install --upgrade pip setuptools wheel
         poetry install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
