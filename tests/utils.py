@@ -183,7 +183,6 @@ def run_command(
                 command,
                 *args,
             ],
-            shell=True,
             capture_output=True,
             text=False,
             env=env,
