@@ -15,7 +15,7 @@ on:
 
 jobs:
 
-  test:
+  test-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -82,7 +82,64 @@ jobs:
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        name: coverage-linux-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+  test-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '4.2' # LTS April 2026
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '4.2'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    - name: Install Release Dependencies
+      run: |
+        poetry config virtualenvs.in-project true
+        poetry run pip install --upgrade pip
+        poetry install
+        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+    - name: Install VIM
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: Setup tmate session
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+      timeout-minutes: 60
+    - name: Run Unit Tests
+      run: |
+        poetry run pip install colorama
+        poetry run pytest
+        poetry run pip uninstall -y rich
+        poetry run pytest --cov-append
+        poetry run pip uninstall -y colorama
+        poetry run pytest -k test_ctor_params --cov-append
+        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-windows-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   linux-shell-completion:

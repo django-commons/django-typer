@@ -2528,6 +2528,12 @@ class OutputWrapper(BaseOutputWrapper):
             msg = str(msg)
         return super().write(msg=msg, style_func=style_func, ending=ending)
 
+    def flush(self):
+        try:
+            super().flush()
+        except ValueError:
+            pass
+
 
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     """

@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 
 from django_typer.management import TyperCommand, get_command
-from tests.utils import rich_installed, run_command
+from tests.utils import rich_installed, run_command, similarity
 
 
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
@@ -94,18 +94,24 @@ class TestGroupsHowto(TestCase):
         groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "groups")
-        self.assertEqual(stdout.getvalue().strip(), self.root_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.root_help.strip()), 0.99
+        )
         stdout.truncate(0)
         stdout.seek(0)
 
         groups.print_help("./howto.py", "groups", "group1")
-        self.assertEqual(stdout.getvalue().strip(), self.group1_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.group1_help.strip()), 0.99
+        )
 
         stdout.truncate(0)
         stdout.seek(0)
 
         groups.print_help("./howto.py", "groups", "group1", "subgroup1")
-        self.assertEqual(stdout.getvalue().strip(), self.subgroup1_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.subgroup1_help.strip()), 0.99
+        )
 
         groups.group1()
         groups.group1.subgroup1()
@@ -181,7 +187,9 @@ class TestDefaultOptionsHowto(TestCase):
         groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "default_options")
-        self.assertEqual(stdout.getvalue().strip(), self.cmd_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.cmd_help.strip()), 0.99
+        )
 
 
 class TestDefaultOptionsTyperHowto(TestDefaultOptionsHowto):

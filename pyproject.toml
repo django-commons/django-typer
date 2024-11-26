@@ -58,7 +58,10 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
-click = ">=8.1.0"
+
+# TODO - replace after click 8.1.8 or 8.2 release, <= 8.1.7 has terminal color bug that fails on windows
+#click = ">=8.1.8"
+click = { git = "https://github.com/pallets/click.git", branch = "main" }
 
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer
@@ -102,6 +105,8 @@ graphviz = ">=0.20.3"
 sphinx-tabs = ">=3.4.5"
 furo = ">=2024.7.18"
 pluggy = ">=1.5.0"
+pywinpty = { version = ">=2.0.14", markers = "sys_platform == 'win32'" }
+pytest-timeout = ">=2.3.1"
 
 [tool.poetry.extras]
 rich = ["rich"]

@@ -1,45 +1,40 @@
 from django.core.management import call_command
 from django.test import TestCase
+import pytest
 
 from tests.utils import interact
 
 
 class TestPromptOptions(TestCase):
+    @pytest.mark.timeout(30)
     def test_run_with_option_prompt(self):
         cmd = interact("prompt", "--no-color", "cmd1", "bckohan")
-        cmd.expect("Password: ")
+        cmd.expect("Password:")
         cmd.sendline("test_password")
-
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "bckohan test_password")
+        cmd.expect("bckohan test_password")
 
         cmd = interact("prompt", "--no-color", "cmd2", "bckohan")
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "bckohan None")
+        cmd.expect("bckohan None")
 
         cmd = interact("prompt", "--no-color", "cmd2", "bckohan", "-p")
-        cmd.expect("Password: ")
+        cmd.expect("Password:")
         cmd.sendline("test_password2")
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "bckohan test_password2")
+        cmd.expect("bckohan test_password2")
 
         cmd = interact("prompt", "--no-color", "cmd3", "bckohan")
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "bckohan default")
+        cmd.expect("bckohan default")
 
         cmd = interact("prompt", "--no-color", "cmd3", "bckohan", "-p")
-        cmd.expect(r"Password \[default\]: ")
+        cmd.expect(r"Password \[default\]:")
         cmd.sendline("test_password3")
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "bckohan test_password3")
+        cmd.expect("bckohan test_password3")
 
         cmd = interact("prompt", "--no-color", "group1", "cmd4", "bckohan")
-        cmd.expect(r"Flag: ")
+        cmd.expect(r"Flag:")
         cmd.sendline("test_flag")
-        cmd.expect(r"Password: ")
+        cmd.expect(r"Password:")
         cmd.sendline("test_password4")
-        result = cmd.read().decode("utf-8").strip().splitlines()[0]
-        self.assertEqual(result, "test_flag bckohan test_password4")
+        cmd.expect("test_flag bckohan test_password4")
 
     def test_call_with_option_prompt(self):
         self.assertEqual(

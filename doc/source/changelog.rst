@@ -5,6 +5,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Implemented `Run full test suite on windows in CI <https://github.com/django-commons/django-typer/issues/146>`_
 * Fixed `Typer-style interface throws an assertion when no callback is present on a subgroup. <https://github.com/django-commons/django-typer/issues/145>`_
 * Implemented `ANSI color control sequences should optionally be scrubbed from shell completions <https://github.com/django-commons/django-typer/issues/144>`_
 * Fixed `supressed_base_arguments are still present in the Context <https://github.com/django-commons/django-typer/issues/143>`_

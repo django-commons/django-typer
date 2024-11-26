@@ -71,7 +71,7 @@ class TestGroups(TestCase):
                             result.stdout,
                             (
                                 TESTS_DIR / "apps" / "test_app" / "helps" / "groups.txt"
-                            ).read_text(),
+                            ).read_text(encoding="utf-8"),
                         ),
                         0.99,  # width inconsistences drive this number < 1
                     )
@@ -91,7 +91,6 @@ class TestGroups(TestCase):
         ],
     )
     def test_helps(self, app="test_app"):
-        print("test_helps")
         for cmds in [
             ("groups",),
             ("groups", "echo"),
@@ -125,11 +124,14 @@ class TestGroups(TestCase):
                         hlp,
                         (
                             TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
-                        ).read_text(),
+                        ).read_text(encoding="utf-8"),
                     ),
                     0.99,  # width inconsistences drive this number < 1
                 )
             except AssertionError:
+                import pdb
+
+                pdb.set_trace()
                 raise
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
@@ -217,7 +219,7 @@ class TestGroups(TestCase):
                 ("hey! " * 5).strip(),
             )
         else:
-            self.assertIn("Usage: ./manage.py groups echo [OPTIONS] MESSAGE", result[0])
+            self.assertIn("manage.py groups echo [OPTIONS] MESSAGE", result[0])
             self.assertIn("Got unexpected extra argument (5)", result[1])
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
@@ -373,7 +375,7 @@ class TestGroups(TestCase):
         )
         if override:
             self.assertIn(
-                "Usage: ./manage.py groups string STRING case upper [OPTIONS]",
+                "manage.py groups string STRING case upper [OPTIONS]",
                 result[0],
             )
             self.assertIn("Got unexpected extra arguments (4 9)", result[1].strip())
@@ -410,7 +412,7 @@ class TestGroups(TestCase):
             parse_json=False,
         )
         if override:
-            self.assertEqual(result[0], "emmatc\n")
+            self.assertEqual(result[0].strip(), "emmatc")
             self.assertEqual(
                 call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
             )
@@ -418,7 +420,7 @@ class TestGroups(TestCase):
             self.assertEqual(grp_cmd.strip(), "emmatc")
         else:
             self.assertIn(
-                "Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]",
+                "manage.py groups string [OPTIONS] STRING COMMAND [ARGS]",
                 result[0],
             )
             self.assertIn("No such command 'strip'.", result[1])

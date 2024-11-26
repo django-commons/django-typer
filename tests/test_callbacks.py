@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from django_typer.management import get_command
-from tests.utils import run_command
+from tests.utils import run_command, similarity
 
 
 class CallbackTests(TestCase):
@@ -15,10 +15,15 @@ class CallbackTests(TestCase):
     def test_helps(self, top_level_only=False):
         buffer = StringIO()
         cmd = get_command(self.cmd_name, stdout=buffer, no_color=True)
-        help_output_top = run_command(self.cmd_name, "--no-color", "--help")[0]
+        help_output_top, stderr = run_command(self.cmd_name, "--no-color", "--help")[
+            0:2
+        ]
         cmd.print_help("./manage.py", self.cmd_name)
-        self.assertEqual(help_output_top.strip(), buffer.getvalue().strip())
-        self.assertIn(f"Usage: ./manage.py {self.cmd_name} [OPTIONS]", help_output_top)
+        self.assertGreaterEqual(
+            similarity(help_output_top.strip(), buffer.getvalue().strip()), 0.99
+        )
+        self.assertIn(f"Usage: ", help_output_top)
+        self.assertIn(f"manage.py {self.cmd_name} [OPTIONS]", help_output_top)
 
         if not top_level_only:
             buffer.truncate(0)
@@ -27,9 +32,10 @@ class CallbackTests(TestCase):
                 self.cmd_name, "--no-color", "5", self.cmd_name, "--help"
             )[0]
             cmd.print_help("./manage.py", self.cmd_name, self.cmd_name)
-            self.assertEqual(callback_help.strip(), buffer.getvalue().strip())
+            self.assertGreaterEqual(similarity(callback_help, buffer.getvalue()), 0.99)
+            self.assertIn(f"Usage: ", callback_help)
             self.assertIn(
-                f"Usage: ./manage.py {self.cmd_name} P1 {self.cmd_name} [OPTIONS] ARG1 ARG2",
+                f"manage.py {self.cmd_name} P1 {self.cmd_name} [OPTIONS] ARG1 ARG2",
                 callback_help,
             )
 

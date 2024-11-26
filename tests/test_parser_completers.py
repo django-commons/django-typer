@@ -1108,8 +1108,10 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertIn(f'"{settings_expected[-1]}"', result)
 
     def test_pythonpath_completer(self):
-        local_dirs = [pth for pth in os.listdir() if Path(pth).is_dir()]
-        local_files = [f for f in os.listdir() if not Path(f).is_dir()]
+        local_dirs = [
+            Path(pth).as_posix() for pth in os.listdir() if Path(pth).is_dir()
+        ]
+        local_files = [Path(f).as_posix() for f in os.listdir() if not Path(f).is_dir()]
         result = run_command(
             "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath "
         )[0]
@@ -1143,12 +1145,12 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertNotIn(f'"./{pth}"', result)
 
         local_dirs = [
-            str(Path("django_typer") / d)
+            (Path("django_typer") / d).as_posix()
             for d in os.listdir("django_typer")
             if (Path("django_typer") / d).is_dir()
         ]
         local_files = [
-            str(Path("django_typer") / f)
+            (Path("django_typer") / f).as_posix()
             for f in os.listdir("django_typer")
             if not (Path("django_typer") / f).is_dir()
         ]
@@ -1206,6 +1208,8 @@ class TestShellCompletersAndParsers(TestCase):
             "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath /"
         )[0]
         for pth in os.listdir("/"):
+            if pth.startswith("$"):
+                continue  # TODO weird case of /\\$Recycle.Bin on windows
             if Path(f"/{pth}").is_dir():
                 self.assertIn(f'"/{pth}"', result)
             else:
@@ -1239,7 +1243,7 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertNotIn("django_typer", result)
 
     def test_path_completer(self):
-        local_paths = [pth for pth in os.listdir()]
+        local_paths = [Path(pth).as_posix() for pth in os.listdir()]
         result = run_command(
             "shellcompletion", "complete", "--shell", "zsh", "completion --path "
         )[0]
@@ -1276,7 +1280,7 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertNotIn(f'"./{pth}"', result)
 
         local_paths = [
-            str(Path("django_typer") / d)
+            (Path("django_typer") / d).as_posix()
             for d in os.listdir("django_typer")
             if (Path("django_typer") / d).is_dir()
         ]
@@ -1330,6 +1334,8 @@ class TestShellCompletersAndParsers(TestCase):
             "shellcompletion", "complete", "--shell", "zsh", "completion --path /"
         )[0]
         for pth in os.listdir("/"):
+            if pth.startswith("$"):
+                continue  # TODO weird case of /\\$Recycle.Bin on windows
             self.assertIn(f'"/{pth}"', result)
 
         result = run_command(

@@ -52,6 +52,8 @@ from django.utils.translation import gettext as _
 Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
 Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
 
+PATH_SEPARATOR = os.sep
+
 
 class ModelObjectCompleter:
     """
@@ -494,7 +496,7 @@ def complete_path(
     completions = []
     incomplete_path = Path(incomplete)
     partial_dir = ""
-    if not exists(incomplete_path) and not incomplete.endswith(os.sep):
+    if not exists(incomplete_path) and not incomplete.endswith(PATH_SEPARATOR):
         partial_dir = incomplete_path.name
         incomplete_path = incomplete_path.parent
     elif incomplete_path.is_file() and not dir_only:
@@ -508,7 +510,7 @@ def complete_path(
                 completions.append(
                     CompletionItem(
                         f"{to_complete}"
-                        f"{'' if not to_complete or to_complete.endswith(os.sep) else os.sep}"
+                        f"{'' if not to_complete or to_complete.endswith(PATH_SEPARATOR) else PATH_SEPARATOR}"
                         f"{child}",
                         type="dir" if (incomplete_path / child).is_dir() else "file",
                     )

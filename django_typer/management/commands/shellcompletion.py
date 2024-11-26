@@ -502,12 +502,18 @@ class Command(TyperCommand):
             :width: 80
             :convert-png: latex
         """
+        from django_typer import completers
+
         os.environ[self.COMPLETE_VAR] = (
             f"complete_{shell.value}"
             if shell
             else os.environ.get(self.COMPLETE_VAR, f"complete_{self.shell.value}")
         )
         self.shell = Shells(os.environ[self.COMPLETE_VAR].partition("_")[2])
+        if self.shell in [Shells.powershell, Shells.pwsh]:
+            completers.PATH_SEPARATOR = "\\"
+        else:
+            completers.PATH_SEPARATOR = "/"
 
         completion_init()
         CompletionClass = get_completion_class(  # pylint: disable=C0103
