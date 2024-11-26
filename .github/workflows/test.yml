@@ -331,7 +331,7 @@ jobs:
   #       path: windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   coverage-combine:
-    needs: [test, linux-shell-completion, macos-shell-completion] #, windows-shell-completion]
+    needs: [test-linux, test-windows, linux-shell-completion, macos-shell-completion] #, windows-shell-completion]
     runs-on: ubuntu-latest
 
     steps:
