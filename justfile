@@ -1,4 +1,4 @@
-set windows-powershell := true
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 install:
     poetry install -E rich
@@ -11,18 +11,27 @@ check-package:
     poetry check
     poetry run pip check
 
-build-docs:
-    cd ./doc && poetry run make html
+clean-docs:
+    python -c "from shutil import rmtree; rmtree('./doc/build', ignore_errors=True)"
 
-docs:
-    {{ just_executable() }} --justfile {{ justfile() }} build-docs
+build-docs-html:
+    poetry run sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
+
+build-docs: build-docs-html
+
+build-docs-pdf:
+    poetry run sphinx-build --fresh-env --builder latexpdf --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
+
+open-docs:
     python -c "from pathlib import Path; import webbrowser; webbrowser.open(Path('./doc/build/html/index.html').absolute().as_uri())"
+
+docs: build-docs-html open-docs
 
 check-docs-links:
     poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./doc/source ./doc/build > /dev/null 2>&1
 
 check-docs:
-    cd ./doc && poetry run doc8 --ignore-path build --max-line-length 100 -q
+    poetry run doc8 --ignore-path ./build --max-line-length 100 -q ./doc
 
 check-lint:
     poetry run ruff check --select I
@@ -44,18 +53,9 @@ lint:
     poetry run ruff check --fix --select I
     poetry run ruff check --fix
 
-fix-all:
-    {{ just_executable() }} --justfile {{ justfile() }} format
-    {{ just_executable() }} --justfile {{ justfile() }} lint
+fix-all: format lint
 
-check-all:
-    {{ just_executable() }} --justfile {{ justfile() }} check-lint
-    {{ just_executable() }} --justfile {{ justfile() }} check-format
-    {{ just_executable() }} --justfile {{ justfile() }} check-types
-    {{ just_executable() }} --justfile {{ justfile() }} check-package
-    {{ just_executable() }} --justfile {{ justfile() }} check-docs
-    {{ just_executable() }} --justfile {{ justfile() }} check-docs-links
-    {{ just_executable() }} --justfile {{ justfile() }} check-readme
+check-all: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
 test:
     poetry run pytest
