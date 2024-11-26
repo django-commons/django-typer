@@ -2320,7 +2320,7 @@ class CommandNode:
                     name: self.context.command.get_command(self.context, name)  # type: ignore[attr-defined]
                     for name in (
                         self.context.command.list_commands(self.context)
-                        if isinstance(self.context.command, click.MultiCommand)
+                        if isinstance(self.context.command, click.Group)
                         else []
                     )
                 },
