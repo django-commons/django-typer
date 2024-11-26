@@ -1,3 +1,5 @@
+set windows-powershell := true
+
 install:
     poetry install -E rich
 
