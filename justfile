@@ -31,7 +31,7 @@ check-docs-links:
     poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./doc/source ./doc/build > /dev/null 2>&1
 
 check-docs:
-    poetry run doc8 --ignore-path ./build --max-line-length 100 -q ./doc
+    poetry run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
 
 check-lint:
     poetry run ruff check --select I
