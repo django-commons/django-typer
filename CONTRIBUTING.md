@@ -40,11 +40,13 @@ just check-docs-links  # check for broken links in the docs
 
 `django-typer` uses [ruff](https://docs.astral.sh/ruff/) for Python linting, header import standardization and code formatting. [mypy](http://mypy-lang.org/) and [pyright](https://github.com/microsoft/pyright) are used for static type checking. Before any PR is accepted the following must be run, and static analysis tools should not produce any errors or warnings. Disabling certain errors or warnings where justified is acceptable:
 
+To fix formatting and linting problems that are fixable run:
+
 ```bash
 just fix-all
 ```
 
-To run static analysis without automated fixing you can run:
+To run all static analysis without automated fixing you can run:
 
 ```bash
 just check-all
