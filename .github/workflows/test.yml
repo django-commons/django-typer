@@ -87,6 +87,9 @@ jobs:
 
   test-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
