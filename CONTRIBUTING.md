@@ -6,6 +6,12 @@ We are actively seeking additional maintainers. If you're interested, please ope
 
 ## Installation
 
+### Install Just
+
+We provide a justfile with recipes for all the development tasks. You should [install just](https://just.systems/man/en/installation.html) if it is not on your system already.
+
+### Install Poetry
+
 `django-typer` uses [Poetry](https://python-poetry.org/) for environment, package, and dependency management:
 
 ```shell
@@ -25,9 +31,9 @@ git config --global core.symlinks true
 `django-typer` documentation is generated using [Sphinx](https://www.sphinx-doc.org) with the [furo](https://github.com/pradyunsg/furo) theme. Any new feature PRs must provide updated documentation for the features added. To build the docs run doc8 to check for formatting issues then run Sphinx:
 
 ```bash
-cd ./doc
-poetry run doc8 --ignore-path build --max-line-length 100
-poetry run make html
+just docs  # builds docs
+just check-docs  # lint the docs
+just check-docs-links  # check for broken links in the docs
 ```
 
 ## Static Analysis
@@ -35,13 +41,13 @@ poetry run make html
 `django-typer` uses [ruff](https://docs.astral.sh/ruff/) for Python linting, header import standardization and code formatting. [mypy](http://mypy-lang.org/) and [pyright](https://github.com/microsoft/pyright) are used for static type checking. Before any PR is accepted the following must be run, and static analysis tools should not produce any errors or warnings. Disabling certain errors or warnings where justified is acceptable:
 
 ```bash
-./check.sh
+just fix-all
 ```
 
 To run static analysis without automated fixing you can run:
 
 ```bash
-./check.sh --no-fix
+just check-all
 ```
 
 ## Running Tests
@@ -51,7 +57,7 @@ To run static analysis without automated fixing you can run:
 To run the full suite:
 
 ```shell
-poetry run pytest
+just test
 ```
 
 To run a single test, or group of tests in a class:

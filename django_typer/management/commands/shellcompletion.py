@@ -37,7 +37,7 @@ from click.shell_completion import (
     CompletionItem,
     add_completion_class,
     get_completion_class,
-    split_arg_string
+    split_arg_string,
 )
 from django.core.management import CommandError, ManagementUtility
 from django.template import Context, Engine
