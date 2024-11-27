@@ -139,6 +139,7 @@ exclude = ["tests"]
 [tool.doc8]
 max-line-length = 100
 sphinx = true
+ignore = [ "D004" ]
 
 [tool.pytest.ini_options]
 # py.test options:
