@@ -1,6 +1,7 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 install:
+    poetry env use python
     poetry install -E rich
 
 check-types:
@@ -42,7 +43,7 @@ check-format:
     poetry run ruff format --line-length 80 --check examples
 
 check-readme:
-    python -m readme_renderer ./README.md -o /tmp/README.html
+    poetry run python -m readme_renderer ./README.md -o /tmp/README.html
 
 format:
     just --fmt --unstable
@@ -58,4 +59,4 @@ fix-all: format lint
 check-all: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
 test:
-    poetry run pytest
+    poetry run pytest --cov-append

@@ -105,6 +105,8 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Setup Just
+      uses: extractions/setup-just@v2
     - name: Install Poetry
       run: |
         pip install pipx
@@ -116,7 +118,7 @@ jobs:
       run: |
         poetry env use python
         poetry run pip install --upgrade pip setuptools wheel
-        poetry install
+        just install
         poetry run pip install -U "Django~=${{ matrix.django-version }}"
     - name: Install VIM
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -129,8 +131,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pip install colorama
-        poetry run pytest
+        just test
         poetry run pip uninstall -y rich
         poetry run pytest --cov-append
         poetry run pip uninstall -y colorama
