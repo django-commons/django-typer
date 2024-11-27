@@ -108,6 +108,7 @@ jobs:
     - name: Install Poetry
       run: |
         pip install pipx
+        pipx ensurepath
         pipx install poetry
         poetry config virtualenvs.create true
         poetry config virtualenvs.in-project true
