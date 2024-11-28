@@ -4,6 +4,9 @@ install:
     poetry env use python
     poetry install -E rich
 
+install-colorama:
+    poetry run pip install colorama
+
 install-docs:
     poetry env use python
     poetry install --with docs
@@ -78,8 +81,7 @@ test-rich:
     poetry install -E rich
     poetry run pytest -m rich --cov-append
 
-test: test-rich test-no-rich
-    poetry run pip install colorama
+test: test-rich test-no-rich install-colorama
     poetry run pytest -m "not rich and not no_rich" --cov-append
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append

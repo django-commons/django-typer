@@ -5,6 +5,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
 * Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_
 * Implemented `Run full test suite on windows in CI <https://github.com/django-commons/django-typer/issues/146>`_
 * Fixed `Typer-style interface throws an assertion when no callback is present on a subgroup. <https://github.com/django-commons/django-typer/issues/145>`_

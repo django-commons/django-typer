@@ -69,12 +69,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pip install colorama
-        poetry run pytest
-        poetry run pip uninstall -y rich
-        poetry run pytest --cov-append
-        poetry run pip uninstall -y colorama
-        poetry run pytest -k test_ctor_params --cov-append
+        just test
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -133,16 +128,74 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test
-        poetry run pip uninstall -y rich
-        poetry run pytest --cov-append
-        poetry run pip uninstall -y colorama
-        poetry run pytest -k test_ctor_params --cov-append
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
         name: coverage-windows-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+  test-macos:
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: zsh
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Set up Homebrew
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: Homebrew/actions/setup-homebrew@master
+    - name: Install Emacs
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: Install Poetry
+      run: |
+        pip install pipx
+        pipx ensurepath
+        pipx install poetry
+        poetry config virtualenvs.create true
+        poetry config virtualenvs.in-project true
+    - name: Install Release Dependencies
+      run: |
+        poetry env use python
+        poetry run pip install --upgrade pip setuptools wheel
+        just install
+        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+    - name: Setup tmate session
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+      timeout-minutes: 60
+    - name: Run Unit Tests
+      run: |
+        just test
+        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-macos-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   linux-shell-completion:
