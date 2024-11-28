@@ -4,6 +4,10 @@ install:
     poetry env use python
     poetry install -E rich
 
+install-docs:
+    poetry env use python
+    poetry install --with docs
+
 check-types:
     poetry run mypy django_typer
     poetry run pyright
@@ -15,13 +19,21 @@ check-package:
 clean-docs:
     python -c "from shutil import rmtree; rmtree('./doc/build', ignore_errors=True)"
 
-build-docs-html:
+clean-env:
+    python -c "import shutil, sys; shutil.rmtree(sys.argv[1])" $(poetry env info --path)
+
+clean-git-ignored:
+    git clean -fdX
+
+clean: clean-docs clean-env clean-git-ignored
+
+build-docs-html: install-docs
     poetry run sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
 
-build-docs: build-docs-html
-
-build-docs-pdf:
+build-docs-pdf: install-docs
     poetry run sphinx-build --fresh-env --builder latexpdf --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
+
+build-docs: build-docs-html
 
 open-docs:
     python -c "from pathlib import Path; import webbrowser; webbrowser.open(Path('./doc/build/html/index.html').absolute().as_uri())"
@@ -58,5 +70,16 @@ fix-all: format lint
 
 check-all: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
-test:
-    poetry run pytest --cov-append
+test-no-rich:
+    poetry run pip uninstall -y rich
+    poetry run pytest -m no_rich --cov-append
+
+test-rich:
+    poetry install -E rich
+    poetry run pytest -m rich --cov-append
+
+test: test-rich test-no-rich
+    poetry run pip install colorama
+    poetry run pytest -m "not rich and not no_rich" --cov-append
+    poetry run pip uninstall -y colorama
+    poetry run pytest -k test_ctor_params --cov-append

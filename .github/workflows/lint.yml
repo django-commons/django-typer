@@ -2,6 +2,7 @@ name: Lint
 
 on:
   push:
+    branches: main
   pull_request:
   workflow_dispatch:
     inputs:
@@ -47,14 +48,12 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pipx
+          sudo apt install pipx
           pipx ensurepath
           pipx install poetry
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
-          poetry install -E rich
-          poetry run pip install colorama
+          just install
           poetry run pip install -U "django~=${{ matrix.django-version }}"
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
@@ -72,6 +71,4 @@ jobs:
           just check-format
           just check-types
           just check-package
-          just check-docs
           just check-readme
-          echo "$(poetry env info --path)/bin" >> $GITHUB_PATH

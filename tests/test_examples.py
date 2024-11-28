@@ -1,7 +1,3 @@
-import sys
-from contextlib import redirect_stdout
-from io import StringIO
-
 import pytest
 from django.test import TestCase, override_settings
 
@@ -304,6 +300,8 @@ Options:
 class ExampleTests(TestCase):
     settings = "tests.settings.examples"
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_basic(self):
         observed_help = run_command(
             "basic", "--settings", self.settings, "--no-color", "--help"
@@ -317,6 +315,8 @@ class ExampleTests(TestCase):
             0.99,
         )
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_multi(self):
         observed_help = run_command(
             "multi", "--settings", self.settings, "--no-color", "--help"
@@ -350,6 +350,8 @@ class ExampleTests(TestCase):
             0.99,
         )
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_hierarchy(self):
         observed_help = run_command(
             "hierarchy", "--settings", self.settings, "--no-color", "--help"

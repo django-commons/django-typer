@@ -32,6 +32,7 @@ class TestDefaultCmdTyperHowto(TestDefaultCmdHowto):
     cmd = "default_cmd_typer"
 
 
+@pytest.mark.rich
 @pytest.mark.skipif(not rich_installed, reason="This test requires rich help output")
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
 class TestGroupsHowto(TestCase):
@@ -148,6 +149,7 @@ class TestInitializerTyperHowto(TestInitializerHowto):
     cmd = "initializer_typer"
 
 
+@pytest.mark.rich
 @pytest.mark.skipif(not rich_installed, reason="This test requires rich help output")
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
 class TestDefaultOptionsHowto(TestCase):
@@ -325,6 +327,8 @@ class TestOrderHowTo(TestCase):
 
     grp_cls = AlphabetizeCommands
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_howto_order(self):
         from tests.apps.howto.management.commands.order import Command as OrderCommand
 

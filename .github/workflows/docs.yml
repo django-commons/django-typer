@@ -1,0 +1,54 @@
+name: Lint
+
+on:
+  push:
+    branches: main
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Open ssh debug session.'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+
+  linting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12  # keep this aligned with .readthedocs.yaml
+      - name: Install Just
+        uses: extractions/setup-just@v2
+      - name: Install LaTex
+        run: |
+          sudo apt install texlive-full
+      - name: Install Dependencies
+        run: |
+          sudo apt install pipx
+          pipx ensurepath
+          pipx install poetry
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          just install
+      - name: Install Emacs
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          sudo apt install emacs
+      - name: Setup tmate session
+        if: ${{ github.event.inputs.debug == 'true' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+        timeout-minutes: 60
+      - name: Lint/Build Documentation
+        run: |
+          just check-docs
+          just check-docs-links
+          just build-docs-html
+          just build-docs-pdf

@@ -11,7 +11,7 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 
 from django_typer.management import get_command
-from tests.utils import TESTS_DIR, manage_py, run_command, similarity
+from tests.utils import TESTS_DIR, manage_py, run_command, similarity, rich_installed
 
 
 class TestGroups(TestCase):
@@ -19,16 +19,6 @@ class TestGroups(TestCase):
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
     """
-
-    rich_installed: bool
-
-    def setUp(self):
-        try:
-            import rich  # noqa
-
-            self.rich_installed = True
-        except ImportError:
-            self.rich_installed = False
 
     def test_group_call(self):
         with self.assertRaises(NotImplementedError):
@@ -79,6 +69,8 @@ class TestGroups(TestCase):
         finally:
             os.chdir(cwd)
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     @override_settings(
         INSTALLED_APPS=[
             "tests.apps.test_app",
@@ -117,7 +109,7 @@ class TestGroups(TestCase):
             cmd = get_command(cmds[0], stdout=buffer, no_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
-            helps_dir = "helps" if self.rich_installed else "helps_no_rich"
+            helps_dir = "helps" if rich_installed else "helps_no_rich"
             try:
                 self.assertGreater(
                     sim := similarity(
@@ -138,9 +130,11 @@ class TestGroups(TestCase):
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
-            if self.rich_installed:
+            if rich_installed:
                 self.assertTrue("\x1b" in hlp)
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     @override_settings(
         INSTALLED_APPS=[
             "tests.apps.test_app2",

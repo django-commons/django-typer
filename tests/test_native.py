@@ -180,6 +180,7 @@ class TestNative(TestCase):
             DJANGO_VERSION,
         )
 
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_help_rich(self):
         stdout = StringIO()
@@ -192,6 +193,7 @@ class TestNative(TestCase):
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
+    @pytest.mark.no_rich
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_native_help_no_rich(self):
         stdout = StringIO()
@@ -226,6 +228,7 @@ class TestNativeGroups(TestCase):
         ("{command} grp1 cmd2", native_groups_grp1_cmd2_help_rich),
     ]
 
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_groups_helps(self):
         for cmd_pth, expected_help in self.commands:
