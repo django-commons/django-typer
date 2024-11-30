@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.5.0 (2024-11-29)
+===================
+
+* Implemented `Support Typer >=0.14 <https://github.com/django-commons/django-typer/issues/149>`_
+* Fixed `Typer-style interface throws an assertion when no callback is present on a subgroup. <https://github.com/django-commons/django-typer/issues/145>`_
+
 v2.4.0 (2024-11-07)
 ===================
 
