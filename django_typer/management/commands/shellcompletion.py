@@ -123,7 +123,7 @@ class Command(TyperCommand):
         Django template engine that will find and render completer script templates.
         """
         return Engine(
-            dirs=[str(files("django_typer").joinpath("scripts"))],
+            dirs=[str(files("django_typer").joinpath("shells"))],
             libraries={
                 "default": "django.template.defaulttags",
                 "filter": "django.template.defaultfilters",

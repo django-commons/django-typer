@@ -38,13 +38,23 @@ build-docs-pdf: install-docs
 
 build-docs: build-docs-html
 
+build-wheel:
+    poetry build -f wheel
+
+build-sdist:
+    poetry build -f sdist
+
+build: build-docs-html
+    poetry build
+
 open-docs:
-    python -c "from pathlib import Path; import webbrowser; webbrowser.open(Path('./doc/build/html/index.html').absolute().as_uri())"
+    poetry run python ./scripts/open-docs.py
 
 docs: build-docs-html open-docs
 
 check-docs-links:
-    poetry run sphinx-build -b linkcheck -q -D linkcheck_timeout=5 ./doc/source ./doc/build > /dev/null 2>&1
+    -poetry run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
+    poetry run python ./doc/broken_links.py
 
 check-docs:
     poetry run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
@@ -65,13 +75,15 @@ format:
     poetry run ruff format
     poetry run ruff format --line-length 80 examples
 
-lint:
+sort-imports:
     poetry run ruff check --fix --select I
+
+lint: sort-imports
     poetry run ruff check --fix
 
-fix-all: format lint
+fix: format lint
 
-check-all: check-lint check-format check-types check-package check-docs check-docs-links check-readme
+check: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
 test-no-rich:
     poetry run pip uninstall -y rich
@@ -85,3 +97,5 @@ test: test-rich test-no-rich install-colorama
     poetry run pytest -m "not rich and not no_rich" --cov-append
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append
+
+precommit: fix
