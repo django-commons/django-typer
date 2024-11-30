@@ -66,7 +66,7 @@ click = { git = "https://github.com/pallets/click.git", branch = "main" }
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer
 # version very strictly to bug fix releases for specific minor lines.
-typer-slim = ">=0.13.0,<0.14.0"
+typer-slim = ">=0.14.0,<0.15.0"
 
 # this should track typer's rich dependency, so long as our console
 # patches still work - so be sure to test on the low end of the range

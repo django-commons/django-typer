@@ -5,6 +5,7 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
+import pytest
 
 from django.apps import apps
 from django.core.management import CommandError, call_command

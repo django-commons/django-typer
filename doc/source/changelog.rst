@@ -8,7 +8,6 @@ v3.0.0 (202X-XX-XX)
 * Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
 * Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_
 * Implemented `Run full test suite on windows in CI <https://github.com/django-commons/django-typer/issues/146>`_
-* Fixed `Typer-style interface throws an assertion when no callback is present on a subgroup. <https://github.com/django-commons/django-typer/issues/145>`_
 * Implemented `ANSI color control sequences should optionally be scrubbed from shell completions <https://github.com/django-commons/django-typer/issues/144>`_
 * Fixed `supressed_base_arguments are still present in the Context <https://github.com/django-commons/django-typer/issues/143>`_
 * Implemented `Add showcase of commands using django-typer to docs <https://github.com/django-commons/django-typer/issues/142>`_
@@ -16,6 +15,12 @@ v3.0.0 (202X-XX-XX)
 * Fixed `Remove management imports in django_typer/__init__.py <https://github.com/django-commons/django-typer/issues/95>`_
 * Fixed `ParamSpec includes self for group methods <https://github.com/django-commons/django-typer/issues/73>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
+
+v2.5.0 (2024-11-29)
+===================
+
+* Implemented `Support Typer >=0.14 <https://github.com/django-commons/django-typer/issues/149>`_
+* Fixed `Typer-style interface throws an assertion when no callback is present on a subgroup. <https://github.com/django-commons/django-typer/issues/145>`_
 
 v2.4.0 (2024-11-07)
 ===================

@@ -665,6 +665,10 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     information.
     """
 
+    def __init__(self, *args, **kwargs):
+        self._name = kwargs.get("name", None)
+        super().__init__(*args, **kwargs)
+
     def list_commands(self, ctx: click.Context) -> t.List[str]:
         """
         Do our best to list commands in definition order.
@@ -676,6 +680,18 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 ordered.append(defined)
                 cmds.remove(defined)
         return ordered + cmds
+
+    @property
+    def name(self) -> t.Optional[str]:
+        return (
+            self._name or self._callback.__name__.replace("_", "-")
+            if self._callback
+            else None
+        )
+
+    @name.setter
+    def name(self, name: t.Optional[str]):
+        self._name = name
 
 
 # staticmethod objects are not picklable which causes problems with deepcopy
