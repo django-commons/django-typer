@@ -1,5 +1,7 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
+#set windows-shell := ["pwsh", "-NoLogo", "-Command"]
+
 install:
     poetry env use python
     poetry install -E rich

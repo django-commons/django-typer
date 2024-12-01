@@ -248,3 +248,18 @@ def read_django_parameters():
 
 def to_platform_str(path: str) -> str:
     return path.replace("/", os.path.sep)
+
+
+def install_manage_script(name="manage"):
+    """
+    We don't want to deliver bogus entry_points so we manually install
+    manage.py to our distro's bin directory for shell complete testing.
+    """
+    bin_dir = Path(sys.executable).parent
+    with open(bin_dir / name, "wt") as ms:
+        ms.write(f"#!{sys.executable}{os.linesep}")
+        ms.write(f"import sys{os.linesep}")
+        ms.write(f"from tests.manage import main{os.linesep}")
+        ms.write(f"{os.linesep}")
+        ms.write(f"if __name__ == '__main__':{os.linesep}")
+        ms.write(f"    sys.exit(main()){os.linesep}")
