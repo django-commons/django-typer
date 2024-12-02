@@ -4,6 +4,7 @@ set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 install:
     poetry env use python
+    poetry lock
     poetry install -E rich
 
 install-colorama:

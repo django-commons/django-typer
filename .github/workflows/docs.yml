@@ -35,7 +35,7 @@ jobs:
           pipx install poetry
           poetry config virtualenvs.create true
           poetry config virtualenvs.in-project true
-          just install
+          just install --with-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |

@@ -42,7 +42,7 @@ LICENSE  text
 *.ipynb  text eol=lf
 
 # Declare files that will always have CRLF line endings on checkout.
-django_typer/shells/powershell.tmpl text eol=crlf
+django_typer/management/commands/shells/powershell.tmpl text eol=crlf
 
 # Binary files
 # ============
