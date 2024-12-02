@@ -147,10 +147,11 @@ class TestNativeInitOverride(
         )
 
     def test_native_groups_run(self):
-        self.assertEqual(
-            run_command(self.command, "--verbosity", "3", "main", "Brian")[0].strip(),
-            str({"verbosity": 3, "name": "Brian"}),
+        stdout, stderr, retcode = run_command(
+            self.command, "--verbosity", "3", "main", "Brian"
         )
+        self.assertEqual(retcode, 0, stderr)
+        self.assertEqual(stdout.strip(), str({"verbosity": 3, "name": "Brian"}))
 
         self.assertEqual(
             run_command(
@@ -320,7 +321,7 @@ class TestNativeOverrides(test_native.TestNativeGroups):
         native_groups = get_command(self.command)
         native_groups.init(verbosity=3)
         native_groups.init_grp1(flag=True)
-        native_groups.run_subgrp(option2=False, option1=True)
+        native_groups.subgrp(option2=False, option1=True)
         self.assertEqual(
             native_groups.sg_cmd1(),
             {"verbosity": 3, "flag": True, "option1": True, "option2": False},

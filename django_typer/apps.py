@@ -21,8 +21,8 @@ try_install = isinstance(tb_config, dict) and not tb_config.get("no_install", Fa
 
 if try_install:
     try:
-        import rich
-        from rich import traceback
+        import rich  # pyright: ignore[reportMissingImports]
+        from rich import traceback  # pyright: ignore[reportMissingImports]
 
         from django_typer import patch
 
@@ -74,7 +74,7 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
     if try_install:
         assert isinstance(tb_config, dict)
         try:
-            from rich import traceback
+            from rich import traceback  # pyright: ignore[reportMissingImports]
 
             expected = {
                 "no_install",

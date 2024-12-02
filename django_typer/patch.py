@@ -60,7 +60,7 @@ def apply() -> None:
         pass
 
     try:
-        from rich.console import Console
+        from rich.console import Console  # pyright: ignore[reportMissingImports]
 
         # this has to go here before rich Consoles are instantiated by Typer
         color_system: t.Optional[

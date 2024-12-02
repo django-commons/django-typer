@@ -5,10 +5,10 @@ app = Typer()
 # the normal way to add a subgroup in typer is to create a new Typer instance
 # and add it to the parent group using add_typer()
 grp1 = Typer()
-app.add_typer(grp1)
+app.add_typer(grp1, name="group1")
 
 grp2 = Typer()
-app.add_typer(grp2)
+app.add_typer(grp2, name="group2")
 
 
 @grp1.callback()

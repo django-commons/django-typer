@@ -66,9 +66,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_typer_callback_interface_matches(self):
-        dt_params = set(get_named_arguments(Typer.callback)) - {
-            "name"
-        }  # todo fix in 3.0
+        dt_params = set(get_named_arguments(Typer.callback))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(dt_params.symmetric_difference(typer_params))
@@ -78,9 +76,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_typer_initialize_interface_matches(self):
-        dt_params = set(get_named_arguments(Typer.initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        dt_params = set(get_named_arguments(Typer.initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(dt_params.symmetric_difference(typer_params))
@@ -136,9 +132,7 @@ class InterfaceTests(TestCase):
     def test_initialize_interface_matches(self):
         from django_typer.management import callback
 
-        initialize_params = set(get_named_arguments(initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(initialize_params.symmetric_difference(typer_params))
@@ -211,9 +205,7 @@ class InterfaceTests(TestCase):
     def test_base_class_initialize_interface_matches(self):
         from django_typer.management import TyperCommand
 
-        command_params = set(get_named_arguments(TyperCommand.initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        command_params = set(get_named_arguments(TyperCommand.initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(command_params.symmetric_difference(typer_params))

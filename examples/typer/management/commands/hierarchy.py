@@ -13,7 +13,7 @@ app = Typer(
 
 math_grp = Typer(help=_("Do some math at the given precision."))
 
-app.add_typer(math_grp)
+app.add_typer(math_grp, name="math")
 
 
 @math_grp.callback()

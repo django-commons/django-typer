@@ -283,6 +283,10 @@ class TestNativeGroups(TestCase):
             native_groups.run_subgrp("hello!"),
             {"verbosity": 3, "flag": flag, "msg": "hello!"},
         )
+        self.assertEqual(
+            native_groups.subgrp("hello!"),
+            {"verbosity": 3, "flag": flag, "msg": "hello!"},
+        )
 
     def test_native_groups_run(self):
         self.assertEqual(

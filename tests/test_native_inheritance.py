@@ -269,7 +269,7 @@ class TestNativeOverrides(test_native.TestNativeGroups):
         native_groups = get_command(self.command)
         native_groups.init(verbosity=3)
         native_groups.init_grp1(flag=True)
-        native_groups.run_subgrp(option2=False, option1=True)
+        native_groups.subgrp(option2=False, option1=True)
         self.assertEqual(
             native_groups.sg_cmd1(),
             {"verbosity": 3, "flag": True, "option1": True, "option2": False},

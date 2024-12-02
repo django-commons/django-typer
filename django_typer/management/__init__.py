@@ -3,7 +3,7 @@ import sys
 import typing as t
 from collections import deque
 from copy import copy, deepcopy
-from functools import cached_property
+from functools import cached_property, lru_cache
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -665,10 +665,6 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     information.
     """
 
-    def __init__(self, *args, **kwargs):
-        self._name = kwargs.get("name", None)
-        super().__init__(*args, **kwargs)
-
     def list_commands(self, ctx: click.Context) -> t.List[str]:
         """
         Do our best to list commands in definition order.
@@ -680,18 +676,6 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 ordered.append(defined)
                 cmds.remove(defined)
         return ordered + cmds
-
-    @property
-    def name(self) -> t.Optional[str]:
-        return (
-            self._name or self._callback.__name__.replace("_", "-")
-            if self._callback
-            else None
-        )
-
-    @name.setter
-    def name(self, name: t.Optional[str]):
-        self._name = name
 
 
 # staticmethod objects are not picklable which causes problems with deepcopy
@@ -772,19 +756,17 @@ def _strip_static(func: t.Optional[t.Callable[P, R]]) -> t.Optional[t.Callable[P
 def _cache_initializer(
     callback: t.Callable[..., t.Any],
     common_init: bool,
-    name: t.Optional[str] = Default(None),
     help: t.Optional[t.Union[str, Promise]] = Default(None),
     cls: t.Type[DTGroup] = DTGroup,
     **kwargs: t.Any,
 ):
     def register(
         cmd: t.Type["TyperCommand"],
-        _name: t.Optional[str] = Default(None),
         _help: t.Optional[t.Union[str, Promise]] = Default(None),
         **extra,
     ):
+        extra.pop("_name", None)
         return cmd.typer_app.callback(
-            name=name or _name,
             cls=type(
                 "_Initializer",
                 (cls,),
@@ -944,8 +926,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     parent: t.Optional["Typer"] = None
 
-    name: t.Optional[str] = None
-
     _django_command: t.Optional[t.Type["TyperCommand"]] = None
 
     # these aren't defined on the super class which messes up __getattr__
@@ -1033,7 +1013,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         typer_app = kwargs.pop("typer_app", None)
         callback = _strip_static(callback)
         if callback:
-            self.name = callback.__name__
             self.is_method = is_method(callback)
 
         super().__init__(
@@ -1079,7 +1058,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     def callback(  # type: ignore
         self,
-        name: t.Optional[str] = Default(None),
         *,
         cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
@@ -1106,9 +1084,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
             self.is_method = is_method(func)
-            self.name = func.__name__
             self.registered_callback = typer.models.TyperInfo(
-                name=name,
                 cls=type(
                     "_Initializer",
                     (cls,),
@@ -1123,6 +1099,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 chain=chain,
                 result_callback=result_callback,
                 context_settings=context_settings,
+                name=func.__name__,
                 callback=func,
                 help=t.cast(str, help),
                 epilog=epilog,
@@ -1362,7 +1339,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             func: t.Callable[Concatenate[TC, P2], R2],
         ) -> Typer[P2, R2]:
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
-                name=name,
+                name=name or func.__name__.replace("_", "-"),
                 cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
@@ -1382,7 +1359,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 parent=self,
                 **kwargs,
             )
-            self.add_typer(grp)
+            self.add_typer(grp, name=name or func.__name__.replace("_", "-"))
             return grp
 
         return create_app
@@ -1396,7 +1373,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
         def create_finalizer(func: t.Callable[P2, R2]) -> t.Callable[P2, R2]:
             func = _strip_static(func)
-            # TODO not this easy: setattr(self, func.__name__, func)
             self.info.result_callback = Finalizer(func)
             return func
 
@@ -1449,7 +1425,6 @@ class BoundProxy(t.Generic[P, R]):
 
 
 def initialize(
-    name: t.Optional[str] = Default(None),
     *,
     cls: t.Type[DTGroup] = DTGroup,
     invoke_without_command: bool = Default(False),
@@ -1567,7 +1542,6 @@ def initialize(
         _cache_initializer(
             func,
             common_init=True,
-            name=name,
             cls=cls,
             invoke_without_command=invoke_without_command,
             subcommand_metavar=subcommand_metavar,
@@ -1821,7 +1795,7 @@ def group(
         func: t.Callable[Concatenate[TC, P], R],
     ) -> Typer[P, R]:
         grp = Typer(
-            name=name,
+            name=name or func.__name__.replace("_", "-"),
             cls=cls,
             invoke_without_command=invoke_without_command,
             no_args_is_help=no_args_is_help,
@@ -1913,27 +1887,31 @@ def _resolve_help(dj_cmd: "TyperCommand"):
         dj_cmd.typer_app.registered_commands[0].help = dj_cmd.typer_app.info.help
 
 
-def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.List[str]:
+def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.Set[str]:
     """
     For a command or group, get a list of attribute name and its CLI name.
 
     This annoyingly lives in different places depending on how the command
     or group was defined. This logic is sensitive to typer internals.
     """
-    names = []
+    names = set()
     if isinstance(tc, typer.models.CommandInfo):
         assert tc.callback
-        names.append(tc.callback.__name__)
-        if tc.name and tc.name != tc.callback.__name__:
-            names.append(tc.name)
-    else:
+        names.add(tc.callback.__name__)
         if tc.name:
-            names.append(tc.name)
-        if tc.info.name and tc.info.name != tc.name:
-            names.append(tc.info.name)
+            names.add(tc.name)
+    else:
+        if tc.info.name:
+            names.add(tc.info.name)
+        # TODO sometimes tc.info can be disjoint with tc.registered_callback
+        if tc.registered_callback and tc.registered_callback.callback:
+            names.add(tc.registered_callback.callback.__name__)
+        if tc.info.callback:
+            names.add(tc.info.callback.__name__)
     return names
 
 
+@lru_cache(maxsize=None)
 def _bfs_match(
     app: Typer, name: str
 ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer, Finalizer]]:
@@ -1973,12 +1951,12 @@ def _bfs_match(
         bfs_order.append(grp)
         # if names conflict, only pick the first the others have been
         # overridden - avoids walking down stale branches
-        seen = []
+        seen = set()
         for child_grp in reversed(grp.registered_groups):
             child_app = t.cast(Typer, child_grp.typer_instance)
             assert child_app
-            if child_app.name not in seen:
-                seen.extend(_names(child_app))
+            if child_app.info.name not in seen:
+                seen.update(_names(child_app))
                 queue.append(child_app)
 
     for grp in bfs_order[1:]:
@@ -2210,7 +2188,7 @@ class TyperCommandMeta(type):
                 if grp.top_level:
                     cpy = deepcopy(grp)
                     cpy.parent = typer_app
-                    typer_app.add_typer(cpy)
+                    typer_app.add_typer(cpy, name=cpy.info.name)
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
@@ -2718,7 +2696,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     @classmethod
     def initialize(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
-        name: t.Optional[str] = Default(None),
         *,
         cls: t.Type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
@@ -2781,7 +2758,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         if called_from_command_definition():
             return initialize(
-                name=name,
                 cls=cls,
                 context_settings=context_settings,
                 help=help,
@@ -2805,7 +2781,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             # we might have to override a method defined in the base class
             setattr(cmd, func.__name__, func)
             cmd.typer_app.callback(
-                name=name,
                 cls=type("_Initializer", (cls,), {"django_command": cmd}),
                 context_settings=context_settings,
                 help=help,
@@ -3042,7 +3017,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             func: t.Callable[Concatenate[TC, P], R],
         ) -> Typer[P, R]:
             grp: Typer[P, R] = Typer(
-                name=name,
+                name=name or func.__name__.replace("_", "-"),
                 cls=cls,
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
@@ -3062,7 +3037,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 parent=None,
                 **kwargs,
             )
-            cmd.typer_app.add_typer(grp)
+            cmd.typer_app.add_typer(grp, name=name or func.__name__.replace("_", "-"))
             return grp
 
         return create_app

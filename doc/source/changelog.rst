@@ -1,3 +1,5 @@
+.. include:: ./refs.rst
+
 ==========
 Change Log
 ==========
@@ -5,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* BREAKING `Remove name parameter from initialize()/callback(). <https://github.com/django-commons/django-typer/issues/150>`_
 * Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
 * Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_
 * Implemented `Run full test suite on windows in CI <https://github.com/django-commons/django-typer/issues/146>`_
@@ -15,6 +18,14 @@ v3.0.0 (202X-XX-XX)
 * Fixed `Remove management imports in django_typer/__init__.py <https://github.com/django-commons/django-typer/issues/95>`_
 * Fixed `ParamSpec includes self for group methods <https://github.com/django-commons/django-typer/issues/73>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
+
+Migrating from 2.x to 3.x
+-------------------------
+
+* The `name` parameter has been removed from
+  :func:`django_typer.management.initialize()` and :func:`django_typer.management.Typer.callback()`.
+  This change was forced by [upstream changes](https://github.com/fastapi/typer/pull/1052) in
+  Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to extend apps.
 
 v2.5.0 (2024-11-29)
 ===================
