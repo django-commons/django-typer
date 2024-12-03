@@ -30,6 +30,7 @@ Migrating from 2.x to 3.x
 v2.6.0 (2024-12-03)
 ===================
 
+* Fixed `On Python 3.13, sometimes flush is called on the stream wrapped by OutputWrapper after it is closed. <https://github.com/django-commons/django-typer/issues/155>`_
 * Implemented `Support Typer 0.15.x <https://github.com/django-commons/django-typer/issues/154>`_
 
 v2.5.0 (2024-11-29)

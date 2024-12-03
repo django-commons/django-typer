@@ -2523,10 +2523,9 @@ class OutputWrapper(BaseOutputWrapper):
         return super().write(msg=msg, style_func=style_func, ending=ending)
 
     def flush(self):
-        try:
+        # as of python 3.13, sometimes flush is called on a closed stream
+        if not getattr(self._out, "closed", False):
             super().flush()
-        except ValueError:
-            pass
 
 
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
