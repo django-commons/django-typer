@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.6.0 (2024-12-03)
+===================
+
+* Implemented `Support Typer 0.15.x <https://github.com/django-commons/django-typer/issues/154>`_
+
 v2.5.0 (2024-11-29)
 ===================
 
