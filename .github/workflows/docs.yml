@@ -30,12 +30,8 @@ jobs:
           sudo apt install texlive-full
       - name: Install Dependencies
         run: |
-          sudo apt install pipx
-          pipx ensurepath
-          pipx install poetry
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-          just install --with-docs
+          just init
+          just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
