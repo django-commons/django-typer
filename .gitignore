@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 poetry.lock
+poetry.toml
 .vscode
 django_typer/tests/dj_params.json
 **/.DS_Store

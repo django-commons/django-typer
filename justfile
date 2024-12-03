@@ -1,11 +1,22 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
-#set windows-shell := ["pwsh", "-NoLogo", "-Command"]
+default:
+    @just --list
 
-install:
+init:
+    pip install pipx
+    pipx ensurepath
+    pipx install poetry
+    poetry env use python
+    poetry config --local virtualenvs.create true
+    poetry config --local virtualenvs.in-project true
+    poetry run pip install --upgrade pip setuptools wheel
+
+install *PACKAGES="Django":
     poetry env use python
     poetry lock
     poetry install -E rich
+    poetry run pip install -U {{ PACKAGES }}
 
 install-colorama:
     poetry run pip install colorama
@@ -101,4 +112,12 @@ test: test-rich test-no-rich install-colorama
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append
 
+test-cases +TESTS:
+    poetry run pytest {{ TESTS }}
+
 precommit: fix
+
+coverage:
+    poetry run coverage combine --keep *.coverage
+    poetry run coverage report
+    poetry run coverage xml

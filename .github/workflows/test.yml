@@ -49,14 +49,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Release Dependencies
+    - name: Install
       run: |
-        pip install pipx
-        pipx install poetry
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+        just init
+        just install Django~=${{ matrix.django-version }}
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -103,19 +99,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install Poetry
+    - name: Install
       run: |
-        pip install pipx
-        pipx ensurepath
-        pipx install poetry
-        poetry config virtualenvs.create true
-        poetry config virtualenvs.in-project true
-    - name: Install Release Dependencies
-      run: |
-        poetry env use python
-        poetry run pip install --upgrade pip setuptools wheel
-        just install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+        just init
+        just install Django~=${{ matrix.django-version }}
     - name: Install VIM
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
@@ -168,19 +155,10 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         brew install emacs
-    - name: Install Poetry
+    - name: Install
       run: |
-        pip install pipx
-        pipx ensurepath
-        pipx install poetry
-        poetry config virtualenvs.create true
-        poetry config virtualenvs.in-project true
-    - name: Install Release Dependencies
-      run: |
-        poetry env use python
-        poetry run pip install --upgrade pip setuptools wheel
-        just install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+        just init
+        just install Django~=${{ matrix.django-version }}
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
@@ -219,14 +197,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Release Dependencies
+    - name: Install
       run: |
-        pip install pipx
-        pipx install poetry
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+        just init
+        just install Django~=${{ matrix.django-version }}
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -243,7 +217,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        poetry run pytest tests/shellcompletion/*
+        just test-cases tests/shellcompletion/*
         mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -307,14 +281,10 @@ jobs:
       run: |
         brew install emacs
 
-    - name: Install Release Dependencies
+    - name: Install
       run: |
-        pip install pipx
-        pipx install poetry
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
+        just init
+        just install Django~=${{ matrix.django-version }}
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
@@ -324,7 +294,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        poetry run pytest tests/shellcompletion/test_zsh.py || exit 1
+        just test-cases tests/shellcompletion/test_zsh.py || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -397,11 +367,8 @@ jobs:
 
       - name: Install Release Dependencies
         run: |
-          pip install pipx
-          pipx install poetry
-          poetry config virtualenvs.in-project true
-          poetry run pip install --upgrade pip
-          poetry install
+          just init
+          just install
 
       - name: Get coverage files
         uses: actions/download-artifact@v4
@@ -410,9 +377,7 @@ jobs:
           merge-multiple: true
 
       - run: ls -la *.coverage
-      - run: poetry run coverage combine --keep *.coverage
-      - run: poetry run coverage report
-      - run: poetry run coverage xml
+      - run: just coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
