@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+    - id: lint
+      name: Lint
+      entry: just lint
+      language: system
+      pass_filenames: false
+    - id: format
+      name: Format
+      entry: just format
+      language: system
+      pass_filenames: false
