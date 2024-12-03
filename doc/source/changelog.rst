@@ -26,6 +26,11 @@ Migrating from 2.x to 3.x
   :func:`django_typer.management.initialize()` and :func:`django_typer.management.Typer.callback()`.
   This change was forced by [upstream changes](https://github.com/fastapi/typer/pull/1052) in
   Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to extend apps.
+  
+v2.6.0 (2024-12-03)
+===================
+
+* Implemented `Support Typer 0.15.x <https://github.com/django-commons/django-typer/issues/154>`_
 
 v2.5.0 (2024-11-29)
 ===================
