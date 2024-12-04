@@ -34,10 +34,10 @@ check-package:
     poetry run pip check
 
 clean-docs:
-    python -c "from shutil import rmtree; rmtree('./doc/build', ignore_errors=True)"
+    python -c "import shutil; shutil.rmtree('./doc/build', ignore_errors=True)"
 
 clean-env:
-    python -c "import shutil, sys; shutil.rmtree(sys.argv[1])" $(poetry env info --path)
+    python -c "import shutil, sys; shutil.rmtree(sys.argv[1], ignore_errors=True)" $(poetry env info --path)
 
 clean-git-ignored:
     git clean -fdX

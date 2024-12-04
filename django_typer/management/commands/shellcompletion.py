@@ -46,12 +46,9 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure, detect_shell
 from typer import Argument, Option, echo
-from typer.completion import (  # type: ignore
-    Shells,  # pyright: ignore[reportPrivateImportUsage]
-    completion_init,  # pyright: ignore[reportPrivateImportUsage]
-)
 
 from django_typer.management import TyperCommand, command, get_command, initialize
+from django_typer.management.commands.shells import Shells, completion_init
 from django_typer.types import COMMON_PANEL
 from django_typer.utils import get_usage_script
 
@@ -63,6 +60,7 @@ except (ShellDetectionFailure, RuntimeError):
     pass
 
 DJANGO_COMMAND = Path(__file__).name.split(".")[0]
+
 
 
 class Command(TyperCommand):
