@@ -7,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
 * BREAKING `Remove name parameter from initialize()/callback(). <https://github.com/django-commons/django-typer/issues/150>`_
 * Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
 * Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_

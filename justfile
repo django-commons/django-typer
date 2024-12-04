@@ -12,10 +12,14 @@ init:
     poetry config --local virtualenvs.in-project true
     poetry run pip install --upgrade pip setuptools wheel
 
+install-precommit:
+    poetry run pre-commit install
+
 install *PACKAGES="Django":
     poetry env use python
     poetry lock
     poetry install -E rich
+    poetry run pre-commit install
     poetry run pip install -U {{ PACKAGES }}
 
 install-colorama:
@@ -95,7 +99,7 @@ sort-imports:
 lint: sort-imports
     poetry run ruff check --fix
 
-fix: format lint
+fix: lint format
 
 check: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
@@ -115,7 +119,8 @@ test: test-rich test-no-rich install-colorama
 test-cases +TESTS:
     poetry run pytest {{ TESTS }}
 
-precommit: fix
+precommit:
+    poetry run pre-commit
 
 coverage:
     poetry run coverage combine --keep *.coverage
