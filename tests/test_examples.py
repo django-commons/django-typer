@@ -472,29 +472,23 @@ class CompleterExampleTests(TestCase):
         from django_typer.management.commands.shellcompletion import (
             Command as ShellCompletion,
         )
-        from django_typer.management.commands.shellcompletion import (
-            Shells,
+
+        shellcompletion = get_command("shellcompletion", ShellCompletion).init(
+            shell="zsh"
         )
+        completions = shellcompletion.complete(f"{self.app_labels_cmd} ")
+        self.assertTrue("contenttypes" in completions)
+        self.assertTrue("completers" in completions)
+        self.assertTrue("django_typer" in completions)
+        self.assertTrue("admin" in completions)
+        self.assertTrue("auth" in completions)
+        self.assertTrue("sessions" in completions)
+        self.assertTrue("messages" in completions)
 
-        shellcompletion = get_command("shellcompletion", ShellCompletion)
-        completions = shellcompletion.complete(
-            f"{self.app_labels_cmd} ", shell=Shells.zsh
-        )
+        completions = shellcompletion.complete(f"{self.app_labels_cmd} a")
 
-        self.assertTrue('"contenttypes"' in completions)
-        self.assertTrue('"completers"' in completions)
-        self.assertTrue('"django_typer"' in completions)
-        self.assertTrue('"admin"' in completions)
-        self.assertTrue('"auth"' in completions)
-        self.assertTrue('"sessions"' in completions)
-        self.assertTrue('"messages"' in completions)
-
-        completions = shellcompletion.complete(
-            f"{self.app_labels_cmd} a", shell=Shells.zsh
-        )
-
-        self.assertTrue('"admin"' in completions)
-        self.assertTrue('"auth"' in completions)
+        self.assertTrue("admin" in completions)
+        self.assertTrue("auth" in completions)
 
         stdout, stderr, retcode = run_command(
             self.app_labels_cmd,

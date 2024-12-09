@@ -202,7 +202,7 @@ def accepts_var_kwargs(func: t.Callable[..., t.Any]) -> bool:
     """
     Determines if the given function accepts variable keyword arguments.
     """
-    for param in reversed(inspect.signature(func).parameters.values()):
+    for param in reversed(list(inspect.signature(func).parameters.values())):
         return param.kind is inspect.Parameter.VAR_KEYWORD
     return False
 

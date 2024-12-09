@@ -18,37 +18,38 @@ management command libraries or custom completion logic, a fallback completion f
 be specified.
 """
 
-# A needed refactoring here would be to provide root hooks for completion logic in Django core that
-# base classes can register for. This would provide a coordinated way for libraries like
-# django-typer to plug in their own completion logic.
-
+import collections.abc as cabc
 import contextlib
-import inspect
 import io
 import os
 import re
 import sys
 import typing as t
+import warnings
 from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
+from types import ModuleType
 
+from click.core import Command as ClickCommand
 from click.shell_completion import (
     CompletionItem,
+    ShellComplete,
     add_completion_class,
-    get_completion_class,
     split_arg_string,
 )
 from django.core.management import CommandError, ManagementUtility
 from django.template import Context, Engine
+from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure, detect_shell
-from typer import Argument, Option, echo
+from typer import Argument, Option
+from typer.main import get_command as get_typer_command
 
+from django_typer.completers import these_strings
 from django_typer.management import TyperCommand, command, get_command, initialize
-from django_typer.management.commands.shells import Shells, completion_init
 from django_typer.types import COMMON_PANEL
 from django_typer.utils import get_usage_script
 
@@ -59,8 +60,177 @@ try:
 except (ShellDetectionFailure, RuntimeError):
     pass
 
-DJANGO_COMMAND = Path(__file__).name.split(".")[0]
 
+class DjangoTyperShellCompleter(ShellComplete):
+    """
+    An extension to the click shell completion classes that provides a Django specific
+    shell completion implementation. If you wish to support a new shell, you must
+    derive from this class, implement all of the abstract methods, and register the
+    class with
+    :func:`~django_typer.management.commands.shellcompletion.register_completion_class`
+    """
+
+    SCRIPT: Path
+    """
+    The path to the shell completion script template.
+    """
+
+    color: bool = False
+    """
+    By default, allow or disallow color in the completion output.
+    """
+
+    supports_scripts: bool = False
+    """
+    Does the shell support completions for uninstalled scripts? (i.e. not on the path)
+    """
+
+    complete_var: str = ""
+
+    command: "Command"
+    command_str: str
+    command_args: t.List[str]
+
+    def __init__(
+        self,
+        cli: t.Optional[ClickCommand] = None,
+        ctx_args: cabc.MutableMapping[str, t.Any] = {},
+        prog_name: str = "",
+        complete_var: str = "",
+        command: t.Optional["Command"] = None,
+        command_str: t.Optional[str] = None,
+        command_args: t.Optional[t.List[str]] = None,
+        **kwargs,
+    ):
+        # we don't always need the initialization parameters during completion
+        self.prog_name = kwargs.pop("prog_name", "")
+        if command:
+            self.command = command
+        if command_str is not None:
+            self.command_str = command_str
+        if command_args is not None:
+            self.command_args = split_arg_string(command_str) if command_str else []
+
+        if cli:
+            super().__init__(
+                cli=cli,
+                ctx_args=ctx_args,
+                complete_var=complete_var,
+                prog_name=prog_name,
+                **kwargs,
+            )
+
+    @classproperty
+    def source_template(self) -> str:  # type: ignore
+        return self.SCRIPT.read_text()
+
+    def get_completions(
+        self, args: t.List[str], incomplete: str
+    ) -> t.List[CompletionItem]:
+        """
+        need to remove the django command name from the arg completions
+        """
+        if self.command.fallback:
+            return self.command.fallback(args, incomplete)
+        return super().get_completions(args[1:], incomplete)
+
+    def get_completion_args(self) -> t.Tuple[t.List[str], str]:
+        cwords = self.command_args
+        if self.command_str and self.command_str[-1].isspace():
+            cwords.append("")
+        # allow users to not specify the manage script, but allow for it
+        # if they do by lopping it off - same behavior as upstream classes
+        if cwords:
+            try:
+                if cwords[0] == self.command.manage_script_name:
+                    cwords = cwords[1:]
+                elif Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
+                    cwords = cwords[1:]
+            except (TypeError, ValueError, OSError):  # pragma: no cover
+                pass
+        return (
+            cwords[:-1],
+            cwords[-1] if cwords else "",
+        )
+
+    def source_vars(self) -> t.Dict[str, t.Any]:
+        return {
+            **super().source_vars(),
+            "manage_script": self.command.manage_script,
+            "python": sys.executable,
+            "django_command": self.command.__module__.split(".")[-1],
+            "color": "--no-color"
+            if self.command.no_color
+            else "--force-color"
+            if self.command.force_color
+            else "",
+            "fallback": f" --fallback {self.command.fallback.__module__}.{self.command.fallback.__name__}"
+            if self.command.fallback
+            else "",
+            "is_installed": not isinstance(self.command.manage_script, Path),
+            "rich": "--rich" if self.command.allow_rich else "",
+        }
+
+    @cached_property
+    def template_engine(self):
+        """
+        Django template engine that will find and render completer script templates.
+        """
+        return Engine(
+            dirs=[str(files("django_typer.management.commands").joinpath("shells"))],
+            libraries={
+                "default": "django.template.defaulttags",
+                "filter": "django.template.defaultfilters",
+            },
+        )
+
+    def source(self) -> str:
+        """
+        Render the completion script template to a string.
+        """
+        return self.template_engine.get_template(str(self.SCRIPT)).render(
+            Context(self.source_vars())
+        )
+
+    def install(self):
+        raise NotImplementedError
+
+    def uninstall(self):
+        raise NotImplementedError
+
+
+_completers: t.Dict[str, t.Type[DjangoTyperShellCompleter]] = {}
+
+
+def register_completion_class(cls: t.Type[DjangoTyperShellCompleter]) -> None:
+    """
+    Register a shell completion class for use with the Django shellcompletion command.
+    """
+    _completers[cls.name] = cls
+    add_completion_class(cls)
+
+
+def django_autocomplete(args: t.List[str], incomplete: str) -> t.List[CompletionItem]:
+    # spoof bash environment variables
+    # the first one is lopped off, so we insert a placeholder 0
+    args = ["0", *args]
+    if args[-1] != incomplete:
+        args.append(incomplete)
+    else:  # pragma: no cover
+        pass
+    os.environ["COMP_WORDS"] = " ".join(args)
+    os.environ["COMP_CWORD"] = str(args.index(incomplete))
+    os.environ["DJANGO_AUTO_COMPLETE"] = "1"
+    dj_manager = ManagementUtility(args)
+    capture_completions = io.StringIO()
+    with contextlib.redirect_stdout(capture_completions):
+        try:
+            dj_manager.autocomplete()
+        except SystemExit:
+            pass
+    return [
+        CompletionItem(item) for item in capture_completions.getvalue().split() if item
+    ]
 
 
 class Command(TyperCommand):
@@ -99,33 +269,38 @@ class Command(TyperCommand):
         "verbosity",
     }
 
-    no_color: t.Optional[bool] = None  # type: ignore
+    allow_rich: bool = False
 
-    _shell: Shells
-
-    COMPLETE_VAR = "_COMPLETE_INSTRUCTION"
+    _shell: t.Optional[str] = DETECTED_SHELL
+    shell_module: ModuleType
 
     ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
-    SHELL_COLOR_SUPPORT = {
-        Shells.bash: False,
-        Shells.zsh: True,
-        Shells.fish: True,
-        Shells.powershell: True,
-        Shells.pwsh: True,
-    }
+    _fallback: t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]] = None
 
-    @cached_property
-    def template_engine(self):
-        """
-        Django template engine that will find and render completer script templates.
-        """
-        return Engine(
-            dirs=[str(files("django_typer.management.commands").joinpath("shells"))],
-            libraries={
-                "default": "django.template.defaulttags",
-                "filter": "django.template.defaultfilters",
-            },
+    @property
+    def fallback(
+        self,
+    ) -> t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]]:
+        return self._fallback
+
+    @fallback.setter
+    def fallback(self, fb: t.Optional[str]):
+        try:
+            self._fallback = import_string(fb) if fb else django_autocomplete
+        except ImportError as err:
+            raise CommandError(
+                gettext("Unable to import fallback completion function: {err}").format(
+                    err=str(err)
+                )
+            ) from err
+
+    @property
+    def fallback_import(self) -> t.Optional[str]:
+        return (
+            f"{self.fallback.__module__}.{self.fallback.__name__}"
+            if self.fallback
+            else None
         )
 
     @cached_property
@@ -158,98 +333,52 @@ class Command(TyperCommand):
         return str(getattr(self.manage_script, "name", self.manage_script))
 
     @property
-    def shell(self) -> Shells:
+    def shell(self) -> str:
         """
         Get the active shell. If not explicitly set, it first tries to find the shell
         in the environment variable shell complete scripts set and failing that it will try
         to autodetect the shell.
         """
-        return getattr(
-            self,
-            "_shell",
-            (
-                Shells(os.environ[self.COMPLETE_VAR].partition("_")[2])
-                if self.COMPLETE_VAR in os.environ
-                else None
-            ),
-        ) or Shells(detect_shell()[0])
+        assert self._shell
+        return self._shell
 
     @shell.setter
-    def shell(self, shell: t.Optional[Shells]):
+    def shell(self, shell: t.Optional[str]):
         """Set the shell to install autocompletion for."""
-        if shell is None:
-            try:
-                self._shell = Shells(detect_shell()[0])
-            except (ShellDetectionFailure, RuntimeError) as err:
-                raise CommandError(
-                    gettext(
-                        "Please specify the shell to install or remove "
-                        "autocompletion for. Unable to detect shell: {err}"
-                    ).format(err=str(err))
-                ) from err
-        else:
-            self._shell = shell if isinstance(shell, Shells) else Shells(shell)
-
-    @cached_property
-    def noop_command(self):
-        """
-        This is a no-op command that is used to bootstrap click Completion classes. It
-        has no use other than to avoid any potential attribute errors when we emulate
-        upstream completion logic
-        """
-        return self.get_subcommand("noop")
-
-    def patch_script(
-        self, shell: t.Optional[Shells] = None, fallback: t.Optional[str] = None
-    ) -> None:
-        """
-        We have to monkey patch the typer completion scripts to point to our custom
-        shell complete script. This is potentially brittle but thats why we have robust
-        CI!
-
-        :param shell: The shell to patch the completion script for.
-        :param fallback: The python import path to a fallback autocomplete function to use when
-            the completion command is not a TyperCommand. Defaults to None, which means the bundled
-            complete script will fallback to the django autocomplete function, but wrap it so it
-            works for all supported shells other than just bash.
-        """
-        # do not import this private stuff until we need it - avoids it tanking the whole
-        # library if these imports change
-        from typer import (
-            _completion_shared as typer_scripts,  # pylint: disable=import-outside-toplevel
-        )
-
-        shell = shell or self.shell
-
-        fallback = f" --fallback {fallback}" if fallback else ""
-
-        def render(shell: Shells, **context) -> str:
-            template = self.template_engine.get_template(f"{shell.value}.tmpl")
-            return template.render(Context(context))
-
-        context = {
-            "manage_script": self.manage_script,
-            "django_command": DJANGO_COMMAND,
-            "color": "--no-color"
-            if self.no_color
-            else "--force-color"
-            if self.force_color
-            else "",
-        }
-        if shell in [Shells.powershell, Shells.pwsh]:
-            typer_scripts._completion_scripts[shell.value] = render(
-                Shells.powershell, **context
+        if shell:
+            self._shell = shell
+        if self._shell is None:
+            raise CommandError(
+                gettext(
+                    "Please specify the shell to install or remove "
+                    "autocompletion for. Unable to detect shell."
+                )
             )
-        elif shell in [Shells.bash, Shells.zsh, Shells.fish]:
-            typer_scripts._completion_scripts[shell.value] = render(shell, **context)
-        else:  # pragma: no cover
-            raise NotImplementedError(
-                gettext("Unsupported shell: {shell}").format(shell=shell.value)
-            )
+
+    @property
+    def shell_class(self):
+        global _completers
+        try:
+            return _completers[self.shell]
+        except KeyError as err:
+            raise CommandError(
+                gettext("Unsupported shell: {shell}").format(shell=self.shell)
+            ) from err
 
     @initialize()
     def init(
         self,
+        shell: t.Annotated[
+            t.Optional[str],
+            Option(
+                help=t.cast(
+                    str,
+                    _("The shell to use."),
+                ),
+                metavar="SHELL",
+                shell_complete=these_strings(_completers.keys()),
+            ),
+        ] = DETECTED_SHELL,
         no_color: t.Annotated[
             t.Optional[bool],
             Option(
@@ -258,22 +387,24 @@ class Command(TyperCommand):
                 rich_help_panel=COMMON_PANEL,
             ),
         ] = None,
-    ):
-        self.no_color = no_color  # pyright: ignore[reportAttributeAccessIssue]
+        allow_rich: t.Annotated[
+            bool,
+            Option(
+                "--rich", help=t.cast(str, _("Allow rich output in completion text."))
+            ),
+        ] = allow_rich,
+    ) -> "Command":
+        self.shell = shell  # type: ignore[assignment]
+        assert self.shell
+        self.no_color = not self.shell_class.color if no_color is None else no_color
+        self.allow_rich = allow_rich
+        return self
 
     @command(
         help=t.cast(str, _("Install autocompletion for the current or given shell."))
     )
     def install(
         self,
-        shell: t.Annotated[
-            t.Optional[Shells],
-            Argument(
-                help=t.cast(
-                    str, _("Specify the shell to install or remove autocompletion for.")
-                )
-            ),
-        ] = DETECTED_SHELL,
         manage_script: t.Annotated[
             t.Optional[str],
             Option(
@@ -309,45 +440,46 @@ class Command(TyperCommand):
             :width: 85
             :convert-png: latex
         """
-        # do not import this private stuff until we need it - avoids tanking the whole
-        # library if these imports change
-        from typer._completion_shared import install
+        self.fallback = fallback  # type: ignore[assignment]
+        if (
+            isinstance(self.manage_script, Path)
+            and not self.shell_class.supports_scripts
+        ):
+            if not self.shell_class.supports_scripts:
+                raise CommandError(
+                    gettext(
+                        "Shell {shell} does not support autocompletion for scripts that are not "
+                        "installed on the path. You must create an entry point for {script_name}. "
+                        "See {link}."
+                    ).format(
+                        shell=self.shell,
+                        script_name=self.manage_script_name,
+                        link="https://setuptools.pypa.io/en/latest/userguide/entry_point.html",
+                    )
+                )
+            else:
+                warnings.warn(
+                    gettext(
+                        "It is not recommended to install tab completion for a script not on the path."
+                    )
+                )
 
-        self.shell = shell  # type: ignore
-        assert self.shell
-        self.no_color = (  # pyright: ignore[reportIncompatibleVariableOverride]
-            not self.SHELL_COLOR_SUPPORT.get(self.shell, False)
-            if self.no_color is None
-            else self.no_color
-        )
-        self.patch_script(fallback=fallback)
-        install_path = install(
-            shell=self.shell.value,
-            prog_name=str(manage_script or self.manage_script_name),
-            complete_var=self.COMPLETE_VAR,
-        )[1]
+        install_path = self.shell_class(
+            prog_name=str(manage_script or self.manage_script_name), command=self
+        ).install()
         self.stdout.write(
-            self.style.SUCCESS(  # pylint: disable=no-member
+            self.style.SUCCESS(
                 gettext("Installed autocompletion for {shell} @ {install_path}").format(
-                    shell=self.shell.value, install_path=install_path
+                    shell=self.shell, install_path=install_path
                 )
             )
         )
 
     @command(
-        help=t.cast(str, _("Remove autocompletion for the current or given shell."))
+        help=t.cast(str, _("Uninstall autocompletion for the current or given shell."))
     )
-    def remove(
+    def uninstall(
         self,
-        shell: t.Annotated[
-            t.Optional[Shells],
-            Argument(
-                help=t.cast(
-                    str,
-                    _("Specify the shell to install or remove shell completion for."),
-                )
-            ),
-        ] = DETECTED_SHELL,
         manage_script: t.Annotated[
             t.Optional[str],
             Option(
@@ -374,69 +506,13 @@ class Command(TyperCommand):
             :convert-png: latex
 
         """
-        # do not import this private stuff until we need it - avoids tanking the whole
-        # library if these imports change
-        from typer._completion_shared import install
-
-        # its less brittle to install and use the returned path to uninstall
-        self.shell = shell  # type: ignore
-        prog_name = str(manage_script or self.manage_script_name)
-        installed_path = install(
-            shell=self.shell.value if self.shell else None, prog_name=prog_name
-        )[1]
-        if self.shell in [Shells.pwsh, Shells.powershell]:
-            # annoyingly, powershell has one profile script for all completion commands
-            # so we have to find our entry and remove it
-            edited_lines = []
-            mark = None
-            with open(installed_path, "rt", encoding="utf-8") as pwr_sh:
-                for line in pwr_sh.readlines():
-                    edited_lines.append(line)
-                    if line.startswith("Import-Module PSReadLine"):
-                        mark = len(edited_lines) - 1
-                    elif (
-                        mark is not None
-                        and line.startswith("Register-ArgumentCompleter")
-                        and f" {prog_name} " in line
-                    ):
-                        edited_lines = edited_lines[:mark]
-                        mark = None
-
-            if edited_lines:
-                with open(installed_path, "wt", encoding="utf-8") as pwr_sh:
-                    pwr_sh.writelines(edited_lines)
-            else:
-                installed_path.unlink()
-
-        else:
-            installed_path.unlink()
-            rc_file = {
-                None: None,
-                Shells.bash: Path("~/.bashrc").expanduser(),
-                Shells.zsh: Path("~/.zshrc").expanduser(),
-            }.get(self.shell, None)
-            if rc_file and rc_file.is_file():
-                edited: t.List[str] = []
-                with open(rc_file, "rt", encoding="utf-8") as rc:
-                    for line in rc.readlines():
-                        if (
-                            self.shell is Shells.bash
-                            and line.strip() == f"source {installed_path}"
-                        ):
-                            continue
-                        edited.append(line)
-                # remove empty lines from the end of the file, the typer install scripts add
-                # extra newlines
-                while edited and not edited[-1].strip():
-                    edited.pop()
-                edited.append("")  # add one back on
-                with open(rc_file, "wt", encoding="utf-8") as rc:
-                    rc.writelines(edited)
-
+        self.shell_class(
+            prog_name=str(manage_script or self.manage_script_name), command=self
+        ).uninstall()
         self.stdout.write(
-            self.style.WARNING(  # pylint: disable=no-member
-                gettext("Removed autocompletion for {shell}.").format(
-                    shell=self.shell.value if self.shell else ""
+            self.style.WARNING(
+                gettext("Uninstalled autocompletion for {shell}.").format(
+                    shell=self.shell
                 )
             )
         )
@@ -446,26 +522,14 @@ class Command(TyperCommand):
     )
     def complete(
         self,
-        cmd_str: t.Annotated[
-            t.Optional[str],
+        command: t.Annotated[
+            str,
             Argument(
-                metavar="command",
                 help=t.cast(
                     str, _("The command string to generate completion suggestions for.")
                 ),
             ),
-        ] = None,
-        shell: t.Annotated[
-            t.Optional[Shells],
-            Option(
-                help=t.cast(
-                    str,
-                    _(
-                        "Specify the shell to fetch completion for, default will autodetect."
-                    ),
-                )
-            ),
-        ] = None,
+        ] = "",
         fallback: t.Annotated[
             t.Optional[str],
             Option(
@@ -500,81 +564,10 @@ class Command(TyperCommand):
             :width: 80
             :convert-png: latex
         """
-        from django_typer import completers
+        args = split_arg_string(command)
 
-        os.environ[self.COMPLETE_VAR] = (
-            f"complete_{shell.value}"
-            if shell
-            else os.environ.get(self.COMPLETE_VAR, f"complete_{self.shell.value}")
-        )
-        self.shell = Shells(os.environ[self.COMPLETE_VAR].partition("_")[2])
-        if self.shell in [Shells.powershell, Shells.pwsh]:
-            completers.PATH_SEPARATOR = "\\"
-        else:
-            completers.PATH_SEPARATOR = "/"
-
-        completion_init()
-        CompletionClass = get_completion_class(  # pylint: disable=C0103
-            self.shell.value
-        )
-        assert CompletionClass, gettext(
-            'No completion implementation for "{shell}"'
-        ).format(shell=self.shell.value)
-        if cmd_str:
-            # when the command is given, this is a user testing their autocompletion,
-            # so we need to override the completion classes get_completion_args logic
-            # because our entry point was not an installed completion script
-            def get_completion_args(self) -> t.Tuple[t.List[str], str]:
-                cwords = split_arg_string(cmd_str)
-                if cmd_str[-1].isspace():
-                    cwords.append("")
-                # allow users to not specify the manage script, but allow for it
-                # if they do by lopping it off - same behavior as upstream classes
-                try:
-                    if Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
-                        cwords = cwords[1:]
-                except (TypeError, ValueError, OSError):  # pragma: no cover
-                    pass
-                return (
-                    cwords[:-1],
-                    cwords[-1] if cwords else "",
-                )
-
-            CompletionClass.get_completion_args = get_completion_args  # type: ignore
-
-        # guard against double patching
-        if not getattr(CompletionClass, "_dt_patched", False):
-            _get_completions = CompletionClass.get_completions
-
-            def get_completions(self, args, incomplete):
-                """
-                need to remove the django command name from the arg completions
-                """
-                return _get_completions(self, args[1:], incomplete)
-
-            CompletionClass.get_completions = get_completions  # type: ignore
-
-            add_completion_class(CompletionClass, self.shell.value)
-            CompletionClass._dt_patched = True  # type: ignore
-
-        args = CompletionClass(
-            cli=self.noop_command.click_command,
-            ctx_args={},
-            prog_name=sys.argv[0],
-            complete_var=self.COMPLETE_VAR,
-        ).get_completion_args()[0]
-
-        def call_fallback(fb: t.Optional[str]) -> None:
-            fallback = import_string(fb) if fb else self.django_fallback
-            if cmd_str and inspect.signature(fallback).parameters:
-                fallback(cmd_str)  # type: ignore
-            else:
-                fallback()
-
-        def get_completion() -> None:
-            if not args:
-                call_fallback(fallback)
-            else:
+        def get_completion() -> str:
+            if args:
                 # we first need to figure out which command is being invoked
                 # but we cant be sure which index the command name is at so
                 # we try to fetch each in order and assume the first arg
@@ -588,30 +581,29 @@ class Command(TyperCommand):
                             cmd = get_command(args[cmd_idx])
                         except KeyError:
                             pass
-                except IndexError as err:
-                    if cmd_str:
-                        # if we're here a user is probably trying to debug a completion
-                        # notify them that the command is not recognized
-                        raise CommandError(
-                            gettext('Unrecognized command: "{cmd_str}"').format(
-                                cmd_str=cmd_str
-                            )
-                        ) from err
-                    return  # otherwise nowhere to go
+                except IndexError:
+                    if command.endswith(" "):
+                        # unrecognized command
+                        return ""
+                    # fall through to fallback
 
-                if isinstance(cmd, TyperCommand):  # type: ignore[unreachable]
+                if isinstance(cmd, TyperCommand):
                     # this will exit out so no return is needed here
-                    cmd.typer_app(
-                        args=args[cmd_idx + 1 :],
-                        standalone_mode=True,
-                        django_command=cmd,
-                        complete_var=self.COMPLETE_VAR,
-                        prog_name=(
-                            f"{' '.join(sys.argv[0:cmd_idx or None])} "
-                            f"{self.typer_app.info.name}",
-                        ),
-                    )
-                call_fallback(fallback)
+                    return self.shell_class(
+                        cli=get_typer_command(cmd.typer_app),
+                        ctx_args={"django_command": cmd},
+                        prog_name="",
+                        complete_var="",
+                        command=self,
+                        command_str=command,
+                        command_args=args,
+                    ).complete()
+
+            # only try to set the fallback if we have to use it
+            self.fallback = fallback  # type: ignore[assignment]
+            return self.shell_class(
+                command=self, command_str=command, command_args=args
+            ).complete()
 
         def strip_color(text: str) -> str:
             """
@@ -621,82 +613,16 @@ class Command(TyperCommand):
                 return self.ANSI_ESCAPE_RE.sub("", text)
             return text
 
-        buffer = io.StringIO()
-        try:
-            with contextlib.redirect_stdout(buffer):
-                # typer's internal behavior is to print and exit, we need
-                # to intercept this workflow to do our post processing and
-                # honor the configured stdout
-                get_completion()
+        return strip_color(get_completion())
 
-            # leave this in, incase the interface changes to not exit
-            return strip_color(buffer.getvalue())  # pragma: no cover
-        except SystemExit:
-            completion_str = buffer.getvalue()
-            if completion_str:
-                return strip_color(completion_str)
-            if cmd_str:
-                return ""
-            raise
 
-    def django_fallback(self):
-        """
-        Run django's builtin bash autocomplete function. We wrap the click
-        completion class to make it work for all supported shells, not just
-        bash.
-        """
-        CompletionClass = get_completion_class(  # pylint: disable=C0103
-            self.shell.value
-        )
-        assert CompletionClass, gettext(
-            'No completion implementation for "{shell}"'
-        ).format(shell=self.shell.value)
+from .shells.bash import BashComplete  # noqa: E402
+from .shells.fish import FishComplete  # noqa: E402
+from .shells.powershell import PowerShellComplete, PwshComplete  # noqa: E402
+from .shells.zsh import ZshComplete  # noqa: E402
 
-        def get_completions(self, args, incomplete):
-            # spoof bash environment variables
-            # the first one is lopped off, so we insert a placeholder 0
-            args = ["0", *args]
-            if args[-1] != incomplete:
-                args.append(incomplete)
-            else:  # pragma: no cover
-                pass
-            os.environ["COMP_WORDS"] = " ".join(args)
-            os.environ["COMP_CWORD"] = str(args.index(incomplete))
-            os.environ["DJANGO_AUTO_COMPLETE"] = "1"
-            dj_manager = ManagementUtility(args)
-            capture_completions = io.StringIO()
-            with contextlib.redirect_stdout(capture_completions):
-                try:
-                    dj_manager.autocomplete()
-                except SystemExit:
-                    pass
-            return [
-                CompletionItem(item)
-                for item in capture_completions.getvalue().split()
-                if item
-            ]
-
-        CompletionClass.get_completions = get_completions  # type: ignore
-        echo(
-            CompletionClass(
-                cli=self.noop_command.click_command,
-                ctx_args={},
-                prog_name=self.manage_script_name,
-                complete_var=self.COMPLETE_VAR,
-            ).complete()
-        )
-
-    @command(
-        hidden=True,
-        context_settings={
-            "ignore_unknown_options": True,
-            "allow_extra_args": True,
-            "allow_interspersed_args": True,
-        },
-    )
-    def noop(self):
-        """
-        This is a no-op command that is used to bootstrap click Completion classes. It
-        has no use other than to avoid any potential attribute access errors when we spoof
-        completion logic
-        """
+register_completion_class(ZshComplete)
+register_completion_class(BashComplete)
+register_completion_class(PowerShellComplete)
+register_completion_class(PwshComplete)
+register_completion_class(FishComplete)

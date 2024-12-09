@@ -7,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Implemented `Use in-house shell completer classes. <https://github.com/django-commons/django-typer/issues/156>`_
 * Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
 * BREAKING `Remove name parameter from initialize()/callback(). <https://github.com/django-commons/django-typer/issues/150>`_
 * Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
@@ -23,11 +24,40 @@ v3.0.0 (202X-XX-XX)
 Migrating from 2.x to 3.x
 -------------------------
 
+* Imports from the django_typer namespace have been removed. You should now import from
+  django_typer.management.
+
 * The `name` parameter has been removed from
   :func:`django_typer.management.initialize()` and :func:`django_typer.management.Typer.callback()`.
-  This change was forced by [upstream changes](https://github.com/fastapi/typer/pull/1052) in
-  Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to extend apps.
-  
+  This change was forced by `upstream changes <https://github.com/fastapi/typer/pull/1052>`_ in
+  Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to define commands across
+  multiple files.
+
+* If you are using shell tab completions you will need to reinstall the completion scripts. using
+  the `shellcompletion install` command.
+
+* The interface to shellcompletion has changed. ``--shell`` is now an initialization option. I.e.:
+
+    .. code-block::
+
+        # old interface
+        manage shellcompletion complete --shell zsh "command string"
+
+        # new interface
+        manage shellcompletion --shell zsh complete "command string"
+
+* The function signature for :ref:`shellcompletion fallbacks <completion_fallbacks>` has changed.
+  The fallback signature is now:
+
+    .. code-block::
+
+        import typing as t
+        from click.shell_complete import CompletionItem
+
+        def fallback(args: t.List[str], incomplete: str) -> t.List[CompletionItem]:
+            ...
+
+
 v2.6.0 (2024-12-03)
 ===================
 

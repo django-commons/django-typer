@@ -458,8 +458,7 @@ class Context(TyperContext):
                         if param.name
                     },
                 )
-        else:
-            assert parent
+        elif parent:
             self.django_command = parent.django_command
 
         if supplied_params:

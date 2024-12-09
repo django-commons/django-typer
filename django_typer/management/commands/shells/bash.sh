@@ -25,7 +25,7 @@
 
     COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
                    COMP_CWORD=$COMP_CWORD \
-                   %(autocomplete_var)s=complete_bash $1 {{ django_command }} ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete ) )
+                   %(autocomplete_var)s=complete_bash $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete ) )
     return 0
 }
 

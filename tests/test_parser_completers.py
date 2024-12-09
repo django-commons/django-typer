@@ -743,7 +743,7 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = result.getvalue()
         for id in ids:
-            self.assertTrue(f'"{id}"' in result)
+            self.assertTrue(f"{id}" in result)
 
         for start_char in start_chars:
             expected = starts[start_char]
@@ -752,17 +752,16 @@ class TestShellCompletersAndParsers(TestCase):
             with contextlib.redirect_stdout(result):
                 call_command(
                     "shellcompletion",
-                    "complete",
                     "--shell",
                     "zsh",
+                    "complete",
                     f"model_fields test --id {start_char}",
                 )
 
             result = result.getvalue()
-            for id in expected:
-                self.assertTrue(f'"{id}"' in result)
-            for id in unexpected:
-                self.assertFalse(f'"{id}"' in result)
+            for comp in result.split("\n")[1::3]:
+                self.assertTrue(comp in expected)
+                self.assertTrue(comp not in unexpected)
 
         for id in ids:
             self.assertEqual(
@@ -775,16 +774,16 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
-                "complete",
                 "--shell",
                 "zsh",
+                "complete",
                 "model_fields test --id-limit ",
             )
         result = result.getvalue()
         for id in ids[0:5]:
-            self.assertTrue(f'"{id}"' in result)
+            self.assertTrue(f"{id}" in result)
         for id in ids[5:]:
-            self.assertFalse(f'"{id}"' in result)
+            self.assertFalse(f"{id}" in result)
 
     def test_float_field(self):
         values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
@@ -960,19 +959,21 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "noarg cmd ", shell="zsh")
         result = result.getvalue()
-        self.assertTrue(result)
-        self.assertFalse("--" in result)
+        self.assertFalse(result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "noarg cmd -", shell="zsh")
         result = result.getvalue()
-        self.assertTrue(result)
+        self.assertFalse(result)
         self.assertFalse("--" in result)
 
         # test what happens if we try to complete a non existing command
-        with self.assertRaises(CommandError):
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
             call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
+        result = result.getvalue()
+        self.assertFalse(result)
 
     def test_unsupported_field(self):
         from django_typer.completers import ModelObjectCompleter
@@ -980,7 +981,7 @@ class TestShellCompletersAndParsers(TestCase):
         with self.assertRaises(ValueError):
             ModelObjectCompleter(ShellCompleteTester, "binary_field")
 
-    def test_shellcompletion_no_detection(self):
+    def test_shellcompletion_unsupported_shell(self):
         from django_typer.management.commands import shellcompletion
 
         def raise_error():
@@ -989,7 +990,8 @@ class TestShellCompletersAndParsers(TestCase):
         shellcompletion.detect_shell = raise_error
         cmd = get_command("shellcompletion")
         with self.assertRaises(CommandError):
-            cmd.shell = None
+            cmd.shell = "DNE"
+            cmd.shell_class
 
     def test_shellcompletion_complete_cmd(self):
         # test that we can leave preceeding script off the complete argument
@@ -1018,62 +1020,68 @@ class TestShellCompletersAndParsers(TestCase):
             "tests.fallback.custom_fallback_cmd_str",
             "shell ",
         )[0]
-        self.assertTrue("shell " in result)
+        self.assertTrue("shell" in result)
 
     def test_import_path_completer(self):
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --settings "
+            "shellcompletion", "--shell", "zsh", "complete", "multi --settings "
         )[0]
-        self.assertIn('"importlib"', result)
-        self.assertIn('"django_typer"', result)
-        self.assertIn('"typer"', result)
+        self.assertIn("importlib", result)
+        self.assertIn("django_typer", result)
+        self.assertIn("typer", result)
         self.assertNotIn(".django_typer", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --settings "
+            "shellcompletion", "--shell", "zsh", "complete", "multi --settings "
         )[0]
-        self.assertIn('"importlib"', result)
-        self.assertIn('"django_typer"', result)
-        self.assertIn('"typer"', result)
+        self.assertIn("importlib", result)
+        self.assertIn("django_typer", result)
+        self.assertIn("typer", result)
         self.assertNotIn(".django_typer", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --settings djan"
+            "shellcompletion", "--shell", "zsh", "complete", "multi --settings djan"
         )[0]
-        self.assertNotIn('"importlib"', result)
-        self.assertIn('"django"', result)
-        self.assertIn('"django_typer"', result)
-        self.assertNotIn('"typer"', result)
-        self.assertNotIn(".django_typer", result)
+        self.assertIn("django", result)
+        self.assertIn("django_typer", result)
+        for comp in result.split("\n")[1::3]:
+            self.assertTrue(comp.startswith("djan"), f"{comp} does not start with djan")
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --settings django_ty",
         )[0]
-        self.assertNotIn('"importlib"', result)
-        self.assertNotIn('"typer"', result)
+        self.assertNotIn("importlib", result)
         self.assertNotIn(".django_typer", result)
+        for comp in result.split("\n")[1::3]:
+            self.assertTrue(
+                comp.startswith("django_ty"), f"{comp} does not start with django_ty"
+            )
 
-        self.assertIn('"django_typer.completers"', result)
-        self.assertIn('"django_typer.management"', result)
-        self.assertIn('"django_typer.parsers"', result)
-        self.assertIn('"django_typer.patch"', result)
-        self.assertIn('"django_typer.types"', result)
-        self.assertIn('"django_typer.utils"', result)
+        self.assertIn("django_typer.completers", result)
+        self.assertIn("django_typer.management", result)
+        self.assertIn("django_typer.parsers", result)
+        self.assertIn("django_typer.patch", result)
+        self.assertIn("django_typer.types", result)
+        self.assertIn("django_typer.utils", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --settings tests.settings.",
         )[0]
-        self.assertNotIn('"importlib"', result)
-        self.assertNotIn('"typer"', result)
-        self.assertNotIn(".django_typer", result)
+
+        for comp in result.split("\n")[1::3]:
+            self.assertTrue(
+                comp.startswith("tests.settings."),
+                f"{comp} does not start with tests.settings.",
+            )
+
         settings_expected = [
             "tests.settings.adapted",
             "tests.settings.adapted1",
@@ -1094,19 +1102,19 @@ class TestShellCompletersAndParsers(TestCase):
             "tests.settings.typer_examples",
         ]
         for mod in settings_expected:
-            self.assertIn(f'"{mod}"', result)
+            self.assertIn(f"{mod}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --settings tests.settings.typer_examples",
         )[0]
         for mod in settings_expected[:-1]:
-            self.assertNotIn(f'"{mod}"', result)
+            self.assertNotIn(f"{mod}", result)
 
-        self.assertIn(f'"{settings_expected[-1]}"', result)
+        self.assertIn(f"{settings_expected[-1]}", result)
 
     def test_pythonpath_completer(self):
         local_dirs = [
@@ -1114,36 +1122,36 @@ class TestShellCompletersAndParsers(TestCase):
         ]
         local_files = [Path(f).as_posix() for f in os.listdir() if not Path(f).is_dir()]
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath "
+            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath "
         )[0]
         for pth in local_dirs:
-            self.assertIn(f'"{pth}"', result)
+            self.assertIn(f"{pth}", result)
         for pth in local_files:
-            self.assertNotIn(f'"{pth}"', result)
+            self.assertNotIn(f"{pth}", result)
 
         for incomplete in [".", "./"]:
             result = run_command(
                 "shellcompletion",
-                "complete",
                 "--shell",
                 "zsh",
+                "complete",
                 f"multi --pythonpath {incomplete}",
             )[0]
             for pth in local_dirs:
-                self.assertIn(f'"./{pth}"', result)
+                self.assertIn(f"./{pth}", result)
             for pth in local_files:
-                self.assertNotIn(f'"./{pth}"', result)
+                self.assertNotIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath ./d"
+            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath ./d"
         )[0]
-        self.assertIn('"./doc"', result)
-        self.assertIn('"./django_typer"', result)
+        self.assertIn("./doc", result)
+        self.assertIn("./django_typer", result)
         for pth in [
             *local_files,
             *[pth for pth in local_dirs if not pth.startswith("d")],
         ]:
-            self.assertNotIn(f'"./{pth}"', result)
+            self.assertNotIn(f"./{pth}", result)
 
         local_dirs = [
             (Path("django_typer") / d).as_posix()
@@ -1156,89 +1164,89 @@ class TestShellCompletersAndParsers(TestCase):
             if not (Path("django_typer") / f).is_dir()
         ]
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath dj"
+            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath dj"
         )[0]
         for pth in local_dirs:
-            self.assertIn(f'"{pth}"', result)
+            self.assertIn(f"{pth}", result)
         for pth in local_files:
-            self.assertNotIn(f'"{pth}"', result)
+            self.assertNotIn(f"{pth}", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath ./dj"
+            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath ./dj"
         )[0]
         for pth in local_dirs:
-            self.assertIn(f'"./{pth}"', result)
+            self.assertIn(f"./{pth}", result)
         for pth in local_files:
-            self.assertNotIn(f'"./{pth}"', result)
+            self.assertNotIn(f"./{pth}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath ./django_typer",
         )[0]
-        self.assertIn('"./django_typer/management"', result)
-        self.assertIn('"./django_typer/locale"', result)
-        self.assertNotIn('"./django_typer/__init__.py"', result)
+        self.assertIn("./django_typer/management", result)
+        self.assertIn("./django_typer/locale", result)
+        self.assertNotIn("./django_typer/__init__.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath django_typer/",
         )[0]
-        self.assertIn('"django_typer/management"', result)
-        self.assertIn('"django_typer/locale"', result)
-        self.assertNotIn('"django_typer/__init__.py"', result)
+        self.assertIn("django_typer/management", result)
+        self.assertIn("django_typer/locale", result)
+        self.assertNotIn("django_typer/__init__.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath django_typer/man",
         )[0]
-        self.assertIn('"django_typer/management/commands"', result)
-        self.assertNotIn('"django_typer/examples"', result)
-        self.assertNotIn('"django_typer/locale"', result)
-        self.assertNotIn('"django_typer/management/__init__.py"', result)
+        self.assertIn("django_typer/management/commands", result)
+        self.assertNotIn("django_typer/examples", result)
+        self.assertNotIn("django_typer/locale", result)
+        self.assertNotIn("django_typer/management/__init__.py", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "multi --pythonpath /"
+            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath /"
         )[0]
         for pth in os.listdir("/"):
             if pth.startswith("$"):
                 continue  # TODO weird case of /\\$Recycle.Bin on windows
             if Path(f"/{pth}").is_dir():
-                self.assertIn(f'"/{pth}"', result)
+                self.assertIn(f"/{pth}", result)
             else:
-                self.assertNotIn(f'"/{pth}"', result)
+                self.assertNotIn(f"/{pth}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath django_typer/completers.py",
         )
-        self.assertNotIn('"django_typer/completers.py"', result)
+        self.assertNotIn("django_typer/completers.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath django_typer/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "multi --pythonpath does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
@@ -1246,39 +1254,39 @@ class TestShellCompletersAndParsers(TestCase):
     def test_path_completer(self):
         local_paths = [Path(pth).as_posix() for pth in os.listdir()]
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path "
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path "
         )[0]
         for pth in local_paths:
-            self.assertIn(f'"{pth}"', result)
+            self.assertIn(f"{pth}", result)
 
         for incomplete in [".", "./"]:
             result = run_command(
                 "shellcompletion",
-                "complete",
                 "--shell",
                 "zsh",
+                "complete",
                 f"completion --path {incomplete}",
             )[0]
             for pth in local_paths:
-                self.assertIn(f'"./{pth}"', result)
+                self.assertIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./d"
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./d"
         )[0]
-        self.assertIn('"./doc"', result)
-        self.assertIn('"./django_typer"', result)
+        self.assertIn("./doc", result)
+        self.assertIn("./django_typer", result)
         for pth in [
             *[pth for pth in local_paths if not pth.startswith("d")],
         ]:
-            self.assertNotIn(f'"./{pth}"', result)
+            self.assertNotIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./p"
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./p"
         )[0]
         for pth in [
             *[pth for pth in local_paths if not pth.startswith("p")],
         ]:
-            self.assertNotIn(f'"./{pth}"', result)
+            self.assertNotIn(f"./{pth}", result)
 
         local_paths = [
             (Path("django_typer") / d).as_posix()
@@ -1286,82 +1294,82 @@ class TestShellCompletersAndParsers(TestCase):
             if (Path("django_typer") / d).is_dir()
         ]
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path dj"
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path dj"
         )[0]
         for pth in local_paths:
-            self.assertIn(f'"{pth}"', result)
+            self.assertIn(f"{pth}", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path ./dj"
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./dj"
         )[0]
         for pth in local_paths:
-            self.assertIn(f'"./{pth}"', result)
+            self.assertIn(f"./{pth}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path ./django_typer",
         )[0]
-        self.assertIn('"./django_typer/management"', result)
-        self.assertIn('"./django_typer/locale"', result)
-        self.assertIn('"./django_typer/__init__.py"', result)
+        self.assertIn("./django_typer/management", result)
+        self.assertIn("./django_typer/locale", result)
+        self.assertIn("./django_typer/__init__.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path django_typer/",
         )[0]
-        self.assertIn('"django_typer/management"', result)
-        self.assertIn('"django_typer/locale"', result)
-        self.assertIn('"django_typer/__init__.py"', result)
+        self.assertIn("django_typer/management", result)
+        self.assertIn("django_typer/locale", result)
+        self.assertIn("django_typer/__init__.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path django_typer/man",
         )[0]
-        self.assertIn('"django_typer/management/__init__.py"', result)
-        self.assertIn('"django_typer/management/commands"', result)
-        self.assertNotIn('"django_typer/examples"', result)
-        self.assertNotIn('"django_typer/locale"', result)
+        self.assertIn("django_typer/management/__init__.py", result)
+        self.assertIn("django_typer/management/commands", result)
+        self.assertNotIn("django_typer/examples", result)
+        self.assertNotIn("django_typer/locale", result)
 
         result = run_command(
-            "shellcompletion", "complete", "--shell", "zsh", "completion --path /"
+            "shellcompletion", "--shell", "zsh", "complete", "completion --path /"
         )[0]
         for pth in os.listdir("/"):
             if pth.startswith("$"):
                 continue  # TODO weird case of /\\$Recycle.Bin on windows
-            self.assertIn(f'"/{pth}"', result)
+            self.assertIn(f"/{pth}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path django_typer/completers.py",
         )[0]
-        self.assertIn('"django_typer/completers.py"', result)
+        self.assertIn("django_typer/completers.py", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path django_typer/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --path does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
@@ -1369,65 +1377,65 @@ class TestShellCompletersAndParsers(TestCase):
     def test_these_strings_completer(self):
         for opt in ["--str", "--dup"]:
             result = run_command(
-                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} "
+                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} "
             )[0]
             for s in ["str1", "str2", "ustr"]:
-                self.assertIn(f'"{s}"', result)
+                self.assertIn(f"{s}", result)
 
             result = run_command(
-                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} s"
+                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} s"
             )[0]
-            self.assertNotIn('"ustr"', result)
+            self.assertNotIn("ustr", result)
             for s in ["str1", "str2"]:
-                self.assertIn(f'"{s}"', result)
+                self.assertIn(f"{s}", result)
 
             result = run_command(
-                "shellcompletion", "complete", "--shell", "zsh", f"completion {opt} str"
+                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} str"
             )[0]
-            self.assertNotIn('"ustr"', result)
+            self.assertNotIn("ustr", result)
             for s in ["str1", "str2"]:
-                self.assertIn(f'"{s}"', result)
+                self.assertIn(f"{s}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --str str1 --str ",
         )[0]
-        self.assertNotIn('"str1"', result)
+        self.assertNotIn("str1", result)
         for s in ["str2", "ustr"]:
-            self.assertIn(f'"{s}"', result)
+            self.assertIn(f"{s}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --dup str1 --dup ",
         )[0]
         for s in ["str1", "str2", "ustr"]:
-            self.assertIn(f'"{s}"', result)
+            self.assertIn(f"{s}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --str str1 --dup ",
         )[0]
         for s in ["str1", "str2", "ustr"]:
-            self.assertIn(f'"{s}"', result)
+            self.assertIn(f"{s}", result)
 
         result = run_command(
             "shellcompletion",
-            "complete",
             "--shell",
             "zsh",
+            "complete",
             "completion --dup str1 --str ",
         )[0]
         for s in ["str1", "str2", "ustr"]:
-            self.assertIn(f'"{s}"', result)
+            self.assertIn(f"{s}", result)
 
     def test_chain_and_commands_completer(self):
         result = run_command("shellcompletion", "complete", "completion --cmd dj")[

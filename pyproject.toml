@@ -54,6 +54,9 @@ classifiers = [
 "Changelog" = "https://django-typer.readthedocs.io/en/latest/changelog.html"
 "Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
+[tool.poetry.scripts]
+manage = "tests.manage:main"
+
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"

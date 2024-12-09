@@ -57,7 +57,7 @@ class TestPollExample(SimpleTestCase):
                     "shellcompletion",
                     "complete",
                     shell=shell,
-                    cmd_str=f"closepoll{self.typer} ",
+                    command=f"closepoll{self.typer} ",
                 )
             result2 = StringIO()
             with contextlib.redirect_stdout(result2):
@@ -65,7 +65,7 @@ class TestPollExample(SimpleTestCase):
                     "shellcompletion",
                     "complete",
                     shell=shell,
-                    cmd_str=f"./manage.py closepoll{self.typer} ",
+                    command=f"./manage.py closepoll{self.typer} ",
                 )
 
             result = result1.getvalue()

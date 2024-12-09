@@ -66,7 +66,7 @@ build: build-docs-html
     poetry build
 
 open-docs:
-    poetry run python ./scripts/open-docs.py
+    poetry run python -c "import webbrowser; webbrowser.open('file://$(pwd)/doc/build/html/index.html')"
 
 docs: build-docs-html open-docs
 
@@ -88,13 +88,13 @@ check-format:
 check-readme:
     poetry run python -m readme_renderer ./README.md -o /tmp/README.html
 
-format:
+sort-imports:
+    poetry run ruff check --fix --select I
+
+format: sort-imports
     just --fmt --unstable
     poetry run ruff format
     poetry run ruff format --line-length 80 examples
-
-sort-imports:
-    poetry run ruff check --fix --select I
 
 lint: sort-imports
     poetry run ruff check --fix

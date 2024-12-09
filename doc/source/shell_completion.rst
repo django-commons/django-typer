@@ -133,6 +133,8 @@ installation *should still work*, but you may need to always invoke the script f
 Fish_ may not work at all in this mode.
 
 
+.. _completion_fallbacks:
+
 Integrating with Other CLI Completion Libraries
 -----------------------------------------------
 
