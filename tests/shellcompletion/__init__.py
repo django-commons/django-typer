@@ -148,10 +148,11 @@ class _DefaultCompleteTestCase:
         print(read(master_fd))
         # Send a command with a tab character for completion
 
-        os.write(master_fd, (" ".join(cmds)).encode())
+        cmd = " ".join(cmds)
+        os.write(master_fd, cmd.encode())
         time.sleep(0.5)
 
-        print(f'"{(" ".join(cmds))}"')
+        print(f'"{cmd}"')
         os.write(master_fd, b"\t\t")
 
         time.sleep(0.5)
@@ -159,6 +160,7 @@ class _DefaultCompleteTestCase:
         # Read the output
         output = read_all_from_fd_with_timeout(master_fd, 3)
 
+        # todo - avoid large output because this can mess things up
         if "do you wish" in output or "Display all" in output:
             os.write(master_fd, b"y\n")
             time.sleep(0.5)
@@ -194,7 +196,7 @@ class _DefaultCompleteTestCase:
         # annoingly in CI there are some spaces inserted between the incomplete phrase
         # and the completion on linux in bash specifically
         self.assertTrue(re.match(r".*complet\s*ion.*", completions))
-        completions = self.get_completions(self.launch_script, " ")
+        completions = self.get_completions(self.launch_script)
         self.assertIn("adapted", completions)
         self.assertIn("help_precedence", completions)
         self.assertIn("closepoll", completions)

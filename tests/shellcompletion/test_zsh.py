@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from django.test import TestCase
 
-from tests.shellcompletion import _DefaultCompleteTestCase
+from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTestCase
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
@@ -21,3 +21,8 @@ class ZshShellTests(_DefaultCompleteTestCase, TestCase):
         if not script:
             script = self.manage_script
         self.assertFalse((self.directory / f"_{script}").exists())
+
+
+@pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
+class ZshExeShellTests(_InstalledScriptTestCase, ZshShellTests, TestCase):
+    shell = "zsh"

@@ -9,9 +9,13 @@
     # we need to pass these to the complete script - they may be necessary to find the command!
     local settings_option=""
     local pythonpath_option=""
-
-    {% if is_installed %}
-    (( ! $+commands[%(prog_name)s] )) && return 1
+    local manage="{% if is_installed %}{{ manage_script_name }}{% endif %}"
+    {% if not is_installed %}
+    if [[ ${words[2]} == *{{manage_script_name}} ]]; then
+        manage="${words[1]} ${words[2]}"
+    else
+        manage="${words[1]}"
+    fi
     {% endif %}
 
     for ((i=1; i<$CURRENT; i++)); do
@@ -31,17 +35,7 @@
       esac
     done
 
-    {% if not is_installed %}
-    if [[ ${words[2]} == *{{manage_script_name}} ]]; then
-        cmd="${words[1]} ${words[2]}"
-    else
-        cmd="${words[1]}"
-    fi
-    {% else %}
-    cmd = "{{ manage_script_name }}"
-    {% endif %}
-
-    response=("${(@f)$("${cmd}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${words[*]}")}")
+    response=("${(@f)$("${manage}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${words[*]}")}")
 
     for type key descr in ${response}; do
         if [[ "$type" == "plain" ]]; then

@@ -25,7 +25,6 @@ import os
 import re
 import sys
 import typing as t
-from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
 from types import ModuleType
@@ -311,6 +310,7 @@ class Command(TyperCommand):
     ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
     _fallback: t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]] = None
+    _manage_script: t.Optional[t.Union[str, Path]] = None
 
     @property
     def fallback(
@@ -337,7 +337,7 @@ class Command(TyperCommand):
             else None
         )
 
-    @cached_property
+    @property
     def manage_script(self) -> t.Union[str, Path]:
         """
         Returns the name of the manage command as a string if it is available as a command
@@ -354,17 +354,22 @@ class Command(TyperCommand):
         # with a manage.py script being invoked directly as a script. Completion should work in
         # this case as well, but it does complicate the installation for some shell's so we must
         # first figure out which mode we are in.
-        script = get_usage_script()
-        if isinstance(script, Path):
-            return script.absolute()
-        return script
+        if not self._manage_script:
+            self._manage_script = get_usage_script()
+        return self._manage_script
 
-    @cached_property
+    @manage_script.setter
+    def manage_script(self, script: t.Optional[str]):
+        self._manage_script = get_usage_script(script)
+
+    @property
     def manage_script_name(self) -> str:
         """
         Get the name of the manage script as a command available from the shell's path.
         """
-        return str(getattr(self.manage_script, "name", self.manage_script))
+        if isinstance(self.manage_script, Path):
+            return self.manage_script.name
+        return self.manage_script
 
     @property
     def shell(self) -> str:
@@ -486,6 +491,7 @@ class Command(TyperCommand):
             :convert-png: latex
         """
         self.fallback = fallback  # type: ignore[assignment]
+        self.manage_script = manage_script  # type: ignore[assignment]
         if isinstance(self.manage_script, Path):
             if not self.shell_class.supports_scripts:
                 raise CommandError(
@@ -559,6 +565,7 @@ class Command(TyperCommand):
             :convert-png: latex
 
         """
+        self.manage_script = manage_script  # type: ignore[assignment]
         self.shell_class(
             prog_name=str(manage_script or self.manage_script_name),
             command=self,
