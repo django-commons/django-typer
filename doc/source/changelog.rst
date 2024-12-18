@@ -33,6 +33,13 @@ Migrating from 2.x to 3.x
   Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to define commands across
   multiple files.
 
+Shell Completions
+~~~~~~~~~~~~~~~~~
+
+* If you are using shell tab completions you will need to reinstall the completion scripts. Using
+  the `shellcompletion install` command. To be extra safe you may want to uninstall the old
+  scripts before updating, using the v2.x ``shellcompletion remove`` command.
+
 * If you are using shell tab completions you will need to reinstall the completion scripts. using
   the `shellcompletion install` command.
 
