@@ -11,7 +11,7 @@ from django_typer.management import TyperCommand
 from django_typer import completers, parsers
 
 
-class Command(TyperCommand):
+class Command(TyperCommand, rich_markup_mode="rich"):
     def handle(
         self,
         django_apps: Annotated[
@@ -59,7 +59,7 @@ class Command(TyperCommand):
             t.List[str],
             typer.Option(
                 "--cmd",
-                help=_("A command by import path or name."),
+                help=_("A command by [bold]import path[/bold] or [bold]name[/bold]."),
                 shell_complete=completers.chain(
                     completers.complete_import_path, completers.commands()
                 ),
@@ -69,7 +69,7 @@ class Command(TyperCommand):
             t.List[str],
             typer.Option(
                 "--cmd-dup",
-                help=_("A list of commands by import path or name."),
+                help=_("A list of [reverse]commands[/reverse] by import path or name."),
                 shell_complete=completers.chain(
                     completers.complete_import_path,
                     completers.commands(allow_duplicates=True),
@@ -81,7 +81,9 @@ class Command(TyperCommand):
             t.List[str],
             typer.Option(
                 "--cmd-first",
-                help=_("A list of commands by import path or name."),
+                help=_(
+                    "A list of [yellow][underline]commands[/underline][/yellow] by import path or name."
+                ),
                 shell_complete=completers.chain(
                     completers.complete_import_path,
                     completers.commands(allow_duplicates=True),

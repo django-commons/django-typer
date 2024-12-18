@@ -68,7 +68,7 @@ class _DefaultCompleteTestCase:
 
     @property
     def command(self) -> ShellCompletion:
-        return get_command("shellcompletion")
+        return get_command("shellcompletion", ShellCompletion)
 
     def setUp(self):
         self.remove()
@@ -88,10 +88,10 @@ class _DefaultCompleteTestCase:
         if not script:
             script = self.manage_script
         kwargs = {}
-        if self.shell:
-            kwargs["shell"] = self.shell
         if script:
             kwargs["manage_script"] = script
+        if self.shell:
+            self.command.init(shell=self.shell)
         self.command.install(**kwargs)
         self.verify_install(script=script)
 
@@ -99,11 +99,11 @@ class _DefaultCompleteTestCase:
         if not script:
             script = self.manage_script
         kwargs = {}
-        if self.shell:
-            kwargs["shell"] = self.shell
         if script:
             kwargs["manage_script"] = script
-        self.command.remove(**kwargs)
+        if self.shell:
+            self.command.init(shell=self.shell)
+        self.command.uninstall(**kwargs)
         self.verify_remove(script=script)
 
     def set_environment(self, fd):

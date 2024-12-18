@@ -8,8 +8,7 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 class ZshComplete(DjangoTyperShellCompleter):
     name = "zsh"
-    SCRIPT = Path(__file__).parent / "zsh.sh"
-
+    template = "shell_complete/zsh.sh"
     supports_scripts = True
 
     @cached_property
@@ -31,7 +30,7 @@ class ZshComplete(DjangoTyperShellCompleter):
                 .replace(":", r"\\:")
             )
 
-        return f"{item.type}\n{escape(item.value)}\n{escape(item.help) if item.help else '_'}"
+        return f"{item.type}\n{escape(self.process_rich_text(item.value))}\n{escape(self.process_rich_text(item.help)) if item.help else '_'}"
 
     def install(self) -> Path:
         assert self.prog_name

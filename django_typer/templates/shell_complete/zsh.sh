@@ -1,18 +1,11 @@
-{% if is_installed %}
-#compdef {{ manage_script }}
-{% else %}
-#compdef {{ manage_script.absolute }} {{ manage_script.name }} ./{{ manage_script.name }} */{{ manage_script.name }}
-{% endif %}
-
-{% if is_installed %}
-{% endif %}
+#compdef {{ manage_script_name }}
 
 {{ complete_func }}() {
     local -a completions
     local -a completions_with_descriptions
     local -a response
     
-    # Extract --settings and --pythonpath options and their values if present becase
+    # Extract --settings and --pythonpath options and their values if present because
     # we need to pass these to the complete script - they may be necessary to find the command!
     local settings_option=""
     local pythonpath_option=""
@@ -38,7 +31,17 @@
       esac
     done
 
-    response=("${(@f)$({% if is_installed %}{{ manage_script }}{% else %}{{ python }} {{ manage_script.absolute }}{% endif %} {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} {{ rich }} complete "${words[*]}")}")
+    {% if not is_installed %}
+    if [[ ${words[2]} == *{{manage_script_name}} ]]; then
+        cmd="${words[1]} ${words[2]}"
+    else
+        cmd="${words[1]}"
+    fi
+    {% else %}
+    cmd = "{{ manage_script_name }}"
+    {% endif %}
+
+    response=("${(@f)$("${cmd}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${words[*]}")}")
 
     for type key descr in ${response}; do
         if [[ "$type" == "plain" ]]; then
@@ -67,6 +70,5 @@ if [[ $zsh_eval_context[-1] == loadautofunc ]]; then
     # autoload from fpath, call function directly
     {{ complete_func }} "$@"
 else
-    # eval/source/. command, register function for later
-    compdef {{ complete_func }} {% if is_installed %}{{ manage_script }}{% else %}'*{{ manage_script.name }}'{% endif %}
+  compdef {{ complete_func }} {{ manage_script_name }}
 fi

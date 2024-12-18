@@ -463,7 +463,7 @@ def complete_import_path(
             completions.append(
                 CompletionItem(
                     f'{module_import}{"." if module_import else ""}{module.name}',
-                    type="dir",
+                    type="plain",
                 )
             )
     if len(completions) == 1 and not completions[0].value.endswith("."):

@@ -25,7 +25,6 @@ import os
 import re
 import sys
 import typing as t
-import warnings
 from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
@@ -40,7 +39,9 @@ from click.shell_completion import (
 )
 from django.core.management import CommandError, ManagementUtility
 from django.template import Context, Engine
-from django.utils.functional import classproperty
+from django.template.backends.django import Template as DjangoTemplate
+from django.template.base import Template as BaseTemplate
+from django.template.loader import TemplateDoesNotExist, get_template
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -70,14 +71,14 @@ class DjangoTyperShellCompleter(ShellComplete):
     :func:`~django_typer.management.commands.shellcompletion.register_completion_class`
     """
 
-    SCRIPT: Path
+    template: str
     """
-    The path to the shell completion script template.
+    The name of the shell completion function script template.
     """
 
     color: bool = False
     """
-    By default, allow or disallow color in the completion output.
+    By default, allow or disallow color and formatting in the completion output.
     """
 
     supports_scripts: bool = False
@@ -91,6 +92,9 @@ class DjangoTyperShellCompleter(ShellComplete):
     command_str: str
     command_args: t.List[str]
 
+    console = None  # type: ignore[var-annotated]
+    console_buffer: io.StringIO
+
     def __init__(
         self,
         cli: t.Optional[ClickCommand] = None,
@@ -100,16 +104,34 @@ class DjangoTyperShellCompleter(ShellComplete):
         command: t.Optional["Command"] = None,
         command_str: t.Optional[str] = None,
         command_args: t.Optional[t.List[str]] = None,
+        template: t.Optional[str] = None,
+        color: t.Optional[bool] = None,
         **kwargs,
     ):
         # we don't always need the initialization parameters during completion
-        self.prog_name = kwargs.pop("prog_name", "")
+        self.prog_name = prog_name
         if command:
             self.command = command
         if command_str is not None:
             self.command_str = command_str
         if command_args is not None:
-            self.command_args = split_arg_string(command_str) if command_str else []
+            self.command_args = command_args
+        if template is not None:
+            self.template = template
+        if color is not None:
+            self.color = color
+
+        self.console_buffer = io.StringIO()
+        try:
+            from rich.console import Console
+
+            self.console = Console(
+                color_system="auto" if self.color else None,
+                force_terminal=True,
+                file=self.console_buffer,
+            )
+        except ImportError:
+            pass
 
         if cli:
             super().__init__(
@@ -120,9 +142,9 @@ class DjangoTyperShellCompleter(ShellComplete):
                 **kwargs,
             )
 
-    @classproperty
+    @property
     def source_template(self) -> str:  # type: ignore
-        return self.SCRIPT.read_text()
+        return Path(self.load_template().origin.name).read_text()
 
     def get_completions(
         self, args: t.List[str], incomplete: str
@@ -135,19 +157,13 @@ class DjangoTyperShellCompleter(ShellComplete):
         return super().get_completions(args[1:], incomplete)
 
     def get_completion_args(self) -> t.Tuple[t.List[str], str]:
+        """
+        Return the list of completion arguments and the incomplete string.
+        """
         cwords = self.command_args
         if self.command_str and self.command_str[-1].isspace():
+            # if the command string ends with a space, the incomplete string is empty
             cwords.append("")
-        # allow users to not specify the manage script, but allow for it
-        # if they do by lopping it off - same behavior as upstream classes
-        if cwords:
-            try:
-                if cwords[0] == self.command.manage_script_name:
-                    cwords = cwords[1:]
-                elif Path(cwords[0]).resolve() == Path(sys.argv[0]).resolve():
-                    cwords = cwords[1:]
-            except (TypeError, ValueError, OSError):  # pragma: no cover
-                pass
         return (
             cwords[:-1],
             cwords[-1] if cwords else "",
@@ -157,46 +173,66 @@ class DjangoTyperShellCompleter(ShellComplete):
         return {
             **super().source_vars(),
             "manage_script": self.command.manage_script,
+            "manage_script_name": self.command.manage_script_name,
             "python": sys.executable,
             "django_command": self.command.__module__.split(".")[-1],
-            "color": "--no-color"
-            if self.command.no_color
-            else "--force-color"
+            "color": "--force-color"
+            if self.color
+            else "--no-color"
             if self.command.force_color
             else "",
             "fallback": f" --fallback {self.command.fallback.__module__}.{self.command.fallback.__name__}"
             if self.command.fallback
             else "",
             "is_installed": not isinstance(self.command.manage_script, Path),
-            "rich": "--rich" if self.command.allow_rich else "",
         }
 
-    @cached_property
-    def template_engine(self):
+    def load_template(self) -> t.Union[BaseTemplate, DjangoTemplate]:
         """
-        Django template engine that will find and render completer script templates.
+        Return a compiled Template object for the completion script template.
         """
-        return Engine(
-            dirs=[str(files("django_typer.management.commands").joinpath("shells"))],
-            libraries={
-                "default": "django.template.defaulttags",
-                "filter": "django.template.defaultfilters",
-            },
-        )
+        try:
+            return get_template(self.template)  # type: ignore
+        except TemplateDoesNotExist:
+            # handle case where templating is not configured to find our default
+            # templates
+            return Engine(
+                dirs=[str(files("django_typer").joinpath("templates"))],
+                libraries={
+                    "default": "django.template.defaulttags",
+                    "filter": "django.template.defaultfilters",
+                },
+            ).get_template(self.template)
 
     def source(self) -> str:
         """
         Render the completion script template to a string.
         """
-        return self.template_engine.get_template(str(self.SCRIPT)).render(
-            Context(self.source_vars())
-        )
+        try:
+            return self.load_template().render(self.source_vars())  # type: ignore
+        except TypeError:
+            # it is annoying that get_template() and DjangoEngine.get_template() return different
+            # interfaces
+            return self.load_template().render(Context(self.source_vars()))  # type: ignore
 
     def install(self):
         raise NotImplementedError
 
     def uninstall(self):
         raise NotImplementedError
+
+    def process_rich_text(self, text: str) -> str:
+        if self.console:
+            if self.color:
+                self.console_buffer.truncate(0)
+                self.console_buffer.seek(0)
+                self.console.print(text, end="")
+                return self.console_buffer.getvalue()
+            else:
+                return "".join(
+                    segment.text for segment in self.console.render(text)
+                ).rstrip("\n")
+        return text
 
 
 _completers: t.Dict[str, t.Type[DjangoTyperShellCompleter]] = {}
@@ -268,8 +304,6 @@ class Command(TyperCommand):
         "skip_checks",
         "verbosity",
     }
-
-    allow_rich: bool = False
 
     _shell: t.Optional[str] = DETECTED_SHELL
     shell_module: ModuleType
@@ -383,21 +417,21 @@ class Command(TyperCommand):
             t.Optional[bool],
             Option(
                 "--no-color",
-                help=t.cast(str, _("Filter color codes out of completion text.")),
+                help=t.cast(
+                    str,
+                    _(
+                        "Filter terminal formatting control sequences out of completion text."
+                    ),
+                ),
                 rich_help_panel=COMMON_PANEL,
             ),
         ] = None,
-        allow_rich: t.Annotated[
-            bool,
-            Option(
-                "--rich", help=t.cast(str, _("Allow rich output in completion text."))
-            ),
-        ] = allow_rich,
     ) -> "Command":
         self.shell = shell  # type: ignore[assignment]
         assert self.shell
         self.no_color = not self.shell_class.color if no_color is None else no_color
-        self.allow_rich = allow_rich
+        if self.force_color:
+            self.no_color = False
         return self
 
     @command(
@@ -429,6 +463,17 @@ class Command(TyperCommand):
                 )
             ),
         ] = None,
+        template: t.Annotated[
+            t.Optional[str],
+            Option(
+                help=t.cast(
+                    str,
+                    _(
+                        "The name of the template to use for the shell completion script."
+                    ),
+                )
+            ),
+        ] = None,
     ):
         """
         Install autocompletion for the given shell. If the shell is not specified, it will
@@ -441,10 +486,7 @@ class Command(TyperCommand):
             :convert-png: latex
         """
         self.fallback = fallback  # type: ignore[assignment]
-        if (
-            isinstance(self.manage_script, Path)
-            and not self.shell_class.supports_scripts
-        ):
+        if isinstance(self.manage_script, Path):
             if not self.shell_class.supports_scripts:
                 raise CommandError(
                     gettext(
@@ -458,14 +500,25 @@ class Command(TyperCommand):
                     )
                 )
             else:
-                warnings.warn(
-                    gettext(
-                        "It is not recommended to install tab completion for a script not on the path."
+                self.stdout.write(
+                    self.style.WARNING(
+                        gettext(
+                            "It is not recommended to install tab completion for a script not on "
+                            "the path because completions will likely only work if the script is "
+                            "invoked from the same location and using the same relative path. You "
+                            "may wish to create an entry point for {script_name}. See {link}."
+                        ).format(
+                            script_name=self.manage_script_name,
+                            link="https://setuptools.pypa.io/en/latest/userguide/entry_point.html",
+                        ),
                     )
                 )
 
         install_path = self.shell_class(
-            prog_name=str(manage_script or self.manage_script_name), command=self
+            prog_name=str(manage_script or self.manage_script_name),
+            command=self,
+            template=template,
+            color=not self.no_color or self.force_color,
         ).install()
         self.stdout.write(
             self.style.SUCCESS(
@@ -507,7 +560,9 @@ class Command(TyperCommand):
 
         """
         self.shell_class(
-            prog_name=str(manage_script or self.manage_script_name), command=self
+            prog_name=str(manage_script or self.manage_script_name),
+            command=self,
+            color=not self.no_color or self.force_color,
         ).uninstall()
         self.stdout.write(
             self.style.WARNING(
@@ -565,6 +620,15 @@ class Command(TyperCommand):
             :convert-png: latex
         """
         args = split_arg_string(command)
+        if args:
+            try:
+                # lop the manage script off the front if it's there
+                if args[0] == self.manage_script_name:
+                    args = args[1:]
+                elif Path(args[0]).resolve() == Path(sys.argv[0]).resolve():
+                    args = args[1:]
+            except (TypeError, ValueError, OSError):  # pragma: no cover
+                pass
 
         def get_completion() -> str:
             if args:
@@ -597,12 +661,16 @@ class Command(TyperCommand):
                         command=self,
                         command_str=command,
                         command_args=args,
+                        color=not self.no_color or self.force_color,
                     ).complete()
 
             # only try to set the fallback if we have to use it
             self.fallback = fallback  # type: ignore[assignment]
             return self.shell_class(
-                command=self, command_str=command, command_args=args
+                command=self,
+                command_str=command,
+                command_args=args,
+                color=not self.no_color or self.force_color,
             ).complete()
 
         def strip_color(text: str) -> str:

@@ -46,6 +46,7 @@ clean-env:
 clean-git-ignored:
     git clean -fdX
 
+# remove all non repository artifacts
 clean: clean-docs clean-env clean-git-ignored
 
 build-docs-html: install-docs

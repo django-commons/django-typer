@@ -12,7 +12,7 @@ class BashComplete(DjangoTyperShellCompleter):
     """
 
     name = "bash"
-    SCRIPT = Path(__file__).parent / "bash.sh"
+    template = "shell_complete/bash.sh"
 
     @cached_property
     def install_dir(self) -> Path:

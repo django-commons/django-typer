@@ -9,7 +9,7 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 class PowerShellComplete(DjangoTyperShellCompleter):
     name = "powershell"
-    SCRIPT = Path(__file__).parent / "powershell.ps1"
+    template = "shell_complete/powershell.ps1"
 
     def format_completion(self, item: CompletionItem) -> str:
         return f"{item.value}:::{item.help or ' '}"

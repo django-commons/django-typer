@@ -36,15 +36,18 @@ Migrating from 2.x to 3.x
 * If you are using shell tab completions you will need to reinstall the completion scripts. using
   the `shellcompletion install` command.
 
-* The interface to shellcompletion has changed. ``--shell`` is now an initialization option. I.e.:
+* The interface to shellcompletion has changed. ``--shell`` is now an initialization option and
+  ``remove`` was renamed to ``uninstall``.:
 
     .. code-block::
 
         # old interface
         manage shellcompletion complete --shell zsh "command string"
+        manage shellcompletion remove
 
         # new interface
         manage shellcompletion --shell zsh complete "command string"
+        manage shellcompletion uninstall
 
 * The function signature for :ref:`shellcompletion fallbacks <completion_fallbacks>` has changed.
   The fallback signature is now:
