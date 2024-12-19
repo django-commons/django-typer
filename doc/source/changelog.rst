@@ -9,6 +9,7 @@ v3.0.0 (202X-XX-XX)
 
 * Implemented `Use in-house shell completer classes. <https://github.com/django-commons/django-typer/issues/156>`_
 * Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
+* Fixed `Fish shell complete is broken when rich is installed. <https://github.com/django-commons/django-typer/issues/152>`_
 * BREAKING `Remove name parameter from initialize()/callback(). <https://github.com/django-commons/django-typer/issues/150>`_
 * Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
 * Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_
