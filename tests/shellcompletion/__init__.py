@@ -55,7 +55,7 @@ def read_all_from_fd_with_timeout(fd, timeout):
 
 def scrub(output: str) -> str:
     """Scrub control code characters and ansi escape sequences for terminal colors from output"""
-    return re.sub(r"[\x00-\x1F\x7F]|\x1B\[[0-?]*[ -/]*[@-~]", "", output).replace(
+    return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output, flags=re.IGNORECASE).replace(
         "\t", ""
     )
 
@@ -80,7 +80,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         super().setUp()
 
     def tearDown(self):
-        # self.remove()
+        self.remove()
         super().tearDown()
 
     def verify_install(self, script=None):
@@ -111,6 +111,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         if self.shell:
             self.command.init(shell=self.shell)
         self.command.uninstall(**kwargs)
+        self.get_completions("ping")  # just to reinit shell
         self.verify_remove(script=script)
 
     def set_environment(self, fd):
@@ -202,9 +203,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
 
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
-        # annoyingly in CI there are some spaces inserted between the incomplete phrase
-        # and the completion on linux in bash specifically
-        self.assertTrue(re.match(r".*complet\s*ion.*", completions))
+        self.assertIn("completion", completions)
         completions = self.get_completions(self.launch_script)
         self.assertIn("adapted", completions)
         self.assertIn("help_precedence", completions)
@@ -254,14 +253,43 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
     def test_rich_output(self):
         self.install(force_color=True)
         self.run_rich_option_completion(rich_output_expected=True)
-        self.remove()
 
     @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="Rich not installed")
     def test_no_rich_output(self):
         self.install(no_color=True)
         self.run_rich_option_completion(rich_output_expected=False)
-        # self.remove()
+
+    def test_settings_pass_through(self):
+        # https://github.com/django-commons/django-typer/issues/68
+        self.install()
+        completions = self.get_completions(self.launch_script, "app_labels", " ")
+        self.assertNotIn("django_typer", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "app_labels",
+            "--settings",
+            "tests.settings.examples",
+            " ",
+        )
+        self.assertIn("django_typer", completions)
+
+    def test_pythonpath_pass_through(self):
+        # https://github.com/django-commons/django-typer/issues/68
+        self.install()
+        completions = self.get_completions(
+            self.launch_script, "python_path", "--options", " "
+        )
+        self.assertNotIn("working", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "python_path",
+            "--pythonpath",
+            "tests/off_path",
+            "--option",
+            " ",
+        )
+        self.assertIn("working", completions)
 
 
 class _InstalledScriptTestCase(_DefaultCompleteTestCase):

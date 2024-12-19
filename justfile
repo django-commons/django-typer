@@ -112,12 +112,12 @@ test-rich:
     poetry install -E rich
     poetry run pytest -m rich --cov-append
 
-test: test-rich test-no-rich install-colorama
+test-all: test-rich test-no-rich install-colorama
     poetry run pytest -m "not rich and not no_rich" --cov-append
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append
 
-test-cases +TESTS:
+test *TESTS:
     poetry run pytest {{ TESTS }}
 
 precommit:

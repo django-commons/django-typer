@@ -65,7 +65,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        just test
+        just test-all
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -114,7 +114,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        just test
+        just test-all
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -167,7 +167,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        just test
+        just test-all
         mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -217,7 +217,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        just test-cases tests/shellcompletion/*
+        just test tests/shellcompletion/*
         mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -294,7 +294,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        just test-cases tests/shellcompletion/test_zsh.py || exit 1
+        just test tests/shellcompletion/test_zsh.py || exit 1
         mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
