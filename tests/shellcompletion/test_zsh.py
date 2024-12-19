@@ -8,7 +8,7 @@ from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTest
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
-class ZshShellTests(_DefaultCompleteTestCase, TestCase):
+class ZshTests(_DefaultCompleteTestCase, TestCase):
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
 
@@ -24,5 +24,5 @@ class ZshShellTests(_DefaultCompleteTestCase, TestCase):
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
-class ZshExeShellTests(_InstalledScriptTestCase, ZshShellTests, TestCase):
+class ZshExeTests(_InstalledScriptTestCase, ZshTests, TestCase):
     shell = "zsh"

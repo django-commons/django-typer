@@ -110,21 +110,15 @@ class TestGroups(TestCase):
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
             helps_dir = "helps" if rich_installed else "helps_no_rich"
-            try:
-                self.assertGreater(
-                    sim := similarity(
-                        hlp,
-                        (
-                            TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
-                        ).read_text(encoding="utf-8"),
-                    ),
-                    0.99,  # width inconsistences drive this number < 1
-                )
-            except AssertionError:
-                import pdb
-
-                pdb.set_trace()
-                raise
+            self.assertGreater(
+                sim := similarity(
+                    hlp,
+                    (
+                        TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
+                    ).read_text(encoding="utf-8"),
+                ),
+                0.99,  # width inconsistences drive this number < 1
+            )
             print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
 
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)

@@ -82,7 +82,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             typer.Option(
                 "--cmd-first",
                 help=_(
-                    "A list of [yellow][underline]commands[/underline][/yellow] by import path or name."
+                    "A list of [yellow][underline]commands[/underline][/yellow] by either import path or name."
                 ),
                 shell_complete=completers.chain(
                     completers.complete_import_path,

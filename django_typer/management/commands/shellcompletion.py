@@ -431,10 +431,24 @@ class Command(TyperCommand):
                 rich_help_panel=COMMON_PANEL,
             ),
         ] = None,
+        force_color: t.Annotated[
+            bool,
+            Option(
+                "--force-color",
+                help=t.cast(
+                    str,
+                    _(
+                        "Allow terminal formatting control sequences in completion text."
+                    ),
+                ),
+                rich_help_panel=COMMON_PANEL,
+            ),
+        ] = False,
     ) -> "Command":
         self.shell = shell  # type: ignore[assignment]
         assert self.shell
-        self.no_color = not self.shell_class.color if no_color is None else no_color
+        self.force_color = force_color
+        self.no_color = (not self.shell_class.color) if no_color is None else no_color
         if self.force_color:
             self.no_color = False
         return self

@@ -10,11 +10,16 @@ import termios
 import time
 import typing as t
 from pathlib import Path
+import pytest
+from functools import cached_property
 
 from shellingham import detect_shell
 
+from django.test import TestCase
+from django_typer.utils import with_typehint
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
+from ..utils import rich_installed
 
 default_shell = None
 
@@ -55,7 +60,7 @@ def scrub(output: str) -> str:
     )
 
 
-class _DefaultCompleteTestCase:
+class _DefaultCompleteTestCase(with_typehint(TestCase)):
     shell = None
     manage_script = "manage.py"
     launch_script = "./manage.py"
@@ -66,7 +71,7 @@ class _DefaultCompleteTestCase:
         # this includes zsh, bash, fish and powershell
         return "-i"
 
-    @property
+    @cached_property
     def command(self) -> ShellCompletion:
         return get_command("shellcompletion", ShellCompletion)
 
@@ -75,7 +80,7 @@ class _DefaultCompleteTestCase:
         super().setUp()
 
     def tearDown(self):
-        self.remove()
+        # self.remove()
         super().tearDown()
 
     def verify_install(self, script=None):
@@ -84,14 +89,16 @@ class _DefaultCompleteTestCase:
     def verify_remove(self, script=None):
         pass
 
-    def install(self, script=None):
+    def install(self, script=None, force_color=False, no_color=None):
         if not script:
             script = self.manage_script
+        init_kwargs = {"force_color": force_color, "no_color": no_color}
         kwargs = {}
         if script:
             kwargs["manage_script"] = script
         if self.shell:
-            self.command.init(shell=self.shell)
+            init_kwargs["shell"] = self.shell
+        self.command.init(**init_kwargs)
         self.command.install(**kwargs)
         self.verify_install(script=script)
 
@@ -113,7 +120,7 @@ class _DefaultCompleteTestCase:
             f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
         )
 
-    def get_completions(self, *cmds: str) -> t.List[str]:
+    def get_completions(self, *cmds: str, scrub_output=True) -> str:
         def read(fd):
             """Function to read from a file descriptor."""
             return os.read(fd, 1024 * 1024).decode()
@@ -172,7 +179,9 @@ class _DefaultCompleteTestCase:
         process.terminate()
         process.wait()
         # remove bell character which can show up in some terminals where we hit tab
-        return scrub(output)
+        if scrub_output:
+            return scrub(output)
+        return output
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")
@@ -193,13 +202,40 @@ class _DefaultCompleteTestCase:
 
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
-        # annoingly in CI there are some spaces inserted between the incomplete phrase
+        # annoyingly in CI there are some spaces inserted between the incomplete phrase
         # and the completion on linux in bash specifically
         self.assertTrue(re.match(r".*complet\s*ion.*", completions))
         completions = self.get_completions(self.launch_script)
         self.assertIn("adapted", completions)
         self.assertIn("help_precedence", completions)
         self.assertIn("closepoll", completions)
+
+    def run_rich_option_completion(self, rich_output_expected: bool):
+        completions = self.get_completions(
+            self.launch_script, "completion", "--cmd", scrub_output=False
+        )
+        self.assertIn("--cmd", completions)
+        self.assertIn("--cmd-first", completions)
+        self.assertIn("--cmd-dup", completions)
+        if not rich_installed:
+            self.assertIn("[bold]", completions)
+            self.assertIn("[/bold]", completions)
+            self.assertIn("[reverse]", completions)
+            self.assertIn("[/reverse]", completions)
+            self.assertIn("[underline]", completions)
+            self.assertIn("[/underline]", completions)
+            self.assertIn("[yellow]", completions)
+            self.assertIn("[/yellow]", completions)
+        elif rich_output_expected:
+            self.assertIn("\x1b[7mcommands\x1b[0m", completions)
+            self.assertIn("\x1b[4;33mcommands\x1b[0m", completions)
+            self.assertIn("\x1b[1mimport path\x1b[0m", completions)
+            self.assertIn("\x1b[1mname\x1b[0m", completions)
+        else:
+            self.assertNotIn("\x1b[7mcommands\x1b[0m", completions)
+            self.assertNotIn("\x1b[4;33mcommands\x1b[0m", completions)
+            self.assertNotIn("\x1b[1mimport path\x1b[0m", completions)
+            self.assertNotIn("\x1b[1mname\x1b[0m", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
@@ -212,6 +248,20 @@ class _DefaultCompleteTestCase:
         with self.assertRaises(AssertionError):
             self.run_app_completion()
         self.install()
+
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    def test_rich_output(self):
+        self.install(force_color=True)
+        self.run_rich_option_completion(rich_output_expected=True)
+        self.remove()
+
+    @pytest.mark.rich
+    @pytest.mark.skipif(not rich_installed, reason="Rich not installed")
+    def test_no_rich_output(self):
+        self.install(no_color=True)
+        self.run_rich_option_completion(rich_output_expected=False)
+        # self.remove()
 
 
 class _InstalledScriptTestCase(_DefaultCompleteTestCase):
