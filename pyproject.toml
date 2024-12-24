@@ -61,9 +61,7 @@ manage = "tests.manage:main"
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
 
-# TODO - replace after click 8.1.8 or 8.2 release, <= 8.1.7 has terminal color bug that fails on windows
-#click = ">=8.1.8"
-click = { git = "https://github.com/pallets/click.git", branch = "main" }
+click = ">=8.1.8"
 
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer
