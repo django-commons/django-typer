@@ -148,8 +148,11 @@ ignore = [ "D004" ]
 [tool.pytest.ini_options]
 # py.test options:
 DJANGO_SETTINGS_MODULE = "tests.settings.base"
-python_files = "test_*.py"
-norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__ shellcompletion"
+python_files = [
+    "test_*.py",
+    "shellcompletion/test_*.py"
+]
+norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 env = [
     "TERMINAL_WIDTH=80",
 ]

@@ -60,6 +60,7 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
             self.assertTrue(contents)  # should have been deleted if it were empty
 
 
+@pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
 class PowerShellInstallRemoveTests(_InstalledScriptTestCase, PowerShellTests):
     def test_shell_complete(self):
         # the power shell completion script registration is all in one file

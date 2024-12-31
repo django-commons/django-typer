@@ -12,6 +12,8 @@ import typing as t
 from pathlib import Path
 import pytest
 from functools import cached_property
+import re
+import subprocess
 
 from shellingham import detect_shell
 

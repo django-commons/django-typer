@@ -6,10 +6,7 @@ from pathlib import Path
 import pytest
 from django.test import TestCase
 
-from tests.shellcompletion import (
-    _DefaultCompleteTestCase,
-    _InstalledScriptTestCase,
-)
+from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTestCase
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
@@ -36,6 +33,11 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
         if not script:
             script = self.manage_script
         self.assertFalse((self.directory / f"{script}.sh").exists())
+
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip("Bash completer does not support rich output.")
+    def test_rich_output(self): ...
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
