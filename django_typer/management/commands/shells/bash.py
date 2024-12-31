@@ -1,3 +1,4 @@
+import typing as t
 from functools import cached_property
 from pathlib import Path
 
@@ -13,6 +14,7 @@ class BashComplete(DjangoTyperShellCompleter):
 
     name = "bash"
     template = "shell_complete/bash.sh"
+    supports_scripts = True
 
     @cached_property
     def install_dir(self) -> Path:
@@ -20,10 +22,32 @@ class BashComplete(DjangoTyperShellCompleter):
         install_dir.mkdir(parents=True, exist_ok=True)
         return install_dir
 
+    @staticmethod
+    def _check_version() -> t.Optional[t.Tuple[int, int]]:
+        import re
+        import subprocess
+
+        output = subprocess.run(
+            ["bash", "-c", 'echo "${BASH_VERSION}"'], stdout=subprocess.PIPE
+        )
+        match = re.search(r"^(\d+)\.(\d+)\.\d+", output.stdout.decode())
+
+        if match is not None:
+            major, minor = (int(val) for val in match.groups())
+            return major, minor
+        return None
+
+    def source_vars(self) -> t.Dict[str, t.Any]:
+        complete_opts = ""
+        version = self._check_version()
+        if version and version >= (4, 4):
+            complete_opts = "-o nosort"
+        return {**super().source_vars(), "complete_opts": complete_opts}
+
     def format_completion(self, item: CompletionItem) -> str:
         return f"{item.type},{item.value}"
 
-    def install_bash(self) -> Path:
+    def install(self) -> Path:
         assert self.prog_name
         Path.home().mkdir(parents=True, exist_ok=True)
         script = self.install_dir / f"{self.prog_name}.sh"

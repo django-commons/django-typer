@@ -1,6 +1,7 @@
-%(complete_func)s() {
+{{ complete_func }}() {
     local IFS=$'
 '
+    local response
     # Extract --settings and --pythonpath options and their values if present becase
     # we need to pass these to the complete script - they may be necessary to find the command!
     local settings_option=""
@@ -23,10 +24,31 @@
         esac
     done
 
-    COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   %(autocomplete_var)s=complete_bash $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete ) )
+    response=()
+    while IFS= read -r line; do
+        response+=("$line")
+    done < <( $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${COMP_WORDS[*]}" )
+    
+    COMPREPLY=()
+    for completion in "${response[@]}"; do
+        IFS=',' read type value <<< "$completion"
+
+        if [[ $type == 'dir' ]]; then
+            COMPREPLY=()
+            compopt -o dirnames
+        elif [[ $type == 'file' ]]; then
+            COMPREPLY=()
+            compopt -o default
+        elif [[ $type == 'plain' ]]; then
+            COMPREPLY+=($value)
+        fi
+    done
+
     return 0
 }
 
-complete -o default -F %(complete_func)s %(prog_name)s
+{{ complete_func }}_setup() {
+    complete {{ complete_opts }} -F {{ complete_func }} {{ manage_script_name }}
+}
+
+{{ complete_func }}_setup;
