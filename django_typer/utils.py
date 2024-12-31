@@ -41,7 +41,7 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     if shutil.which(cmd_pth.name):
         return cmd_pth.name
     try:
-        return cmd_pth.absolute().relative_to(Path(os.getcwd())).absolute()
+        return cmd_pth.absolute().relative_to(Path(os.getcwd()))
     except ValueError:
         return cmd_pth.absolute()
 
