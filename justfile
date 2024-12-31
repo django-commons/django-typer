@@ -127,3 +127,6 @@ coverage:
     poetry run coverage combine --keep *.coverage
     poetry run coverage report
     poetry run coverage xml
+
+run +ARGS:
+    poetry run {{ ARGS }}

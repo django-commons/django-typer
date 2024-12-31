@@ -30,12 +30,8 @@ from pathlib import Path
 from types import ModuleType
 
 from click.core import Command as ClickCommand
-from click.shell_completion import (
-    CompletionItem,
-    ShellComplete,
-    add_completion_class,
-    split_arg_string,
-)
+from click.parser import split_arg_string
+from click.shell_completion import CompletionItem, ShellComplete, add_completion_class
 from django.core.management import CommandError, ManagementUtility
 from django.template import Context, Engine
 from django.template.backends.django import Template as DjangoTemplate

@@ -5,17 +5,37 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-import pytest
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from django.utils import timezone
 
+from django_typer.management.commands.shellcompletion import DETECTED_SHELL
 from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
 from tests.apps.test_app.models import ShellCompleteTester
 from tests.utils import run_command
+
+SHELL = {
+    "zsh": "zsh",
+    "bash": "bash",
+    "pwsh": "pwsh",
+    "powershell": "powershell",
+    "fish": "fish",
+}.get(DETECTED_SHELL, "bash")
+
+
+def get_values(completion):
+    if SHELL == "zsh":
+        return completion.split("\n")[1::3]
+    elif SHELL == "bash":
+        return [line.split(",")[1] for line in completion.split("\n") if line]
+    elif SHELL in ["pwsh", "powershell"]:
+        raise NotImplementedError("Powershell completion not implemented")
+    elif SHELL == "fish":
+        raise NotImplementedError("Fish completion not implemented")
+    raise NotImplementedError(f"get_values for shell {SHELL} not implemented")
 
 
 class TestShellCompletersAndParsers(TestCase):
@@ -111,13 +131,21 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         shellcompletion = get_command("shellcompletion", ShellCompletion)
+        shellcompletion.init(shell=SHELL)
         result = shellcompletion.complete("completion ")
         self.assertTrue("test_app" in result)
         self.assertTrue("tests_apps_util" in result)
         self.assertTrue("django_typer" in result)
 
         result2 = StringIO()
-        call_command("shellcompletion", "complete", "completion ", stdout=result2)
+        call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "completion ",
+            stdout=result2,
+        )
         stdout_result = result2.getvalue().strip()
         self.assertTrue("test_app" in stdout_result)
         self.assertTrue("tests_apps_util" in stdout_result)
@@ -128,7 +156,7 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "completion ")
+            call_command("shellcompletion", "--shell", SHELL, "complete", "completion ")
         result = result.getvalue()
         self.assertTrue("test_app" in result)
         self.assertTrue("tests_apps_util" in result)
@@ -143,21 +171,31 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "completion --app-opt ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "completion --app-opt ",
+            )
         result = result.getvalue()
         self.assertTrue("test_app" in result)
         self.assertTrue("tests_apps_util" in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "completion tests.")
+            call_command(
+                "shellcompletion", "--shell", SHELL, "complete", "completion tests."
+            )
         result = result.getvalue()
         self.assertTrue("tests.apps.examples.polls" in result)
         self.assertTrue("tests.apps.test_app" in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "completion tests")
+            call_command(
+                "shellcompletion", "--shell", SHELL, "complete", "completion tests"
+            )
         result = result.getvalue()
         self.assertTrue("tests_apps_examples_polls" in result)
         self.assertTrue("tests_apps_util" in result)
@@ -226,7 +264,13 @@ class TestShellCompletersAndParsers(TestCase):
     def test_char_field(self):
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --char ja")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --char ja",
+            )
         result = result.getvalue()
         self.assertTrue("jack" in result)
         self.assertTrue("jason" in result)
@@ -235,7 +279,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ichar Ja")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ichar Ja",
+            )
         result = result.getvalue()
         self.assertTrue("Jack" in result)
         self.assertTrue("Jason" in result)
@@ -269,14 +319,26 @@ class TestShellCompletersAndParsers(TestCase):
     def test_ip_field(self):
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ip ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip ",
+            )
         result = result.getvalue().replace("\\", "")
         for ip in self.field_values["ip_field"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ip 2001:")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip 2001:",
+            )
         result = result.getvalue().replace("\\", "")
         for ip in ["2001::1"]:
             self.assertTrue(ip in result)
@@ -284,14 +346,18 @@ class TestShellCompletersAndParsers(TestCase):
         # IP normalization complexity is unhandled
         # result = StringIO()
         # with contextlib.redirect_stdout(result):
-        #     call_command("shellcompletion", "complete", "model_fields test --ip 2001:0")
+        #     call_command("shellcompletion", "--shell", SHELL, "complete", "model_fields test --ip 2001:0")
         # result = result.getvalue()
         # self.assertFalse(result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --ip 2a02:42"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip 2a02:42",
             )
         result = result.getvalue().replace("\\", "")
         for ip in ["2a02:42fe::4", "2a02:42ae::4"]:
@@ -300,7 +366,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --ip 2a02:42f"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip 2a02:42f",
             )
         result = result.getvalue().replace("\\", "")
         for ip in ["2a02:42fe::4"]:
@@ -308,21 +378,39 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ip 192.")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip 192.",
+            )
         result = result.getvalue().replace("\\", "")
         for ip in ["192.168.1.1", "192.0.2.30"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ip 192.1")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip 192.1",
+            )
         result = result.getvalue().replace("\\", "")
         for ip in ["192.168.1.1"]:
             self.assertTrue(ip in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --ip :")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --ip :",
+            )
         result = result.getvalue().replace("\\", "")
         for ip in ["::ffff:10.10.10.10"]:
             self.assertTrue(ip in result)
@@ -352,7 +440,13 @@ class TestShellCompletersAndParsers(TestCase):
     def test_text_field(self):
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --text ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --text ",
+            )
         result = result.getvalue()
         self.assertTrue("sockeye" in result)
         self.assertTrue("chinook" in result)
@@ -364,7 +458,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --text ch")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --text ch",
+            )
         result = result.getvalue()
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
@@ -376,7 +476,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --itext S")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --itext S",
+            )
         result = result.getvalue()
         self.assertTrue("Sockeye" in result)
         self.assertFalse("chinook" in result)
@@ -391,6 +497,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --text atlantic --text sockeye --text steelhead --text ",
             )
@@ -408,6 +516,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --itext atlantic --itext sockeye --itext steelhead --itext ",
             )
@@ -490,7 +600,13 @@ class TestShellCompletersAndParsers(TestCase):
     def test_filtered_text_field(self):
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --filtered ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --filtered ",
+            )
         result = result.getvalue()
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
@@ -503,7 +619,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --filtered ch"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --filtered ch",
             )
         result = result.getvalue()
         self.assertFalse("sockeye" in result)
@@ -519,6 +639,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --filtered coho --filtered chinook --filtered ",
             )
@@ -563,7 +685,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --uuid ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --uuid ",
+            )
         result = result.getvalue()
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
         self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
@@ -576,7 +704,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --uuid 12345678"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --uuid 12345678",
             )
         result = result.getvalue()
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
@@ -589,7 +721,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --uuid 12345678-"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --uuid 12345678-",
             )
         result = result.getvalue()
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
@@ -602,7 +738,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --uuid 12345678-5"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --uuid 12345678-5",
             )
         result = result.getvalue()
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
@@ -615,7 +755,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --uuid 123456785"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --uuid 123456785",
             )
         result = result.getvalue()
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
@@ -629,6 +773,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --uuid 123456&78-^56785678-",
             )
@@ -644,6 +790,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --uuid 123456&78-^56785678F",
             )
@@ -659,6 +807,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --uuid 123456&78-^56785678f",
             )
@@ -674,6 +824,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "--no-color",
                 "complete",
                 "model_fields test --uuid 123456&78-^56785678f234---A",
@@ -720,6 +872,8 @@ class TestShellCompletersAndParsers(TestCase):
         with contextlib.redirect_stdout(result):
             call_command(
                 "shellcompletion",
+                "--shell",
+                SHELL,
                 "complete",
                 "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
             )
@@ -738,7 +892,12 @@ class TestShellCompletersAndParsers(TestCase):
 
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --id ", shell="zsh"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --id ",
+                shell=SHELL,
             )
 
         result = result.getvalue()
@@ -753,13 +912,13 @@ class TestShellCompletersAndParsers(TestCase):
                 call_command(
                     "shellcompletion",
                     "--shell",
-                    "zsh",
+                    SHELL,
                     "complete",
                     f"model_fields test --id {start_char}",
                 )
 
             result = result.getvalue()
-            for comp in result.split("\n")[1::3]:
+            for comp in get_values(result):
                 self.assertTrue(comp in expected)
                 self.assertTrue(comp not in unexpected)
 
@@ -775,7 +934,7 @@ class TestShellCompletersAndParsers(TestCase):
             call_command(
                 "shellcompletion",
                 "--shell",
-                "zsh",
+                SHELL,
                 "complete",
                 "model_fields test --id-limit ",
             )
@@ -789,23 +948,26 @@ class TestShellCompletersAndParsers(TestCase):
         values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float ")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float ",
+            )
         result = result.getvalue()
         for value in values:
             self.assertTrue(str(value) in result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 1")
-        result = result.getvalue()
-        for value in [1.1, 1.12]:
-            self.assertTrue(str(value) in result)
-        for value in set([1.1, 1.12]) - set(values):
-            self.assertFalse(str(value) in result)
-
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 1.1")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 1",
+            )
         result = result.getvalue()
         for value in [1.1, 1.12]:
             self.assertTrue(str(value) in result)
@@ -815,7 +977,26 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --float 1.12"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 1.1",
+            )
+        result = result.getvalue()
+        for value in [1.1, 1.12]:
+            self.assertTrue(str(value) in result)
+        for value in set([1.1, 1.12]) - set(values):
+            self.assertFalse(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 1.12",
             )
         result = result.getvalue()
         for value in [1.12]:
@@ -825,7 +1006,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 2")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 2",
+            )
         result = result.getvalue()
         for value in [2.2, 2.3, 2.4]:
             self.assertTrue(str(value) in result)
@@ -834,7 +1021,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 2.")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 2.",
+            )
         result = result.getvalue()
         for value in [2.2, 2.3, 2.4]:
             self.assertTrue(str(value) in result)
@@ -843,7 +1036,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 2.3")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 2.3",
+            )
         result = result.getvalue()
         for value in [2.3]:
             self.assertTrue(str(value) in result)
@@ -852,7 +1051,13 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --float 3")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --float 3",
+            )
         result = result.getvalue()
         for value in [3.0]:
             self.assertTrue(str(value) in result)
@@ -886,15 +1091,12 @@ class TestShellCompletersAndParsers(TestCase):
         ]
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "model_fields test --decimal ")
-        result = result.getvalue()
-        for value in values:
-            self.assertTrue(str(value) in result)
-
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --decimal 1."
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --decimal ",
             )
         result = result.getvalue()
         for value in values:
@@ -903,7 +1105,11 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --decimal 1."
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --decimal 1.",
             )
         result = result.getvalue()
         for value in values:
@@ -912,7 +1118,24 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "complete", "model_fields test --decimal 1.5"
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --decimal 1.",
+            )
+        result = result.getvalue()
+        for value in values:
+            self.assertTrue(str(value) in result)
+
+        result = StringIO()
+        with contextlib.redirect_stdout(result):
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "model_fields test --decimal 1.5",
             )
         result = result.getvalue()
         for value in set(values) - {Decimal("1.2"), Decimal("1.6")}:
@@ -942,7 +1165,12 @@ class TestShellCompletersAndParsers(TestCase):
         result = StringIO()
         with contextlib.redirect_stdout(result):
             call_command(
-                "shellcompletion", "--no-color", "complete", "model_fields test "
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "--no-color",
+                "complete",
+                "model_fields test ",
             )
         result = result.getvalue()
         self.assertTrue("--char" in result)
@@ -957,13 +1185,27 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "noarg cmd ", shell="zsh")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "noarg cmd ",
+                shell=SHELL,
+            )
         result = result.getvalue()
         self.assertFalse(result)
 
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "noarg cmd -", shell="zsh")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "noarg cmd -",
+                shell=SHELL,
+            )
         result = result.getvalue()
         self.assertFalse(result)
         self.assertFalse("--" in result)
@@ -971,7 +1213,14 @@ class TestShellCompletersAndParsers(TestCase):
         # test what happens if we try to complete a non existing command
         result = StringIO()
         with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "complete", "noargs cmd ", shell="zsh")
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "noargs cmd ",
+                shell=SHELL,
+            )
         result = result.getvalue()
         self.assertFalse(result)
 
@@ -996,16 +1245,20 @@ class TestShellCompletersAndParsers(TestCase):
     def test_shellcompletion_complete_cmd(self):
         # test that we can leave preceeding script off the complete argument
         result = run_command(
-            "shellcompletion", "complete", "./manage.py completion dj"
+            "shellcompletion", "--shell", SHELL, "complete", "./manage.py completion dj"
         )[0]
         self.assertTrue("django_typer" in result)
-        result2 = run_command("shellcompletion", "complete", "completion dj")[0]
+        result2 = run_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion dj"
+        )[0]
         self.assertTrue("django_typer" in result2)
         self.assertEqual(result, result2)
 
     def test_custom_fallback(self):
         result = run_command(
             "shellcompletion",
+            "--shell",
+            SHELL,
             "complete",
             "--fallback",
             "tests.fallback.custom_fallback",
@@ -1015,6 +1268,8 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = run_command(
             "shellcompletion",
+            "--shell",
+            SHELL,
             "complete",
             "--fallback",
             "tests.fallback.custom_fallback_cmd_str",
@@ -1024,7 +1279,7 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_import_path_completer(self):
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --settings "
+            "shellcompletion", "--shell", SHELL, "complete", "multi --settings "
         )[0]
         self.assertIn("importlib", result)
         self.assertIn("django_typer", result)
@@ -1032,7 +1287,7 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertNotIn(".django_typer", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --settings "
+            "shellcompletion", "--shell", SHELL, "complete", "multi --settings "
         )[0]
         self.assertIn("importlib", result)
         self.assertIn("django_typer", result)
@@ -1040,23 +1295,23 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertNotIn(".django_typer", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --settings djan"
+            "shellcompletion", "--shell", SHELL, "complete", "multi --settings djan"
         )[0]
         self.assertIn("django", result)
         self.assertIn("django_typer", result)
-        for comp in result.split("\n")[1::3]:
+        for comp in get_values(result):
             self.assertTrue(comp.startswith("djan"), f"{comp} does not start with djan")
 
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --settings django_ty",
         )[0]
         self.assertNotIn("importlib", result)
         self.assertNotIn(".django_typer", result)
-        for comp in result.split("\n")[1::3]:
+        for comp in get_values(result):
             self.assertTrue(
                 comp.startswith("django_ty"), f"{comp} does not start with django_ty"
             )
@@ -1071,12 +1326,12 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --settings tests.settings.",
         )[0]
 
-        for comp in result.split("\n")[1::3]:
+        for comp in get_values(result):
             self.assertTrue(
                 comp.startswith("tests.settings."),
                 f"{comp} does not start with tests.settings.",
@@ -1107,7 +1362,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --settings tests.settings.typer_examples",
         )[0]
@@ -1122,7 +1377,7 @@ class TestShellCompletersAndParsers(TestCase):
         ]
         local_files = [Path(f).as_posix() for f in os.listdir() if not Path(f).is_dir()]
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath "
+            "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath "
         )[0]
         for pth in local_dirs:
             self.assertIn(f"{pth}", result)
@@ -1133,7 +1388,7 @@ class TestShellCompletersAndParsers(TestCase):
             result = run_command(
                 "shellcompletion",
                 "--shell",
-                "zsh",
+                SHELL,
                 "complete",
                 f"multi --pythonpath {incomplete}",
             )[0]
@@ -1143,7 +1398,7 @@ class TestShellCompletersAndParsers(TestCase):
                 self.assertNotIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath ./d"
+            "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath ./d"
         )[0]
         self.assertIn("./doc", result)
         self.assertIn("./django_typer", result)
@@ -1164,7 +1419,7 @@ class TestShellCompletersAndParsers(TestCase):
             if not (Path("django_typer") / f).is_dir()
         ]
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath dj"
+            "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath dj"
         )[0]
         for pth in local_dirs:
             self.assertIn(f"{pth}", result)
@@ -1172,7 +1427,7 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertNotIn(f"{pth}", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath ./dj"
+            "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath ./dj"
         )[0]
         for pth in local_dirs:
             self.assertIn(f"./{pth}", result)
@@ -1182,7 +1437,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath ./django_typer",
         )[0]
@@ -1193,7 +1448,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath django_typer/",
         )[0]
@@ -1204,7 +1459,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath django_typer/man",
         )[0]
@@ -1214,7 +1469,7 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertNotIn("django_typer/management/__init__.py", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "multi --pythonpath /"
+            "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath /"
         )[0]
         for pth in os.listdir("/"):
             if pth.startswith("$"):
@@ -1227,7 +1482,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath django_typer/completers.py",
         )
@@ -1236,7 +1491,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath django_typer/does_not_exist",
         )[0]
@@ -1245,7 +1500,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "multi --pythonpath does_not_exist/does_not_exist",
         )[0]
@@ -1254,7 +1509,7 @@ class TestShellCompletersAndParsers(TestCase):
     def test_path_completer(self):
         local_paths = [Path(pth).as_posix() for pth in os.listdir()]
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path "
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path "
         )[0]
         for pth in local_paths:
             self.assertIn(f"{pth}", result)
@@ -1263,7 +1518,7 @@ class TestShellCompletersAndParsers(TestCase):
             result = run_command(
                 "shellcompletion",
                 "--shell",
-                "zsh",
+                SHELL,
                 "complete",
                 f"completion --path {incomplete}",
             )[0]
@@ -1271,7 +1526,7 @@ class TestShellCompletersAndParsers(TestCase):
                 self.assertIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./d"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path ./d"
         )[0]
         self.assertIn("./doc", result)
         self.assertIn("./django_typer", result)
@@ -1281,7 +1536,7 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertNotIn(f"./{pth}", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./p"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path ./p"
         )[0]
         for pth in [
             *[pth for pth in local_paths if not pth.startswith("p")],
@@ -1294,13 +1549,13 @@ class TestShellCompletersAndParsers(TestCase):
             if (Path("django_typer") / d).is_dir()
         ]
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path dj"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path dj"
         )[0]
         for pth in local_paths:
             self.assertIn(f"{pth}", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path ./dj"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path ./dj"
         )[0]
         for pth in local_paths:
             self.assertIn(f"./{pth}", result)
@@ -1308,7 +1563,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path ./django_typer",
         )[0]
@@ -1319,7 +1574,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path django_typer/",
         )[0]
@@ -1330,7 +1585,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path django_typer/man",
         )[0]
@@ -1340,7 +1595,7 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertNotIn("django_typer/locale", result)
 
         result = run_command(
-            "shellcompletion", "--shell", "zsh", "complete", "completion --path /"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --path /"
         )[0]
         for pth in os.listdir("/"):
             if pth.startswith("$"):
@@ -1350,7 +1605,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path django_typer/completers.py",
         )[0]
@@ -1359,7 +1614,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path django_typer/does_not_exist",
         )[0]
@@ -1368,7 +1623,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --path does_not_exist/does_not_exist",
         )[0]
@@ -1377,20 +1632,20 @@ class TestShellCompletersAndParsers(TestCase):
     def test_these_strings_completer(self):
         for opt in ["--str", "--dup"]:
             result = run_command(
-                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} "
+                "shellcompletion", "--shell", SHELL, "complete", f"completion {opt} "
             )[0]
             for s in ["str1", "str2", "ustr"]:
                 self.assertIn(f"{s}", result)
 
             result = run_command(
-                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} s"
+                "shellcompletion", "--shell", SHELL, "complete", f"completion {opt} s"
             )[0]
             self.assertNotIn("ustr", result)
             for s in ["str1", "str2"]:
                 self.assertIn(f"{s}", result)
 
             result = run_command(
-                "shellcompletion", "--shell", "zsh", "complete", f"completion {opt} str"
+                "shellcompletion", "--shell", SHELL, "complete", f"completion {opt} str"
             )[0]
             self.assertNotIn("ustr", result)
             for s in ["str1", "str2"]:
@@ -1399,7 +1654,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --str str1 --str ",
         )[0]
@@ -1410,7 +1665,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --dup str1 --dup ",
         )[0]
@@ -1420,7 +1675,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --str str1 --dup ",
         )[0]
@@ -1430,7 +1685,7 @@ class TestShellCompletersAndParsers(TestCase):
         result = run_command(
             "shellcompletion",
             "--shell",
-            "zsh",
+            SHELL,
             "complete",
             "completion --dup str1 --str ",
         )[0]
@@ -1438,9 +1693,9 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertIn(f"{s}", result)
 
     def test_chain_and_commands_completer(self):
-        result = run_command("shellcompletion", "complete", "completion --cmd dj")[
-            0
-        ].strip()
+        result = run_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion --cmd dj"
+        )[0].strip()
 
         self.assertTrue("django" in result)
         self.assertTrue("django_typer" in result)
@@ -1451,7 +1706,11 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("dj_params4" in result)
 
         result = run_command(
-            "shellcompletion", "complete", "completion --cmd django_typer --cmd dj"
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "completion --cmd django_typer --cmd dj",
         )[0].strip()
 
         self.assertTrue("django" in result)
@@ -1464,6 +1723,8 @@ class TestShellCompletersAndParsers(TestCase):
 
         result = run_command(
             "shellcompletion",
+            "--shell",
+            SHELL,
             "complete",
             "completion --cmd-dup django_typer --cmd-dup dj",
         )[0].strip()
@@ -1477,7 +1738,7 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("dj_params4" in result)
 
         result = run_command(
-            "shellcompletion", "complete", "completion --cmd-first dj"
+            "shellcompletion", "--shell", SHELL, "complete", "completion --cmd-first dj"
         )[0].strip()
 
         self.assertTrue("django" in result)
@@ -1489,9 +1750,9 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("dj_params4" in result)
 
     def test_databases_completer(self):
-        result = run_command("shellcompletion", "complete", "completion --db ")[
-            0
-        ].strip()
+        result = run_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion --db "
+        )[0].strip()
 
         self.assertTrue("default" in result)
 

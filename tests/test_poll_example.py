@@ -11,12 +11,7 @@ from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
 from tests.utils import run_command
 
-SHELLS = [
-    (None, False),
-    ("zsh", True),
-    ("bash", False),
-    ("pwsh", True),
-]
+SHELLS = [("zsh", True), ("bash", False), ("pwsh", True), ("fish", True)]
 
 
 class TestPollExample(SimpleTestCase):
