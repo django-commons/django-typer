@@ -22,7 +22,9 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
             f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
         )
         os.write(fd, "source ~/.bashrc\n".encode())
-        os.write(fd, "source .venv/bin/activate\n".encode())
+        activate = Path(sys.executable).absolute().parent / "activate"
+        if activate.is_file():
+            os.write(fd, f"source {activate}\n".encode())
 
     def verify_install(self, script=None):
         if not script:
