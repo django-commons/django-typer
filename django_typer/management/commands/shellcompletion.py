@@ -355,12 +355,14 @@ class Command(TyperCommand):
         # this case as well, but it does complicate the installation for some shell's so we must
         # first figure out which mode we are in.
         if not self._manage_script:
-            self._manage_script = get_usage_script()
-        return self._manage_script
+            self.manage_script = None  # type: ignore
+        return self._manage_script  # type: ignore
 
     @manage_script.setter
     def manage_script(self, script: t.Optional[str]):
         self._manage_script = get_usage_script(script)
+        if isinstance(self._manage_script, Path):
+            self._manage_script = self._manage_script.absolute()
 
     @property
     def manage_script_name(self) -> str:
