@@ -120,7 +120,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         os.write(fd, f"PATH={Path(sys.executable).parent}:$PATH\n".encode())
         os.write(
             fd,
-            f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
+            f"DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
         )
 
     def get_completions(self, *cmds: str, scrub_output=True) -> str:
@@ -207,9 +207,11 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         completions = self.get_completions(self.launch_script, "complet")
         self.assertIn("completion", completions)
         completions = self.get_completions(self.launch_script)
-        self.assertIn("adapted", completions)
-        self.assertIn("help_precedence", completions)
-        self.assertIn("closepoll", completions)
+        self.assertIn("changepassword", completions)
+        self.assertIn("check", completions)
+        self.assertIn("dumpdata", completions)
+        self.assertIn("completion", completions)
+        self.assertIn("collectstatic", completions)
 
     def run_rich_option_completion(self, rich_output_expected: bool):
         completions = self.get_completions(

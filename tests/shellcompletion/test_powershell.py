@@ -28,7 +28,7 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
         os.write(fd, f"PATH={Path(sys.executable).parent}:$env:PATH\n".encode())
         os.write(
             fd,
-            f'$env:DJANGO_SETTINGS_MODULE="{os.environ["DJANGO_SETTINGS_MODULE"]}"\n'.encode(),
+            f'$env:DJANGO_SETTINGS_MODULE="tests.settings.completion"\n'.encode(),
         )
 
     def test_shell_complete(self):

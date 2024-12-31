@@ -27,7 +27,7 @@ class FishShellTests(_DefaultCompleteTestCase):  # , TestCase):
         os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
         os.write(
             fd,
-            f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
+            f"export DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
         )
 
     def verify_install(self, script=None):

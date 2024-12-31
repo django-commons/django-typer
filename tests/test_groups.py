@@ -464,6 +464,7 @@ class TestGroups(TestCase):
 class TestCallCommandArgs(TestCase):
     @override_settings(
         INSTALLED_APPS=[
+            "tests.apps.completion",
             "tests.apps.test_app2",
             "tests.apps.test_app",
             "django.contrib.admin",

@@ -19,7 +19,7 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
         os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
         os.write(
             fd,
-            f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
+            f"export DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
         )
         os.write(fd, "source ~/.bashrc\n".encode())
         activate = Path(sys.executable).absolute().parent / "activate"
