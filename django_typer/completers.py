@@ -501,7 +501,7 @@ def complete_path(
         separator = "\\"
 
     completions = []
-    incomplete_path = Path(incomplete)
+    incomplete_path = Path(incomplete.replace(separator, os.path.sep))
     partial_dir = ""
     if not exists(incomplete_path) and not incomplete.endswith(separator):
         partial_dir = incomplete_path.name
