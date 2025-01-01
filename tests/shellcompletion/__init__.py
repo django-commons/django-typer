@@ -31,7 +31,7 @@ except Exception:
     pass
 
 
-def read_all_from_fd_with_timeout(fd, timeout):
+def read_all_from_fd_with_timeout(fd, timeout=1):
     all_data = bytearray()
     start_time = time.time()
 
@@ -160,21 +160,21 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
 
         cmd = " ".join(cmds)
         os.write(master_fd, cmd.encode())
-        time.sleep(0.5)
+        time.sleep(0.25)
 
         print(f'"{cmd}"')
-        os.write(master_fd, b"\t\t")
+        os.write(master_fd, b"\t\t\t")
 
-        time.sleep(0.5)
+        time.sleep(0.25)
 
         # Read the output
-        output = read_all_from_fd_with_timeout(master_fd, 3)
+        output = read_all_from_fd_with_timeout(master_fd)
 
         # todo - avoid large output because this can mess things up
         if "do you wish" in output or "Display all" in output:
             os.write(master_fd, b"y\n")
-            time.sleep(0.5)
-            output = read_all_from_fd_with_timeout(master_fd, 3)
+            time.sleep(0.25)
+            output = read_all_from_fd_with_timeout(master_fd)
 
         # Clean up
         os.close(slave_fd)
