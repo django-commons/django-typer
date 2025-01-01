@@ -493,10 +493,17 @@ def complete_path(
             return pth.is_dir()
         return pth.exists() or pth.is_symlink()
 
+    separator = os.sep
+    if "/" in incomplete:
+        if "\\" not in incomplete:
+            separator = "/"
+    elif "\\" in incomplete:
+        separator = "\\"
+
     completions = []
     incomplete_path = Path(incomplete)
     partial_dir = ""
-    if not exists(incomplete_path) and not incomplete.endswith(PATH_SEPARATOR):
+    if not exists(incomplete_path) and not incomplete.endswith(separator):
         partial_dir = incomplete_path.name
         incomplete_path = incomplete_path.parent
     elif incomplete_path.is_file() and not dir_only:
@@ -510,7 +517,7 @@ def complete_path(
                 completions.append(
                     CompletionItem(
                         f"{to_complete}"
-                        f"{'' if not to_complete or to_complete.endswith(PATH_SEPARATOR) else PATH_SEPARATOR}"
+                        f"{'' if not to_complete or to_complete.endswith(separator) else separator}"
                         f"{child}",
                         type="dir" if (incomplete_path / child).is_dir() else "file",
                     )
