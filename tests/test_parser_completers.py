@@ -32,7 +32,7 @@ def get_values(completion):
     elif SHELL == "bash":
         return [line.split(",")[1] for line in completion.split("\n") if line]
     elif SHELL in ["pwsh", "powershell"]:
-        raise NotImplementedError("Powershell completion not implemented")
+        return [line.split(":::")[0] for line in completion.splitlines() if line]
     elif SHELL == "fish":
         raise NotImplementedError("Fish completion not implemented")
     raise NotImplementedError(f"get_values for shell {SHELL} not implemented")
@@ -1384,7 +1384,7 @@ class TestShellCompletersAndParsers(TestCase):
         for pth in local_files:
             self.assertNotIn(f"{pth}", result)
 
-        for incomplete in [".", "./"]:
+        for incomplete, sep in [(".", os.path.sep), (".\\", "\\")]:
             result = run_command(
                 "shellcompletion",
                 "--shell",
@@ -1393,9 +1393,9 @@ class TestShellCompletersAndParsers(TestCase):
                 f"multi --pythonpath {incomplete}",
             )[0]
             for pth in local_dirs:
-                self.assertIn(f"./{pth}", result)
+                self.assertIn(f".{sep}{pth}", result)
             for pth in local_files:
-                self.assertNotIn(f"./{pth}", result)
+                self.assertNotIn(f".{sep}{pth}", result)
 
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath ./d"
@@ -1422,9 +1422,9 @@ class TestShellCompletersAndParsers(TestCase):
             "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath dj"
         )[0]
         for pth in local_dirs:
-            self.assertIn(f"{pth}", result)
+            self.assertIn(pth.replace("/", os.path.sep), result)
         for pth in local_files:
-            self.assertNotIn(f"{pth}", result)
+            self.assertNotIn(pth.replace("/", os.path.sep), result)
 
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "multi --pythonpath ./dj"
@@ -1514,7 +1514,7 @@ class TestShellCompletersAndParsers(TestCase):
         for pth in local_paths:
             self.assertIn(f"{pth}", result)
 
-        for incomplete in [".", "./"]:
+        for incomplete, sep in [(".", os.path.sep), ("./", "/")]:
             result = run_command(
                 "shellcompletion",
                 "--shell",
@@ -1523,7 +1523,7 @@ class TestShellCompletersAndParsers(TestCase):
                 f"completion --path {incomplete}",
             )[0]
             for pth in local_paths:
-                self.assertIn(f"./{pth}", result)
+                self.assertIn(f".{sep}{pth}", result)
 
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "completion --path ./d"
@@ -1552,7 +1552,7 @@ class TestShellCompletersAndParsers(TestCase):
             "shellcompletion", "--shell", SHELL, "complete", "completion --path dj"
         )[0]
         for pth in local_paths:
-            self.assertIn(f"{pth}", result)
+            self.assertIn(str(pth).replace("/", os.path.sep), result)
 
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "completion --path ./dj"
