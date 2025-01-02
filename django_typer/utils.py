@@ -38,7 +38,8 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     :return: The script name or the relative path to the script from cwd.
     """
     cmd_pth = Path(script or sys.argv[0])
-    if shutil.which(cmd_pth.name):
+    on_path = shutil.which(cmd_pth.name)
+    if on_path and Path(on_path).is_absolute():
         return cmd_pth.name
     try:
         return cmd_pth.absolute().relative_to(Path(os.getcwd()))
