@@ -42,6 +42,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
 
     def install(self) -> Path:
         assert self.prog_name
+        self.uninstall()
         self.set_execution_policy()
         profile = self.get_user_profile()
         profile.parent.mkdir(parents=True, exist_ok=True)
@@ -55,6 +56,8 @@ class PowerShellComplete(DjangoTyperShellCompleter):
         assert self.prog_name
         self.set_execution_policy()
         profile = self.get_user_profile()
+        if not profile.exists():
+            return
         edited_lines = []
         mark = None
         with open(profile, "rt", encoding="utf-8") as pwr_sh:
@@ -65,7 +68,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
                 elif (
                     mark is not None
                     and line.startswith("Register-ArgumentCompleter")
-                    and f" {self.prog_name} " in line
+                    and f" {self.command.manage_script_name} " in line
                 ):
                     edited_lines = edited_lines[:mark]
                     mark = None

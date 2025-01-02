@@ -180,6 +180,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             if self.command.fallback
             else "",
             "is_installed": not isinstance(self.command.manage_script, Path),
+            "shell": self.name,
         }
 
     def load_template(self) -> t.Union[BaseTemplate, DjangoTemplate]:
