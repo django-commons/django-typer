@@ -20,15 +20,19 @@
 
     for ((i=1; i<$CURRENT; i++)); do
       case "${words[i]}" in
-        --settings)
+        --settings|--settings=*)
         # Only pass settings to completion script if we're sure it's value does not itself need completion!
-        if (( i + 1 < CURRENT )) && [[ -n "${words[i+1]}" ]] && [[ "${words[i+1]}" != --* ]]; then
+        if [[ "${words[i]}" == --settings=* ]]; then
+          settings_option="${words[i]}"
+        elif (( i + 1 < CURRENT )) && [[ -n "${words[i+1]}" ]] && [[ "${words[i+1]}" != --* ]]; then
           settings_option="--settings=${words[i+1]}"
         fi
         ;;
-      --pythonpath)
+        --pythonpath|--pythonpath=*)
         # Only pass pythonpath to completion script if we're sure it's value does not itself need completion!
-        if (( i + 1 < CURRENT )) && [[ -n "${words[i+1]}" ]] && [[ "${words[i+1]}" != --* ]]; then
+        if [[ "${words[i]}" == --pythonpath=* ]]; then
+          pythonpath_option="${words[i]}"
+        elif (( i + 1 < CURRENT )) && [[ -n "${words[i+1]}" ]] && [[ "${words[i+1]}" != --* ]]; then
           pythonpath_option="--pythonpath=${words[i+1]}"
         fi
         ;;

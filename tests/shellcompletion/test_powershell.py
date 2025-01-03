@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from django.test import TestCase
+from django_typer.management.commands.shells.powershell import PowerShellComplete
 
 from tests.shellcompletion import (
     _DefaultCompleteTestCase,
@@ -12,10 +13,17 @@ from tests.shellcompletion import (
 )
 
 
-@pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
+@pytest.mark.skipif(
+    shutil.which("powershell") is None, reason="Powershell not available"
+)
 class PowerShellTests(_DefaultCompleteTestCase, TestCase):
-    shell = "pwsh"
-    directory = Path("~/.config/powershell").expanduser()
+    shell = "powershell"
+    profile: Path
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.profile = PowerShellComplete().get_user_profile()
+        return super().setUpClass()
 
     @property
     def interactive_opt(self):
@@ -30,6 +38,9 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
             fd,
             f'$env:DJANGO_SETTINGS_MODULE="tests.settings.completion"\n'.encode(),
         )
+        activate = Path(sys.executable).absolute().parent / "activate.ps1"
+        if activate.is_file():
+            os.write(fd, f"{activate}\n".encode())
 
     def test_shell_complete(self):
         # just verify that install/remove works. The actual completion is not tested
@@ -42,17 +53,17 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
     def verify_install(self, script=None):
         if not script:
             script = self.manage_script
-        self.assertTrue((self.directory / "Microsoft.PowerShell_profile.ps1").exists())
+        self.assertTrue(self.profile.exists())
         self.assertTrue(
             f"Register-ArgumentCompleter -Native -CommandName {script} -ScriptBlock $scriptblock"
-            in (self.directory / "Microsoft.PowerShell_profile.ps1").read_text()
+            in self.profile.read_text()
         )
 
     def verify_remove(self, script=None):
         if not script:
             script = self.manage_script
-        if (self.directory / "Microsoft.PowerShell_profile.ps1").exists():
-            contents = (self.directory / "Microsoft.PowerShell_profile.ps1").read_text()
+        if self.profile.exists():
+            contents = self.profile.read_text()
             self.assertFalse(
                 f"Register-ArgumentCompleter -Native -CommandName {script} -ScriptBlock $scriptblock"
                 in contents
@@ -60,7 +71,9 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
             self.assertTrue(contents)  # should have been deleted if it were empty
 
 
-@pytest.mark.skipif(shutil.which("pwsh") is None, reason="Powershell not available")
+@pytest.mark.skipif(
+    shutil.which("powershell") is None, reason="Powershell not available"
+)
 class PowerShellInstallRemoveTests(_InstalledScriptTestCase, PowerShellTests):
     def test_shell_complete(self):
         # the power shell completion script registration is all in one file

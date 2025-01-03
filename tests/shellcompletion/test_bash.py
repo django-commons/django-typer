@@ -10,13 +10,11 @@ from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTest
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashShellTests(_DefaultCompleteTestCase, TestCase):
+class BashTests(_DefaultCompleteTestCase, TestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
 
     def set_environment(self, fd):
-        # super().set_environment(fd)
-        os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
         os.write(
             fd,
             f"export DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
@@ -43,5 +41,5 @@ class BashShellTests(_DefaultCompleteTestCase, TestCase):
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashExeShellTests(_InstalledScriptTestCase, BashShellTests):
+class BashExeTests(_InstalledScriptTestCase, BashTests):
     shell = "bash"

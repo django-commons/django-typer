@@ -9,15 +9,19 @@
     
     for ((i=0; i<COMP_CWORD; i++)); do
         case "${COMP_WORDS[i]}" in
-            --settings)
+            --settings|--settings=*)
                 # Ensure the next word exists and is not another flag
-                if [[ $((i + 1)) -lt $COMP_CWORD ]]; then
+                if [[ "${COMP_WORDS[i]}" == --settings=* ]]; then
+                    settings_option="${COMP_WORDS[i]}"
+                elif [[ $((i + 1)) -lt $COMP_CWORD ]]; then
                     settings_option="--settings=${COMP_WORDS[i+1]}"
                 fi
                 ;;
-            --pythonpath)
+            --pythonpath|--pythonpath=*)
                 # Ensure the next word exists and is not another flag
-                if [[ $((i + 1)) -lt $COMP_CWORD ]]; then
+                if [[ "${COMP_WORDS[i]}" == --pythonpath=* ]]; then
+                    pythonpath_option="${COMP_WORDS[i]}"
+                elif [[ $((i + 1)) -lt $COMP_CWORD ]]; then
                     pythonpath_option="--pythonpath=${COMP_WORDS[i+1]}"
                 fi
                 ;;

@@ -31,7 +31,7 @@ except Exception:
     pass
 
 
-def read_all_from_fd_with_timeout(fd, timeout=1):
+def read_all_from_fd_with_timeout(fd, timeout=2):
     all_data = bytearray()
     start_time = time.time()
 
@@ -277,6 +277,13 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             " ",
         )
         self.assertIn("django_typer", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "app_labels",
+            "--settings=tests.settings.examples",
+            " ",
+        )
+        self.assertIn("django_typer", completions)
 
     def test_pythonpath_pass_through(self):
         # https://github.com/django-commons/django-typer/issues/68
@@ -290,6 +297,14 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             "python_path",
             "--pythonpath",
             "tests/off_path",
+            "--option",
+            " ",
+        )
+        self.assertIn("working", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "python_path",
+            "--pythonpath=tests/off_path",
             "--option",
             " ",
         )
