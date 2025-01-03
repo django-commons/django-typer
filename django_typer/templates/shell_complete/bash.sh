@@ -39,7 +39,7 @@
         elif [[ $type == 'file' ]]; then
             COMPREPLY=()
             compopt -o default
-        elif [[ $type == 'plain' ]]; then
+        else
             COMPREPLY+=($value)
         fi
     done

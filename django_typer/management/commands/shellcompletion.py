@@ -22,6 +22,7 @@ import collections.abc as cabc
 import contextlib
 import io
 import os
+import platform
 import re
 import sys
 import typing as t
@@ -47,7 +48,7 @@ from typer.main import get_command as get_typer_command
 from django_typer.completers import these_strings
 from django_typer.management import TyperCommand, command, get_command, initialize
 from django_typer.types import COMMON_PANEL
-from django_typer.utils import get_usage_script
+from django_typer.utils import get_usage_script, get_win_shell
 
 DETECTED_SHELL = None
 
@@ -392,6 +393,11 @@ class Command(TyperCommand):
                     "autocompletion for. Unable to detect shell."
                 )
             )
+        elif self._shell == "cmd" and platform.system() == "Windows":
+            try:
+                self._shell = get_win_shell()
+            except ShellDetectionFailure:
+                pass
 
     @property
     def shell_class(self):

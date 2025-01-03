@@ -218,3 +218,54 @@ def accepted_kwargs(
         return kwargs
     param_names = set(inspect.signature(func).parameters.keys())
     return {k: v for k, v in kwargs.items() if k in param_names}
+
+
+def get_win_shell() -> str:
+    """
+    The way installed python scripts are wrapped on Windows means shellingham will detect
+    cmd.exe as the shell. This function will attempt to detect the correct shell, usually
+    either powershell (<=v5) or pwsh (>=v6).
+
+    :raises ShellDetectionFailure: If the shell cannot be detected
+    :return: The name of the shell, either 'powershell' or 'pwsh'
+    """
+    import json
+    import platform
+    import subprocess
+
+    from shellingham import ShellDetectionFailure
+
+    assert platform.system() == "Windows"
+    pwsh = shutil.which("pwsh")
+    powershell = shutil.which("powershell")
+    if pwsh and not powershell:
+        return "pwsh"
+    elif powershell and not pwsh:
+        return "powershell"
+    try:
+        ps_command = """
+        $parent = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = {pid}";
+        $parentPid = $parent.ParentProcessId;
+        $parentInfo = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = $parentPid";
+        $parentInfo | Select-Object Name, ProcessId | ConvertTo-Json -Depth 1
+        """
+        pid = os.getpid()
+        while True:
+            result = subprocess.run(
+                ["pwsh", "-NoProfile", "-Command", ps_command.format(pid=pid)],
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            if not result:
+                break
+            process = json.loads(result)
+            if "pwsh" in process.get("Name", ""):
+                return "pwsh"
+            elif "powershell" in process.get("Name", ""):
+                return "powershell"
+            pid = process["ProcessId"]
+
+        raise ShellDetectionFailure("Unable to detect windows shell")
+
+    except Exception as e:
+        raise ShellDetectionFailure("Unable to detect windows shell") from e

@@ -32,7 +32,7 @@ def get_values(completion):
     elif SHELL == "bash":
         return [line.split(",")[1] for line in completion.split("\n") if line]
     elif SHELL in ["pwsh", "powershell"]:
-        return [line.split(":::")[0] for line in completion.splitlines() if line]
+        return [line.split(":::")[1] for line in completion.splitlines() if line]
     elif SHELL == "fish":
         raise NotImplementedError("Fish completion not implemented")
     raise NotImplementedError(f"get_values for shell {SHELL} not implemented")

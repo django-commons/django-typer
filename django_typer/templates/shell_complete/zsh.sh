@@ -38,16 +38,16 @@
     response=("${(@f)$("${manage}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${words[*]}")}")
 
     for type key descr in ${response}; do
-        if [[ "$type" == "plain" ]]; then
+        if [[ "$type" == "dir" ]]; then
+            _path_files -/
+        elif [[ "$type" == "file" ]]; then
+            _path_files -f
+        else
             if [[ "$descr" == "_" ]]; then
                 completions+=("$key")
             else
                 completions_with_descriptions+=("$key":"$descr")
             fi
-        elif [[ "$type" == "dir" ]]; then
-            _path_files -/
-        elif [[ "$type" == "file" ]]; then
-            _path_files -f
         fi
     done
 

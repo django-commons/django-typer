@@ -22,10 +22,15 @@ $scriptblock = {
 
     {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete "$($commandText)" | ForEach-Object {
         $commandArray = $_ -Split ":::"
-        $command = $commandArray[0]
-        $helpString = $commandArray[1]
-        [System.Management.Automation.CompletionResult]::new(
-            $command, $command, 'ParameterValue', $helpString)
+        $type = $commandArray[0]
+        $value = $commandArray[1]
+        $help = $commandArray[2]
+        if ($help -eq "") {
+            [System.Management.Automation.CompletionResult]::new($value)
+        } else {
+            [System.Management.Automation.CompletionResult]::new(
+                $value, $value, 'ParameterValue', $help)
+        }
     }
 }
 Register-ArgumentCompleter -Native -CommandName {{ manage_script_name }} -ScriptBlock $scriptblock

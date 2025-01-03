@@ -10,9 +10,21 @@ from ..shellcompletion import DjangoTyperShellCompleter
 class PowerShellComplete(DjangoTyperShellCompleter):
     name = "powershell"
     template = "shell_complete/powershell.ps1"
+    supports_scripts = False
 
     def format_completion(self, item: CompletionItem) -> str:
-        return f"{item.value}:::{item.help or ' '}"
+        return ":::".join(
+            [
+                item.type,
+                self.process_rich_text(item.value),
+                " ".join(
+                    [
+                        ln.strip()
+                        for ln in self.process_rich_text(item.help or " ").splitlines()
+                    ]
+                ),
+            ]
+        )
 
     def set_execution_policy(self) -> None:
         subprocess.run(
@@ -50,7 +62,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
             f.writelines([self.source()])
         return profile
 
-    def uninstall(self):
+    def uninstall(self) -> None:
         # annoyingly, powershell has one profile script for all completion commands
         # so we have to find our entry and remove it
         assert self.prog_name
