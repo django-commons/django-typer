@@ -236,36 +236,32 @@ def get_win_shell() -> str:
     from shellingham import ShellDetectionFailure
 
     assert platform.system() == "Windows"
-    pwsh = shutil.which("pwsh")
-    powershell = shutil.which("powershell")
-    if pwsh and not powershell:
-        return "pwsh"
-    elif powershell and not pwsh:
-        return "powershell"
-    try:
-        ps_command = """
-        $parent = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = {pid}";
-        $parentPid = $parent.ParentProcessId;
-        $parentInfo = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = $parentPid";
-        $parentInfo | Select-Object Name, ProcessId | ConvertTo-Json -Depth 1
-        """
-        pid = os.getpid()
-        while True:
-            result = subprocess.run(
-                ["pwsh", "-NoProfile", "-Command", ps_command.format(pid=pid)],
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
-            if not result:
-                break
-            process = json.loads(result)
-            if "pwsh" in process.get("Name", ""):
-                return "pwsh"
-            elif "powershell" in process.get("Name", ""):
-                return "powershell"
-            pid = process["ProcessId"]
+    pwsh = shutil.which("pwsh") or shutil.which("powershell")
+    if pwsh:
+        try:
+            ps_command = """
+            $parent = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = {pid}";
+            $parentPid = $parent.ParentProcessId;
+            $parentInfo = Get-CimInstance -Query "SELECT * FROM Win32_Process WHERE ProcessId = $parentPid";
+            $parentInfo | Select-Object Name, ProcessId | ConvertTo-Json -Depth 1
+            """
+            pid = os.getpid()
+            while True:
+                result = subprocess.run(
+                    [pwsh, "-NoProfile", "-Command", ps_command.format(pid=pid)],
+                    capture_output=True,
+                    text=True,
+                ).stdout.strip()
+                if not result:
+                    break
+                process = json.loads(result)
+                if "pwsh" in process.get("Name", ""):
+                    return "pwsh"
+                elif "powershell" in process.get("Name", ""):
+                    return "powershell"
+                pid = process["ProcessId"]
 
-        raise ShellDetectionFailure("Unable to detect windows shell")
+        except Exception as e:
+            raise ShellDetectionFailure("Unable to detect windows shell") from e
 
-    except Exception as e:
-        raise ShellDetectionFailure("Unable to detect windows shell") from e
+    raise ShellDetectionFailure("Unable to detect windows shell")

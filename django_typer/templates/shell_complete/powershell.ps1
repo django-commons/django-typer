@@ -20,7 +20,14 @@ $scriptblock = {
         $pythonPathOption = "--pythonpath=$($matches[1])"
     }
 
-    {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete "$($commandText)" | ForEach-Object {
+    $results = {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete "$($commandText)"
+
+    if ($results.Count -eq 0) {
+        # avoid default path completion
+        return $null
+    }
+
+    $results | ForEach-Object {
         $commandArray = $_ -Split ":::"
         $type = $commandArray[0]
         $value = $commandArray[1]

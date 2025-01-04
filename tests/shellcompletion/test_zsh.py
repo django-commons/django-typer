@@ -13,6 +13,12 @@ from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTest
 class ZshTests(_DefaultCompleteTestCase, TestCase):
     shell = "zsh"
     directory = Path("~/.zfunc").expanduser()
+    interactive_opt = "-i"
+
+    environment = [
+        f"PATH={Path(sys.executable).parent}:$PATH{os.linesep}"
+        f"DJANGO_SETTINGS_MODULE=tests.settings.completion{os.linesep}"
+    ]
 
     def verify_install(self, script=None):
         if not script:
@@ -23,16 +29,6 @@ class ZshTests(_DefaultCompleteTestCase, TestCase):
         if not script:
             script = self.manage_script
         self.assertFalse((self.directory / f"_{script}").exists())
-
-    # def set_environment(self, fd):
-    #     os.write(
-    #         fd,
-    #         f"export DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
-    #     )
-    #     os.write(fd, "source ~/.zshrc\n".encode())
-    #     activate = Path(sys.executable).absolute().parent / "activate"
-    #     if activate.is_file():
-    #         os.write(fd, f"source {activate}\n".encode())
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")

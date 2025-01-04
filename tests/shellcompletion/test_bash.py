@@ -13,16 +13,13 @@ from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTest
 class BashTests(_DefaultCompleteTestCase, TestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
+    interactive_opt = "-i"
 
-    def set_environment(self, fd):
-        os.write(
-            fd,
-            f"export DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
-        )
-        os.write(fd, "source ~/.bashrc\n".encode())
-        activate = Path(sys.executable).absolute().parent / "activate"
-        if activate.is_file():
-            os.write(fd, f"source {activate}\n".encode())
+    environment = [
+        f"export DJANGO_SETTINGS_MODULE=tests.settings.completion{os.linesep}",
+        f"source ~/.bashrc{os.linesep}",
+        f"source {Path(sys.executable).absolute().parent / 'activate'}{os.linesep}",
+    ]
 
     def verify_install(self, script=None):
         if not script:

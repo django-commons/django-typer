@@ -1,12 +1,9 @@
-import fcntl
 import os
-import pty
 import re
 import select
 import struct
 import subprocess
 import sys
-import termios
 import time
 import typing as t
 from pathlib import Path
@@ -14,6 +11,7 @@ import pytest
 from functools import cached_property
 import re
 import subprocess
+import platform
 
 from shellingham import detect_shell
 
@@ -67,11 +65,9 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
     manage_script = "manage.py"
     launch_script = "./manage.py"
 
-    @property
-    def interactive_opt(self):
-        # currently all supported shells support -i for interactive mode
-        # this includes zsh, bash, fish and powershell
-        return "-i"
+    interactive_opt: t.Optional[str] = None
+
+    environment: t.List[str] = []
 
     @cached_property
     def command(self) -> ShellCompletion:
@@ -116,75 +112,109 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         self.get_completions("ping")  # just to reinit shell
         self.verify_remove(script=script)
 
-    def set_environment(self, fd):
-        os.write(fd, f"PATH={Path(sys.executable).parent}:$PATH\n".encode())
-        os.write(
-            fd,
-            f"DJANGO_SETTINGS_MODULE=tests.settings.completion\n".encode(),
-        )
+    if platform.system() == "Windows":
 
-    def get_completions(self, *cmds: str, scrub_output=True) -> str:
-        def read(fd):
-            """Function to read from a file descriptor."""
-            return os.read(fd, 1024 * 1024).decode()
+        def get_completions(self, *cmds: str, scrub_output=True) -> str:
+            import winpty
 
-        # Create a pseudo-terminal
-        master_fd, slave_fd = pty.openpty()
+            assert self.shell
 
-        # Define window size - width and height
-        os.set_blocking(slave_fd, False)
-        win_size = struct.pack("HHHH", 24, 80, 0, 0)  # 24 rows, 80 columns
-        fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
+            pty = winpty.PTY(24, 80)
 
-        # env = os.environ.copy()
-        # env["TERM"] = "xterm-256color"
+            def read_all() -> str:
+                output = ""
+                while data := pty.read():
+                    output += data
+                    time.sleep(0.1)
+                return output
 
-        # Spawn a new shell process
-        shell = self.shell or detect_shell()[0]
-        process = subprocess.Popen(
-            [shell, *([self.interactive_opt] if self.interactive_opt else [])],
-            stdin=slave_fd,
-            stdout=slave_fd,
-            stderr=slave_fd,
-            text=True,
-            # env=env,
-            # preexec_fn=os.setsid,
-        )
-        # Wait for the shell to start and get to the prompt
-        print(read(master_fd))
+            # Start the subprocess
+            pty.spawn(
+                self.shell, *([self.interactive_opt] if self.interactive_opt else [])
+            )
 
-        self.set_environment(master_fd)
+            # Wait for the shell to start and get to the prompt
+            time.sleep(3)
+            read_all()
 
-        print(read(master_fd))
-        # Send a command with a tab character for completion
+            for line in self.environment:
+                pty.write(line)
 
-        cmd = " ".join(cmds)
-        os.write(master_fd, cmd.encode())
-        time.sleep(0.25)
+            time.sleep(2)
+            output = read_all() + read_all()
 
-        print(f'"{cmd}"')
-        os.write(master_fd, b"\t\t\t")
+            pty.write(" ".join(cmds))
+            time.sleep(0.1)
+            pty.write("\t")
 
-        time.sleep(0.25)
+            time.sleep(2)
+            completion = read_all() + read_all()
 
-        # Read the output
-        output = read_all_from_fd_with_timeout(master_fd)
+            return scrub(completion) if scrub_output else completion
 
-        # todo - avoid large output because this can mess things up
-        if "do you wish" in output or "Display all" in output:
-            os.write(master_fd, b"y\n")
+    else:
+
+        def get_completions(self, *cmds: str, scrub_output=True) -> str:
+            import fcntl
+            import termios
+            import pty
+
+            def read(fd):
+                """Function to read from a file descriptor."""
+                return os.read(fd, 1024 * 1024).decode()
+
+            # Create a pseudo-terminal
+            master_fd, slave_fd = pty.openpty()
+
+            # Define window size - width and height
+            os.set_blocking(slave_fd, False)
+            win_size = struct.pack("HHHH", 24, 80, 0, 0)  # 24 rows, 80 columns
+            fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
+
+            # env = os.environ.copy()
+            # env["TERM"] = "xterm-256color"
+
+            # Spawn a new shell process
+            shell = self.shell or detect_shell()[0]
+            process = subprocess.Popen(
+                [shell, *([self.interactive_opt] if self.interactive_opt else [])],
+                stdin=slave_fd,
+                stdout=slave_fd,
+                stderr=slave_fd,
+                text=True,
+                # env=env,
+                # preexec_fn=os.setsid,
+            )
+            # Wait for the shell to start and get to the prompt
+            print(read(master_fd))
+
+            for line in self.environment:
+                os.write(master_fd, line.encode())
+
+            print(read(master_fd))
+            # Send a command with a tab character for completion
+
+            cmd = " ".join(cmds)
+            os.write(master_fd, cmd.encode())
             time.sleep(0.25)
+
+            print(f'"{cmd}"')
+            os.write(master_fd, b"\t\t\t")
+
+            time.sleep(0.25)
+
+            # Read the output
             output = read_all_from_fd_with_timeout(master_fd)
 
-        # Clean up
-        os.close(slave_fd)
-        os.close(master_fd)
-        process.terminate()
-        process.wait()
-        # remove bell character which can show up in some terminals where we hit tab
-        if scrub_output:
-            return scrub(output)
-        return output
+            # Clean up
+            os.close(slave_fd)
+            os.close(master_fd)
+            process.terminate()
+            process.wait()
+            # remove bell character which can show up in some terminals where we hit tab
+            if scrub_output:
+                return scrub(output)
+            return output
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")
@@ -323,18 +353,24 @@ class _InstalledScriptTestCase(_DefaultCompleteTestCase):
     manage_script = "django_manage"
     launch_script = "django_manage"
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         lines = []
-        with open(self.MANAGE_SCRIPT_TMPL, "r") as f:
+        with open(cls.MANAGE_SCRIPT_TMPL, "r") as f:
             for line in f.readlines():
                 if line.startswith("#!{{shebang}}"):
                     line = f"#!{sys.executable}\n"
                 lines.append(line)
-        exe = Path(sys.executable).parent / self.manage_script
+        exe = Path(sys.executable).parent / cls.manage_script
         with open(exe, "w") as f:
             for line in lines:
                 f.write(line)
 
         # make the script executable
         os.chmod(exe, os.stat(exe).st_mode | 0o111)
-        super().setUp()
+
+        if platform.system() == "Windows":
+            with open(exe.with_suffix(".cmd"), "w") as f:
+                f.write(f'@echo off{os.linesep}"{sys.executable}" "%~dp0{exe.name}" %*')
+            os.chmod(exe, os.stat(exe.with_suffix(".cmd")).st_mode | 0o111)
+        super().setUpClass()
