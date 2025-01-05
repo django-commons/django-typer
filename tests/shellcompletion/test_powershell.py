@@ -4,32 +4,34 @@ import sys
 from pathlib import Path
 
 import pytest
-import platform
+from django.core.management import CommandError
 from django.test import TestCase
-from django_typer.management.commands.shells.powershell import PowerShellComplete
+from django_typer.management.commands.shells.powershell import (
+    PowerShellComplete,
+    PwshComplete,
+)
 
 from tests.shellcompletion import (
-    _DefaultCompleteTestCase,
-    _InstalledScriptTestCase,
+    _ScriptCompleteTestCase,
+    _InstalledScriptCompleteTestCase,
 )
 
 
-@pytest.mark.skipif(
-    shutil.which("powershell") is None, reason="Powershell not available"
-)
-class PowerShellTests(_DefaultCompleteTestCase, TestCase):
+class _PowerShellMixin:
     shell = "powershell"
     profile: Path
+    tabs = "\t"
+    completer_class = PowerShellComplete
 
     environment = [
-        f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8{os.linesep}",
-        f"$env:DJANGO_SETTINGS_MODULE='tests.settings.completion'{os.linesep}",
-        f"{Path(sys.executable).absolute().parent / 'activate.ps1'}{os.linesep}",
+        f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
+        f"$env:DJANGO_SETTINGS_MODULE='tests.settings.completion'",
+        f"{Path(sys.executable).absolute().parent / 'activate.ps1'}",
     ]
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.profile = PowerShellComplete().get_user_profile()
+        cls.profile = cls.completer_class().get_user_profile()
         return super().setUpClass()
 
     def verify_install(self, script=None):
@@ -54,7 +56,43 @@ class PowerShellTests(_DefaultCompleteTestCase, TestCase):
 
 
 @pytest.mark.skipif(
+    shutil.which("powershell") is None, reason="powershell not available"
+)
+class PowerShellTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
+    def test_shell_complete(self):
+        with self.assertRaises(CommandError):
+            self.install()
+
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_rich_output(self): ...
+
+    @pytest.mark.rich
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_no_rich_output(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_settings_pass_through(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_pythonpath_pass_through(self): ...
+
+
+@pytest.mark.skipif(
     shutil.which("powershell") is None, reason="Powershell not available"
 )
-class PowerShellExeTests(_InstalledScriptTestCase, PowerShellTests):
+class PowerShellExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase):
     pass
+
+
+@pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
+class PWSHTests(PowerShellTests):
+    shell = "pwsh"
+    completer_class = PwshComplete
+
+
+@pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
+class PWSHExeTests(PowerShellExeTests):
+    shell = "pwsh"
+    completer_class = PwshComplete

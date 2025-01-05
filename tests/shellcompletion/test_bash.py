@@ -6,19 +6,23 @@ from pathlib import Path
 import pytest
 from django.test import TestCase
 
-from tests.shellcompletion import _DefaultCompleteTestCase, _InstalledScriptTestCase
+from tests.shellcompletion import (
+    _ScriptCompleteTestCase,
+    _InstalledScriptCompleteTestCase,
+)
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashTests(_DefaultCompleteTestCase, TestCase):
+class BashTests(_ScriptCompleteTestCase, TestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
     interactive_opt = "-i"
+    tabs = "\t\t\t"
 
     environment = [
-        f"export DJANGO_SETTINGS_MODULE=tests.settings.completion{os.linesep}",
-        f"source ~/.bashrc{os.linesep}",
-        f"source {Path(sys.executable).absolute().parent / 'activate'}{os.linesep}",
+        f"export DJANGO_SETTINGS_MODULE=tests.settings.completion",
+        f"source ~/.bashrc",
+        f"source {Path(sys.executable).absolute().parent / 'activate'}",
     ]
 
     def verify_install(self, script=None):
@@ -38,5 +42,5 @@ class BashTests(_DefaultCompleteTestCase, TestCase):
 
 
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
-class BashExeTests(_InstalledScriptTestCase, BashTests):
+class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
     shell = "bash"

@@ -16,7 +16,6 @@ import platform
 from shellingham import detect_shell
 
 from django.test import TestCase
-from django_typer.utils import with_typehint
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
 from ..utils import rich_installed
@@ -60,14 +59,16 @@ def scrub(output: str) -> str:
     )
 
 
-class _DefaultCompleteTestCase(with_typehint(TestCase)):
-    shell = None
-    manage_script = "manage.py"
-    launch_script = "./manage.py"
+class _CompleteTestCase:
+    shell: str
+    manage_script: str
+    launch_script: str
 
     interactive_opt: t.Optional[str] = None
 
     environment: t.List[str] = []
+
+    tabs: str
 
     @cached_property
     def command(self) -> ShellCompletion:
@@ -138,14 +139,14 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             read_all()
 
             for line in self.environment:
-                pty.write(line)
+                pty.write(f"{line}{os.linesep}")
 
             time.sleep(2)
             output = read_all() + read_all()
 
             pty.write(" ".join(cmds))
             time.sleep(0.1)
-            pty.write("\t")
+            pty.write(self.tabs)
 
             time.sleep(2)
             completion = read_all() + read_all()
@@ -189,7 +190,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             print(read(master_fd))
 
             for line in self.environment:
-                os.write(master_fd, line.encode())
+                os.write(master_fd, f"{line}{os.linesep}".encode())
 
             print(read(master_fd))
             # Send a command with a tab character for completion
@@ -199,7 +200,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             time.sleep(0.25)
 
             print(f'"{cmd}"')
-            os.write(master_fd, b"\t\t\t")
+            os.write(master_fd, self.tabs.encode())
 
             time.sleep(0.25)
 
@@ -236,7 +237,7 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
         self.assertIn("completion", completions)
-        completions = self.get_completions(self.launch_script)
+        completions = self.get_completions(self.launch_script, " ")
         self.assertIn("changepassword", completions)
         self.assertIn("check", completions)
         self.assertIn("dumpdata", completions)
@@ -260,15 +261,18 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
             self.assertIn("[yellow]", completions)
             self.assertIn("[/yellow]", completions)
         elif rich_output_expected:
-            self.assertIn("\x1b[7mcommands\x1b[0m", completions)
-            self.assertIn("\x1b[4;33mcommands\x1b[0m", completions)
-            self.assertIn("\x1b[1mimport path\x1b[0m", completions)
-            self.assertIn("\x1b[1mname\x1b[0m", completions)
+            # \x1b[0m and \x1b[m are the same
+            self.assertIn("\x1b[1mimport path\x1b[", completions)
+            if self.shell not in ["powershell", "pwsh"]:
+                # on powershell the helps cycle through when you tab - so only the first one is listed
+                self.assertIn("\x1b[7mcommands\x1b[", completions)
+                self.assertIn("\x1b[4;33mcommands\x1b[", completions)
+                self.assertIn("\x1b[1mname\x1b[", completions)
         else:
-            self.assertNotIn("\x1b[7mcommands\x1b[0m", completions)
-            self.assertNotIn("\x1b[4;33mcommands\x1b[0m", completions)
-            self.assertNotIn("\x1b[1mimport path\x1b[0m", completions)
-            self.assertNotIn("\x1b[1mname\x1b[0m", completions)
+            self.assertNotIn("\x1b[7mcommands\x1b[", completions)
+            self.assertNotIn("\x1b[4;33mcommands\x1b[", completions)
+            self.assertNotIn("\x1b[1mimport path\x1b[", completions)
+            self.assertNotIn("\x1b[1mname\x1b[", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
@@ -341,7 +345,12 @@ class _DefaultCompleteTestCase(with_typehint(TestCase)):
         self.assertIn("working", completions)
 
 
-class _InstalledScriptTestCase(_DefaultCompleteTestCase):
+class _ScriptCompleteTestCase(_CompleteTestCase):
+    manage_script: str = "manage.py"
+    launch_script: str = "./manage.py"
+
+
+class _InstalledScriptCompleteTestCase(_CompleteTestCase):
     """
     These shell completes use an installed script available on the path
     instead of a script directly invoked by path. The difference may
