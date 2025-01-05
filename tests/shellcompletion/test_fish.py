@@ -15,12 +15,13 @@ from tests.shellcompletion import (
 class _FishMixin:
     shell = "fish"
     profile: Path
-    tabs = "\t\t"
+    tabs = "\t"
     directory = Path("~/.config/fish/completions").expanduser()
+    interactive_opt = "--interactive"
 
     environment = [
         f"set -x DJANGO_SETTINGS_MODULE 'tests.settings.completion'"
-        f"{Path(sys.executable).absolute().parent / 'activate.fish'}",
+        f"source {Path(sys.executable).absolute().parent / 'activate.fish'}",
     ]
 
     def verify_install(self, script=None):

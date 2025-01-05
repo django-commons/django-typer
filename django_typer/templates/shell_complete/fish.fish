@@ -1,14 +1,9 @@
 function __fish_{{prog_name}}_complete
-    # Get the entire current command line
-    set cmd (commandline)
 
-    # Position of the cursor (for detecting trailing whitespace)
+    set cmd (commandline)
     set cursor (commandline -C)
 
-    # If the cursor extends beyond the length of the text, there's trailing space
-    if test $cursor -gt (string length $cmd)
-        set cmd "$cmd "
-    end
+    set completeCmd {{ django_command }} --shell fish {{ color }} complete "$cmd"
 
     # We'll extract --settings=... and --pythonpath=... if present
     set settingsOption ''
@@ -26,7 +21,15 @@ function __fish_{{prog_name}}_complete
         set pythonPathOption "--pythonpath=$pythonPathVal"
     end
 
-    set results ({{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell fish {{ color }} complete "$cmd")
+    # Only add these options if they're non-empty
+    if test -n "$settingsOption"
+        set completeCmd $completeCmd $settingsOption
+    end
+    if test -n "$pythonPathOption"
+        set completeCmd $completeCmd $pythonPathOption
+    end
+
+    set results ({{ manage_script_name }} $completeCmd)
 
     for completion in $results;
         set -l metadata (string split "," $completion);
@@ -41,4 +44,4 @@ function __fish_{{prog_name}}_complete
     end;
 end
 
-complete -c {{ manage_script_name }} -no-files --arguments '(__fish_manage_complete)'
+complete -c {{ manage_script_name }} --no-files --arguments '(__fish_manage_complete)'
