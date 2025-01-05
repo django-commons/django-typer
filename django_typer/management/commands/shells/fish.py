@@ -9,6 +9,7 @@ from ..shellcompletion import DjangoTyperShellCompleter
 class FishComplete(DjangoTyperShellCompleter):
     name = "fish"
     template = "shell_complete/fish.fish"
+    supports_scripts = False
 
     @cached_property
     def install_dir(self) -> Path:
