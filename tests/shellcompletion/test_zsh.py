@@ -19,8 +19,8 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
     tabs = "\t\t\t"
 
     environment = [
-        f"PATH={Path(sys.executable).parent}:$PATH"
-        f"DJANGO_SETTINGS_MODULE=tests.settings.completion"
+        f"PATH={Path(sys.executable).parent}:$PATH",
+        f"DJANGO_SETTINGS_MODULE=tests.settings.completion",
     ]
 
     def verify_install(self, script=None):

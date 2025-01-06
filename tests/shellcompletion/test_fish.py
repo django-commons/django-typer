@@ -20,7 +20,7 @@ class _FishMixin:
     interactive_opt = "--interactive"
 
     environment = [
-        f"set -x DJANGO_SETTINGS_MODULE 'tests.settings.completion'"
+        f"set -x DJANGO_SETTINGS_MODULE 'tests.settings.completion'",
         f"source {Path(sys.executable).absolute().parent / 'activate.fish'}",
     ]
 
@@ -59,4 +59,7 @@ class FishShellTests(_FishMixin, _ScriptCompleteTestCase, TestCase):
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
 class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
-    pass
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip(reason="fish does not support ansi control sequences")
+    def test_rich_output(self): ...

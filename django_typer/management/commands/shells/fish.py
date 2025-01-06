@@ -11,6 +11,9 @@ class FishComplete(DjangoTyperShellCompleter):
     template = "shell_complete/fish.fish"
     supports_scripts = False
 
+    # ansi control codes break fish
+    color = False
+
     @cached_property
     def install_dir(self) -> Path:
         """
@@ -22,8 +25,8 @@ class FishComplete(DjangoTyperShellCompleter):
 
     def format_completion(self, item: CompletionItem) -> str:
         if item.help:
-            return f"{item.type},{item.value}\t{item.help}"
-        return f"{item.type},{item.value}"
+            return f"{item.type},{self.process_rich_text(item.value)}\t{self.process_rich_text(item.help)}"
+        return f"{item.type},{self.process_rich_text(item.value)}"
 
     def install(self) -> Path:
         assert self.prog_name
