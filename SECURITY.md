@@ -1,6 +1,6 @@
 # Security Policy
 
-[[!CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
+[![CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
 
 ## Supported Versions
 
