@@ -1,5 +1,7 @@
 # Security Policy
 
+[!CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
+
 ## Supported Versions
 
 Only the latest version of django-typer [![PyPI version](https://badge.fury.io/py/django-typer.svg)](https://pypi.python.org/pypi/django-typer) is supported.
