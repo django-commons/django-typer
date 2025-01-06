@@ -4,7 +4,7 @@
 
 ## Supported Versions
 
-Only the latest version of django-typer [![PyPI version](https://badge.fury.io/py/django-typer.svg)](https://pypi.python.org/pypi/django-typer) is supported.
+Only the latest version [![PyPI version](https://badge.fury.io/py/django-typer.svg)](https://pypi.python.org/pypi/django-typer) is supported.
 
 ## Reporting a Vulnerability
 
