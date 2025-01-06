@@ -27,6 +27,7 @@ install-colorama:
 
 install-docs:
     poetry env use python
+    poetry lock
     poetry install --with docs
 
 check-types:
@@ -70,6 +71,9 @@ open-docs:
     poetry run python -c "import webbrowser; webbrowser.open('file://$(pwd)/doc/build/html/index.html')"
 
 docs: build-docs-html open-docs
+
+docs-live:
+    poetry run sphinx-autobuild doc/source doc/build --open-browser --watch django_typer --port 8000
 
 check-docs-links:
     -poetry run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
