@@ -61,7 +61,7 @@ manage = "tests.manage:main"
 python = ">=3.9,<4.0"
 Django = ">=3.2,<6.0"
 
-click = ">=8.1.8"
+click = ">=8.1.8,<9.0"
 
 # typer's release history is full of breaking changes for minor versions
 # given the reliance on some of its private internals we peg the typer
@@ -72,7 +72,7 @@ typer-slim = ">=0.14.0,<0.16.0"
 # patches still work - so be sure to test on the low end of the range
 rich = { version = ">=10.11.0,<14.0.0", optional = true }
 
-shellingham = ">=1.5.4"
+shellingham = ">=1.5.4,<2.0"
 
 # we need this on 3.9 for ParamSpec
 typing-extensions = { version = ">=3.7.4.3", markers = "python_version < '3.10'" }
