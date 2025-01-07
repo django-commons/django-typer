@@ -9,12 +9,37 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 class BashComplete(DjangoTyperShellCompleter):
     """
-    https://github.com/scop/bash-completion#faq
+    This completer class supports the bash_ shell. Completion scripts are
+    installed in the ``~/.bash_completions`` directory and are sourced in
+    ``~/.bashrc``.
+
+    Bash_ does not support help text in completions so these are not returned.
+    The format of the completion is ``type,value`` and different suggestions
+    are separated by newlines.
+
+    See also: https://github.com/scop/bash-completion#faq
     """
 
     name = "bash"
+    """
+    shell executable.
+    """
+
     template = "shell_complete/bash.sh"
+    """
+    The template used to render the bash completion script.
+    """
+
     supports_scripts = True
+    """
+    The bash completer supports script invocations.
+    """
+
+    color = False
+    """
+    Zsh_ does support ansi control codes in completion suggestions, but we disable them by
+    default.
+    """
 
     @cached_property
     def install_dir(self) -> Path:
@@ -38,6 +63,13 @@ class BashComplete(DjangoTyperShellCompleter):
         return None
 
     def source_vars(self) -> t.Dict[str, t.Any]:
+        """
+        When the bash version is 4.4 or higher, the ``nosort`` option is
+        available and can be used to disable sorting of completions. We
+        add an additional context variable to the template to include this:
+
+        * ``complete_opts``: The options to pass to bash's ``complete`` command.
+        """
         complete_opts = ""
         version = self._check_version()
         if version and version >= (4, 4):

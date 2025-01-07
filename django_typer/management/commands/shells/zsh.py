@@ -7,9 +7,40 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 
 class ZshComplete(DjangoTyperShellCompleter):
+    """
+    This completer class supports Zsh_. Completion scripts are installed to the ``.zfunc``
+    directory in the user's home directory. Style and completion initialization instructions
+    are added to the user's ``.zshrc`` file if needed.
+
+    Returned suggestions are delimited by newlines. Each suggestion is on three lines:
+
+    * The first line is the type of the completion.
+    * The second line is the value of the completion.
+    * The third line is the help text for the completion.
+
+    See also: https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
+    """
+
     name = "zsh"
+    """
+    shell executable.
+    """
+
     template = "shell_complete/zsh.sh"
+    """
+    The template used to render the zsh completion script.
+    """
+
     supports_scripts = True
+    """
+    The zsh completer supports script invocations.
+    """
+
+    color = False
+    """
+    Zsh_ does support ansi control codes in completion suggestions, but we disable them by
+    default.
+    """
 
     @cached_property
     def install_dir(self) -> Path:

@@ -20,7 +20,7 @@ $scriptblock = {
         $pythonPathOption = "--pythonpath=$($matches[1])"
     }
 
-    $results = {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete "$($commandText)"
+    $results = {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete  {{ fallback }} "$($commandText)"
 
     if ($results.Count -eq 0) {
         # avoid default path completion

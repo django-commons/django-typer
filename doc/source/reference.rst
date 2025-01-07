@@ -69,3 +69,20 @@ shellcompletion
 .. automodule:: django_typer.management.commands.shellcompletion
     :members:
 
+shells
+~~~~~~
+
+.. autoclass:: django_typer.management.commands.shells.bash.BashComplete
+    :members: name, template, color, supports_scripts
+
+.. autoclass:: django_typer.management.commands.shells.zsh.ZshComplete
+    :members: name, template, color, supports_scripts
+
+.. autoclass:: django_typer.management.commands.shells.powershell.PowerShellComplete
+    :members: name, template, color, supports_scripts
+
+.. autoclass:: django_typer.management.commands.shells.powershell.PwshComplete
+    :members: name, template, color, supports_scripts
+
+.. autoclass:: django_typer.management.commands.shells.fish.FishComplete
+    :members: name, template, color, supports_scripts

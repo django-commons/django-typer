@@ -7,18 +7,36 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 
 class FishComplete(DjangoTyperShellCompleter):
-    name = "fish"
-    template = "shell_complete/fish.fish"
-    supports_scripts = False
+    """
+    This completer class supports the fish_ shell. Completion scripts are installed in the
+    ``~/.config/fish/completions`` directory.
 
-    # ansi control codes break fish
+    Returned suggestions are formatted as ``type,value[\thelp]``. Each suggestion is on one line
+    and if no help is provided, the help text including the tab delimiter is omitted.
+    """
+
+    name = "fish"
+    """
+    shell executable.
+    """
+
+    template = "shell_complete/fish.fish"
+    """
+    The template used to render the fish completion script.
+    """
+
+    supports_scripts = False
+    """
+    Fish does not support script invocations.
+    """
+
     color = False
+    """
+    Fish does not support ansi control codes.
+    """
 
     @cached_property
     def install_dir(self) -> Path:
-        """
-        The directory where completer scripts will be installed.
-        """
         install_dir = Path.home() / ".config/fish/completions"
         install_dir.mkdir(parents=True, exist_ok=True)
         return install_dir

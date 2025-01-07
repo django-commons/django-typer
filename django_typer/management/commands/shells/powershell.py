@@ -8,9 +8,34 @@ from ..shellcompletion import DjangoTyperShellCompleter
 
 
 class PowerShellComplete(DjangoTyperShellCompleter):
+    """
+    This completer class supports the PowerShell_ versions < 6. See :class:`~PwshComplete` for versions >= 6.
+
+    Completion scripts are installed into the user's profile file.
+
+    Returned suggestions are delimited by ``:::``. Each suggestion is one one line.
+    """
+
     name = "powershell"
+    """
+    shell executable.
+    """
+
     template = "shell_complete/powershell.ps1"
+    """
+    The template used to render the powershell completion script.
+    """
+
     supports_scripts = False
+    """
+    PowerShell does not support script invocations.
+    """
+
+    color = False
+    """
+    PowerShell_ does support ansi control codes in completion suggestions, but we disable them by
+    default.
+    """
 
     def format_completion(self, item: CompletionItem) -> str:
         return ":::".join(
@@ -93,4 +118,15 @@ class PowerShellComplete(DjangoTyperShellCompleter):
 
 
 class PwshComplete(PowerShellComplete):
+    """
+    This completer class supports the PowerShell_ versions >= 6. See
+    :class:`~PowerShellComplete` for versions < 6.
+
+    All behaviors are the same as :class:`~PowerShellComplete`, except that ``pwsh`` is used
+    instead of ``powershell``.
+    """
+
     name = "pwsh"
+    """
+    shell executable.
+    """

@@ -3,7 +3,7 @@ function __fish_{{prog_name}}_complete
     set cmd (commandline)
     set cursor (commandline -C)
 
-    set completeCmd {{ django_command }} --shell fish {{ color }} complete "$cmd"
+    set completeCmd {{ django_command }} --shell fish {{ color }} complete  {{ fallback }} "$cmd"
 
     # We'll extract --settings=... and --pythonpath=... if present
     set settingsOption ''

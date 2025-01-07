@@ -31,7 +31,7 @@
     response=()
     while IFS= read -r line; do
         response+=("$line")
-    done < <( $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete "${COMP_WORDS[*]}" )
+    done < <( $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete {{ fallback }} "${COMP_WORDS[*]}" )
     
     COMPREPLY=()
     for completion in "${response[@]}"; do
