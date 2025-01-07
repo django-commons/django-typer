@@ -21,6 +21,7 @@ class BashTests(_ScriptCompleteTestCase, TestCase):
 
     environment = [
         f"export DJANGO_SETTINGS_MODULE=tests.settings.completion",
+        f"export PATH={Path(sys.executable).parent}:$PATH",
         f"source ~/.bashrc",
         f"source {Path(sys.executable).absolute().parent / 'activate'}",
     ]
