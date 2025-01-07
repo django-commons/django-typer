@@ -45,3 +45,19 @@ class BashTests(_ScriptCompleteTestCase, TestCase):
 @pytest.mark.skipif(shutil.which("bash") is None, reason="Bash not available")
 class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
     shell = "bash"
+
+    @pytest.mark.skipif(
+        not bool(os.environ.get("ENABLE_CI_ONLY_TESTS", False)),
+        reason="This test is dangerous to run on a user machine, "
+        "because it may nuke their shell profile file.",
+    )
+    def test_no_bashrc_file(self):
+        bashrc = ""
+        try:
+            if (Path.home() / ".bashrc").exists():
+                bashrc = (Path.home() / ".bashrc").read_text()
+                os.unlink(Path.home() / ".bashrc")
+            self.test_shell_complete()
+        finally:
+            if bashrc:
+                (Path.home() / ".bashrc").write_text(bashrc)
