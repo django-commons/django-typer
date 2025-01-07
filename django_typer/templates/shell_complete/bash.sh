@@ -6,6 +6,8 @@
     # we need to pass these to the complete script - they may be necessary to find the command!
     local settings_option=""
     local pythonpath_option=""
+
+    COMP_WORDBREAKS="${COMP_WORDBREAKS//=/}"
     
     for ((i=0; i<COMP_CWORD; i++)); do
         case "${COMP_WORDS[i]}" in

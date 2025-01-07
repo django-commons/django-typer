@@ -17,7 +17,7 @@ class BashTests(_ScriptCompleteTestCase, TestCase):
     shell = "bash"
     directory = Path("~/.bash_completions").expanduser()
     interactive_opt = "-i"
-    tabs = "\t\t\t"
+    tabs = "\t"
 
     environment = [
         f"export DJANGO_SETTINGS_MODULE=tests.settings.completion",
