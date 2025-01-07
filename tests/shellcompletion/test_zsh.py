@@ -40,7 +40,7 @@ class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
     shell = "zsh"
 
     @pytest.mark.skipif(
-        bool(os.environ.get("ENABLE_CI_ONLY_TESTS", False)),
+        not bool(os.environ.get("ENABLE_CI_ONLY_TESTS", False)),
         reason="This test is dangerous to run on a user machine, "
         "because it may nuke their shell profile file.",
     )
