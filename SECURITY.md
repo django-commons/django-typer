@@ -1,6 +1,7 @@
 # Security Policy
 
 [![CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge)](https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer)
 
 ## Supported Versions
 
