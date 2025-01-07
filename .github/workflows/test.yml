@@ -179,7 +179,7 @@ jobs:
         name: coverage-macos-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  linux-shell-completion:
+  linux-bash-complete:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -230,7 +230,7 @@ jobs:
         name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  macos-zsh-completion:
+  macos-zsh-complete:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -308,7 +308,7 @@ jobs:
         name: coverage-macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  windows-powershell-completion:
+  windows-powershell-complete:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -350,7 +350,7 @@ jobs:
         path: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   coverage-combine:
-    needs: [test-linux, test-windows, test-macos, linux-bash-completion, macos-zsh-completion, windows-powershell-completion]
+    needs: [test-linux, test-windows, test-macos, linux-bash-complete, macos-zsh-complete, windows-powershell-complete]
     runs-on: ubuntu-latest
 
     steps:
