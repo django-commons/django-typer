@@ -1,3 +1,4 @@
+import os
 from functools import cached_property
 from pathlib import Path
 
@@ -70,15 +71,19 @@ class ZshComplete(DjangoTyperShellCompleter):
         zshrc_source = ""
         if zshrc.is_file():
             zshrc_source = zshrc.read_text()
-        if "fpath+=~/.zfunc" not in zshrc_source:
-            zshrc_source += "fpath+=~/.zfunc\n"
-        if "autoload -Uz compinit" not in zshrc_source:
-            zshrc_source += "autoload -Uz compinit\n"
+        if "fpath" not in zshrc_source:
+            zshrc_source += f"if type brew &>/dev/null; then{os.linesep}"
+            zshrc_source += f"\tfpath=(~/.zfunc $(brew --prefix)/share/zsh-completions $fpath){os.linesep}"
+            zshrc_source += f"else{os.linesep}"
+            zshrc_source += f"\tfpath=(~/.zfunc $fpath){os.linesep}"
+            zshrc_source += f"fi{os.linesep}{os.linesep}"
         if "compinit" not in zshrc_source:
-            zshrc_source += "compinit\n"
+            zshrc_source += f"autoload -Uz compinit{os.linesep}"
+            zshrc_source += f"compinit{os.linesep}"
+
         style = f"zstyle ':completion:*:*:{self.prog_name}:*' menu select"
         if style not in zshrc_source:
-            zshrc_source += f"{style}\n"
+            zshrc_source += f"{style}{os.linesep}"
         zshrc.write_text(zshrc_source)
         script = self.install_dir / f"_{self.prog_name}"
         script.write_text(self.source())
