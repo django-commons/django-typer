@@ -128,9 +128,6 @@ jobs:
 
   test-macos:
     runs-on: macos-latest
-    defaults:
-      run:
-        shell: zsh
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
