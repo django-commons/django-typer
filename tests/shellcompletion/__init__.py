@@ -17,7 +17,10 @@ from shellingham import detect_shell
 
 from django.test import TestCase
 from django_typer.management import get_command
-from django_typer.management.commands.shellcompletion import Command as ShellCompletion
+from django_typer.management.commands.shellcompletion import (
+    Command as ShellCompletion,
+    DjangoTyperShellCompleter,
+)
 from ..utils import rich_installed
 
 default_shell = None
@@ -72,7 +75,14 @@ class _CompleteTestCase:
 
     @cached_property
     def command(self) -> ShellCompletion:
-        return get_command("shellcompletion", ShellCompletion)
+        cmd = get_command("shellcompletion", ShellCompletion)
+        cmd.init(shell=self.shell)
+        return cmd
+
+    def get_completer(self, **kwargs) -> DjangoTyperShellCompleter:
+        return self.command.shell_class(
+            **{"prog_name": self.manage_script, "command": self.command, **kwargs}
+        )
 
     def setUp(self):
         self.remove()

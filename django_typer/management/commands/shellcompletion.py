@@ -218,10 +218,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             else "--no-color"
             if self.command.force_color
             else "",
-            "fallback": (
-                f" --fallback {self.command.fallback.__module__}."
-                f"{self.command.fallback.__name__}"
-            )
+            "fallback": f" --fallback {self.command.fallback_import}"
             if self.command.fallback
             else "",
             "is_installed": not isinstance(self.command.manage_script, Path),
@@ -555,6 +552,7 @@ class Command(TyperCommand):
                         "The name of the template to use for the shell completion script."
                     ),
                 )
+                # todo - add template name completer - see django-render-static
             ),
         ] = None,
     ):

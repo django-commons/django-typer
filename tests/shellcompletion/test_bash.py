@@ -61,3 +61,20 @@ class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
         finally:
             if bashrc:
                 (Path.home() / ".bashrc").write_text(bashrc)
+
+    def test_source_template(self):
+        self.assertEqual(
+            (
+                Path(__file__).parent.parent.parent
+                / "django_typer/templates/shell_complete/bash.sh"
+            ).read_text(),
+            self.get_completer().source_template,
+        )
+
+        self.assertEqual(
+            (
+                Path(__file__).parent.parent.parent
+                / "django_typer/templates/shell_complete/zsh.sh"
+            ).read_text(),
+            self.get_completer(template="shell_complete/zsh.sh").source_template,
+        )
