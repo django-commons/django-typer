@@ -112,7 +112,6 @@ test-no-rich:
     poetry run pytest -m no_rich --cov-append
 
 test-rich:
-    poetry install -E rich
     poetry run pytest -m rich --cov-append
 
 test-all: test-rich test-no-rich
