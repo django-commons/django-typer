@@ -98,7 +98,7 @@ class _CompleteTestCase:
     def verify_remove(self, script=None):
         pass
 
-    def install(self, script=None, force_color=False, no_color=None):
+    def install(self, script=None, force_color=False, no_color=None, fallback=None):
         if not script:
             script = self.manage_script
         init_kwargs = {"force_color": force_color, "no_color": no_color}
@@ -107,6 +107,8 @@ class _CompleteTestCase:
             kwargs["manage_script"] = script
         if self.shell:
             init_kwargs["shell"] = self.shell
+        if fallback:
+            kwargs["fallback"] = fallback
         self.command.init(**init_kwargs)
         self.command.install(**kwargs)
         self.verify_install(script=script)
@@ -295,6 +297,12 @@ class _CompleteTestCase:
         with self.assertRaises(AssertionError):
             self.run_app_completion()
         self.install()
+
+    def test_fallback(self):
+        self.remove()
+        self.install(fallback="tests.fallback.custom_fallback")
+        completions = self.get_completions(self.launch_script, " ")
+        self.assertIn("custom_fallback", completions)
 
     @pytest.mark.rich
     @pytest.mark.no_rich
