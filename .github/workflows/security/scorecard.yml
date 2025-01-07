@@ -8,7 +8,7 @@ on:
   schedule:
     - cron: $cron-weekly
   push:
-    branches: [ $default-branch ]
+  #  branches: [ $default-branch ]
 
 # Declare default permissions as read only.
 permissions: read-all
