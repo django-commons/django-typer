@@ -108,16 +108,16 @@ or have solutions, please `report them on our discussions page <https://github.c
 
         .. code-block:: bash
 
-            zstyle ':completion:*' menu select
-
             if type brew &>/dev/null; then
-                FPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH
-
-                autoload -Uz compinit
-                compinit
+                fpath=(~/.zfunc $(brew --prefix)/share/zsh-completions $fpath)
+            else
+                fpath=(~/.zfunc $fpath)
             fi
 
-            fpath+=~/.zfunc
+            autoload -Uz compinit
+            compinit
+
+            zstyle ':completion:*' menu select
 
         .. tip::
 

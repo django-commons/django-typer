@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 
 import pytest
-from django.test import TestCase
+from django.test import TestCase, override_settings
 import sys
 import os
 
@@ -54,3 +54,7 @@ class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
         finally:
             if zshrc:
                 (Path.home() / ".zshrc").write_text(zshrc)
+
+    @override_settings(TEMPLATES=[])
+    def test_no_template_config(self):
+        self.test_shell_complete()
