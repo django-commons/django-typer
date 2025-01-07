@@ -15,20 +15,19 @@ init:
 install-precommit:
     poetry run pre-commit install
 
-install *PACKAGES="Django":
+install:
     poetry env use python
     poetry lock
     poetry install -E rich
     poetry run pre-commit install
-    poetry run pip install -U {{ PACKAGES }}
-
-install-colorama:
-    poetry run pip install colorama
 
 install-docs:
     poetry env use python
     poetry lock
     poetry install --with docs
+
+pin-dependency +PACKAGES:
+    poetry run pip install -U {{ PACKAGES }}
 
 check-types:
     poetry run mypy django_typer
@@ -116,7 +115,8 @@ test-rich:
     poetry install -E rich
     poetry run pytest -m rich --cov-append
 
-test-all: test-rich test-no-rich install-colorama
+test-all: test-rich test-no-rich
+    poetry run pip install colorama
     poetry run pytest -m "not rich and not no_rich" --cov-append
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append

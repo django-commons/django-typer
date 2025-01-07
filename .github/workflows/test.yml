@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-    branches: main
+  #  branches: main
   pull_request:
   workflow_dispatch:
     inputs:
@@ -52,7 +52,8 @@ jobs:
     - name: Install
       run: |
         just init
-        just install Django~=${{ matrix.django-version }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -102,7 +103,8 @@ jobs:
     - name: Install
       run: |
         just init
-        just install Django~=${{ matrix.django-version }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
     - name: Install VIM
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
@@ -158,7 +160,8 @@ jobs:
     - name: Install
       run: |
         just init
-        just install Django~=${{ matrix.django-version }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
@@ -200,7 +203,8 @@ jobs:
     - name: Install
       run: |
         just init
-        just install Django~=${{ matrix.django-version }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -217,7 +221,7 @@ jobs:
       timeout-minutes: 60
     - name: Run Unit Tests
       run: |
-        just test tests/shellcompletion/*
+        just test tests/shellcompletion/test_bash.py
         mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
@@ -226,7 +230,7 @@ jobs:
         name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
         path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  macos-shell-completion:
+  macos-zsh-completion:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -284,7 +288,8 @@ jobs:
     - name: Install
       run: |
         just init
-        just install Django~=${{ matrix.django-version }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
@@ -295,60 +300,57 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
-        mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: coverage-macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
-  # windows-shell-completion:
-  #   runs-on: windows-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: ['3.9', '3.13']
-  #       django-version:
-  #         - '3.2' # LTS April 2024
-  #         - '5.0' # April 2025
-  #       exclude:
-  #         - python-version: '3.9'
-  #           django-version: '5.0'
-  #         - python-version: '3.13'
-  #           django-version: '3.2'
+  windows-powershell-completion:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.0' # April 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.0'
+          - python-version: '3.13'
+            django-version: '3.2'
 
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Set up Python ${{ matrix.python-version }}
-  #     uses: actions/setup-python@v5
-  #     with:
-  #       python-version: ${{ matrix.python-version }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
-  #   - name: Add to Poetry to PATH
-  #     run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
-  #     shell: powershell
-  #   - name: Install Release Dependencies
-  #     run: |
-  #       pip install pipx
-  #       pipx install poetry
-  #       poetry config virtualenvs.in-project true
-  #       poetry run pip install --upgrade pip
-  #       poetry install
-  #       poetry run pip install -U "Django~=${{ matrix.django-version }}"
-  #     shell: powershell
-  #   - name: Run Unit Tests
-  #     run: |
-  #       poetry run pytest tests/completion_tests.py::PowerShellTests
-  #       mv .coverage windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
-  #     shell: powershell
-  #   - name: Store coverage files
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: coverage-windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-  #       path: windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+    - name: Add to Poetry to PATH
+      run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
+      shell: powershell
+    - name: Install Release Dependencies
+      run: |
+        just init
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
+      shell: powershell
+    - name: Run Unit Tests
+      run: |
+        just test tests/shellcompletion/test_powershell.py
+        mv .coverage windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      shell: powershell
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   coverage-combine:
-    needs: [test-linux, test-windows, linux-shell-completion, macos-shell-completion] #, windows-shell-completion]
+    needs: [test-linux, test-windows, test-macos, linux-bash-completion, macos-zsh-completion, windows-powershell-completion]
     runs-on: ubuntu-latest
 
     steps:
