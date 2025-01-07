@@ -1277,6 +1277,17 @@ class TestShellCompletersAndParsers(TestCase):
         )[0]
         self.assertTrue("shell" in result)
 
+        with self.assertRaises(CommandError):
+            call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                "--fallback",
+                "tests.fallback.does_not_exist",
+                "shell ",
+            )
+
     def test_import_path_completer(self):
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "multi --settings "

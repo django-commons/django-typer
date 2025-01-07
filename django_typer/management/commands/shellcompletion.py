@@ -248,7 +248,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         """
         try:
             return self.load_template().render(self.source_vars())  # type: ignore
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError, ValueError):
             # it is annoying that get_template() and DjangoEngine.get_template() return different
             # interfaces
             return self.load_template().render(Context(self.source_vars()))  # type: ignore
@@ -260,14 +260,12 @@ class DjangoTyperShellCompleter(ShellComplete):
 
         This method should return the path to the installed script.
         """
-        ...
 
     @abstractmethod
     def uninstall(self):
         """
         Deriving classes must implement this method to uninstall the completion script.
         """
-        ...
 
     def process_rich_text(self, text: str) -> str:
         """
