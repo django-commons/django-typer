@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from django.test import TestCase
 import sys
+import os
 
 from tests.shellcompletion import (
     _ScriptCompleteTestCase,
@@ -37,3 +38,19 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
 class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
     shell = "zsh"
+
+    @pytest.mark.skipif(
+        bool(os.environ.get("ENABLE_CI_ONLY_TESTS", False)),
+        reason="This test is dangerous to run on a user machine, "
+        "because it may nuke their shell profile file.",
+    )
+    def test_no_zshrc_file(self):
+        zshrc = ""
+        try:
+            if (Path.home() / ".zshrc").exists():
+                zshrc = (Path.home() / ".zshrc").read_text()
+                os.unlink(Path.home() / ".zshrc")
+            self.test_shell_complete()
+        finally:
+            if zshrc:
+                (Path.home() / ".zshrc").write_text(zshrc)

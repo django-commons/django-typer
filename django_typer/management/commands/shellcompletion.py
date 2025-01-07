@@ -263,14 +263,14 @@ class DjangoTyperShellCompleter(ShellComplete):
 
         This method should return the path to the installed script.
         """
-        raise NotImplementedError
+        ...
 
     @abstractmethod
     def uninstall(self):
         """
         Deriving classes must implement this method to uninstall the completion script.
         """
-        raise NotImplementedError
+        ...
 
     def process_rich_text(self, text: str) -> str:
         """

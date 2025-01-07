@@ -14,6 +14,9 @@ on:
   schedule:
     - cron: '0 13 * * SUN'  # Runs at 6 am pacific every sunday
 
+env:
+  ENABLE_CI_ONLY_TESTS: "1"
+
 jobs:
 
   test-linux:
