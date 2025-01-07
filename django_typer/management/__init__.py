@@ -1338,7 +1338,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             func: t.Callable[Concatenate[TC, P2], R2],
         ) -> Typer[P2, R2]:
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
-                name=name or func.__name__.replace("_", "-"),
+                name=name or _strip_static(func).__name__.replace("_", "-"),
                 cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
@@ -1358,7 +1358,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 parent=self,
                 **kwargs,
             )
-            self.add_typer(grp, name=name or func.__name__.replace("_", "-"))
+            self.add_typer(
+                grp, name=name or _strip_static(func).__name__.replace("_", "-")
+            )
             return grp
 
         return create_app
@@ -1794,7 +1796,7 @@ def group(
         func: t.Callable[Concatenate[TC, P], R],
     ) -> Typer[P, R]:
         grp = Typer(
-            name=name or func.__name__.replace("_", "-"),
+            name=name or _strip_static(func).__name__.replace("_", "-"),
             cls=cls,
             invoke_without_command=invoke_without_command,
             no_args_is_help=no_args_is_help,

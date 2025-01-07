@@ -204,10 +204,10 @@ jobs:
         just init
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
-    - name: Install Fish shell
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fish
+    # - name: Install Fish shell
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y fish
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
