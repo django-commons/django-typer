@@ -121,7 +121,7 @@ test-all: test-rich test-no-rich
     poetry run pytest -k test_ctor_params --cov-append
 
 test *TESTS:
-    poetry run pytest {{ TESTS }}
+    poetry run pytest --cov-append {{ TESTS }}
 
 precommit:
     poetry run pre-commit

@@ -229,6 +229,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py
+        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -279,17 +280,6 @@ jobs:
         chmod -R go-w /opt/homebrew/share/zsh
         source ~/.zshrc
         sudo chsh -s /bin/zsh runner
-    # - name: Install Bash Completions
-    #   shell: bash
-    #   run: |
-    #     brew install bash-completion@2
-    #     touch ~/.bashrc
-    #     echo "\n[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
-    #     source ~/.bashrc
-    # - name: Install Fish shell
-    #   run: |
-    #     brew install sbt
-    #     brew install fish
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -310,6 +300,7 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
+        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -362,6 +353,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py || exit 1
+        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -407,7 +399,12 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_powershell.py
+        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell
       shell: powershell
+    - name: Detect PWSH
+      run: |
+        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh
+      shell: pwsh
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:

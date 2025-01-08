@@ -462,12 +462,3 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove(script=manage2)
         finally:
             self.remove_script(script=manage2)
-
-    def test_shell_resolution(self):
-        self.remove()
-        self.install(no_shell=True)
-        self.verify_install()
-        completions = self.get_completions(self.manage_script, "complet")
-        self.assertIn("completion", completions)
-        self.remove()
-        self.verify_remove()
