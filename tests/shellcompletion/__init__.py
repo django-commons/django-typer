@@ -98,14 +98,21 @@ class _CompleteTestCase:
     def verify_remove(self, script=None):
         pass
 
-    def install(self, script=None, force_color=False, no_color=None, fallback=None):
+    def install(
+        self,
+        script=None,
+        force_color=False,
+        no_color=None,
+        fallback=None,
+        no_shell=False,
+    ):
         if not script:
             script = self.manage_script
         init_kwargs = {"force_color": force_color, "no_color": no_color}
         kwargs = {}
         if script:
             kwargs["manage_script"] = script
-        if self.shell:
+        if self.shell and not no_shell:
             init_kwargs["shell"] = self.shell
         if fallback:
             kwargs["fallback"] = fallback
@@ -455,3 +462,12 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove(script=manage2)
         finally:
             self.remove_script(script=manage2)
+
+    def test_shell_resolution(self):
+        self.remove()
+        self.install(no_shell=True)
+        self.verify_install()
+        completions = self.get_completions(self.manage_script, "complet")
+        self.assertIn("completion", completions)
+        self.remove()
+        self.verify_remove()
