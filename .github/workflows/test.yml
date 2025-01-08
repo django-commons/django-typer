@@ -44,7 +44,8 @@ jobs:
             django-version: '4.2'
           - python-version: '3.13'
             django-version: '5.0'
-
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -71,13 +72,13 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-linux-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   test-windows:
     runs-on: windows-latest
@@ -96,6 +97,8 @@ jobs:
           - python-version: '3.13'
             django-version: '3.2'
 
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -121,13 +124,13 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-windows-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   test-macos:
     runs-on: macos-latest
@@ -142,6 +145,9 @@ jobs:
             django-version: '5.1'
           - python-version: '3.13'
             django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
 
     steps:
     - uses: actions/checkout@v4
@@ -172,13 +178,13 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-macos-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   linux-bash-complete:
     runs-on: ubuntu-latest
@@ -193,6 +199,8 @@ jobs:
             django-version: '5.1'
           - python-version: '3.13'
             django-version: '3.2'
+    env:
+      COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     steps:
     - uses: actions/checkout@v4
@@ -224,13 +232,13 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py
-        mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   macos-zsh-complete:
     runs-on: macos-latest
@@ -245,6 +253,9 @@ jobs:
             django-version: '5.1'
           - python-version: '3.13'
             django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     steps:
     - uses: actions/checkout@v4
@@ -303,13 +314,13 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
-        mv .coverage macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   windows-powershell-complete:
     runs-on: windows-latest
@@ -324,6 +335,9 @@ jobs:
             django-version: '5.0'
           - python-version: '3.13'
             django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
     steps:
     - uses: actions/checkout@v4
@@ -346,13 +360,13 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_powershell.py
-        mv .coverage windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        mv .coverage $COVERAGE_FILE
       shell: powershell
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   coverage-combine:
     needs: [test-linux, test-windows, test-macos, linux-bash-complete, macos-zsh-complete, windows-powershell-complete]
@@ -381,7 +395,7 @@ jobs:
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
-          pattern: coverage-*
+          pattern: *.coverage
           merge-multiple: true
 
       - run: ls -la *.coverage
