@@ -317,6 +317,65 @@ jobs:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
 
+  macos-bash-complete:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: macos-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install Bash Completions
+      shell: bash
+      run: |
+        brew install bash-completion@2
+        touch ~/.bashrc
+        echo "\n[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
+        source ~/.bashrc
+
+    - name: Install Emacs
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+
+    - name: Install
+      run: |
+        just init
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}
+    - name: Setup tmate session
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+      timeout-minutes: 60
+    - name: Run Unit Tests
+      run: |
+        just test tests/shellcompletion/test_bash.py || exit 1
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
   windows-powershell-complete:
     runs-on: windows-latest
     strategy:

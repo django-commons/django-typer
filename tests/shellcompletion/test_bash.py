@@ -58,6 +58,9 @@ class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
                 bashrc = (Path.home() / ".bashrc").read_text()
                 os.unlink(Path.home() / ".bashrc")
             self.test_shell_complete()
+            os.unlink(Path.home() / ".bashrc")
+            self.remove()
+            self.verify_remove()
         finally:
             if bashrc:
                 (Path.home() / ".bashrc").write_text(bashrc)

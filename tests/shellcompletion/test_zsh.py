@@ -51,6 +51,9 @@ class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
                 zshrc = (Path.home() / ".zshrc").read_text()
                 os.unlink(Path.home() / ".zshrc")
             self.test_shell_complete()
+            os.unlink(Path.home() / ".zshrc")
+            self.remove()
+            self.verify_remove()
         finally:
             if zshrc:
                 (Path.home() / ".zshrc").write_text(zshrc)
