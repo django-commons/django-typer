@@ -435,7 +435,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
     def test_multi_install(self):
         parts = self.manage_script.split(".")
-        manage2 = ".".join(parts[0] + "2", *parts[1:])
+        manage2 = ".".join([parts[0] + "2", *parts[1:]])
         try:
             self.install_script(script=manage2)
             self.install()
