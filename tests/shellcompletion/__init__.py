@@ -394,13 +394,25 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.install_script()
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.remove_script()
+        super().tearDownClass()
+
+    @classmethod
+    def install_script(cls, script=None):
+        if not script:
+            script = cls.manage_script
         lines = []
         with open(cls.MANAGE_SCRIPT_TMPL, "r") as f:
             for line in f.readlines():
                 if line.startswith("#!{{shebang}}"):
                     line = f"#!{sys.executable}\n"
                 lines.append(line)
-        exe = Path(sys.executable).parent / cls.manage_script
+        exe = Path(sys.executable).parent / script
         with open(exe, "w") as f:
             for line in lines:
                 f.write(line)
@@ -412,4 +424,34 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             with open(exe.with_suffix(".cmd"), "w") as f:
                 f.write(f'@echo off{os.linesep}"{sys.executable}" "%~dp0{exe.name}" %*')
             os.chmod(exe, os.stat(exe.with_suffix(".cmd")).st_mode | 0o111)
-        super().setUpClass()
+
+    @classmethod
+    def remove_script(cls, script=None):
+        if not script:
+            script = cls.manage_script
+        exe = Path(sys.executable).parent / script
+        exe.unlink(missing_ok=True)
+        exe.with_suffix(".cmd").unlink(missing_ok=True)
+
+    def test_multi_install(self):
+        parts = self.manage_script.split(".")
+        manage2 = ".".join(parts[0] + "2", *parts[1:])
+        try:
+            self.install_script(script=manage2)
+            self.install()
+            self.verify_install()
+            self.install(script=manage2)
+            self.verify_install(script=manage2)
+
+            completions = self.get_completions(self.manage_script, "complet")
+            self.assertIn("completion", completions)
+
+            completions = self.get_completions(manage2, "complet")
+            self.assertIn("completion", completions)
+
+            self.remove()
+            self.verify_remove()
+            self.remove(script=manage2)
+            self.verify_remove(script=manage2)
+        finally:
+            self.remove_script(script=manage2)

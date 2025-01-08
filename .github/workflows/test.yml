@@ -77,7 +77,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-linux-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        path: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
 
   test-windows:
     runs-on: windows-latest
@@ -127,7 +127,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-windows-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        path: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
 
   test-macos:
     runs-on: macos-latest
@@ -178,7 +178,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-macos-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        path: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
 
   linux-bash-complete:
     runs-on: ubuntu-latest
@@ -229,8 +229,8 @@ jobs:
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: coverage-linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
+        path: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
 
   macos-zsh-complete:
     runs-on: macos-latest
