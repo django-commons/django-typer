@@ -342,13 +342,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Setup Just
       uses: extractions/setup-just@v2
-    # - name: Install Bash Completions
-    #   shell: bash
-    #   run: |
-    #     brew install bash-completion@2
-    #     touch ~/.bashrc
-    #     echo "\n[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
-    #     source ~/.bashrc
 
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}

@@ -1288,6 +1288,16 @@ class TestShellCompletersAndParsers(TestCase):
                 "shell ",
             )
 
+    def test_unknown_shell_error(self):
+        from django_typer.management.commands.shellcompletion import (
+            Command as ShellCompletion,
+        )
+
+        shellcompletion = get_command("shellcompletion", ShellCompletion)
+        shellcompletion._shell = None
+        with self.assertRaises(CommandError):
+            shellcompletion.shell = None
+
     def test_import_path_completer(self):
         result = run_command(
             "shellcompletion", "--shell", SHELL, "complete", "multi --settings "
