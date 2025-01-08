@@ -81,6 +81,9 @@ class PowerShellTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
     @pytest.mark.skip(reason="powershell does not support script installations")
     def test_fallback(self): ...
 
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_reentrant_install_uninstall(self): ...
+
 
 @pytest.mark.skipif(
     shutil.which("powershell") is None, reason="Powershell not available"

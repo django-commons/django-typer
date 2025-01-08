@@ -362,6 +362,18 @@ class _CompleteTestCase:
         )
         self.assertIn("working", completions)
 
+    def test_reentrant_install_uninstall(self):
+        self.install()
+        self.install()
+        self.verify_install()
+
+        completions = self.get_completions(self.launch_script, "complet")
+        self.assertIn("completion", completions)
+
+        self.remove()
+        self.remove()
+        self.verify_remove()
+
 
 class _ScriptCompleteTestCase(_CompleteTestCase):
     manage_script: str = "manage.py"
