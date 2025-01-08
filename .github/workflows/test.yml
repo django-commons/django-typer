@@ -72,7 +72,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -124,7 +124,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -178,7 +178,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -232,7 +232,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -314,7 +314,7 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -360,7 +360,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_powershell.py
-        mv .coverage $COVERAGE_FILE
+        mv .coverage ${{ env.COVERAGE_FILE }}
       shell: powershell
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -395,7 +395,7 @@ jobs:
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
-          pattern: "*coverage"
+          pattern: "*.coverage"
           merge-multiple: true
 
       - run: ls -la *.coverage
