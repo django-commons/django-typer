@@ -163,9 +163,6 @@ jobs:
     - name: Setup Just
       run: |
         brew install just
-    - name: Set up Homebrew
-      if: ${{ github.event.inputs.debug == 'true' }}
-      uses: Homebrew/actions/setup-homebrew@master
     - name: Install
       run: |
         just init

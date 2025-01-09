@@ -15,20 +15,25 @@ class TestShellResolution(TestCase):
 
     def test_powershell(self):
         command = get_command("shellcompletion", ShellComplete)
+        command.init()
         self.assertEqual(command.shell, "powershell")
 
     def test_pwsh(self):
         command = get_command("shellcompletion", ShellComplete)
+        command.init()
         self.assertEqual(command.shell, "pwsh")
 
     def test_bash(self):
         command = get_command("shellcompletion", ShellComplete)
+        command.init()
         self.assertEqual(command.shell, "bash")
 
     def test_zsh(self):
         command = get_command("shellcompletion", ShellComplete)
+        command.init()
         self.assertEqual(command.shell, "zsh")
 
     def test_fish(self):
         command = get_command("shellcompletion", ShellComplete)
+        command.init()
         self.assertEqual(command.shell, "fish")
