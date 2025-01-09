@@ -530,14 +530,14 @@ jobs:
 
     steps:
       - name: install-emacs-linux
-      if: ${{ github.event.inputs.debug == 'true' }}
-      run: |
-        sudo apt install emacs
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          sudo apt install emacs
       - name: setup-ssh-debug
-      if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3
-      with:
-        detached: true
+        if: ${{ github.event.inputs.debug == 'true' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
       - name: Setup Just
