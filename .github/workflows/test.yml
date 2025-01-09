@@ -229,7 +229,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py
-        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash
+        just test-bash-resolution
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -300,7 +300,7 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
-        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh
+        just test-zsh-resolution
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -353,7 +353,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_bash.py || exit 1
-        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash
+        just test-bash-resolution
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -399,11 +399,12 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test tests/shellcompletion/test_powershell.py
-        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell
+        just test-powershell-resolution
       shell: powershell
     - name: Detect PWSH
       run: |
         just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh
+        just test-pwsh-resolution
       shell: pwsh
     - name: Store coverage files
       uses: actions/upload-artifact@v4

@@ -1,4 +1,5 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+set unstable := true
 
 default:
     @just --list
@@ -119,6 +120,26 @@ test-all: test-rich test-no-rich
     poetry run pytest -m "not rich and not no_rich" --cov-append
     poetry run pip uninstall -y colorama
     poetry run pytest -k test_ctor_params --cov-append
+
+[script("bash")]
+test-bash-resolution:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash --cov-append
+
+[script("zsh")]
+test-zsh-resolution:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh --cov-append
+
+[script("powershell")]
+test-powershell-resolution:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell --cov-append
+
+[script("pwsh")]
+test-pwsh-resolution:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh --cov-append
+
+[script("fish")]
+test-fish-resolution:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish --cov-append
 
 test *TESTS:
     poetry run pytest --cov-append {{ TESTS }}
