@@ -52,11 +52,11 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: &install-emacs-linux
+    - name: install-emacs-linux
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         sudo apt install emacs
-    - name: &setup-ssh-debug
+    - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
@@ -104,8 +104,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *setup-ssh-debug
-    - &install-vim-windows
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
     - name: Setup Just
@@ -147,11 +151,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - &install-emacs-macos
+    - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         brew install emacs
-    - *setup-ssh-debug
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Set up Homebrew
@@ -193,8 +201,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-emacs-linux
-    - *setup-ssh-debug
+    - name: install-emacs-linux
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        sudo apt install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install
@@ -235,8 +250,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-emacs-linux
-    - *setup-ssh-debug
+    - name: install-emacs-linux
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        sudo apt install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install
@@ -282,8 +304,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-emacs-macos
-    - *setup-ssh-debug
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Homebrew and Zshell Completion
@@ -344,8 +373,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-emacs-macos
-    - *setup-ssh-debug
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install
@@ -387,8 +423,15 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-emacs-macos
-    - *setup-ssh-debug
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Fish
@@ -436,8 +479,14 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - *install-vim-windows
-    - *setup-ssh-debug
+    - name: install-vim-windows
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
     - name: Add to Poetry to PATH
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
@@ -480,8 +529,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - *install-emacs-linux
-      - *setup-ssh-debug
+      - name: install-emacs-linux
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        sudo apt install emacs
+      - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
       - name: Setup Just
