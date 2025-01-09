@@ -438,7 +438,7 @@ jobs:
       run: |
         brew install fish
         sudo bash -c 'echo $(which fish) >> /etc/shells'
-        chsh -s $(which fish)
+        sudo chsh -s $(which fish)
     - name: Install
       run: |
         just init
