@@ -161,7 +161,8 @@ jobs:
       with:
         detached: true
     - name: Setup Just
-      uses: extractions/setup-just@v2
+      run: |
+        brew install just
     - name: Set up Homebrew
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: Homebrew/actions/setup-homebrew@master
@@ -314,7 +315,8 @@ jobs:
       with:
         detached: true
     - name: Setup Just
-      uses: extractions/setup-just@v2
+      run: |
+        brew install just
     - name: Install Homebrew and Zshell Completion
       shell: zsh {0}
       run: |
@@ -383,7 +385,8 @@ jobs:
       with:
         detached: true
     - name: Setup Just
-      uses: extractions/setup-just@v2
+      run: |
+        brew install just
     - name: Install
       run: |
         just init
@@ -433,7 +436,8 @@ jobs:
       with:
         detached: true
     - name: Setup Just
-      uses: extractions/setup-just@v2
+      run: |
+        brew install just
     - name: Install Fish
       run: |
         brew install fish

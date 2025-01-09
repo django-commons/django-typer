@@ -89,16 +89,39 @@ class PowerShellTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
     shutil.which("powershell") is None, reason="Powershell not available"
 )
 class PowerShellExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase):
-    pass
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_rich_output(self): ...
+
+    @pytest.mark.rich
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_no_rich_output(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_settings_pass_through(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_pythonpath_pass_through(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_fallback(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_reentrant_install_uninstall(self): ...
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
-class PWSHTests(PowerShellTests):
+class PWSHTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
+    def test_shell_complete(self):
+        with self.assertRaises(CommandError):
+            self.install()
+
     shell = "pwsh"
     completer_class = PwshComplete
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
-class PWSHExeTests(PowerShellExeTests):
+class PWSHExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase):
     shell = "pwsh"
     completer_class = PwshComplete
