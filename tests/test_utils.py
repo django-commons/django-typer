@@ -6,7 +6,10 @@ import pytest
 
 
 def test_get_usage_script():
-    assert get_usage_script("/root/path/to/script") == Path("/root/path/to/script")
+    assert (
+        get_usage_script("/root/path/to/script")
+        == Path("/root/path/to/script").absolute()
+    )
 
 
 def test_accepts_var_kwargs():
