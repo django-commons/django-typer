@@ -1,6 +1,8 @@
 from django_typer.utils import called_from_module, called_from_command_definition
 
 print(called_from_module())
+print(called_from_module(look_back=0))
+print(called_from_module(look_back=3))
 
 
 def function():
@@ -15,7 +17,7 @@ def nested():
 
 
 class Command:
-    called_from_defn = called_from_command_definition(lookback=0)
+    called_from_defn = called_from_command_definition(look_back=0)
 
 
 function()

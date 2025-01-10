@@ -155,7 +155,7 @@ def _load_command_plugins(command: str) -> int:
     return len(plugins)
 
 
-def _check_call_frame(frame_name: str, lookback=1) -> bool:
+def _check_call_frame(frame_name: str, look_back=1) -> bool:
     """
     Returns True if the stack frame one frame above where this function has the given
     name.
@@ -163,7 +163,7 @@ def _check_call_frame(frame_name: str, lookback=1) -> bool:
     :param frame_name: The name of the frame to check for
     """
     frame = inspect.currentframe()
-    for _ in range(0, lookback + 1):
+    for _ in range(0, look_back + 1):
         if not frame:
             break
         frame = frame.f_back

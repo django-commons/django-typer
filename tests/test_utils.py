@@ -48,4 +48,11 @@ def test_call_frame_check():
     result = subprocess.run(
         [sys.executable, str(check_frame.absolute())], text=True, capture_output=True
     )
-    assert result.stdout.splitlines() == ["False", "True", "False", "True"]
+    assert result.stdout.splitlines() == [
+        "False",
+        "True",
+        "False",
+        "True",
+        "False",
+        "True",
+    ]
