@@ -166,6 +166,14 @@ markers = [
     "no_rich: marks tests as requiring rich to not be installed"
 ]
 
+# upstream typer has deprecated shell_completion in favor of autocomplete, but
+# has not updated the autocomplete interface. We silence this warning for now
+# because there is no way to fix it!
+# https://github.com/fastapi/typer/pull/1006
+filterwarnings = [
+    "ignore:.*shell_complete.*:DeprecationWarning:typer.core"
+]
+
 [tool.coverage.run]
 branch = true
 source = ["django_typer"]
