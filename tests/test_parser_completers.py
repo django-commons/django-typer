@@ -5,17 +5,22 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
+import pytest
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from django.utils import timezone
 
-from django_typer.management.commands.shellcompletion import DETECTED_SHELL
+from django_typer.management.commands.shellcompletion import (
+    DETECTED_SHELL,
+    Command as ShellCompletion,
+)
 from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
 from tests.apps.test_app.models import ShellCompleteTester
 from tests.utils import run_command
+import platform
 
 SHELL = {
     "zsh": "zsh",
@@ -126,10 +131,6 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertEqual(parse_app_label(poll_app), poll_app)
 
     def test_shellcompletion_stdout(self):
-        from django_typer.management.commands.shellcompletion import (
-            Command as ShellCompletion,
-        )
-
         shellcompletion = get_command("shellcompletion", ShellCompletion)
         shellcompletion.init(shell=SHELL)
         result = shellcompletion.complete("completion ")
@@ -1289,10 +1290,6 @@ class TestShellCompletersAndParsers(TestCase):
             )
 
     def test_unknown_shell_error(self):
-        from django_typer.management.commands.shellcompletion import (
-            Command as ShellCompletion,
-        )
-
         shellcompletion = get_command("shellcompletion", ShellCompletion)
         shellcompletion._shell = None
         with self.assertRaises(CommandError):
@@ -1649,6 +1646,15 @@ class TestShellCompletersAndParsers(TestCase):
             "completion --path does_not_exist/does_not_exist",
         )[0]
         self.assertNotIn("django_typer", result)
+
+        result = run_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "completion --path ./django_typer\\completers.py",
+        )[0]
+        self.assertIn("django_typer/completers.py", result)
 
     def test_these_strings_completer(self):
         for opt in ["--str", "--dup"]:

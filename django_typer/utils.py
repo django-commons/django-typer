@@ -264,7 +264,7 @@ def get_win_shell() -> str:
                     return "powershell"
                 pid = process["ProcessId"]
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             raise ShellDetectionFailure("Unable to detect windows shell") from e
 
     raise ShellDetectionFailure("Unable to detect windows shell")

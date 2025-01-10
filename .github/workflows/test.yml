@@ -215,10 +215,11 @@ jobs:
         just init
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
-    - name: Run Unit Tests
+    - name: Test Tab Completion
       run: |
         just test tests/shellcompletion/test_bash.py
         just test-bash-resolution
+        just test ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -268,7 +269,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y fish
-    - name: Run Unit Tests
+    - name: Test Tab Completion
       run: |
         just test tests/shellcompletion/test_fish.py
         just test-fish-resolution

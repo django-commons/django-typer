@@ -1,11 +1,12 @@
-import os
 import shutil
 import sys
 from pathlib import Path
+import platform
 
 import pytest
 from django.core.management import CommandError
 from django.test import TestCase
+from django_typer.management import get_command
 from django_typer.management.commands.shells.powershell import (
     PowerShellComplete,
     PwshComplete,
@@ -125,3 +126,14 @@ class PWSHTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
 class PWSHExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase):
     shell = "pwsh"
     completer_class = PwshComplete
+
+    @pytest.mark.skipif(platform.system() != "windows", reason="Windows only test")
+    def test_mixed_path_dividers(self):
+        self.install()
+        self.verify_install()
+        self.assertIn(
+            "./django-typer\\completers.py",
+            self.get_completions("completion", "--path", "./django-typer\\comp"),
+        )
+        self.remove()
+        self.verify_remove()
