@@ -10,7 +10,7 @@ from shellingham import detect_shell
 
 
 def test_detect_shell():
-    assert detect_shell()
+    assert detect_shell(max_depth=256)
 
 
 class TestShellResolution(TestCase):
