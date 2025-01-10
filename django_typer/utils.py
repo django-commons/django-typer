@@ -39,7 +39,12 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     """
     cmd_pth = Path(script or sys.argv[0])
     on_path = shutil.which(cmd_pth.name)
-    if on_path and Path(on_path).is_absolute():
+    if (
+        on_path
+        and Path(on_path).is_absolute()
+        and Path(on_path) == cmd_pth.absolute()
+        and cmd_pth.is_file()
+    ):
         return cmd_pth.name
     try:
         return cmd_pth.absolute().relative_to(Path(os.getcwd()))
