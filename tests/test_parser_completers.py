@@ -1408,7 +1408,7 @@ class TestShellCompletersAndParsers(TestCase):
                 "--shell",
                 SHELL,
                 "complete",
-                f"multi --pythonpath '{incomplete}'",
+                f"multi --pythonpath {incomplete}",
             )[0]
             for pth in local_dirs:
                 self.assertIn(f".{sep}{pth}", result)
