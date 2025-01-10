@@ -235,12 +235,10 @@ def get_win_shell() -> str:
     :return: The name of the shell, either 'powershell' or 'pwsh'
     """
     import json
-    import platform
     import subprocess
 
     from shellingham import ShellDetectionFailure
 
-    assert platform.system() == "Windows"
     pwsh = shutil.which("pwsh") or shutil.which("powershell")
     if pwsh:
         try:
