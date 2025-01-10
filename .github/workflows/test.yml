@@ -332,6 +332,8 @@ jobs:
         chmod -R go-w /opt/homebrew/share/zsh
         source ~/.zshrc
         sudo chsh -s /bin/zsh runner
+    - name: Set SHELL variable
+      run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
     - name: Install
       run: |
         just init
