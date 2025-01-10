@@ -39,11 +39,11 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     """
     cmd_pth = Path(script or sys.argv[0])
     on_path = shutil.which(cmd_pth.name)
+    on_path = on_path and Path(on_path)
     if (
         on_path
-        and Path(on_path).is_absolute()
-        and Path(on_path) == cmd_pth.absolute()
-        and cmd_pth.is_file()
+        and on_path.is_absolute()
+        and (on_path != cmd_pth.absolute() or not cmd_pth.is_file())
     ):
         return cmd_pth.name
     try:
