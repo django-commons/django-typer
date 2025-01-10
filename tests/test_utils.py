@@ -3,12 +3,17 @@ from pathlib import Path
 from shellingham import ShellDetectionFailure
 import platform
 import pytest
+import subprocess
+import sys
+
+
+check_frame = Path(__file__).parent / "frame_check.py"
 
 
 def test_get_usage_script():
     assert (
-        get_usage_script("/root/path/to/script")
-        == Path("/root/path/to/script").absolute()
+        get_usage_script("/root/path/to/scrapt")
+        == Path("/root/path/to/scrapt").absolute()
     )
 
 
@@ -37,3 +42,10 @@ def test_accepts_var_kwargs():
 def test_get_win_shell_wrong_platform():
     with pytest.raises(ShellDetectionFailure):
         get_win_shell()
+
+
+def test_call_frame_check():
+    result = subprocess.run(
+        [sys.executable, str(check_frame.absolute())], text=True, capture_output=True
+    )
+    assert result.stdout.splitlines() == ["False", "True", "False", "True"]
