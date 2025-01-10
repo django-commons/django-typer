@@ -381,6 +381,24 @@ class _CompleteTestCase:
         self.remove()
         self.verify_remove()
 
+    def test_path_completion(self):
+        self.install()
+        self.verify_install()
+        completions = self.get_completions(
+            self.launch_script, "completion", "--path", "./django_typer/co"
+        )
+        self.assertIn("completers.py", completions)
+        self.assertIn("config.py", completions)
+        completions = self.get_completions(
+            self.launch_script, "completion", "--dir", "./django_typer/"
+        )
+        self.assertNotIn("completers.py", completions)
+        self.assertNotIn("config.py", completions)
+        self.assertIn("templates", completions)
+        self.assertIn("management", completions)
+        self.remove()
+        self.verify_remove()
+
 
 class _ScriptCompleteTestCase(_CompleteTestCase):
     manage_script: str = "manage.py"

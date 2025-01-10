@@ -39,6 +39,7 @@
     for completion in "${response[@]}"; do
         IFS=',' read type value <<< "$completion"
 
+        {% if use_compopt %}
         if [[ $type == 'dir' ]]; then
             COMPREPLY=()
             compopt -o dirnames
@@ -48,6 +49,9 @@
         else
             COMPREPLY+=($value)
         fi
+        {% else %}
+        COMPREPLY+=($value)
+        {% endif %}
     done
 
     return 0

@@ -702,7 +702,7 @@ class Command(TyperCommand):
             :width: 80
             :convert-png: latex
         """
-        args = split_arg_string(command)
+        args = split_arg_string(command.replace("\\", "\\\\"))
         if args:
             try:
                 # lop the manage script off the front if it's there

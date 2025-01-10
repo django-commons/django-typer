@@ -74,7 +74,12 @@ class BashComplete(DjangoTyperShellCompleter):
         version = self._check_version()
         if version and version >= (4, 4):
             complete_opts = "-o nosort"
-        return {**super().source_vars(), "complete_opts": complete_opts}
+        return {
+            **super().source_vars(),
+            "complete_opts": complete_opts,
+            "bash_version": version,
+            "use_compopt": version and version >= (4, 4),
+        }
 
     def format_completion(self, item: CompletionItem) -> str:
         return f"{item.type},{item.value}"

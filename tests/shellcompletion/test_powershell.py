@@ -55,6 +55,17 @@ class _PowerShellMixin:
             )
             self.assertTrue(contents)  # should have been deleted if it were empty
 
+    @pytest.mark.skipif(platform.system() != "Windows", reason="Windows only test")
+    def test_mixed_path_dividers(self):
+        self.install()
+        self.verify_install()
+        self.assertIn(
+            "django_typer\\completers.py",
+            self.get_completions("completion", "--path", "./django_typer\\comp"),
+        )
+        self.remove()
+        self.verify_remove()
+
 
 @pytest.mark.skipif(
     shutil.which("powershell") is None, reason="powershell not available"
@@ -85,11 +96,29 @@ class PowerShellTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
     @pytest.mark.skip(reason="powershell does not support script installations")
     def test_reentrant_install_uninstall(self): ...
 
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_path_completion(self): ...
+
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_mixed_path_dividers(self): ...
+
 
 @pytest.mark.skipif(
     shutil.which("powershell") is None, reason="Powershell not available"
 )
 class PowerShellExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase):
+    pass
+
+
+@pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
+class PWSHTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
+    shell = "pwsh"
+    completer_class = PwshComplete
+
+    def test_shell_complete(self):
+        with self.assertRaises(CommandError):
+            self.install()
+
     @pytest.mark.rich
     @pytest.mark.no_rich
     @pytest.mark.skip(reason="powershell does not support script installations")
@@ -111,15 +140,11 @@ class PowerShellExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, Tes
     @pytest.mark.skip(reason="powershell does not support script installations")
     def test_reentrant_install_uninstall(self): ...
 
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_path_completion(self): ...
 
-@pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
-class PWSHTests(_PowerShellMixin, _ScriptCompleteTestCase, TestCase):
-    def test_shell_complete(self):
-        with self.assertRaises(CommandError):
-            self.install()
-
-    shell = "pwsh"
-    completer_class = PwshComplete
+    @pytest.mark.skip(reason="powershell does not support script installations")
+    def test_mixed_path_dividers(self): ...
 
 
 @pytest.mark.skipif(shutil.which("pwsh") is None, reason="pwsh not available")
@@ -127,13 +152,13 @@ class PWSHExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase)
     shell = "pwsh"
     completer_class = PwshComplete
 
-    @pytest.mark.skipif(platform.system() != "windows", reason="Windows only test")
+    @pytest.mark.skipif(platform.system() != "Windows", reason="Windows only test")
     def test_mixed_path_dividers(self):
         self.install()
         self.verify_install()
         self.assertIn(
-            "./django-typer\\completers.py",
-            self.get_completions("completion", "--path", "./django-typer\\comp"),
+            "django_typer\\completers.py",
+            self.get_completions("completion", "--path", "./django_typer\\comp"),
         )
         self.remove()
         self.verify_remove()

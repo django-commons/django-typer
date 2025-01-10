@@ -52,8 +52,6 @@ from django.utils.translation import gettext as _
 Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
 Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
 
-PATH_SEPARATOR = os.sep
-
 
 class ModelObjectCompleter:
     """

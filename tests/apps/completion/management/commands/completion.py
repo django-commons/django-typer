@@ -37,6 +37,13 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                 shell_complete=completers.complete_path,
             ),
         ] = None,
+        dir: Annotated[
+            t.Optional[Path],
+            typer.Option(
+                help=_("A directory given as an option."),
+                shell_complete=completers.complete_directory,
+            ),
+        ] = None,
         strings_unique: Annotated[
             t.Optional[t.List[str]],
             typer.Option(

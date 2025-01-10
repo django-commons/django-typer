@@ -1647,14 +1647,16 @@ class TestShellCompletersAndParsers(TestCase):
         )[0]
         self.assertNotIn("django_typer", result)
 
-        result = run_command(
-            "shellcompletion",
-            "--shell",
-            SHELL,
-            "complete",
-            "completion --path ./django_typer\\completers.py",
-        )[0]
-        self.assertIn("django_typer/completers.py", result)
+    def test_mixed_divider_path_completer(self):
+        shellcompletion = get_command("shellcompletion", ShellCompletion)
+        shellcompletion.init(shell=SHELL)
+        completions = shellcompletion.complete(
+            "completion --path ./django_typer\\compl"
+        )
+        if platform.system() == "Windows":
+            self.assertIn("django_typer/completers.py", completions)
+        else:
+            self.assertFalse(completions.strip())
 
     def test_these_strings_completer(self):
         for opt in ["--str", "--dup"]:

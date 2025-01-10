@@ -62,6 +62,9 @@ class FishShellTests(_FishMixin, _ScriptCompleteTestCase, TestCase):
     @pytest.mark.skip(reason="fish does not support script installations")
     def test_reentrant_install_uninstall(self): ...
 
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_path_completion(self): ...
+
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
 class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
@@ -101,3 +104,6 @@ class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
 
     @pytest.mark.skip(reason="TODO")
     def test_multi_install(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_path_completion(self): ...
