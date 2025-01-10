@@ -341,6 +341,7 @@ jobs:
       shell: zsh {0}
       run: |
         just test tests/shellcompletion/test_zsh.py || exit 1
+        just test ./tests/shellcompletion/test_shell_resolution.py::test_detect_shell
         just test-zsh-resolution
 
     - name: Store coverage files
