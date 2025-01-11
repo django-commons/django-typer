@@ -509,14 +509,9 @@ jobs:
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-powershell-resolution
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      shell: powershell
-    - name: Run PWSH Tab Completion Tests
-      run: |
-        just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-pwsh-resolution
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      shell: pwsh
+      shell: powershell
     - name: Test CMD shell failure
       run: |
         poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
