@@ -100,9 +100,9 @@ class Command(TyperCommand):
             ),
         ] = [],
     ):
-        assert len(load_order) <= len(commands), (
-            "Cannot provide more load options than commands"
-        )
+        assert len(load_order) <= len(
+            commands
+        ), "Cannot provide more load options than commands"
 
         plugin_loads = []
 
