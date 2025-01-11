@@ -114,7 +114,7 @@ class Command(TyperCommand):
         Convert the given string to upper case.
         """
         assert issubclass(self.__class__, Command)
-        return f'{self.op_string[0:begin]}{self.op_string[begin:end].upper()}{self.op_string[end:None] if end else ""}'
+        return f"{self.op_string[0:begin]}{self.op_string[begin:end].upper()}{self.op_string[end:None] if end else ''}"
 
     @case.command()
     def lower(
@@ -131,7 +131,7 @@ class Command(TyperCommand):
         Convert the given string to upper case.
         """
         assert issubclass(self.__class__, Command)
-        return f'{self.op_string[0:begin]}{self.op_string[begin:end].lower()}{self.op_string[end:None] if end else ""}'
+        return f"{self.op_string[0:begin]}{self.op_string[begin:end].lower()}{self.op_string[end:None] if end else ''}"
 
     @string.command()
     def split(self, sep: str = " "):

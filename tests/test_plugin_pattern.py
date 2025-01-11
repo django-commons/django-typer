@@ -163,7 +163,7 @@ class ResetAppsMixin:
                     for path in [
                         "tests.apps.adapter1",
                         "tests.apps.adapter2",
-                        "tests.apps.test_app.management.commands" "tests.apps.adapter0",
+                        "tests.apps.test_app.management.commandstests.apps.adapter0",
                     ]
                 ]
             ):

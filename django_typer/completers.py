@@ -202,7 +202,9 @@ class ModelObjectCompleter:
         incomplete = incomplete.rstrip("0").rstrip(".")
         lower = float(incomplete)
         if "." in incomplete:
-            upper = lower + float(f'0.{"0"*(len(incomplete)-incomplete.index(".")-2)}1')
+            upper = lower + float(
+                f"0.{'0' * (len(incomplete) - incomplete.index('.') - 2)}1"
+            )
         else:
             return self.int_query(context, parameter, incomplete)
         return Q(**{f"{self.lookup_field}__gte": lower}) & Q(
@@ -460,7 +462,7 @@ def complete_import_path(
         if module.name.startswith(prefix):
             completions.append(
                 CompletionItem(
-                    f'{module_import}{"." if module_import else ""}{module.name}',
+                    f"{module_import}{'.' if module_import else ''}{module.name}",
                     type="plain",
                 )
             )

@@ -119,7 +119,7 @@ class TestGroups(TestCase):
                 ),
                 0.99,  # width inconsistences drive this number < 1
             )
-            print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
+            print(f"{app}: {' '.join(cmds)} = {sim:.2f}")
 
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)
             cmd.print_help("./manage.py", *cmds)

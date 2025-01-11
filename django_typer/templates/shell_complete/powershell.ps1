@@ -35,8 +35,7 @@ $scriptblock = {
         if ($help -eq "") {
             [System.Management.Automation.CompletionResult]::new($value)
         } else {
-            [System.Management.Automation.CompletionResult]::new(
-                $value, $value, 'ParameterValue', $help)
+            [System.Management.Automation.CompletionResult]::new($value, $value, 'ParameterValue', $help)
         }
     }
 }
