@@ -1654,7 +1654,7 @@ class TestShellCompletersAndParsers(TestCase):
             "completion --path ./django_typer\\compl"
         )
         if platform.system() == "Windows":
-            self.assertIn("django_typer/completers.py", completions)
+            self.assertIn("./django_typer\\completers.py", completions)
         else:
             self.assertFalse(completions.strip())
 
