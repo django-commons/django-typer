@@ -274,6 +274,8 @@ jobs:
       run: |
         just test tests/shellcompletion/test_fish.py
         just test-fish-resolution
+        just test tests/test_parser_completers.py
+      shell: fish {0}
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -453,6 +455,7 @@ jobs:
       shell: fish {0}
       run: |
         just test tests/shellcompletion/test_fish.py || exit 1
+        just test tests/test_parser_completers.py
       #  just test-fish-resolution
 
     - name: Store coverage files
