@@ -3,6 +3,7 @@ import re
 import pytest
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
+from django_typer.config import traceback_config
 
 from tests.utils import rich_installed, run_command
 import platform
@@ -152,6 +153,10 @@ class TestTracebackConfig(TestCase):
 
         result = run_command("test_command1", "delete", "Brian", "--throw")[1]
         self.assertNotIn("\x1b", result)
+
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=None)
+    def test_traceback_set_to_none(self):
+        self.assertIs(traceback_config(), False)
 
 
 @pytest.mark.no_rich
