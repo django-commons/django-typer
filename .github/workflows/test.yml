@@ -515,7 +515,6 @@ jobs:
     - name: Test CMD shell failure
       run: |
         poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4
