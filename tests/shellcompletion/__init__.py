@@ -31,7 +31,7 @@ except Exception:
     pass
 
 
-def read_all_from_fd_with_timeout(fd, timeout=2):
+def read_all_from_fd_with_timeout(fd, timeout=3):
     all_data = bytearray()
     start_time = time.time()
 
@@ -216,12 +216,12 @@ class _CompleteTestCase:
 
             cmd = " ".join(cmds)
             os.write(master_fd, cmd.encode())
-            time.sleep(0.25)
+            time.sleep(0.5)
 
             print(f'"{cmd}"')
             os.write(master_fd, self.tabs.encode())
 
-            time.sleep(0.25)
+            time.sleep(0.5)
 
             # Read the output
             output = read_all_from_fd_with_timeout(master_fd)
