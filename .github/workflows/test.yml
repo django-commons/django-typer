@@ -122,6 +122,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         just test-all
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
@@ -505,16 +506,21 @@ jobs:
     - name: Run Powershell Tab Completion Tests
       run: |
         just test tests/shellcompletion/test_powershell.py
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-powershell-resolution
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
     - name: Run PWSH Tab Completion Tests
       run: |
         just test tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-pwsh-resolution
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: pwsh
     - name: Test CMD shell failure
       run: |
         poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4

@@ -1,4 +1,6 @@
 from django_typer.utils import get_usage_script, accepts_var_kwargs, get_win_shell
+from django.test import override_settings
+from django.core.management import call_command
 from pathlib import Path
 from shellingham import ShellDetectionFailure
 import platform
@@ -56,3 +58,9 @@ def test_call_frame_check():
         "False",
         "True",
     ]
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.bad", "django_typer"])
+def test_register_bad_command_plugin():
+    with pytest.raises(ValueError):
+        call_command("bad")
