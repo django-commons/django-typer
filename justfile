@@ -122,24 +122,24 @@ test-all: test-rich test-no-rich
     poetry run pytest -k test_ctor_params --cov-append
 
 [script("bash")]
-test-bash-resolution:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash --cov-append
+test-bash:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py --cov-append
 
 [script("zsh")]
-test-zsh-resolution:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh --cov-append
+test-zsh:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py --cov-append
 
 [script("powershell")]
-test-powershell-resolution:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell --cov-append
+test-powershell:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests --cov-append
 
 [script("pwsh")]
-test-pwsh-resolution:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh --cov-append
+test-pwsh:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests --cov-append
 
 [script("fish")]
-test-fish-resolution:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish --cov-append
+test-fish:
+    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py --cov-append
 
 test *TESTS:
     poetry run pytest --cov-append {{ TESTS }}
