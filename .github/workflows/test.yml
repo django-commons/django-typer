@@ -393,7 +393,7 @@ jobs:
         path: ${{ env.COVERAGE_FILE }}
 
   macos-fish-complete:
-    runs-on: macos-latest
+    runs-on: macos-14
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -442,8 +442,6 @@ jobs:
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
-        ps -p $$ -o comm=
-        echo $SHELL
         poetry run python -c "from shellingham import detect_shell; print(detect_shell())"
         just test-fish || exit 1
 
