@@ -332,6 +332,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
+        python -c "from shellingham import detect_shell; print(detect_shell())"
         just test-zsh || exit 1
 
     - name: Store coverage files
@@ -382,6 +383,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
       run: |
+        python -c "from shellingham import detect_shell; print(detect_shell())"
         just test-bash || exit 1
 
     - name: Store coverage files
@@ -440,7 +442,7 @@ jobs:
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
-        fish
+        python -c "from shellingham import detect_shell; print(detect_shell())"
         just test-fish || exit 1
 
     - name: Store coverage files
