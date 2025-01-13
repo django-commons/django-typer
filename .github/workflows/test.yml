@@ -321,17 +321,14 @@ jobs:
         brew install zsh-completions
         chmod go-w /opt/homebrew/share
         chmod -R go-w /opt/homebrew/share/zsh
-        sudo chsh -s /bin/zsh runner
-    - name: Set SHELL variable
-      run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
     - name: Install
       run: |
         just init
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
-      shell: zsh {0}
       run: |
+        zsh
         just test-zsh || exit 1
 
     - name: Store coverage files
@@ -429,15 +426,14 @@ jobs:
       run: |
         brew install fish
         sudo bash -c 'echo $(which fish) >> /etc/shells'
-        sudo chsh -s $(which fish)
     - name: Install
       run: |
         just init
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Tab Completion Tests
-      shell: fish {0}
       run: |
+        fish
         just test-fish || exit 1
 
     - name: Store coverage files
