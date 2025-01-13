@@ -443,6 +443,7 @@ jobs:
       shell: fish {0}
       run: |
         poetry run python -c "from shellingham import detect_shell; print(detect_shell())"
+        echo $SHELL
         just test-fish || exit 1
 
     - name: Store coverage files

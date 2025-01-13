@@ -13,7 +13,7 @@ import re
 import subprocess
 import platform
 
-from shellingham import detect_shell
+from django_typer.utils import detect_shell
 
 from django.test import TestCase, override_settings
 from django_typer.management import get_command

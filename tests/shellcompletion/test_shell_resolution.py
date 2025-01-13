@@ -6,8 +6,8 @@ from django.test import TestCase, override_settings
 
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellComplete
-from shellingham import detect_shell, ShellDetectionFailure
-from django_typer.utils import get_win_shell
+from shellingham import ShellDetectionFailure
+from django_typer.utils import get_win_shell, detect_shell
 
 
 def test_detect_shell():

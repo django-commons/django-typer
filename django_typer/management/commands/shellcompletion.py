@@ -42,14 +42,14 @@ from django.template.loader import TemplateDoesNotExist, get_template
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from shellingham import ShellDetectionFailure, detect_shell
+from shellingham import ShellDetectionFailure
 from typer import Argument, Option
 from typer.main import get_command as get_typer_command
 
 from django_typer.completers import complete_import_path, these_strings
 from django_typer.management import TyperCommand, command, get_command, initialize
 from django_typer.types import COMMON_PANEL
-from django_typer.utils import get_usage_script, get_win_shell
+from django_typer.utils import detect_shell, get_usage_script, get_win_shell
 
 DETECTED_SHELL = None
 

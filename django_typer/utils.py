@@ -14,11 +14,15 @@ from pathlib import Path
 from threading import local
 from types import MethodType, ModuleType
 
+from shellingham import ShellDetectionFailure
+from shellingham import detect_shell as _detect_shell
+
 from .config import traceback_config
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
 
 __all__ = [
+    "detect_shell",
     "get_usage_script",
     "traceback_config",
     "get_current_command",
@@ -27,6 +31,22 @@ __all__ = [
     "called_from_module",
     "called_from_command_definition",
 ]
+
+
+def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:
+    """
+    Detect the current shell.
+
+    :raises ShellDetectionFailure: If the shell cannot be detected
+    :return: A tuple of the shell name and the shell command
+    """
+    try:
+        return _detect_shell(max_depth=max_depth)
+    except ShellDetectionFailure:
+        login_shell = os.environ.get("SHELL", "")
+        if login_shell:
+            return (os.path.basename(login_shell).lower(), login_shell)
+        raise
 
 
 def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
