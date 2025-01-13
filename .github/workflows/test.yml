@@ -442,6 +442,7 @@ jobs:
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
+        echo $SHELL
         poetry run python -c "from shellingham import detect_shell; print(detect_shell())"
         just test-fish || exit 1
 
