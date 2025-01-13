@@ -391,7 +391,7 @@ jobs:
         path: ${{ env.COVERAGE_FILE }}
 
   macos-fish-complete:
-    runs-on: macos-14
+    runs-on: macos-latest
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
