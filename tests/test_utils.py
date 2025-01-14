@@ -75,6 +75,17 @@ def test_get_win_shell_no_pwsh():
         get_win_shell()
 
 
+@pytest.mark.skipif(
+    bool(shutil.which("pwsh") or shutil.which("powershell")),
+    reason="Only test when pwsh is unavailable",
+)
+def test_powershell_profile_fail():
+    from django_typer.management.commands.shells.powershell import PowerShellComplete
+
+    with pytest.raises(Exception):
+        PowerShellComplete().get_user_profile()
+
+
 def test_detection_failure_no_env():
     shell = os.environ.pop("SHELL")
     try:

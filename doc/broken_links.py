@@ -10,7 +10,7 @@ from pathlib import Path
 if __name__ == "__main__":
     
     # The json output isn't valid, so we have to fix it before we can process.
-    data = json.loads(f"[{','.join((Path(__file__).parent / "build/output.json").read_text().splitlines())}]")
+    data = json.loads(f"[{','.join((Path(__file__).parent / 'build/output.json').read_text().splitlines())}]")
     broken_links = [link for link in data if link["status"] not in {"working", "redirected", "unchecked", "ignored"}]
     if broken_links:
         for link in broken_links:

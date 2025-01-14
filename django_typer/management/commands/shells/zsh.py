@@ -4,7 +4,7 @@ from pathlib import Path
 
 from click.shell_completion import CompletionItem
 
-from ..shellcompletion import DjangoTyperShellCompleter
+from . import DjangoTyperShellCompleter
 
 
 class ZshComplete(DjangoTyperShellCompleter):

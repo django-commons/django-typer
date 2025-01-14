@@ -4,7 +4,7 @@ from pathlib import Path
 from click.shell_completion import CompletionItem
 from django.utils.translation import gettext as _
 
-from ..shellcompletion import DjangoTyperShellCompleter
+from . import DjangoTyperShellCompleter
 
 
 class PowerShellComplete(DjangoTyperShellCompleter):
@@ -73,9 +73,11 @@ class PowerShellComplete(DjangoTyperShellCompleter):
             for encoding in ["windows-1252", "utf8", "cp850"]:
                 try:
                     return Path(result.stdout.decode(encoding).strip())
-                except UnicodeDecodeError:
+                except UnicodeDecodeError:  # pragma: no cover
                     pass
-        raise RuntimeError(_("Unable to find the PowerShell user profile."))
+        raise RuntimeError(
+            _("Unable to find the PowerShell user profile.")
+        )  # pragma: no cover
 
     def install(self) -> Path:
         assert self.prog_name
