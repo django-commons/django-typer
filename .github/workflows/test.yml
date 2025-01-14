@@ -69,6 +69,7 @@ jobs:
         just init
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
+        sudo apt remove powershell
     - name: Run Unit Tests
       run: |
         just test-all

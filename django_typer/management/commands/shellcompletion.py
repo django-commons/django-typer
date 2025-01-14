@@ -55,7 +55,7 @@ DETECTED_SHELL = None
 
 try:
     DETECTED_SHELL = detect_shell()[0]
-except (ShellDetectionFailure, RuntimeError):
+except (ShellDetectionFailure, RuntimeError):  # pragma: no cover
     pass
 
 
@@ -450,7 +450,7 @@ class Command(TyperCommand):
         elif self._shell == "cmd" and platform.system() == "Windows":
             try:
                 self._shell = get_win_shell()
-            except ShellDetectionFailure:
+            except ShellDetectionFailure:  # pragma: no cover
                 pass
 
     @property
@@ -712,6 +712,10 @@ class Command(TyperCommand):
                     args = args[1:]
             except (TypeError, ValueError, OSError):  # pragma: no cover
                 pass
+        else:
+            import ipdb
+
+            ipdb.set_trace()
 
         def get_completion() -> str:
             if args:

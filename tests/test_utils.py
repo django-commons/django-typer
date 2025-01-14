@@ -1,12 +1,18 @@
-from django_typer.utils import get_usage_script, accepts_var_kwargs, get_win_shell
+from django_typer.utils import (
+    get_usage_script,
+    accepts_var_kwargs,
+    get_win_shell,
+    detect_shell,
+)
 from django.test import override_settings
 from django.core.management import call_command
 from pathlib import Path
 from shellingham import ShellDetectionFailure
-import platform
+import shutil
 import pytest
 import subprocess
 import sys
+import os
 
 
 check_frame = Path(__file__).parent / "frame_check.py"
@@ -40,12 +46,6 @@ def test_accepts_var_kwargs():
     assert not accepts_var_kwargs(func6)
 
 
-@pytest.mark.skipif(platform.system() == "Windows", reason="Only test off Windows")
-def test_get_win_shell_wrong_platform():
-    with pytest.raises(ShellDetectionFailure):
-        get_win_shell()
-
-
 def test_call_frame_check():
     result = subprocess.run(
         [sys.executable, str(check_frame.absolute())], text=True, capture_output=True
@@ -64,3 +64,34 @@ def test_call_frame_check():
 def test_register_bad_command_plugin():
     with pytest.raises(ValueError):
         call_command("bad")
+
+
+@pytest.mark.skipif(
+    bool(shutil.which("pwsh") or shutil.which("powershell")),
+    reason="Only test when pwsh is unavailable",
+)
+def test_get_win_shell_no_pwsh():
+    with pytest.raises(ShellDetectionFailure):
+        get_win_shell()
+
+
+def test_detection_failure_no_env():
+    shell = os.environ.pop("SHELL")
+    try:
+        with pytest.raises(ShellDetectionFailure):
+            detect_shell(max_depth=0)
+    finally:
+        os.environ["SHELL"] = shell
+
+
+def test_detection_env_fallback():
+    shell = os.environ.pop("SHELL")
+    os.environ["SHELL"] = "/bin/bash"
+    try:
+        assert detect_shell(max_depth=0)[0] == "bash"
+    finally:
+        os.environ["SHELL"] = shell
+
+
+def test_detect_shell():
+    assert detect_shell(max_depth=256)

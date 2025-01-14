@@ -1632,3 +1632,6 @@ class TestShellCompletersAndParsers(TestCase):
 
         with self.assertRaises(ValueError):
             ModelObjectCompleter(NotAModel, "char_field", "test")
+
+    def test_empty_complete(self):
+        self.assertIn("makemigrations", self.shellcompletion.complete(""))
