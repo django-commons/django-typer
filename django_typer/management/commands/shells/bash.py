@@ -56,11 +56,7 @@ class BashComplete(DjangoTyperShellCompleter):
             ["bash", "-c", 'echo "${BASH_VERSION}"'], stdout=subprocess.PIPE
         )
         match = re.search(r"^(\d+)\.(\d+)\.\d+", output.stdout.decode())
-
-        if match is not None:
-            major, minor = (int(val) for val in match.groups())
-            return major, minor
-        return None
+        return (int(match.groups()[0]), int(match.groups()[1])) if match else None
 
     def source_vars(self) -> t.Dict[str, t.Any]:
         """
