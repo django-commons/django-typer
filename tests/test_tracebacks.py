@@ -62,6 +62,14 @@ class TestTracebackConfig(TestCase):
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
 
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=False)
+    def test_traceback_set_to_false(self):
+        self.assertIs(traceback_config(), False)
+
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=True)
+    def test_traceback_set_to_true(self):
+        self.assertEqual(traceback_config(), {"show_locals": True})
+
     def test_turn_traceback_off_none(self):
         result = run_command(
             "test_command1",

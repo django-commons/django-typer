@@ -500,9 +500,9 @@ It is possible to customize the shell specific completion scripts or add support
 shells. There are two main extension points:
 
 1. Derive a class from
-   :class:`~django_typer.management.commands.shellcompletion.DjangoTyperShellCompleter`
+   :class:`~django_typer.shells.DjangoTyperShellCompleter`
    for your shell and register it using
-   :func:`~django_typer.management.commands.shellcompletion.register_completion_class`. This class
+   :func:`~django_typer.shells.register_completion_class`. This class
    will control how suggestions are formatted and returned and how the completion script
    is generated and installed.
 
@@ -523,14 +523,14 @@ shells. There are two main extension points:
      - Completer Class
    * - bash_
      - ``shell_complete/bash.sh``
-     - :class:`~django_typer.management.commands.shells.bash.BashComplete`
+     - :class:`~django_typer.shells.bash.BashComplete`
    * - zsh_
      - ``shell_complete/zsh.sh``
-     - :class:`~django_typer.management.commands.shells.zsh.ZshComplete`
+     - :class:`~django_typer.shells.zsh.ZshComplete`
    * - fish_
      - ``shell_complete/fish.fish``
-     - :class:`~django_typer.management.commands.shells.fish.FishComplete`
+     - :class:`~django_typer.shells.fish.FishComplete`
    * - powershell_
      - ``shell_complete/powershell.ps1``
-     - :class:`~django_typer.management.commands.shells.powershell.PowerShellComplete`,
-       :class:`~django_typer.management.commands.shells.powershell.PwshComplete`
+     - :class:`~django_typer.shells.powershell.PowerShellComplete`,
+       :class:`~django_typer.shells.powershell.PwshComplete`

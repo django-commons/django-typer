@@ -14,5 +14,5 @@ def traceback_config() -> t.Union[bool, t.Dict[str, t.Any]]:
     """
     cfg = getattr(settings, "DT_RICH_TRACEBACK_CONFIG", {"show_locals": True})
     if cfg:
-        return {"show_locals": True, **cfg}
+        return {"show_locals": True, **(cfg if isinstance(cfg, dict) else {})}
     return bool(cfg)

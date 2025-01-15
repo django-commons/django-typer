@@ -13,7 +13,7 @@ from django.template.backends.django import Template as DjangoTemplate
 from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
 
-if t.TYPE_CHECKING:
+if t.TYPE_CHECKING:  # pragma: no cover
     from django_typer.management.commands.shellcompletion import (
         Command as ShellCompletion,
     )

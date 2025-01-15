@@ -177,7 +177,7 @@ filterwarnings = [
 [tool.coverage.run]
 branch = true
 source = ["django_typer"]
-concurrency = ["multiprocessing"]
+concurrency = ["multiprocessing", "thread"]
 parallel = true
 relative_files = true
 command_line = "-m pytest --cov=django_typer"

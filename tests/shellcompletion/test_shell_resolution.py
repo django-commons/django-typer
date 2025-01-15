@@ -1,7 +1,10 @@
+import pytest
 from django.test import TestCase
 
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellComplete
+from django_typer.utils import get_win_shell
+from shellingham import ShellDetectionFailure
 
 
 class TestShellResolution(TestCase):
@@ -33,3 +36,9 @@ class TestShellResolution(TestCase):
         command = get_command("shellcompletion", ShellComplete)
         command.init()
         self.assertEqual(command.shell, "fish")
+
+
+# only run this test if not a subprocess of powershell/pwsh
+def test_get_win_shell_failure():
+    with pytest.raises(ShellDetectionFailure):
+        get_win_shell()
