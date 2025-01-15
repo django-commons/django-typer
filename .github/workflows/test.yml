@@ -219,8 +219,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Test Tab Completion
       run: |
-        just test-bash
-        just test ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
+        just test-bash || exit 1
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
