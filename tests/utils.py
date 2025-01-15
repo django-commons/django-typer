@@ -171,7 +171,7 @@ def run_command(
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
-        env = os.environ.copy()
+        env = kwargs.pop("env") if "env" in kwargs else os.environ.copy()
         if platform.system() == "Windows":
             env.setdefault("PYTHONIOENCODING", "utf-8")
         if chdir:

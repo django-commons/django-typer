@@ -103,30 +103,42 @@ class TestShellCompletersAndParsers(TestCase):
         ShellCompleteTester.objects.all().delete()
         return super().tearDown()
 
-    @cached_property
+    @property
     def shellcompletion(self) -> ShellCompletion:
         shellcompletion = get_command("shellcompletion", ShellCompletion)
         shellcompletion.init(shell=SHELL)
         return shellcompletion
 
     def test_model_object_parser_metavar(self):
-        result = run_command("model_fields", "--no-color", "test", "--help")[0]
-        self.assertTrue(re.search(r"--char\s+TXT", result))
-        self.assertTrue(re.search(r"--ichar\s+TXT", result))
-        self.assertTrue(re.search(r"--text\s+TXT", result))
-        self.assertTrue(re.search(r"--itext\s+TXT", result))
-        self.assertTrue(re.search(r"--uuid\s+UUID", result))
-        self.assertTrue(re.search(r"--id\s+INT", result))
-        self.assertTrue(re.search(r"--id-limit\s+INT", result))
-        self.assertTrue(re.search(r"--float\s+FLOAT", result))
-        self.assertTrue(re.search(r"--decimal\s+FLOAT", result))
-        self.assertTrue(re.search(r"--ip\s+\[IPV4\|IPV6\]", result))
-        self.assertTrue(re.search(r"--email\s+EMAIL", result))
-        self.assertTrue(re.search(r"--url\s+URL", result))
+        stdout, stderr, retcode = run_command(
+            "model_fields", "--no-color", "test", "--help"
+        )
+        if retcode:
+            self.fail(stderr)
+        try:
+            self.assertTrue(re.search(r"--char\s+TXT", stdout))
+            self.assertTrue(re.search(r"--ichar\s+TXT", stdout))
+            self.assertTrue(re.search(r"--text\s+TXT", stdout))
+            self.assertTrue(re.search(r"--itext\s+TXT", stdout))
+            self.assertTrue(re.search(r"--uuid\s+UUID", stdout))
+            self.assertTrue(re.search(r"--id\s+INT", stdout))
+            self.assertTrue(re.search(r"--id-limit\s+INT", stdout))
+            self.assertTrue(re.search(r"--float\s+FLOAT", stdout))
+            self.assertTrue(re.search(r"--decimal\s+FLOAT", stdout))
+            self.assertTrue(re.search(r"--ip\s+\[IPV4\|IPV6\]", stdout))
+            self.assertTrue(re.search(r"--email\s+EMAIL", stdout))
+            self.assertTrue(re.search(r"--url\s+URL", stdout))
+        except AssertionError:
+            self.fail(stdout)
 
     def test_model_object_parser_metavar_override(self):
-        result = run_command("poll_as_option", "--help", "--no-color")[0]
-        self.assertTrue(re.search(r"--polls\s+POLL", result))
+        stdout, stderr, retcode = run_command("poll_as_option", "--help", "--no-color")
+        if retcode:
+            self.fail(stderr)
+        try:
+            self.assertTrue(re.search(r"--polls\s+POLL", stdout))
+        except AssertionError:
+            self.fail(stdout)
 
     def test_model_object_parser_idempotency(self):
         from django_typer.parsers import ModelObjectParser
@@ -1247,13 +1259,13 @@ class TestShellCompletersAndParsers(TestCase):
             raise RuntimeError()
 
         shellcompletion.detect_shell = raise_error
-        cmd = get_command("shellcompletion")
+        cmd = get_command("shellcompletion", ShellCompletion)
         with self.assertRaises(CommandError):
             cmd.shell = "DNE"
             cmd.shell_class
 
     def test_shellcompletion_complete_cmd(self):
-        # test that we can leave preceeding script off the complete argument
+        # test that we can leave proceeding script off the complete argument
         result = self.shellcompletion.complete("./manage.py completion dj")
         self.assertTrue("django_typer" in result)
         result2 = self.shellcompletion.complete("completion dj")
@@ -1633,5 +1645,9 @@ class TestShellCompletersAndParsers(TestCase):
         with self.assertRaises(ValueError):
             ModelObjectCompleter(NotAModel, "char_field", "test")
 
-    def test_empty_complete(self):
+    def test_empty_complete_and_env_stability(self):
+        env = os.environ.copy()
         self.assertIn("makemigrations", self.shellcompletion.complete(""))
+        self.assertEqual(env, os.environ)
+        self.assertIn("makemigrations", self.shellcompletion.complete())
+        self.assertEqual(env, os.environ)

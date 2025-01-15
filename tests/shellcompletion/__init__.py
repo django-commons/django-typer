@@ -15,12 +15,9 @@ import platform
 
 from django_typer.utils import detect_shell
 
-from django.test import TestCase, override_settings
 from django_typer.management import get_command
-from django_typer.management.commands.shellcompletion import (
-    Command as ShellCompletion,
-    DjangoTyperShellCompleter,
-)
+from django_typer.management.commands.shellcompletion import Command as ShellCompletion
+from django_typer.shells import DjangoTyperShellCompleter
 from ..utils import rich_installed
 
 default_shell = None

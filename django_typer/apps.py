@@ -108,17 +108,7 @@ class DjangoTyperConfig(AppConfig):
     verbose_name = "Django Typer"
 
     def ready(self):
-        from .management.commands.shells import register_completion_class
-        from .management.commands.shells.bash import BashComplete
-        from .management.commands.shells.fish import FishComplete
-        from .management.commands.shells.powershell import (
-            PowerShellComplete,
-            PwshComplete,
-        )
-        from .management.commands.shells.zsh import ZshComplete
+        from django_typer.management import extensions
+        from django_typer.utils import register_command_plugins
 
-        register_completion_class(ZshComplete)
-        register_completion_class(BashComplete)
-        register_completion_class(PowerShellComplete)
-        register_completion_class(PwshComplete)
-        register_completion_class(FishComplete)
+        register_command_plugins(extensions, ["shellcompletion"])

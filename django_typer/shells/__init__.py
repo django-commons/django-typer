@@ -14,7 +14,9 @@ from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
 
 if t.TYPE_CHECKING:
-    from ..shellcompletion import Command
+    from django_typer.management.commands.shellcompletion import (
+        Command as ShellCompletion,
+    )
 
 
 class DjangoTyperShellCompleter(ShellComplete):
@@ -55,7 +57,7 @@ class DjangoTyperShellCompleter(ShellComplete):
 
     complete_var: str = ""
 
-    command: "Command"
+    command: "ShellCompletion"
     command_str: str
     command_args: t.List[str]
 
@@ -68,7 +70,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         ctx_args: cabc.MutableMapping[str, t.Any] = {},
         prog_name: str = "",
         complete_var: str = "",
-        command: t.Optional["Command"] = None,
+        command: t.Optional["ShellCompletion"] = None,
         command_str: t.Optional[str] = None,
         command_args: t.Optional[t.List[str]] = None,
         template: t.Optional[str] = None,

@@ -40,10 +40,9 @@ from typer.main import get_command as get_typer_command
 
 from django_typer.completers import complete_import_path, these_strings
 from django_typer.management import TyperCommand, command, get_command, initialize
+from django_typer.shells import _completers
 from django_typer.types import COMMON_PANEL
 from django_typer.utils import detect_shell, get_usage_script, get_win_shell
-
-from .shells import _completers
 
 DETECTED_SHELL = None
 
@@ -519,4 +518,9 @@ class Command(TyperCommand):
                 return self.ANSI_ESCAPE_RE.sub("", text)
             return text
 
-        return strip_color(get_completion())
+        env = os.environ.copy()
+        try:
+            return strip_color(get_completion())
+        finally:
+            os.environ.clear()
+            os.environ.update(env)
