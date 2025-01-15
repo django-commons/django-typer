@@ -6,8 +6,7 @@ import platform
 import pytest
 from django.core.management import CommandError
 from django.test import TestCase
-from django_typer.management import get_command
-from django_typer.management.commands.shells.powershell import (
+from django_typer.shells.powershell import (
     PowerShellComplete,
     PwshComplete,
 )

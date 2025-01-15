@@ -80,14 +80,14 @@ def test_get_win_shell_no_pwsh():
     reason="Only test when pwsh is unavailable",
 )
 def test_powershell_profile_fail():
-    from django_typer.management.commands.shells.powershell import PowerShellComplete
+    from django_typer.shells.powershell import PowerShellComplete
 
     with pytest.raises(Exception):
         PowerShellComplete().get_user_profile()
 
 
 def test_detection_failure_no_env():
-    shell = os.environ.pop("SHELL")
+    shell = os.environ.pop("SHELL", "")
     try:
         with pytest.raises(ShellDetectionFailure):
             detect_shell(max_depth=0)
@@ -96,7 +96,7 @@ def test_detection_failure_no_env():
 
 
 def test_detection_env_fallback():
-    shell = os.environ.pop("SHELL")
+    shell = os.environ.pop("SHELL", "")
     os.environ["SHELL"] = "/bin/bash"
     try:
         assert detect_shell(max_depth=0)[0] == "bash"
