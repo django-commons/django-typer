@@ -4,16 +4,14 @@ import pytest
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 from django_typer.config import traceback_config
+from django_typer.utils import with_typehint
 
 from tests.utils import rich_installed, run_command
 import platform
 
 
-@pytest.mark.skipif(not rich_installed, reason="rich not installed")
-class TestTracebackConfig(TestCase):
+class TracebackConfigTests(with_typehint(TestCase)):
     rich_installed = True
-
-    uninstall = False
 
     def test_default_traceback(self):
         result = run_command("test_command1", "--no-color", "delete", "me", "--throw")[
@@ -31,8 +29,6 @@ class TestTracebackConfig(TestCase):
         else:
             self.assertNotIn("────────", result)
 
-    @pytest.mark.rich
-    @pytest.mark.no_rich
     def test_tb_command_overrides(self):
         result = run_command(
             "test_tb_overrides", "--no-color", "delete", "me", "--throw"
@@ -70,6 +66,10 @@ class TestTracebackConfig(TestCase):
     def test_traceback_set_to_true(self):
         self.assertEqual(traceback_config(), {"show_locals": True})
 
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=None)
+    def test_traceback_set_to_none(self):
+        self.assertIs(traceback_config(), False)
+
     def test_turn_traceback_off_none(self):
         result = run_command(
             "test_command1",
@@ -83,8 +83,6 @@ class TestTracebackConfig(TestCase):
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
 
-    @pytest.mark.rich
-    @pytest.mark.no_rich
     def test_traceback_no_locals_short_false(self):
         result = run_command(
             "test_command1",
@@ -108,41 +106,6 @@ class TestTracebackConfig(TestCase):
 
         self.assertNotIn("\x1b", result)
 
-    @pytest.mark.rich
-    @pytest.mark.skipif(not rich_installed, reason="rich not installed")
-    def test_rich_install(self):
-        result = run_command(
-            "test_command1",
-            "--settings",
-            "tests.settings.settings_throw_init_exception",
-            "--no-color",
-            "delete",
-            "me",
-        )[1]
-        self.assertIn("Traceback (most recent call last)", result)
-        self.assertIn("Exception: Test ready exception", result)
-        self.assertIn("────────", result)
-        self.assertIn("── locals ──", result)
-        self.assertNotIn("\x1b", result)
-
-    @pytest.mark.rich
-    @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
-    @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
-    def test_tb_no_install(self):
-        result = run_command(
-            "test_command1",
-            "--settings",
-            "tests.settings.settings_tb_no_install",
-            "delete",
-            "me",
-        )[1]
-        self.assertIn("Traceback (most recent call last)", result)
-        self.assertIn("Exception: Test ready exception", result)
-        self.assertNotIn("────────", result)
-        self.assertNotIn("── locals ──", result)
-
-    @pytest.mark.rich
-    @pytest.mark.no_rich
     @pytest.mark.skipif(
         platform.system() == "Windows",
         reason="TODO --force-color not working on Windows",
@@ -162,14 +125,45 @@ class TestTracebackConfig(TestCase):
         result = run_command("test_command1", "delete", "Brian", "--throw")[1]
         self.assertNotIn("\x1b", result)
 
-    @override_settings(DT_RICH_TRACEBACK_CONFIG=None)
-    def test_traceback_set_to_none(self):
-        self.assertIs(traceback_config(), False)
+
+@pytest.mark.rich
+@pytest.mark.skipif(not rich_installed, reason="rich not installed")
+class TestTracebackConfig(TracebackConfigTests, TestCase):
+    rich_installed = True
+
+    @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
+    def test_tb_no_install(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_no_install",
+            "delete",
+            "me",
+        )[1]
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: Test ready exception", result)
+        self.assertNotIn("────────", result)
+        self.assertNotIn("── locals ──", result)
+
+    def test_rich_install(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_throw_init_exception",
+            "--no-color",
+            "delete",
+            "me",
+        )[1]
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: Test ready exception", result)
+        self.assertIn("────────", result)
+        self.assertIn("── locals ──", result)
+        self.assertNotIn("\x1b", result)
 
 
 @pytest.mark.no_rich
 @pytest.mark.skipif(rich_installed, reason="rich installed")
-class TestTracebackConfigNoRich(TestTracebackConfig):
+class TestTracebackConfigNoRich(TracebackConfigTests, TestCase):
     rich_installed = False
 
 

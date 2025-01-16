@@ -110,36 +110,42 @@ check: check-lint check-format check-types check-package check-docs check-docs-l
 
 test-no-rich:
     poetry run pip uninstall -y rich
-    poetry run pytest -m no_rich --cov-append
+    poetry run pytest --cov-append -m no_rich
 
 test-rich:
-    poetry run pytest -m rich --cov-append
+    poetry run pytest --cov-append -m rich
+
+log-tests:
+    poetry run python -m pytest --collect-only --disable-warnings -q --no-cov | poetry run python -c "from pathlib import Path; import sys; Path('tests.log').unlink(missing_ok=True); open('tests.log', 'a').close(); open('all_tests.log', 'w').writelines(sys.stdin)"
 
 test-all: test-rich test-no-rich
     poetry run pip install colorama
-    poetry run pytest -m "not rich and not no_rich" --cov-append
+    poetry run pytest --cov-append -m "not rich and not no_rich"
     poetry run pip uninstall -y colorama
-    poetry run pytest -k test_ctor_params --cov-append
+    poetry run pytest --cov-append -k test_ctor_params
+
+list-missed-tests: install log-tests test-all
+    poetry run python ./missed_tests.py
 
 [script("bash")]
 test-bash:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py --cov-append
+    poetry run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
 
 [script("zsh")]
 test-zsh:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py --cov-append
+    poetry run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
 
 [script("powershell")]
 test-powershell:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests --cov-append
+    poetry run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
 
 [script("pwsh")]
 test-pwsh:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests --cov-append
+    poetry run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
 
 [script("fish")]
 test-fish:
-    poetry run pytest tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py --cov-append
+    poetry run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
 
 test *TESTS:
     poetry run pytest --cov-append {{ TESTS }}

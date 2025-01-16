@@ -1,4 +1,5 @@
-import warnings
+import pytest
+from pathlib import Path
 
 
 # conftest.py
@@ -25,3 +26,14 @@ def pytest_collection_modifyitems(items):
         *native_plugin_tests,
         *interference_tests,
     ]
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    log_file = Path("tests.log")
+    if log_file.exists():
+        outcome = yield
+        report = outcome.get_result()
+        if report.when == "call" and report.outcome == "passed":
+            with open("tests.log", "a") as log_file:
+                log_file.write(f"{item.nodeid}\n")
