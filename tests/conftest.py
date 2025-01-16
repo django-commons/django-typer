@@ -29,7 +29,7 @@ def pytest_collection_modifyitems(items):
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_log_executed_tests(item, call):
+def pytest_runtest_makereport(item, call):
     log_file = Path("tests.log")
     outcome = yield
     report = outcome.get_result()
