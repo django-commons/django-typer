@@ -8,6 +8,7 @@ v3.0.0 (202X-XX-XX)
 ===================
 
 * Implemented `Add security scans to CI. <https://github.com/django-commons/django-typer/issues/158>`_
+* Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
 * Implemented `Use in-house shell completer classes. <https://github.com/django-commons/django-typer/issues/156>`_
 * Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
 * Fixed `Fish shell complete is broken when rich is installed. <https://github.com/django-commons/django-typer/issues/152>`_
