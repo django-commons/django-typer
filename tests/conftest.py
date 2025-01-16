@@ -29,11 +29,11 @@ def pytest_collection_modifyitems(items):
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_log_executed_tests(item, call):
     log_file = Path("tests.log")
-    if log_file.exists():
-        outcome = yield
-        report = outcome.get_result()
-        if report.when == "call" and report.outcome == "passed":
+    outcome = yield
+    report = outcome.get_result()
+    if report.when == "call" and report.outcome == "passed":
+        if log_file.exists():
             with open("tests.log", "a") as log_file:
                 log_file.write(f"{item.nodeid}\n")
