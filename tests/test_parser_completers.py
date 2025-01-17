@@ -391,6 +391,17 @@ class TestShellCompletersAndParsers(TestCase):
         )
         self.assertEqual(completions, ["file3.txt"])
 
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--file", "file3.txt")),
+            {
+                "file": {
+                    str(
+                        ShellCompleteTester.objects.get(file_field="file3.txt").pk
+                    ): "file3.txt"
+                }
+            },
+        )
+
     def test_file_path_field(self):
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file-path ")
@@ -416,6 +427,21 @@ class TestShellCompletersAndParsers(TestCase):
             self.shellcompletion.complete("model_fields test --file-path dir2")
         )
         self.assertEqual(completions, ["dir2/file3.txt"])
+
+        self.assertEqual(
+            json.loads(
+                call_command("model_fields", "test", "--file-path", "dir2/file3.txt")
+            ),
+            {
+                "file_path": {
+                    str(
+                        ShellCompleteTester.objects.get(
+                            file_path_field="dir2/file3.txt"
+                        ).pk
+                    ): "dir2/file3.txt"
+                }
+            },
+        )
 
     def test_date_field(self):
         completions = get_values(
