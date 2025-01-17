@@ -76,7 +76,7 @@ class ModelObjectCompleter:
             - `ImageField <https://docs.djangoproject.com/en/stable/ref/models/fields/#imagefield>`_
         - `FilePathField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield>`_
         - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
-        - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601 format (YYYY-MM-DD)**
+        - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601: YYYY-MM-DD)**
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_

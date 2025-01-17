@@ -388,7 +388,7 @@ class Command(TyperCommand):
         Since the installation routine is upstream we first run install to determine where the
         completion script is installed and then we remove it.
 
-        .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:remove
+        .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:uninstall
             :prog: shellcompletion
             :width: 80
             :convert-png: latex
