@@ -23,3 +23,5 @@ class ShellCompleteTester(models.Model):
     )
 
     file_path_field = models.FilePathField(null=True, default=None, db_index=True)
+
+    date_field = models.DateField(null=True, default=None, db_index=True)

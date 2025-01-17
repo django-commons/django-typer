@@ -163,6 +163,13 @@ class Command(TyperCommand):
                 help=t.cast(str, _("Fetch objects by their file path fields.")),
             ),
         ] = None,
+        date: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "date_field"),
+                help=t.cast(str, _("Fetch objects by their date fields.")),
+            ),
+        ] = None,
     ):
         assert self.__class__ is Command
         objects = {}
@@ -204,6 +211,9 @@ class Command(TyperCommand):
             assert isinstance(file, ShellCompleteTester)
             objects["file"] = {file.id: str(file.file_field)}
         if file_path is not None:
-            assert isinstance(file, ShellCompleteTester)
+            assert isinstance(file_path, ShellCompleteTester)
             objects["file_path"] = {file_path.id: str(file_path.file_path_field)}
+        if date is not None:
+            assert isinstance(date, ShellCompleteTester)
+            objects["date"] = {date.id: str(date.date_field)}
         return json.dumps(objects)

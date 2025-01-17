@@ -16,15 +16,12 @@ types:
 
 # pylint: disable=line-too-long
 
-import inspect
 import os
-import pkgutil
 import sys
 import typing as t
 from functools import partial
 from pathlib import Path
 from types import MethodType
-from uuid import UUID
 
 from click import Context, Parameter
 from click.core import ParameterSource
@@ -34,6 +31,7 @@ from django.conf import settings
 from django.core.management import get_commands
 from django.db.models import (
     CharField,
+    DateField,
     DecimalField,
     Field,
     FileField,
@@ -78,6 +76,7 @@ class ModelObjectCompleter:
             - `ImageField <https://docs.djangoproject.com/en/stable/ref/models/fields/#imagefield>`_
         - `FilePathField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield>`_
         - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
+        - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601 format (YYYY-MM-DD)**
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
@@ -247,6 +246,7 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is too long or contains invalid
             UUID characters. Anything other than (0-9a-fA-F).
         """
+        from uuid import UUID
 
         # the offset futzing is to allow users to ignore the - in the UUID
         # as a convenience of its implementation any non-alpha numeric character
@@ -280,6 +280,50 @@ class ModelObjectCompleter:
             **{f"{self.lookup_field}__lte": max_uuid}
         )
 
+    def date_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+        """
+        Default completion query builder for date fields. This method will return a Q object that
+        will match any value that starts with the incomplete date string. All dates must be in
+        ISO8601 format (YYYY-MM-DD).
+
+        :param context: The click context.
+        :param parameter: The click parameter.
+        :param incomplete: The incomplete string.
+        :return: A Q object to use for filtering the queryset.
+        :raises ValueError: If the incomplete string is not a valid partial date.
+        :raises AssertionError: If the incomplete string is not a valid partial date.
+        """
+        import calendar
+        from datetime import date
+
+        parts = incomplete.split("-")
+        year_low = max(int(parts[0] + "0" * (4 - len(parts[0]))), 1)
+        year_high = int(parts[0] + "9" * (4 - len(parts[0])))
+        month_high = 12
+        month_low = 1
+        day_low = 1
+        day_high = None
+        if len(parts) > 1:
+            assert len(parts[0]) > 3, _("Year must be 4 digits")
+            month_high = min(int(parts[1] + "9" * (2 - len(parts[1]))), 12)
+            month_low = max(int(parts[1] + "0" * (2 - len(parts[1]))), 1)
+            if len(parts) > 2:
+                assert len(parts[1]) > 1, _("Month must be 2 digits")
+                day_low = max(int(parts[2] + "0" * (2 - len(parts[2]))), 1)
+                day_high = min(
+                    int(parts[2] + "9" * (2 - len(parts[2]))),
+                    calendar.monthrange(year_high, month_high)[1],
+                )
+        lower_bound = date(year=year_low, month=month_low, day=day_low)
+        upper_bound = date(
+            year=year_high,
+            month=month_high,
+            day=day_high or calendar.monthrange(year_high, month_high)[1],
+        )
+        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+            **{f"{self.lookup_field}__lte": upper_bound}
+        )
+
     def __init__(
         self,
         model_or_qry: t.Union[t.Type[Model], QuerySet],
@@ -290,6 +334,8 @@ class ModelObjectCompleter:
         case_insensitive: bool = case_insensitive,
         distinct: bool = distinct,
     ):
+        import inspect
+
         if inspect.isclass(model_or_qry) and issubclass(model_or_qry, Model):
             self.model_cls = model_or_qry
         elif isinstance(model_or_qry, QuerySet):
@@ -324,6 +370,8 @@ class ModelObjectCompleter:
                 self.query = self.uuid_query
             elif isinstance(self._field, (FloatField, DecimalField)):
                 self.query = self.float_query
+            elif isinstance(self._field, DateField):
+                self.query = self.date_query
             else:
                 raise ValueError(
                     _("Unsupported lookup field class: {cls}").format(
@@ -348,14 +396,14 @@ class ModelObjectCompleter:
         :return: A list of CompletionItem objects.
         """
 
-        completion_qry = Q()
+        completion_qry = Q(**{self.lookup_field + "__isnull": False})
 
         if incomplete:
             try:
                 completion_qry &= self.query(  # pylint: disable=not-callable
                     context, parameter, incomplete
                 )
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, AssertionError):
                 return []
 
         excluded: t.List[t.Type[Model]] = []
@@ -454,6 +502,8 @@ def complete_import_path(
     :param incomplete: The incomplete string.
     :return: A list of available matching import paths
     """
+    import pkgutil
+
     incomplete = incomplete.strip()
     completions = []
     packages = [pkg for pkg in incomplete.split(".") if pkg]

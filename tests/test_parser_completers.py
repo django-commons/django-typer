@@ -5,6 +5,7 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
+from datetime import date
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -97,6 +98,19 @@ class TestShellCompletersAndParsers(TestCase):
             "dir2/file3.txt",
             "file4.txt",
         ],
+        "date_field": [
+            date(1984, 8, 7),
+            date(1989, 7, 27),
+            date(2021, 1, 6),
+            date(2021, 1, 7),
+            date(2021, 1, 8),
+            date(2021, 1, 31),
+            date(2021, 2, 9),
+            date(2021, 2, 10),
+            date(2024, 2, 29),
+            date(2024, 9, 20),
+            date(2025, 2, 28),
+        ],
     }
 
     def setUp(self):
@@ -138,6 +152,9 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertTrue(re.search(r"--ip\s+\[IPV4\|IPV6\]", stdout))
             self.assertTrue(re.search(r"--email\s+EMAIL", stdout))
             self.assertTrue(re.search(r"--url\s+URL", stdout))
+            self.assertTrue(re.search(r"--file\s+PATH", stdout))
+            self.assertTrue(re.search(r"--file-path\s+PATH", stdout))
+            self.assertTrue(re.search(r"--date\s+YYYY-MM-DD", stdout))
         except AssertionError:
             self.fail(stdout)
 
@@ -399,6 +416,165 @@ class TestShellCompletersAndParsers(TestCase):
             self.shellcompletion.complete("model_fields test --file-path dir2")
         )
         self.assertEqual(completions, ["dir2/file3.txt"])
+
+    def test_date_field(self):
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --date ")
+        )
+        self.assertEqual(
+            completions,
+            [
+                "1984-08-07",
+                "1989-07-27",
+                "2021-01-06",
+                "2021-01-07",
+                "2021-01-08",
+                "2021-01-31",
+                "2021-02-09",
+                "2021-02-10",
+                "2024-02-29",
+                "2024-09-20",
+                "2025-02-28",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 1")),
+            ["1984-08-07", "1989-07-27"],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 19")),
+            ["1984-08-07", "1989-07-27"],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 198")),
+            ["1984-08-07", "1989-07-27"],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 1984-")),
+            ["1984-08-07"],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 2-")),
+            [],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 20")),
+            [
+                "2021-01-06",
+                "2021-01-07",
+                "2021-01-08",
+                "2021-01-31",
+                "2021-02-09",
+                "2021-02-10",
+                "2024-02-29",
+                "2024-09-20",
+                "2025-02-28",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 2021")),
+            [
+                "2021-01-06",
+                "2021-01-07",
+                "2021-01-08",
+                "2021-01-31",
+                "2021-02-09",
+                "2021-02-10",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-0")
+            ),
+            [
+                "2021-01-06",
+                "2021-01-07",
+                "2021-01-08",
+                "2021-01-31",
+                "2021-02-09",
+                "2021-02-10",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-01-")
+            ),
+            [
+                "2021-01-06",
+                "2021-01-07",
+                "2021-01-08",
+                "2021-01-31",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-01-3")
+            ),
+            [
+                "2021-01-31",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-01-0")
+            ),
+            ["2021-01-06", "2021-01-07", "2021-01-08"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-01-06")
+            ),
+            ["2021-01-06"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2021-01-09")
+            ),
+            [],
+        )
+
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --date 2024")),
+            ["2024-02-29", "2024-09-20"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2024-02-2")
+            ),
+            ["2024-02-29"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --date 2025-02-")
+            ),
+            ["2025-02-28"],
+        )
+
+        self.assertEqual(
+            json.loads(call_command("model_fields", "test", "--date", "2024-02-29")),
+            {
+                "date": {
+                    str(
+                        ShellCompleteTester.objects.get(date_field=date(2024, 2, 29)).pk
+                    ): "2024-02-29"
+                }
+            },
+        )
 
     def test_ip_field(self):
         result = StringIO()
@@ -967,12 +1143,16 @@ class TestShellCompletersAndParsers(TestCase):
     def test_id_field(self):
         result = StringIO()
 
-        ids = ShellCompleteTester.objects.values_list("id", flat=True)
+        ids = ShellCompleteTester.objects.filter(id__isnull=False).values_list(
+            "id", flat=True
+        )
 
         starts = {}
         for id in ids:
             starts.setdefault(str(id)[0], []).append(str(id))
         start_chars = set(starts.keys())
+
+        ids = ids[0:50]
 
         with contextlib.redirect_stdout(result):
             call_command(
