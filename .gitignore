@@ -165,4 +165,4 @@ poetry.toml
 django_typer/tests/dj_params.json
 **/.DS_Store
 .ruff_cache
-./tests/*.json
+**/tests/*.json
