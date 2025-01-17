@@ -36,6 +36,8 @@ from django.db.models import (
     CharField,
     DecimalField,
     Field,
+    FileField,
+    FilePathField,
     FloatField,
     GenericIPAddressField,
     IntegerField,
@@ -72,6 +74,9 @@ class ModelObjectCompleter:
             - `SlugField <https://docs.djangoproject.com/en/stable/ref/models/fields/#slugfield>`_
             - `URLField <https://docs.djangoproject.com/en/stable/ref/models/fields/#urlfield>`_
             - `EmailField <https://docs.djangoproject.com/en/stable/ref/models/fields/#emailfield>`_
+        - `FileField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filefield>`_
+            - `ImageField <https://docs.djangoproject.com/en/stable/ref/models/fields/#imagefield>`_
+        - `FilePathField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield>`_
         - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
@@ -310,7 +315,10 @@ class ModelObjectCompleter:
         else:
             if isinstance(self._field, IntegerField):
                 self.query = self.int_query
-            elif isinstance(self._field, (CharField, TextField, GenericIPAddressField)):
+            elif isinstance(
+                self._field,
+                (CharField, TextField, GenericIPAddressField, FileField, FilePathField),
+            ):
                 self.query = self.text_query
             elif isinstance(self._field, UUIDField):
                 self.query = self.uuid_query

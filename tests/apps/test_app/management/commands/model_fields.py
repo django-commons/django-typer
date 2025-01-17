@@ -36,7 +36,7 @@ class Command(TyperCommand):
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "char_field"),
-                help=_("Fetch objects by their char fields."),
+                help=t.cast(str, _("Fetch objects by their char fields.")),
             ),
         ] = None,
         ichar: Annotated[
@@ -48,7 +48,9 @@ class Command(TyperCommand):
                     case_insensitive=True,
                     on_error=obj_not_found,
                 ),
-                help=_("Fetch objects by their char fields, case insensitive."),
+                help=t.cast(
+                    str, _("Fetch objects by their char fields, case insensitive.")
+                ),
             ),
         ] = None,
         text: Annotated[
@@ -59,7 +61,7 @@ class Command(TyperCommand):
                     "text_field",
                     query=ModelObjectCompleter.text_query,
                 ),
-                help=_("Fetch objects by their text fields."),
+                help=t.cast(str, _("Fetch objects by their text fields.")),
             ),
         ] = None,
         itext: Annotated[
@@ -71,63 +73,65 @@ class Command(TyperCommand):
                     case_insensitive=True,
                     distinct=False,
                 ),
-                help=_("Fetch objects by their text fields, case insensitive."),
+                help=t.cast(
+                    str, _("Fetch objects by their text fields, case insensitive.")
+                ),
             ),
         ] = None,
         uuid: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "uuid_field"),
-                help=_("Fetch objects by their UUID fields."),
+                help=t.cast(str, _("Fetch objects by their UUID fields.")),
             ),
         ] = None,
         id: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester),
-                help=_("Fetch objects by their int (pk) fields."),
+                help=t.cast(str, _("Fetch objects by their int (pk) fields.")),
             ),
         ] = None,
         id_limit: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, limit=5),
-                help=_("Fetch objects by their int (pk) fields."),
+                help=t.cast(str, _("Fetch objects by their int (pk) fields.")),
             ),
         ] = None,
         float: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "float_field"),
-                help=_("Fetch objects by their float fields."),
+                help=t.cast(str, _("Fetch objects by their float fields.")),
             ),
         ] = None,
         decimal: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "decimal_field"),
-                help=_("Fetch objects by their decimal fields."),
+                help=t.cast(str, _("Fetch objects by their decimal fields.")),
             ),
         ] = None,
         ip: Annotated[
             t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "ip_field"),
-                help=_("Fetch objects by their IP address fields."),
+                help=t.cast(str, _("Fetch objects by their IP address fields.")),
             ),
         ] = None,
         email: Annotated[
             t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "email_field"),
-                help=_("Fetch objects by their email fields."),
+                help=t.cast(str, _("Fetch objects by their email fields.")),
             ),
         ] = None,
         url: Annotated[
             t.Optional[t.List[ShellCompleteTester]],
             typer.Option(
                 **model_parser_completer(ShellCompleteTester, "url_field"),
-                help=_("Fetch objects by their url fields."),
+                help=t.cast(str, _("Fetch objects by their url fields.")),
             ),
         ] = None,
         filtered: Annotated[
@@ -142,7 +146,21 @@ class Command(TyperCommand):
                     ),
                     "text_field",
                 ),
-                help=_("Fetch objects by their text fields."),
+                help=t.cast(str, _("Fetch objects by their text fields.")),
+            ),
+        ] = None,
+        file: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "file_field"),
+                help=t.cast(str, _("Fetch objects by their file fields.")),
+            ),
+        ] = None,
+        file_path: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "file_path_field"),
+                help=t.cast(str, _("Fetch objects by their file path fields.")),
             ),
         ] = None,
     ):
@@ -182,4 +200,10 @@ class Command(TyperCommand):
             for txt in filtered:
                 assert isinstance(txt, ShellCompleteTester)
             objects["filtered"] = [{txt.id: txt.text_field} for txt in filtered]
+        if file is not None:
+            assert isinstance(file, ShellCompleteTester)
+            objects["file"] = {file.id: str(file.file_field)}
+        if file_path is not None:
+            assert isinstance(file, ShellCompleteTester)
+            objects["file_path"] = {file_path.id: str(file_path.file_path_field)}
         return json.dumps(objects)

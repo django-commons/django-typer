@@ -18,7 +18,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[AppConfig],
             typer.Argument(
                 parser=parsers.parse_app_label,
-                help=_("One or more application labels."),
+                help=t.cast(str, _("One or more application labels.")),
                 shell_complete=completers.complete_app_label,
             ),
         ],
@@ -26,21 +26,21 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.Optional[AppConfig],
             typer.Option(
                 parser=parsers.parse_app_label,
-                help=_("An app given as an option."),
+                help=t.cast(str, _("An app given as an option.")),
                 shell_complete=completers.complete_app_label,
             ),
         ] = None,
         path: Annotated[
             t.Optional[Path],
             typer.Option(
-                help=_("A path given as an option."),
+                help=t.cast(str, _("A path given as an option.")),
                 shell_complete=completers.complete_path,
             ),
         ] = None,
         dir: Annotated[
             t.Optional[Path],
             typer.Option(
-                help=_("A directory given as an option."),
+                help=t.cast(str, _("A directory given as an option.")),
                 shell_complete=completers.complete_directory,
             ),
         ] = None,
@@ -48,7 +48,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.Optional[t.List[str]],
             typer.Option(
                 "--str",
-                help=_("A list of unique strings."),
+                help=t.cast(str, _("A list of unique strings.")),
                 shell_complete=completers.these_strings(["str1", "str2", "ustr"]),
             ),
         ] = None,
@@ -56,7 +56,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.Optional[t.List[str]],
             typer.Option(
                 "--dup",
-                help=_("A list of strings that can have duplicates."),
+                help=t.cast(str, _("A list of strings that can have duplicates.")),
                 shell_complete=completers.these_strings(
                     ["str1", "str2", "ustr"], allow_duplicates=True
                 ),
@@ -66,7 +66,10 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[str],
             typer.Option(
                 "--cmd",
-                help=_("A command by [bold]import path[/bold] or [bold]name[/bold]."),
+                help=t.cast(
+                    str,
+                    _("A command by [bold]import path[/bold] or [bold]name[/bold]."),
+                ),
                 shell_complete=completers.chain(
                     completers.complete_import_path, completers.commands()
                 ),
@@ -76,7 +79,10 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[str],
             typer.Option(
                 "--cmd-dup",
-                help=_("A list of [reverse]commands[/reverse] by import path or name."),
+                help=t.cast(
+                    str,
+                    _("A list of [reverse]commands[/reverse] by import path or name."),
+                ),
                 shell_complete=completers.chain(
                     completers.complete_import_path,
                     completers.commands(allow_duplicates=True),
@@ -88,8 +94,11 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[str],
             typer.Option(
                 "--cmd-first",
-                help=_(
-                    "A list of [yellow][underline]commands[/underline][/yellow] by either import path or name."
+                help=t.cast(
+                    str,
+                    _(
+                        "A list of [yellow][underline]commands[/underline][/yellow] by either import path or name."
+                    ),
                 ),
                 shell_complete=completers.chain(
                     completers.complete_import_path,
@@ -101,7 +110,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
         app_opt: Annotated[
             t.List[str],
             typer.Option(
-                help=_("One or more application labels."),
+                help=t.cast(str, _("One or more application labels.")),
                 shell_complete=completers.complete_app_label,
             ),
         ] = ["test_app"],
@@ -109,7 +118,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[str],
             typer.Option(
                 "--db",
-                help=_("One or more database aliases."),
+                help=t.cast(str, _("One or more database aliases.")),
                 shell_complete=completers.databases(),
             ),
         ] = [],

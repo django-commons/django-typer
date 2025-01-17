@@ -24,6 +24,7 @@ v3.0.0 (202X-XX-XX)
 * Fixed `ParamSpec includes self for group methods <https://github.com/django-commons/django-typer/issues/73>`_
 * Fixed `Installed shellcompletion scripts do not pass values of --settings or --pythonpath <https://github.com/django-commons/django-typer/issues/68>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
+* Implemented `Add completer/parser for FileField and FilePathField <https://github.com/django-commons/django-typer/issues/17>`_
 
 Migrating from 2.x to 3.x
 -------------------------

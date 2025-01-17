@@ -17,3 +17,9 @@ class ShellCompleteTester(models.Model):
     email_field = models.EmailField(null=True, default=None, db_index=True)
 
     url_field = models.URLField(null=True, default=None, db_index=True)
+
+    file_field = models.FileField(
+        null=True, default=None, upload_to="documents/", db_index=True
+    )
+
+    file_path_field = models.FilePathField(null=True, default=None, db_index=True)

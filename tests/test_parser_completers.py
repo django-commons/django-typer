@@ -5,7 +5,6 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-import pytest
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -17,7 +16,6 @@ from django_typer.management.commands.shellcompletion import (
     Command as ShellCompletion,
 )
 from django_typer.management import get_command
-from functools import cached_property
 from tests.apps.examples.polls.models import Question
 from tests.apps.test_app.models import ShellCompleteTester
 from tests.utils import run_command
@@ -86,6 +84,18 @@ class TestShellCompletersAndParsers(TestCase):
             #'2001:0::0:01', this gets normalized to the one below
             "2001::1",
             "::ffff:10.10.10.10",
+        ],
+        "file_field": [
+            "path1/file1.txt",
+            "path1/file2.txt",
+            "path2/file3.txt",
+            "file3.txt",
+        ],
+        "file_path_field": [
+            "dir1/file1.txt",
+            "dir1/file2.txt",
+            "dir2/file3.txt",
+            "file4.txt",
         ],
     }
 
@@ -337,6 +347,58 @@ class TestShellCompletersAndParsers(TestCase):
 
         with self.assertRaises(RuntimeError):
             call_command("model_fields", "test", "--ichar", "jane")
+
+    def test_file_field(self):
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file ")
+        )
+        self.assertEqual(
+            completions,
+            ["path1/file1.txt", "path1/file2.txt", "path2/file3.txt", "file3.txt"],
+        )
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file p")
+        )
+        self.assertEqual(
+            completions, ["path1/file1.txt", "path1/file2.txt", "path2/file3.txt"]
+        )
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file path1/f")
+        )
+        self.assertEqual(completions, ["path1/file1.txt", "path1/file2.txt"])
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file f")
+        )
+        self.assertEqual(completions, ["file3.txt"])
+
+    def test_file_path_field(self):
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file-path ")
+        )
+        self.assertEqual(
+            completions,
+            ["dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt", "file4.txt"],
+        )
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file-path d")
+        )
+        self.assertEqual(
+            completions, ["dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt"]
+        )
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file-path dir1/f")
+        )
+        self.assertEqual(completions, ["dir1/file1.txt", "dir1/file2.txt"])
+
+        completions = get_values(
+            self.shellcompletion.complete("model_fields test --file-path dir2")
+        )
+        self.assertEqual(completions, ["dir2/file3.txt"])
 
     def test_ip_field(self):
         result = StringIO()
