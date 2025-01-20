@@ -30,10 +30,10 @@ def pytest_collection_modifyitems(items):
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    log_file = Path("tests.log")
+    log_file = Path(__file__).parent / "tests.log"
     outcome = yield
     report = outcome.get_result()
     if report.when == "call" and report.outcome == "passed":
         if log_file.exists():
-            with open("tests.log", "a") as log_file:
+            with open(log_file, "a") as log_file:
                 log_file.write(f"{item.nodeid}\n")

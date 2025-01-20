@@ -116,7 +116,7 @@ test-rich:
     poetry run pytest --cov-append -m rich
 
 log-tests:
-    poetry run python -m pytest --collect-only --disable-warnings -q --no-cov | poetry run python -c "from pathlib import Path; import sys; Path('tests.log').unlink(missing_ok=True); open('tests.log', 'a').close(); open('all_tests.log', 'w').writelines(sys.stdin)"
+    poetry run python -m pytest --collect-only --disable-warnings -q --no-cov | poetry run python -c "from pathlib import Path; import sys; Path('./tests/tests.log').unlink(missing_ok=True); open('./tests/tests.log', 'a').close(); open('./tests/all_tests.log', 'w').writelines(sys.stdin)"
 
 test-all: test-rich test-no-rich
     poetry run pip install colorama
@@ -125,7 +125,7 @@ test-all: test-rich test-no-rich
     poetry run pytest --cov-append -k test_ctor_params
 
 list-missed-tests: install log-tests test-all
-    poetry run python ./missed_tests.py
+    poetry run python ./tests/missed_tests.py
 
 [script("bash")]
 test-bash:
