@@ -337,7 +337,7 @@ class ModelObjectCompleter:
         :return: A 2-tuple of (lower, upper) time object boundaries.
         """
         time_parts = incomplete.split(":")
-        if len(time_parts) > 0:
+        if time_parts and time_parts[0]:
             hours_low = int(time_parts[0] + "0" * (2 - len(time_parts[0])))
             hours_high = min(int(time_parts[0] + "9" * (2 - len(time_parts[0]))), 23)
             minutes_low = 0
