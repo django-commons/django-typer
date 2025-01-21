@@ -224,15 +224,14 @@ jobs:
         - name: install-emacs-macos
           if: ${{ github.event.inputs.debug == 'true' }}
           run: |
-            brew install emacs
+            sudo apt install emacs
         - name: setup-ssh-debug
           if: ${{ github.event.inputs.debug == 'true' }}
           uses: mxschmitt/action-tmate@v3
           with:
             detached: true
         - name: Setup Just
-          run: |
-            brew install just
+          uses: extractions/setup-just@v2
         - name: Install
           run: |
             just init
