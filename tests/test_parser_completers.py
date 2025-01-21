@@ -5,11 +5,11 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone as tz_utils
 
 from django_typer.management.commands.shellcompletion import (
@@ -17,10 +17,14 @@ from django_typer.management.commands.shellcompletion import (
     Command as ShellCompletion,
 )
 from django_typer.management import get_command
+from django_typer.utils import with_typehint
 from tests.apps.examples.polls.models import Question
 from tests.apps.test_app.models import ShellCompleteTester
 from tests.utils import run_command
 import platform
+from django.utils.timezone import get_default_timezone, get_default_timezone_name
+import pytest
+from django.db import connection
 
 SHELL = {
     "zsh": "zsh",
@@ -47,7 +51,31 @@ def get_values(completion):
     raise NotImplementedError(f"get_values for shell {SHELL} not implemented")
 
 
-class TestShellCompletersAndParsers(TestCase):
+class ParserCompleterMixin(with_typehint(TestCase)):
+    field_values = {}
+
+    def setUp(self):
+        super().setUp()
+        self.q1 = Question.objects.create(
+            question_text="Is Putin a war criminal?",
+            pub_date=tz_utils.now(),
+        )
+        for field, values in self.field_values.items():
+            for value in values:
+                ShellCompleteTester.objects.create(**{field: value})
+
+    def tearDown(self) -> None:
+        ShellCompleteTester.objects.all().delete()
+        return super().tearDown()
+
+    @property
+    def shellcompletion(self) -> ShellCompletion:
+        shellcompletion = get_command("shellcompletion", ShellCompletion)
+        shellcompletion.init(shell=SHELL)
+        return shellcompletion
+
+
+class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
     field_values = {
         "char_field": ["jon", "john", "jack", "jason"],
         "text_field": [
@@ -122,38 +150,7 @@ class TestShellCompletersAndParsers(TestCase):
             time(22, 30, 46, 999900),
             time(23, 59, 59, 999999),
         ],
-        "datetime_field": [
-            datetime(2021, 1, 31, 0, 0, 0, tzinfo=timezone.utc),
-            datetime(2021, 2, 9, 2, 0, 0, tzinfo=timezone.utc),
-            datetime(2021, 2, 10, 20, 0, 0, tzinfo=timezone.utc),
-            datetime(2021, 2, 10, 22, 0, 0, tzinfo=timezone.utc),
-            datetime(2024, 2, 29, 22, 30, 45, 990000, tzinfo=timezone.utc),
-            datetime(2024, 2, 29, 22, 30, 46, 990000, tzinfo=timezone.utc),
-            datetime(2024, 9, 20, 22, 30, 46, 990100, tzinfo=timezone.utc),
-            datetime(2024, 9, 20, 22, 30, 46, 999900, tzinfo=timezone.utc),
-            datetime(2025, 2, 28, 23, 59, 59, 999999, tzinfo=timezone.utc),
-        ],
     }
-
-    def setUp(self):
-        super().setUp()
-        self.q1 = Question.objects.create(
-            question_text="Is Putin a war criminal?",
-            pub_date=tz_utils.now(),
-        )
-        for field, values in self.field_values.items():
-            for value in values:
-                ShellCompleteTester.objects.create(**{field: value})
-
-    def tearDown(self) -> None:
-        ShellCompleteTester.objects.all().delete()
-        return super().tearDown()
-
-    @property
-    def shellcompletion(self) -> ShellCompletion:
-        shellcompletion = get_command("shellcompletion", ShellCompletion)
-        shellcompletion.init(shell=SHELL)
-        return shellcompletion
 
     def test_model_object_parser_metavar(self):
         stdout, stderr, retcode = run_command(
@@ -227,10 +224,9 @@ class TestShellCompletersAndParsers(TestCase):
     def test_app_label_parser_completers(self):
         from django.apps import apps
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command("shellcompletion", "--shell", SHELL, "complete", "completion ")
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion "
+        )
         self.assertTrue("test_app" in result)
         self.assertTrue("tests_apps_util" in result)
         self.assertTrue("django_typer" in result)
@@ -242,34 +238,25 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("messages" in result)
         self.assertTrue("staticfiles" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "completion --app-opt ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "completion --app-opt ",
+        )
         self.assertTrue("test_app" in result)
         self.assertTrue("tests_apps_util" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion", "--shell", SHELL, "complete", "completion tests."
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion tests."
+        )
         self.assertTrue("tests.apps.examples.polls" in result)
         self.assertTrue("tests.apps.test_app" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion", "--shell", SHELL, "complete", "completion tests"
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion", "--shell", SHELL, "complete", "completion tests"
+        )
         self.assertTrue("tests_apps_examples_polls" in result)
         self.assertTrue("tests_apps_util" in result)
 
@@ -335,31 +322,25 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
     def test_char_field(self):
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --char ja",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --char ja",
+        )
         self.assertTrue("jack" in result)
         self.assertTrue("jason" in result)
         self.assertFalse("jon" in result)
         self.assertFalse("john" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ichar Ja",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ichar Ja",
+        )
         self.assertTrue("Jack" in result)
         self.assertTrue("Jason" in result)
         self.assertFalse("Jon" in result)
@@ -394,26 +375,26 @@ class TestShellCompletersAndParsers(TestCase):
             self.shellcompletion.complete("model_fields test --file ")
         )
         self.assertEqual(
-            completions,
-            ["path1/file1.txt", "path1/file2.txt", "path2/file3.txt", "file3.txt"],
+            set(completions),
+            {"path1/file1.txt", "path1/file2.txt", "path2/file3.txt", "file3.txt"},
         )
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file p")
         )
         self.assertEqual(
-            completions, ["path1/file1.txt", "path1/file2.txt", "path2/file3.txt"]
+            set(completions), {"path1/file1.txt", "path1/file2.txt", "path2/file3.txt"}
         )
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file path1/f")
         )
-        self.assertEqual(completions, ["path1/file1.txt", "path1/file2.txt"])
+        self.assertEqual(set(completions), {"path1/file1.txt", "path1/file2.txt"})
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file f")
         )
-        self.assertEqual(completions, ["file3.txt"])
+        self.assertEqual(set(completions), {"file3.txt"})
 
         self.assertEqual(
             json.loads(call_command("model_fields", "test", "--file", "file3.txt")),
@@ -431,26 +412,26 @@ class TestShellCompletersAndParsers(TestCase):
             self.shellcompletion.complete("model_fields test --file-path ")
         )
         self.assertEqual(
-            completions,
-            ["dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt", "file4.txt"],
+            set(completions),
+            {"dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt", "file4.txt"},
         )
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file-path d")
         )
         self.assertEqual(
-            completions, ["dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt"]
+            set(completions), {"dir1/file1.txt", "dir1/file2.txt", "dir2/file3.txt"}
         )
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file-path dir1/f")
         )
-        self.assertEqual(completions, ["dir1/file1.txt", "dir1/file2.txt"])
+        self.assertEqual(set(completions), {"dir1/file1.txt", "dir1/file2.txt"})
 
         completions = get_values(
             self.shellcompletion.complete("model_fields test --file-path dir2")
         )
-        self.assertEqual(completions, ["dir2/file3.txt"])
+        self.assertEqual(set(completions), {"dir2/file3.txt"})
 
         self.assertEqual(
             json.loads(
@@ -468,11 +449,11 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
     def test_date_field(self):
-        completions = get_values(
-            self.shellcompletion.complete("model_fields test --date ")
-        )
+        def date_vals(values):
+            return list(reversed(get_values(values)))
+
         self.assertEqual(
-            completions,
+            date_vals(self.shellcompletion.complete("model_fields test --date ")),
             [
                 "1984-08-07",
                 "1989-07-27",
@@ -489,32 +470,32 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 1")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 1")),
             ["1984-08-07", "1989-07-27"],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 19")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 19")),
             ["1984-08-07", "1989-07-27"],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 198")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 198")),
             ["1984-08-07", "1989-07-27"],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 1984-")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 1984-")),
             ["1984-08-07"],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 2-")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 2-")),
             [],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 20")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 20")),
             [
                 "2021-01-06",
                 "2021-01-07",
@@ -529,7 +510,7 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 2021")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 2021")),
             [
                 "2021-01-06",
                 "2021-01-07",
@@ -541,9 +522,7 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(
-                self.shellcompletion.complete("model_fields test --date 2021-0")
-            ),
+            date_vals(self.shellcompletion.complete("model_fields test --date 2021-0")),
             [
                 "2021-01-06",
                 "2021-01-07",
@@ -555,7 +534,7 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2021-01-")
             ),
             [
@@ -567,7 +546,7 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2021-01-3")
             ),
             [
@@ -576,40 +555,40 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2021-01-0")
             ),
             ["2021-01-06", "2021-01-07", "2021-01-08"],
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2021-01-06")
             ),
             ["2021-01-06"],
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2021-01-09")
             ),
             [],
         )
 
         self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --date 2024")),
+            date_vals(self.shellcompletion.complete("model_fields test --date 2024")),
             ["2024-02-29", "2024-09-20"],
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2024-02-2")
             ),
             ["2024-02-29"],
         )
 
         self.assertEqual(
-            get_values(
+            date_vals(
                 self.shellcompletion.complete("model_fields test --date 2025-02-")
             ),
             ["2025-02-28"],
@@ -628,7 +607,7 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_time_field(self):
         def time_vals(completions):
-            return get_values(completions)
+            return list(reversed(get_values(completions)))
 
         self.assertEqual(
             time_vals(self.shellcompletion.complete("model_fields test --time ")),
@@ -772,244 +751,24 @@ class TestShellCompletersAndParsers(TestCase):
                 },
             )
 
-    def test_datetime_field(self):
-        self.assertEqual(
-            get_values(self.shellcompletion.complete("model_fields test --datetime ")),
-            [
-                "2021-01-31T00:00:00+00:00",
-                "2021-02-09T02:00:00+00:00",
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-                "2024-02-29T22:30:45.990000+00:00",
-                "2024-02-29T22:30:46.990000+00:00",
-                "2024-09-20T22:30:46.990100+00:00",
-                "2024-09-20T22:30:46.999900+00:00",
-                "2025-02-28T23:59:59.999999+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete("model_fields test --datetime 202")
-            ),
-            [
-                "2021-01-31T00:00:00+00:00",
-                "2021-02-09T02:00:00+00:00",
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-                "2024-02-29T22:30:45.990000+00:00",
-                "2024-02-29T22:30:46.990000+00:00",
-                "2024-09-20T22:30:46.990100+00:00",
-                "2024-09-20T22:30:46.999900+00:00",
-                "2025-02-28T23:59:59.999999+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete("model_fields test --datetime 2021-")
-            ),
-            [
-                "2021-01-31T00:00:00+00:00",
-                "2021-02-09T02:00:00+00:00",
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete("model_fields test --datetime 2021-02-1")
-            ),
-            [
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T"
-                )
-            ),
-            [
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T2"
-                )
-            ),
-            [
-                "2021-02-10T20:00:00+00:00",
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:00:"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:00:00+"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:00:00+00:"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:00:00+00:0"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2021-02-10T22:00:00+00:00"
-                )
-            ),
-            [
-                "2021-02-10T22:00:00+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-02-29T22:30:4"
-                )
-            ),
-            ["2024-02-29T22:30:45.990000+00:00", "2024-02-29T22:30:46.990000+00:00"],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-02-29T22:30:46."
-                )
-            ),
-            ["2024-02-29T22:30:46.990000+00:00"],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-02-29T22:30:46.9"
-                )
-            ),
-            ["2024-02-29T22:30:46.990000+00:00"],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-09-20T22:30:46.99"
-                )
-            ),
-            [
-                "2024-09-20T22:30:46.990100+00:00",
-                "2024-09-20T22:30:46.999900+00:00",
-            ],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-09-20T22:30:46.990"
-                )
-            ),
-            ["2024-09-20T22:30:46.990100+00:00"],
-        )
-
-        self.assertEqual(
-            get_values(
-                self.shellcompletion.complete(
-                    "model_fields test --datetime 2024-09-20T22:30:46.999"
-                )
-            ),
-            ["2024-09-20T22:30:46.999900+00:00"],
-        )
-
-        for dt in self.field_values["datetime_field"]:
-            self.assertEqual(
-                json.loads(call_command("model_fields", "test", "--datetime", str(dt))),
-                {
-                    "datetime": {
-                        str(ShellCompleteTester.objects.get(datetime_field=dt).pk): str(
-                            dt
-                        )
-                    }
-                },
-            )
-
     def test_ip_field(self):
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip ",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip ",
+        )
         for ip in self.field_values["ip_field"]:
             self.assertTrue(ip in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip 2001:",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip 2001:",
+        )
         for ip in ["2001::1"]:
             self.assertTrue(ip in result)
 
@@ -1020,68 +779,53 @@ class TestShellCompletersAndParsers(TestCase):
         # result = result.getvalue()
         # self.assertFalse(result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip 2a02:42",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip 2a02:42",
+        )
         for ip in ["2a02:42fe::4", "2a02:42ae::4"]:
             self.assertTrue(ip in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip 2a02:42f",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip 2a02:42f",
+        )
         for ip in ["2a02:42fe::4"]:
             self.assertTrue(ip in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip 192.",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip 192.",
+        )
         for ip in ["192.168.1.1", "192.0.2.30"]:
             self.assertTrue(ip in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip 192.1",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip 192.1",
+        )
         for ip in ["192.168.1.1"]:
             self.assertTrue(ip in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --ip :",
-            )
-        result = result.getvalue().replace("\\", "")
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --ip :",
+        )
         for ip in ["::ffff:10.10.10.10"]:
             self.assertTrue(ip in result)
 
@@ -1108,16 +852,13 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
     def test_text_field(self):
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --text ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --text ",
+        )
         self.assertTrue("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertTrue("steelhead" in result)
@@ -1126,16 +867,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("pink" in result)
         self.assertTrue("chum" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --text ch",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --text ch",
+        )
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertFalse("steelhead" in result)
@@ -1144,16 +882,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("pink" in result)
         self.assertTrue("chum" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --itext S",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --itext S",
+        )
         self.assertTrue("Sockeye" in result)
         self.assertFalse("chinook" in result)
         self.assertTrue("Steelhead" in result)
@@ -1163,16 +898,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("chum" in result)
 
         # distinct completions by default
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --text atlantic --text sockeye --text steelhead --text ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --text atlantic --text sockeye --text steelhead --text ",
+        )
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertFalse("steelhead" in result)
@@ -1182,16 +914,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("chum" in result)
 
         # check distinct flag set to False
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --itext atlantic --itext sockeye --itext steelhead --itext ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --itext atlantic --itext sockeye --itext steelhead --itext ",
+        )
         self.assertTrue("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertTrue("steelhead" in result)
@@ -1267,17 +996,14 @@ class TestShellCompletersAndParsers(TestCase):
             },
         )
 
-    def test_filtered_text_field(self):
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --filtered ",
-            )
-        result = result.getvalue()
+    def test_text_field_filtered(self):
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --filtered ",
+        )
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertFalse("steelhead" in result)
@@ -1286,16 +1012,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("pink" in result)
         self.assertTrue("chum" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --filtered ch",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --filtered ch",
+        )
         self.assertFalse("sockeye" in result)
         self.assertTrue("chinook" in result)
         self.assertFalse("steelhead" in result)
@@ -1305,16 +1028,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("chum" in result)
 
         # distinct completions by default
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --filtered coho --filtered chinook --filtered ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --filtered coho --filtered chinook --filtered ",
+        )
         self.assertFalse("sockeye" in result)
         self.assertFalse("chinook" in result)
         self.assertFalse("steelhead" in result)
@@ -1353,16 +1073,13 @@ class TestShellCompletersAndParsers(TestCase):
     def test_uuid_field(self):
         from uuid import UUID
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid ",
+        )
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
         self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
@@ -1371,16 +1088,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
         self.assertFalse("None" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 12345678",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 12345678",
+        )
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
         self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
@@ -1388,16 +1102,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
         self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 12345678-",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 12345678-",
+        )
         self.assertTrue("12345678-1234-5678-1234-567812345678" in result)
         self.assertTrue("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
@@ -1405,16 +1116,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
         self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 12345678-5",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 12345678-5",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("12345678-5678-5678-1234-567812345670" in result)
@@ -1422,16 +1130,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("12345678-5678-5678-1234-a67812345671" in result)
         self.assertTrue("12345678-5678-5678-f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 123456785",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 123456785",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("123456785678-5678-1234-567812345670" in result)
@@ -1439,16 +1144,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("123456785678-5678-1234-a67812345671" in result)
         self.assertTrue("123456785678-5678-f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 123456&78-^56785678-",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 123456&78-^56785678-",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertTrue("123456&78-^56785678-1234-567812345670" in result)
@@ -1456,16 +1158,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("123456&78-^56785678-1234-a67812345671" in result)
         self.assertTrue("123456&78-^56785678-f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 123456&78-^56785678F",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 123456&78-^56785678F",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertFalse("123456&78-^567856781234-567812345670" in result)
@@ -1473,16 +1172,13 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("123456&78-^567856781234-a67812345671" in result)
         self.assertTrue("123456&78-^56785678F234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 123456&78-^56785678f",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 123456&78-^56785678f",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertFalse("123456&78-^567856781234-567812345670" in result)
@@ -1490,17 +1186,14 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertFalse("123456&78-^567856781234-a67812345671" in result)
         self.assertTrue("123456&78-^56785678f234-a67812345671" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "--no-color",
-                "complete",
-                "model_fields test --uuid 123456&78-^56785678f234---A",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "--no-color",
+            "complete",
+            "model_fields test --uuid 123456&78-^56785678f234---A",
+        )
         self.assertFalse("12345678-1234-5678-1234-567812345678" in result)
         self.assertFalse("12345678-1234-5678-1234-567812345679" in result)
         self.assertFalse("123456&78-^567856781234-567812345670" in result)
@@ -1538,23 +1231,22 @@ class TestShellCompletersAndParsers(TestCase):
                 "model_fields", "test", "--uuid", "12345678-5678-5678-f234-a67812345675"
             )
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --uuid 12345678-5678-5678-f234-a678123456755",
+        )
         self.assertFalse("12345678" in result)
 
     def test_id_field(self):
         result = StringIO()
 
-        ids = ShellCompleteTester.objects.filter(id__isnull=False).values_list(
-            "id", flat=True
+        ids = (
+            ShellCompleteTester.objects.filter(id__isnull=False)
+            .values_list("id", flat=True)
+            .order_by("id")
         )
 
         starts = {}
@@ -1564,34 +1256,28 @@ class TestShellCompletersAndParsers(TestCase):
 
         ids = ids[0:50]
 
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --id ",
-                shell=SHELL,
-            )
-
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --id ",
+            shell=SHELL,
+        )
         for id in ids:
             self.assertTrue(f"{id}" in result)
 
         for start_char in start_chars:
             expected = starts[start_char]
             unexpected = [str(id) for id in ids if str(id) not in expected]
-            result = StringIO()
-            with contextlib.redirect_stdout(result):
-                call_command(
-                    "shellcompletion",
-                    "--shell",
-                    SHELL,
-                    "complete",
-                    f"model_fields test --id {start_char}",
-                )
+            result = call_command(
+                "shellcompletion",
+                "--shell",
+                SHELL,
+                "complete",
+                f"model_fields test --id {start_char}",
+            )
 
-            result = result.getvalue()
             for comp in get_values(result):
                 self.assertTrue(comp in expected)
                 self.assertTrue(comp not in unexpected)
@@ -1603,16 +1289,13 @@ class TestShellCompletersAndParsers(TestCase):
             )
 
         # test the limit option
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --id-limit ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --id-limit ",
+        )
         for id in ids[0:5]:
             self.assertTrue(f"{id}" in result)
         for id in ids[5:]:
@@ -1620,119 +1303,95 @@ class TestShellCompletersAndParsers(TestCase):
 
     def test_float_field(self):
         values = [1.1, 1.12, 2.2, 2.3, 2.4, 3.0, 4.0]
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float ",
+        )
         for value in values:
             self.assertTrue(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 1",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 1",
+        )
         for value in [1.1, 1.12]:
             self.assertTrue(str(value) in result)
         for value in set([1.1, 1.12]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 1.1",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 1.1",
+        )
         for value in [1.1, 1.12]:
             self.assertTrue(str(value) in result)
         for value in set([1.1, 1.12]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 1.12",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 1.12",
+        )
         for value in [1.12]:
             self.assertTrue(str(value) in result)
         for value in set([1.12]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 2",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 2",
+        )
         for value in [2.2, 2.3, 2.4]:
             self.assertTrue(str(value) in result)
         for value in set([2.2, 2.3, 2.4]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 2.",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 2.",
+        )
         for value in [2.2, 2.3, 2.4]:
             self.assertTrue(str(value) in result)
         for value in set([2.2, 2.3, 2.4]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 2.3",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 2.3",
+        )
         for value in [2.3]:
             self.assertTrue(str(value) in result)
         for value in set([2.3]) - set(values):
             self.assertFalse(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --float 3",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --float 3",
+        )
         for value in [3.0]:
             self.assertTrue(str(value) in result)
         for value in set([3.0]) - set(values):
@@ -1763,55 +1422,43 @@ class TestShellCompletersAndParsers(TestCase):
             Decimal("1.2"),
             Decimal("1.6"),
         ]
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --decimal ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --decimal ",
+        )
         for value in values:
             self.assertTrue(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --decimal 1.",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --decimal 1.",
+        )
         for value in values:
             self.assertTrue(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --decimal 1.",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --decimal 1.",
+        )
         for value in values:
             self.assertTrue(str(value) in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "model_fields test --decimal 1.5",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --decimal 1.5",
+        )
         for value in set(values) - {Decimal("1.2"), Decimal("1.6")}:
             self.assertTrue(str(value) in result)
         for value in {Decimal("1.2"), Decimal("1.6")}:
@@ -1836,17 +1483,14 @@ class TestShellCompletersAndParsers(TestCase):
         )
 
     def test_option_complete(self):
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "--no-color",
-                "complete",
-                "model_fields test ",
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "--no-color",
+            "complete",
+            "model_fields test ",
+        )
         self.assertTrue("--char" in result)
         self.assertTrue("--ichar" in result)
         self.assertTrue("--text" in result)
@@ -1857,45 +1501,36 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertTrue("--decimal" in result)
         self.assertTrue("--help" in result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "noarg cmd ",
-                shell=SHELL,
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "noarg cmd ",
+            shell=SHELL,
+        )
         self.assertFalse(result)
 
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "noarg cmd -",
-                shell=SHELL,
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "noarg cmd -",
+            shell=SHELL,
+        )
         self.assertFalse(result)
         self.assertFalse("--" in result)
 
         # test what happens if we try to complete a non existing command
-        result = StringIO()
-        with contextlib.redirect_stdout(result):
-            call_command(
-                "shellcompletion",
-                "--shell",
-                SHELL,
-                "complete",
-                "noargs cmd ",
-                shell=SHELL,
-            )
-        result = result.getvalue()
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "noargs cmd ",
+            shell=SHELL,
+        )
         self.assertFalse(result)
 
     def test_unsupported_field(self):
@@ -2303,3 +1938,271 @@ class TestShellCompletersAndParsers(TestCase):
         self.assertEqual(env, os.environ)
         self.assertIn("makemigrations", self.shellcompletion.complete())
         self.assertEqual(env, os.environ)
+
+
+class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
+    tz_info = None
+
+    def populate_db(self):
+        from django.conf import settings
+
+        ShellCompleteTester.objects.all().delete()
+        if settings.USE_TZ:
+            self.tz_info = get_default_timezone()
+        else:
+            self.tz_info = None
+        self.field_values = {
+            "datetime_field": [
+                datetime(2021, 1, 31, 0, 0, 0, tzinfo=self.tz_info),
+                datetime(2021, 2, 9, 2, 0, 0, tzinfo=self.tz_info),
+                datetime(2021, 2, 10, 20, 0, 0, tzinfo=self.tz_info),
+                datetime(2021, 2, 10, 22, 0, 0, tzinfo=self.tz_info),
+                datetime(2024, 2, 29, 22, 30, 45, 990000, tzinfo=self.tz_info),
+                datetime(2024, 2, 29, 22, 30, 46, 990000, tzinfo=self.tz_info),
+                datetime(2024, 9, 20, 22, 30, 46, 990100, tzinfo=self.tz_info),
+                datetime(2024, 9, 20, 22, 30, 46, 999900, tzinfo=self.tz_info),
+                datetime(2025, 2, 28, 23, 59, 59, 999999, tzinfo=self.tz_info),
+            ]
+        }
+        super().setUp()
+
+    def run_tests(self, tz1="+00:00", tz2="+00:00"):
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --datetime ")),
+            [
+                f"2021-01-31T00:00:00{tz1}",
+                f"2021-02-09T02:00:00{tz1}",
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+                f"2024-02-29T22:30:45.990000{tz1}",
+                f"2024-02-29T22:30:46.990000{tz1}",
+                f"2024-09-20T22:30:46.990100{tz2}",
+                f"2024-09-20T22:30:46.999900{tz2}",
+                f"2025-02-28T23:59:59.999999{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 202")
+            ),
+            [
+                f"2021-01-31T00:00:00{tz1}",
+                f"2021-02-09T02:00:00{tz1}",
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+                f"2024-02-29T22:30:45.990000{tz1}",
+                f"2024-02-29T22:30:46.990000{tz1}",
+                f"2024-09-20T22:30:46.990100{tz2}",
+                f"2024-09-20T22:30:46.999900{tz2}",
+                f"2025-02-28T23:59:59.999999{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 2021-")
+            ),
+            [
+                f"2021-01-31T00:00:00{tz1}",
+                f"2021-02-09T02:00:00{tz1}",
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 2021-02-1")
+            ),
+            [
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T"
+                )
+            ),
+            [
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T2"
+                )
+            ),
+            [
+                f"2021-02-10T20:00:00{tz1}",
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{'+' if not tz1 else ''}{tz1}",
+            ]
+            if tz1.startswith("+")
+            else [],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+00:"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{'+00:' if not tz1 else ''}{tz1}",
+            ]
+            if tz1.startswith("+00:")
+            else [],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+00:0"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{'+00:0' if not tz1 else ''}{tz1}",
+            ]
+            if tz1.startswith("+00:0")
+            else [],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    f"model_fields test --datetime 2021-02-10T22:00:00{tz1}"
+                )
+            ),
+            [
+                f"2021-02-10T22:00:00{tz1}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:4"
+                )
+            ),
+            [f"2024-02-29T22:30:45.990000{tz1}", f"2024-02-29T22:30:46.990000{tz1}"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:46."
+                )
+            ),
+            [f"2024-02-29T22:30:46.990000{tz1}"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:46.9"
+                )
+            ),
+            [f"2024-02-29T22:30:46.990000{tz1}"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.99"
+                )
+            ),
+            [
+                f"2024-09-20T22:30:46.990100{tz2}",
+                f"2024-09-20T22:30:46.999900{tz2}",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.990"
+                )
+            ),
+            [f"2024-09-20T22:30:46.990100{tz2}"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.999"
+                )
+            ),
+            [f"2024-09-20T22:30:46.999900{tz2}"],
+        )
+
+        for dt in self.field_values["datetime_field"]:
+            self.assertEqual(
+                json.loads(call_command("model_fields", "test", "--datetime", str(dt))),
+                {
+                    "datetime": {
+                        str(ShellCompleteTester.objects.get(datetime_field=dt).pk): str(
+                            dt
+                        )
+                    }
+                },
+            )
+
+    @override_settings(USE_TZ=True)
+    def test_datetime_field_use_tz(self):
+        self.assertEqual(get_default_timezone_name(), "UTC")
+        self.populate_db()
+        self.run_tests()
+
+    @override_settings(USE_TZ=False)
+    def test_datetime_field_no_tz(self):
+        self.assertEqual(get_default_timezone_name(), "UTC")
+        self.populate_db()
+        self.run_tests(tz1="", tz2="")
+
+    @pytest.mark.skipif(
+        connection.vendor == "sqlite", reason="Skipped because the database is SQLite"
+    )
+    @override_settings(USE_TZ=True, TIME_ZONE="America/Los_Angeles")
+    def test_datetime_field_tz_pacific(self):
+        self.assertEqual(get_default_timezone_name(), "America/Los_Angeles")
+        self.populate_db()
+        self.run_tests(tz1="-08:00", tz2="-07:00")

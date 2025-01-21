@@ -138,6 +138,8 @@ class ModelObjectCompleter:
         This is not the same as calling distinct() on the queryset - which will happen
         regardless - but rather whether or not to filter out values that are already
         given for the parameter on the command line.
+    :param order_by: The order_by parameter to prioritize completions in. By default
+        the default queryset ordering will be used for the model.
     """
 
     QueryBuilder = t.Callable[["ModelObjectCompleter", Context, Parameter, str], Q]
@@ -150,6 +152,7 @@ class ModelObjectCompleter:
     limit: t.Optional[int] = 50
     case_insensitive: bool = False
     distinct: bool = True
+    order_by: t.List[str] = []
 
     # used to adjust the index into the completion strings when we concatenate
     # the incomplete string with the lookup field value - see UUID which has
@@ -165,7 +168,11 @@ class ModelObjectCompleter:
     def to_str(self, obj: t.Any) -> str:
         from datetime import datetime
 
+        from django.utils.timezone import get_default_timezone
+
         if isinstance(obj, datetime):
+            if settings.USE_TZ and get_default_timezone():
+                obj = obj.astimezone(get_default_timezone())
             return obj.isoformat()
         elif isinstance(obj, time):
             return obj.isoformat()
@@ -435,18 +442,35 @@ class ModelObjectCompleter:
         import re
         from datetime import datetime
 
+        from django.utils.timezone import get_default_timezone, make_aware
+
         parts = incomplete.split("T")
         lower_bound, upper_bound = self._get_date_bounds(parts[0])
 
+        def get_tz_part(dt_str: str) -> str:
+            return dt_str[dt_str.rindex("+") if "+" in dt_str else dt_str.rindex("-") :]
+
         time_lower = datetime.min.time()
         time_upper = datetime.max.time()
+        tz_part = ""
         if len(parts) > 1:
             time_parts = re.split(r"[+-]", parts[1])
             time_lower, time_upper = self._get_time_bounds(time_parts[0])
-            # if len(time_parts) > 1:
-            #     TODO - handle timezone??
+            # we punt on the timezones - if the user supplies a partial timezone different than
+            # the default django timezone, its just too complicated to be worth trying to complete,
+            # we ensure it aligns as a prefix to the configured default timezone instead
+            if len(time_parts) > 1 and parts[1]:
+                tz_part = get_tz_part(parts[1])
         lower_bound = datetime.combine(lower_bound, time_lower)
         upper_bound = datetime.combine(upper_bound, time_upper)
+
+        if settings.USE_TZ:
+            lower_bound = make_aware(lower_bound, get_default_timezone())
+            upper_bound = make_aware(upper_bound, get_default_timezone())
+            db_tz_part = get_tz_part(lower_bound.isoformat())
+            assert db_tz_part.startswith(tz_part)
+        else:
+            assert not tz_part
         return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
             **{f"{self.lookup_field}__lte": upper_bound}
         )
@@ -460,6 +484,7 @@ class ModelObjectCompleter:
         limit: t.Optional[int] = limit,
         case_insensitive: bool = case_insensitive,
         distinct: bool = distinct,
+        order_by: t.Optional[t.Union[str, t.Sequence[str]]] = order_by,
     ):
         import inspect
 
@@ -479,6 +504,8 @@ class ModelObjectCompleter:
         self.limit = limit
         self.case_insensitive = case_insensitive
         self.distinct = distinct
+        if order_by:
+            self.order_by = [order_by] if isinstance(order_by, str) else list(order_by)
 
         self._field = self.model_cls._meta.get_field(  # pylint: disable=protected-access
             self.lookup_field
@@ -512,7 +539,7 @@ class ModelObjectCompleter:
 
     def __call__(
         self, context: Context, parameter: Parameter, incomplete: str
-    ) -> t.Union[t.List[CompletionItem], t.List[str]]:
+    ) -> t.List[CompletionItem]:
         """
         The completer method. This method will return a list of CompletionItem
         objects. If the help_field constructor parameter is not None, the help
@@ -537,7 +564,11 @@ class ModelObjectCompleter:
             except (ValueError, TypeError, AssertionError):
                 return []
 
-        excluded: t.List[t.Type[Model]] = []
+        columns = [self.lookup_field]
+        if self.help_field:
+            columns.append(self.help_field)
+
+        excluded: t.List[Model] = []
         if (
             self.distinct
             and parameter.name
@@ -546,22 +577,24 @@ class ModelObjectCompleter:
         ):
             excluded = context.params.get(parameter.name, []) or []
 
-        return [
-            CompletionItem(
-                # use the incomplete string prefix incase this was a case insensitive match
-                value=incomplete
-                + self.to_str(getattr(obj, self.lookup_field))[
-                    len(incomplete) + self._offset :
-                ],
-                help=getattr(obj, self.help_field, None) if self.help_field else "",
-            )
-            for obj in self.queryset.filter(completion_qry).distinct()[0 : self.limit]
-            if (
-                getattr(obj, self.lookup_field) is not None
-                and self.to_str(getattr(obj, self.lookup_field))
-                and obj not in excluded
-            )
-        ]
+        qryset = self.queryset.filter(completion_qry).exclude(
+            pk__in=[ex.pk for ex in excluded]
+        )
+        if self.order_by:
+            qryset = qryset.order_by(*self.order_by)
+
+        completions = []
+        for values in qryset.distinct().values_list(*columns)[0 : self.limit]:
+            str_value = self.to_str(values[0])
+            if str_value:
+                completions.append(
+                    CompletionItem(
+                        # use the incomplete string prefix incase this was a case insensitive match
+                        value=incomplete + str_value[len(incomplete) + self._offset :],
+                        help=values[1] if len(values) > 1 else None,
+                    )
+                )
+        return completions
 
 
 def complete_app_label(

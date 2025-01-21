@@ -7,6 +7,8 @@ from typing import Annotated
 import typer
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
+from django.conf import settings
+from django.utils.timezone import get_default_timezone
 
 from django_typer.management import (
     TyperCommand,
@@ -88,7 +90,7 @@ class Command(TyperCommand):
         id: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
-                **model_parser_completer(ShellCompleteTester),
+                **model_parser_completer(ShellCompleteTester, order_by="id"),
                 help=t.cast(str, _("Fetch objects by their int (pk) fields.")),
             ),
         ] = None,
@@ -166,21 +168,29 @@ class Command(TyperCommand):
         date: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
-                **model_parser_completer(ShellCompleteTester, "date_field"),
+                **model_parser_completer(
+                    ShellCompleteTester, "date_field", order_by=["-date_field"]
+                ),
                 help=t.cast(str, _("Fetch objects by their date fields.")),
             ),
         ] = None,
         datetime: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
-                **model_parser_completer(ShellCompleteTester, "datetime_field"),
+                **model_parser_completer(
+                    ShellCompleteTester,
+                    "datetime_field",
+                    order_by=("datetime_field", "id"),
+                ),
                 help=t.cast(str, _("Fetch objects by their datetime fields.")),
             ),
         ] = None,
         time: Annotated[
             t.Optional[ShellCompleteTester],
             typer.Option(
-                **model_parser_completer(ShellCompleteTester, "time_field"),
+                **model_parser_completer(
+                    ShellCompleteTester, "time_field", order_by="-time_field"
+                ),
                 help=t.cast(str, _("Fetch objects by their time fields.")),
             ),
         ] = None,
@@ -232,7 +242,13 @@ class Command(TyperCommand):
             objects["date"] = {date.id: str(date.date_field)}
         if datetime is not None:
             assert isinstance(datetime, ShellCompleteTester)
-            objects["datetime"] = {datetime.id: str(datetime.datetime_field)}
+            objects["datetime"] = {
+                datetime.id: str(
+                    datetime.datetime_field.astimezone(get_default_timezone())
+                    if settings.USE_TZ
+                    else datetime.datetime_field
+                )
+            }
         if time is not None:
             assert isinstance(time, ShellCompleteTester)
             objects["time"] = {time.id: str(time.time_field)}

@@ -117,6 +117,12 @@ Sphinx = [
 docutils = ">=0.21"
 sphinx-autobuild = ">=2024.10.3"
 
+[tool.poetry.group.psycopg3]
+optional = true
+
+[tool.poetry.group.psycopg3.dependencies]
+psycopg = "^3.1.8"
+
 [tool.mypy]
 # The mypy configurations: http://bit.ly/2zEl9WI
 allow_redefinition = false

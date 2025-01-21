@@ -16,10 +16,10 @@ init:
 install-precommit:
     poetry run pre-commit install
 
-install:
+install *OPTS:
     poetry env use python
     poetry lock
-    poetry install -E rich
+    poetry install -E rich {{ OPTS }}
     poetry run pre-commit install
 
 install-docs:

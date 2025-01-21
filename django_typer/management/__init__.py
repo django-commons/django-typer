@@ -125,6 +125,7 @@ def model_parser_completer(
     limit: t.Optional[int] = ModelObjectCompleter.limit,
     distinct: bool = ModelObjectCompleter.distinct,
     on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
+    order_by: t.Optional[t.Union[str, t.Sequence[str]]] = None,
 ) -> t.Dict[str, t.Any]:
     """
     A factory function that returns a dictionary that can be used to specify
@@ -176,6 +177,7 @@ def model_parser_completer(
             query=query,
             limit=limit,
             distinct=distinct,
+            order_by=order_by,
         ),
     }
 

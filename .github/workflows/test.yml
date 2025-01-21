@@ -179,6 +179,74 @@ jobs:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
 
+  postgres:
+      runs-on: ubuntu-latest
+      # Service containers to run with `container-job`
+      env:
+        RDBMS: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+        COVERAGE_FILE: postgres-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      strategy:
+        matrix:
+          python-version: ['3.13']
+          postgres-version: ['latest']
+          django-version:
+            - '5.1' # December 2025
+
+      # Service containers to run with `runner-job`
+      services:
+        # Label used to access the service container
+        postgres:
+          # Docker Hub image
+          image: postgres:${{ matrix.postgres-version }}
+          # Provide the password for postgres
+          env:
+            POSTGRES_PASSWORD: postgres
+          # Set health checks to wait until postgres has started
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+          ports:
+            # Maps tcp port 5432 on service container to the host
+            - 5432:5432
+
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v5
+          with:
+            python-version: ${{ matrix.python-version }}
+        - name: install-emacs-macos
+          if: ${{ github.event.inputs.debug == 'true' }}
+          run: |
+            brew install emacs
+        - name: setup-ssh-debug
+          if: ${{ github.event.inputs.debug == 'true' }}
+          uses: mxschmitt/action-tmate@v3
+          with:
+            detached: true
+        - name: Setup Just
+          run: |
+            brew install just
+        - name: Install
+          run: |
+            just init
+            just install --with psycopg3
+            just pin-dependency Django~=${{ matrix.django-version }}
+        - name: Run Unit Tests
+          run: |
+            just test-all
+        - name: Store coverage files
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ env.COVERAGE_FILE }}
+            path: ${{ env.COVERAGE_FILE }}
+
   linux-bash-complete:
     runs-on: ubuntu-latest
     strategy:
