@@ -54,12 +54,13 @@ class ZshComplete(DjangoTyperShellCompleter):
 
     def format_completion(self, item: CompletionItem) -> str:
         def escape(s: str) -> str:
+            # TODO is any of this necessary?
             return (
                 s.replace('"', '""')
                 .replace("'", "''")
                 .replace("$", "\\$")
                 .replace("`", "\\`")
-                .replace(":", r"\\:")
+                # .replace(":", r"\\:")
             )
 
         return f"{item.type}\n{escape(self.process_rich_text(item.value))}\n{escape(self.process_rich_text(item.help)) if item.help else '_'}"

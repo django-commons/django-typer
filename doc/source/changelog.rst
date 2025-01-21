@@ -28,6 +28,7 @@ v3.0.0 (202X-XX-XX)
 * Implemented `Add completer/parser for FileField and FilePathField <https://github.com/django-commons/django-typer/issues/17>`_
 * Implemented `Add completer/parser for DateTimeField <https://github.com/django-commons/django-typer/issues/15>`_
 * Implemented `Add completer/parser for DateField <https://github.com/django-commons/django-typer/issues/14>`_
+* Implemented `Add completer/parser for TimeField <https://github.com/django-commons/django-typer/issues/13>`_
 
 
 Migrating from 2.x to 3.x

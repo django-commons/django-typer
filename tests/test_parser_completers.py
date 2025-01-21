@@ -5,12 +5,12 @@ import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-from datetime import date
+from datetime import date, datetime, time, timezone
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone as tz_utils
 
 from django_typer.management.commands.shellcompletion import (
     DETECTED_SHELL,
@@ -111,13 +111,35 @@ class TestShellCompletersAndParsers(TestCase):
             date(2024, 9, 20),
             date(2025, 2, 28),
         ],
+        "time_field": [
+            time(0, 0, 0),
+            time(2, 0, 0),
+            time(20, 0, 0),
+            time(22, 0, 0),
+            time(22, 30, 45, 990000),
+            time(22, 30, 46, 990000),
+            time(22, 30, 46, 990100),
+            time(22, 30, 46, 999900),
+            time(23, 59, 59, 999999),
+        ],
+        "datetime_field": [
+            datetime(2021, 1, 31, 0, 0, 0, tzinfo=timezone.utc),
+            datetime(2021, 2, 9, 2, 0, 0, tzinfo=timezone.utc),
+            datetime(2021, 2, 10, 20, 0, 0, tzinfo=timezone.utc),
+            datetime(2021, 2, 10, 22, 0, 0, tzinfo=timezone.utc),
+            datetime(2024, 2, 29, 22, 30, 45, 990000, tzinfo=timezone.utc),
+            datetime(2024, 2, 29, 22, 30, 46, 990000, tzinfo=timezone.utc),
+            datetime(2024, 9, 20, 22, 30, 46, 990100, tzinfo=timezone.utc),
+            datetime(2024, 9, 20, 22, 30, 46, 999900, tzinfo=timezone.utc),
+            datetime(2025, 2, 28, 23, 59, 59, 999999, tzinfo=timezone.utc),
+        ],
     }
 
     def setUp(self):
         super().setUp()
         self.q1 = Question.objects.create(
             question_text="Is Putin a war criminal?",
-            pub_date=timezone.now(),
+            pub_date=tz_utils.now(),
         )
         for field, values in self.field_values.items():
             for value in values:
@@ -155,6 +177,8 @@ class TestShellCompletersAndParsers(TestCase):
             self.assertTrue(re.search(r"--file\s+PATH", stdout))
             self.assertTrue(re.search(r"--file-path\s+PATH", stdout))
             self.assertTrue(re.search(r"--date\s+YYYY-MM-DD", stdout))
+            self.assertTrue(re.search(r"--datetime\s+ISO 8601", stdout))
+            self.assertTrue(re.search(r"--time\s+HH:MM:SS.SSS", stdout))
         except AssertionError:
             self.fail(stdout)
 
@@ -601,6 +625,366 @@ class TestShellCompletersAndParsers(TestCase):
                 }
             },
         )
+
+    def test_time_field(self):
+        def time_vals(completions):
+            return get_values(completions)
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time ")),
+            [
+                "00:00:00",
+                "02:00:00",
+                "20:00:00",
+                "22:00:00",
+                "22:30:45.990000",
+                "22:30:46.990000",
+                "22:30:46.990100",
+                "22:30:46.999900",
+                "23:59:59.999999",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 0")),
+            [
+                "00:00:00",
+                "02:00:00",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 00:")),
+            ["00:00:00"],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 02:00")),
+            ["02:00:00"],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 2")),
+            [
+                "20:00:00",
+                "22:00:00",
+                "22:30:45.990000",
+                "22:30:46.990000",
+                "22:30:46.990100",
+                "22:30:46.999900",
+                "23:59:59.999999",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 22")),
+            [
+                "22:00:00",
+                "22:30:45.990000",
+                "22:30:46.990000",
+                "22:30:46.990100",
+                "22:30:46.999900",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(self.shellcompletion.complete("model_fields test --time 22:3")),
+            [
+                "22:30:45.990000",
+                "22:30:46.990000",
+                "22:30:46.990100",
+                "22:30:46.999900",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:4")
+            ),
+            [
+                "22:30:45.990000",
+                "22:30:46.990000",
+                "22:30:46.990100",
+                "22:30:46.999900",
+            ],
+        )
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46")
+            ),
+            ["22:30:46.990000", "22:30:46.990100", "22:30:46.999900"],
+        )
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.")
+            ),
+            ["22:30:46.990000", "22:30:46.990100", "22:30:46.999900"],
+        )
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.9")
+            ),
+            ["22:30:46.990000", "22:30:46.990100", "22:30:46.999900"],
+        )
+
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.99")
+            ),
+            ["22:30:46.990000", "22:30:46.990100", "22:30:46.999900"],
+        )
+
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.990")
+            ),
+            [
+                "22:30:46.990000",
+                "22:30:46.990100",
+            ],
+        )
+
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.9901")
+            ),
+            [
+                "22:30:46.990100",
+            ],
+        )
+        self.assertEqual(
+            time_vals(
+                self.shellcompletion.complete("model_fields test --time 22:30:46.99012")
+            ),
+            [],
+        )
+        self.assertFalse(self.shellcompletion.complete("model_fields test --time 3"))
+
+        for time in self.field_values["time_field"]:
+            self.assertEqual(
+                json.loads(call_command("model_fields", "test", "--time", str(time))),
+                {
+                    "time": {
+                        str(ShellCompleteTester.objects.get(time_field=time).pk): str(
+                            time
+                        )
+                    }
+                },
+            )
+
+    def test_datetime_field(self):
+        self.assertEqual(
+            get_values(self.shellcompletion.complete("model_fields test --datetime ")),
+            [
+                "2021-01-31T00:00:00+00:00",
+                "2021-02-09T02:00:00+00:00",
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+                "2024-02-29T22:30:45.990000+00:00",
+                "2024-02-29T22:30:46.990000+00:00",
+                "2024-09-20T22:30:46.990100+00:00",
+                "2024-09-20T22:30:46.999900+00:00",
+                "2025-02-28T23:59:59.999999+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 202")
+            ),
+            [
+                "2021-01-31T00:00:00+00:00",
+                "2021-02-09T02:00:00+00:00",
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+                "2024-02-29T22:30:45.990000+00:00",
+                "2024-02-29T22:30:46.990000+00:00",
+                "2024-09-20T22:30:46.990100+00:00",
+                "2024-09-20T22:30:46.999900+00:00",
+                "2025-02-28T23:59:59.999999+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 2021-")
+            ),
+            [
+                "2021-01-31T00:00:00+00:00",
+                "2021-02-09T02:00:00+00:00",
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete("model_fields test --datetime 2021-02-1")
+            ),
+            [
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T"
+                )
+            ),
+            [
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T2"
+                )
+            ),
+            [
+                "2021-02-10T20:00:00+00:00",
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+00:"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+00:0"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2021-02-10T22:00:00+00:00"
+                )
+            ),
+            [
+                "2021-02-10T22:00:00+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:4"
+                )
+            ),
+            ["2024-02-29T22:30:45.990000+00:00", "2024-02-29T22:30:46.990000+00:00"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:46."
+                )
+            ),
+            ["2024-02-29T22:30:46.990000+00:00"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-02-29T22:30:46.9"
+                )
+            ),
+            ["2024-02-29T22:30:46.990000+00:00"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.99"
+                )
+            ),
+            [
+                "2024-09-20T22:30:46.990100+00:00",
+                "2024-09-20T22:30:46.999900+00:00",
+            ],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.990"
+                )
+            ),
+            ["2024-09-20T22:30:46.990100+00:00"],
+        )
+
+        self.assertEqual(
+            get_values(
+                self.shellcompletion.complete(
+                    "model_fields test --datetime 2024-09-20T22:30:46.999"
+                )
+            ),
+            ["2024-09-20T22:30:46.999900+00:00"],
+        )
+
+        for dt in self.field_values["datetime_field"]:
+            self.assertEqual(
+                json.loads(call_command("model_fields", "test", "--datetime", str(dt))),
+                {
+                    "datetime": {
+                        str(ShellCompleteTester.objects.get(datetime_field=dt).pk): str(
+                            dt
+                        )
+                    }
+                },
+            )
 
     def test_ip_field(self):
         result = StringIO()

@@ -19,6 +19,7 @@ types:
 import os
 import sys
 import typing as t
+from datetime import date, time
 from functools import partial
 from pathlib import Path
 from types import MethodType
@@ -32,6 +33,7 @@ from django.core.management import get_commands
 from django.db.models import (
     CharField,
     DateField,
+    DateTimeField,
     DecimalField,
     Field,
     FileField,
@@ -44,6 +46,7 @@ from django.db.models import (
     Model,
     Q,
     TextField,
+    TimeField,
     UUIDField,
 )
 from django.db.models.query import QuerySet
@@ -77,6 +80,8 @@ class ModelObjectCompleter:
         - `FilePathField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield>`_
         - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
         - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601: YYYY-MM-DD)**
+        - `TimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#timefield>`_ **(Must use ISO 8601: HH:MM:SS.ssssss)**
+        - `DateTimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datetimefield>`_ **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
@@ -158,6 +163,14 @@ class ModelObjectCompleter:
         return self._queryset or self.model_cls.objects
 
     def to_str(self, obj: t.Any) -> str:
+        from datetime import datetime
+
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, time):
+            return obj.isoformat()
+        elif isinstance(obj, date):
+            return obj.isoformat()
         return str(obj)
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
@@ -280,21 +293,14 @@ class ModelObjectCompleter:
             **{f"{self.lookup_field}__lte": max_uuid}
         )
 
-    def date_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def _get_date_bounds(self, incomplete: str) -> t.Tuple[date, date]:
         """
-        Default completion query builder for date fields. This method will return a Q object that
-        will match any value that starts with the incomplete date string. All dates must be in
-        ISO8601 format (YYYY-MM-DD).
+        Turn an incomplete YYYY-MM-DD date string into upper and lower bound date objects.
 
-        :param context: The click context.
-        :param parameter: The click parameter.
-        :param incomplete: The incomplete string.
-        :return: A Q object to use for filtering the queryset.
-        :raises ValueError: If the incomplete string is not a valid partial date.
-        :raises AssertionError: If the incomplete string is not a valid partial date.
+        :param incomplete: The incomplete time string.
+        :return: A 2-tuple of (lower, upper) date object boundaries.
         """
         import calendar
-        from datetime import date
 
         parts = incomplete.split("-")
         year_low = max(int(parts[0] + "0" * (4 - len(parts[0]))), 1)
@@ -320,6 +326,127 @@ class ModelObjectCompleter:
             month=month_high,
             day=day_high or calendar.monthrange(year_high, month_high)[1],
         )
+        return lower_bound, upper_bound
+
+    def _get_time_bounds(self, incomplete: str) -> t.Tuple[time, time]:
+        """
+        Turn an incomplete HH::MM::SS.ssssss time string into upper and lower bound time
+        objects.
+
+        :param incomplete: The incomplete time string.
+        :return: A 2-tuple of (lower, upper) time object boundaries.
+        """
+        time_parts = incomplete.split(":")
+        if len(time_parts) > 0:
+            hours_low = int(time_parts[0] + "0" * (2 - len(time_parts[0])))
+            hours_high = min(int(time_parts[0] + "9" * (2 - len(time_parts[0]))), 23)
+            minutes_low = 0
+            minutes_high = 59
+            seconds_low = 0
+            seconds_high = 59
+            microseconds_low = 0
+            microseconds_high = 999999
+            if len(time_parts) > 1:
+                assert len(time_parts[0]) > 1  # Hours must be 2 digits
+                minutes_low = int(time_parts[1] + "0" * (2 - len(time_parts[1])))
+                minutes_high = min(
+                    int(time_parts[1] + "9" * (2 - len(time_parts[1]))), 59
+                )
+                if len(time_parts) > 2:
+                    seconds_parts = time_parts[2].split(".")
+                    int_seconds = seconds_parts[0]
+                    assert len(time_parts[1]) > 1  # Minutes must be 2 digits
+                    seconds_low = int(int_seconds + "0" * (2 - len(int_seconds)))
+                    seconds_high = min(
+                        int(int_seconds + "9" * (2 - len(int_seconds))), 59
+                    )
+                    if len(seconds_parts) > 1:
+                        microseconds = seconds_parts[1]
+                        microseconds_low = int(
+                            microseconds + "0" * (6 - len(microseconds))
+                        )
+                        microseconds_high = int(
+                            microseconds + "9" * (6 - len(microseconds))
+                        )
+            return time(
+                hour=hours_low,
+                minute=minutes_low,
+                second=seconds_low,
+                microsecond=microseconds_low,
+            ), time(
+                hour=hours_high,
+                minute=minutes_high,
+                second=seconds_high,
+                microsecond=microseconds_high,
+            )
+        return time.min, time.max
+
+    def date_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+        """
+        Default completion query builder for date fields. This method will return a Q object that
+        will match any value that starts with the incomplete date string. All dates must be in
+        ISO8601 format (YYYY-MM-DD).
+
+        :param context: The click context.
+        :param parameter: The click parameter.
+        :param incomplete: The incomplete string.
+        :return: A Q object to use for filtering the queryset.
+        :raises ValueError: If the incomplete string is not a valid partial date.
+        :raises AssertionError: If the incomplete string is not a valid partial date.
+        """
+        lower_bound, upper_bound = self._get_date_bounds(incomplete)
+        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+            **{f"{self.lookup_field}__lte": upper_bound}
+        )
+
+    def time_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+        """
+        Default completion query builder for time fields. This method will return a Q object that
+        will match any value that starts with the incomplete time string. All times must be in
+        ISO 8601 format (HH:MM:SS.ssssss).
+
+        :param context: The click context.
+        :param parameter: The click parameter.
+        :param incomplete: The incomplete string.
+        :return: A Q object to use for filtering the queryset.
+        :raises ValueError: If the incomplete string is not a valid partial time.
+        :raises AssertionError: If the incomplete string is not a valid partial time.
+        """
+        lower_bound, upper_bound = self._get_time_bounds(incomplete)
+        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+            **{f"{self.lookup_field}__lte": upper_bound}
+        )
+
+    def datetime_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
+        """
+        Default completion query builder for datetime fields. This method will return a Q object that
+        will match any value that starts with the incomplete datetime string. All dates must be in
+        ISO8601 format (YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM).
+
+        :param context: The click context.
+        :param parameter: The click parameter.
+        :param incomplete: The incomplete string.
+        :return: A Q object to use for filtering the queryset.
+        :raises ValueError: If the incomplete string is not a valid partial datetime.
+        :raises AssertionError: If the incomplete string is not a valid partial datetime.
+        """
+        import re
+        from datetime import datetime
+
+        parts = incomplete.split("T")
+        lower_bound, upper_bound = self._get_date_bounds(parts[0])
+
+        time_lower = datetime.min.time()
+        time_upper = datetime.max.time()
+        if len(parts) > 1:
+            time_parts = re.split(r"[+-]", parts[1])
+            time_lower, time_upper = self._get_time_bounds(time_parts[0])
+            # if len(time_parts) > 1:
+            #     TODO - handle timezone??
+        lower_bound = datetime.combine(lower_bound, time_lower)
+        upper_bound = datetime.combine(upper_bound, time_upper)
         return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
             **{f"{self.lookup_field}__lte": upper_bound}
         )
@@ -370,8 +497,12 @@ class ModelObjectCompleter:
                 self.query = self.uuid_query
             elif isinstance(self._field, (FloatField, DecimalField)):
                 self.query = self.float_query
+            elif isinstance(self._field, DateTimeField):
+                self.query = self.datetime_query
             elif isinstance(self._field, DateField):
                 self.query = self.date_query
+            elif isinstance(self._field, TimeField):
+                self.query = self.time_query
             else:
                 raise ValueError(
                     _("Unsupported lookup field class: {cls}").format(

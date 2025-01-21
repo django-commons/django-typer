@@ -170,6 +170,20 @@ class Command(TyperCommand):
                 help=t.cast(str, _("Fetch objects by their date fields.")),
             ),
         ] = None,
+        datetime: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "datetime_field"),
+                help=t.cast(str, _("Fetch objects by their datetime fields.")),
+            ),
+        ] = None,
+        time: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(ShellCompleteTester, "time_field"),
+                help=t.cast(str, _("Fetch objects by their time fields.")),
+            ),
+        ] = None,
     ):
         assert self.__class__ is Command
         objects = {}
@@ -216,4 +230,10 @@ class Command(TyperCommand):
         if date is not None:
             assert isinstance(date, ShellCompleteTester)
             objects["date"] = {date.id: str(date.date_field)}
+        if datetime is not None:
+            assert isinstance(datetime, ShellCompleteTester)
+            objects["datetime"] = {datetime.id: str(datetime.datetime_field)}
+        if time is not None:
+            assert isinstance(time, ShellCompleteTester)
+            objects["time"] = {time.id: str(time.time_field)}
         return json.dumps(objects)

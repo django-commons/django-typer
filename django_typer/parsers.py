@@ -23,7 +23,7 @@ typer.Argument. Parsers are provided for:
 """
 
 import typing as t
-from datetime import date
+from datetime import date, datetime, time
 from uuid import UUID
 
 from click import Context, Parameter, ParamType
@@ -99,8 +99,12 @@ class ModelObjectParser(ParamType):
             return "FLOAT"
         elif isinstance(self._field, (models.FileField, models.FilePathField)):
             return "PATH"
+        elif isinstance(self._field, models.DateTimeField):
+            return "ISO 8601"
         elif isinstance(self._field, models.DateField):
             return "YYYY-MM-DD"
+        elif isinstance(self._field, models.TimeField):
+            return "HH:MM:SS.sss"
         return "TXT"
 
     def __init__(
@@ -152,8 +156,12 @@ class ModelObjectParser(ParamType):
                     if char.isalnum():
                         uuid += char
                 value = UUID(uuid)
+            elif isinstance(self._field, models.DateTimeField):
+                value = datetime.fromisoformat(value)
             elif isinstance(self._field, models.DateField):
                 value = date.fromisoformat(value)
+            elif isinstance(self._field, models.TimeField):
+                value = time.fromisoformat(value)
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )
