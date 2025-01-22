@@ -239,7 +239,6 @@ jobs:
             just pin-dependency Django~=${{ matrix.django-version }}
         - name: Run Unit Tests
           run: |
-            just run ./manage.py migrate
             just test-all
         - name: Store coverage files
           uses: actions/upload-artifact@v4
