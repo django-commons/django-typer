@@ -1,18 +1,18 @@
 import datetime
 import os
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
-from django.test import SimpleTestCase
+from django.test import TestCase
+from django.db import connection
 
 from tests.utils import run_command
 
 BACKUP_DIRECTORY = Path(__file__).parent / "_test_archive"
 
 
-class TestBackupExample(SimpleTestCase):
+class TestBackupExample(TestCase):
     databases = {"default"}
 
     typer = ""
@@ -84,6 +84,10 @@ class TestBackupExample(SimpleTestCase):
         self.assertTrue((BACKUP_DIRECTORY / "media.tar.gz").exists())
         self.assertTrue(len(os.listdir(BACKUP_DIRECTORY)) == 2)
 
+    @pytest.mark.skipif(
+        connection.vendor != "sqlite",
+        reason="Skipped because the database should be sqlite",
+    )
     def test_extend_backup(self):
         stdout, stderr, retcode = run_command(
             f"backup{self.typer}",
