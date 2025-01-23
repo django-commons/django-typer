@@ -1,8 +1,6 @@
 import contextlib
-import sys
 from io import StringIO
 
-import pytest
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
@@ -10,7 +8,6 @@ import contextlib
 
 from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
-from tests.utils import run_command
 
 SHELLS = [("zsh", True), ("bash", False), ("pwsh", True), ("fish", True)]
 
