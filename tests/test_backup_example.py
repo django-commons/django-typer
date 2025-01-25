@@ -17,6 +17,12 @@ class TestBackupExample(TestCase):
 
     typer = ""
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        if connection.vendor != "sqlite":
+            run_command("migrate")
+        super().setUpClass()
+
     def setUp(self):
         if BACKUP_DIRECTORY.exists():
             shutil.rmtree(BACKUP_DIRECTORY)
