@@ -112,7 +112,7 @@ sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.5.1", mark
 doc8 = "^1.1.1"
 Sphinx = [
     { version = "^8.0", markers = "python_version >= '3.10'" },
-    { version = "^7.4", markers = "python_version >= '3.9'" }
+    { version = "^7.4", markers = "python_version < '3.10'" }
 ]
 docutils = "^0.21"
 sphinx-autobuild = "2024.10.3"
