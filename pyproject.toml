@@ -78,25 +78,25 @@ shellingham = ">=1.5.4,<2.0"
 typing-extensions = { version = ">=3.7.4.3", markers = "python_version < '3.10'" }
 
 [tool.poetry.group.dev.dependencies]
-ipdb = ">=0.13.13"
+ipdb = "^0.13.13"
 ipython = [
-    { version = ">=8.20.0", markers = "python_version >= '3.10'" },
-    { version = ">=8.18.1", markers = "python_version >= '3.9'" }
+    { version = "^8.20.0", markers = "python_version >= '3.10'" },
+    { version = "^8.18.1", markers = "python_version >= '3.9'" }
 ]
-pytest-django = ">=4.8.0"
-pytest-cov = ">=5.0.0"
-mypy = ">=1.0"
-aiohttp = ">=3.9.1"
-pytest-env = ">=1.0.0"
+pytest-django = "^4.8.0"
+pytest-cov = "^6.0.0"
+mypy = "^1.14"
+aiohttp = "^3.9.1"
+pytest-env = "^1.0.0"
 django-stubs = ">=4.2.7"
-pexpect = ">=4.9.0"
-pyright = {extras = ["nodejs"], version = ">=1.1.357"}
-ruff = ">=0.4.1"
-graphviz = ">=0.20.3"
-pluggy = ">=1.5.0"
-pywinpty = { version = ">=2.0.14", markers = "sys_platform == 'win32'" }
-pytest-timeout = ">=2.3.1"
-pre-commit = ">=4.0.1"
+pexpect = "^4.9.0"
+pyright = {extras = ["nodejs"], version = "^1.1.357"}
+ruff = "^0.9"
+graphviz = "^0.20.3"
+pluggy = "^1.5.0"
+pywinpty = { version = "^2.0.14", markers = "sys_platform == 'win32'" }
+pytest-timeout = "^2.3.1"
+pre-commit = "^4.0.1"
 
 [tool.poetry.extras]
 rich = ["rich"]
@@ -105,17 +105,17 @@ rich = ["rich"]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-furo = ">=2024.7.18"
-sphinx-tabs = ">=3.4.5"
-readme-renderer = {extras = ["md"], version = ">=42"}
-sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = ">=0.5.1", markers="python_version >= '3.9'"}
-doc8 = ">=1.1.1"
+furo = "2024.8.6"
+sphinx-tabs = "^3.4.5"
+readme-renderer = { extras = ["md"], version = "44"}
+sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.5.1", markers="python_version >= '3.9'"}
+doc8 = "^1.1.1"
 Sphinx = [
-    { version = ">=8.0", markers = "python_version >= '3.10'" },
-    { version = ">=7.4", markers = "python_version >= '3.9'" }
+    { version = "^8.0", markers = "python_version >= '3.10'" },
+    { version = "^7.4", markers = "python_version >= '3.9'" }
 ]
-docutils = ">=0.21"
-sphinx-autobuild = ">=2024.10.3"
+docutils = "^0.21"
+sphinx-autobuild = "2024.10.3"
 
 [tool.poetry.group.psycopg3]
 optional = true
