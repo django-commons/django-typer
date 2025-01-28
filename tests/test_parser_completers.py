@@ -1,11 +1,10 @@
-import contextlib
 import json
 import os
 import re
 from decimal import Decimal
 from io import StringIO
 from pathlib import Path
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -149,6 +148,20 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             time(22, 30, 46, 990100),
             time(22, 30, 46, 999900),
             time(23, 59, 59, 999999),
+        ],
+        "duration_field": [
+            -timedelta(days=62, hours=13, seconds=5, microseconds=124),
+            -timedelta(days=51, hours=13, seconds=5, microseconds=124),
+            -timedelta(days=50, hours=13, seconds=5, microseconds=124),
+            -timedelta(days=50, hours=12, seconds=5, microseconds=124),
+            -timedelta(days=50, hours=12, seconds=4, microseconds=124),
+            -timedelta(days=50, hours=12, seconds=4, microseconds=123456),
+            timedelta(days=50, hours=12, seconds=4, microseconds=123456),
+            timedelta(days=50, hours=12, seconds=4, microseconds=124),
+            timedelta(days=50, hours=12, seconds=5, microseconds=124),
+            timedelta(days=50, hours=13, seconds=5, microseconds=124),
+            timedelta(days=51, hours=13, seconds=5, microseconds=124),
+            timedelta(days=62, hours=13, seconds=5, microseconds=124),
         ],
     }
 
@@ -747,6 +760,51 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
                         str(ShellCompleteTester.objects.get(time_field=time).pk): str(
                             time
                         )
+                    }
+                },
+            )
+
+    def test_duration_field(self):
+        from django.utils.duration import duration_iso_string
+
+        def duration_vals(completions):
+            return list(get_values(completions))
+
+        durations = duration_vals(
+            self.shellcompletion.complete("model_fields test --duration ")
+        )
+        self.assertEqual(
+            durations,
+            [
+                "-P62DT13H00M05.000124S",
+                "-P51DT13H00M05.000124S",
+                "-P50DT13H00M05.000124S",
+                "-P50DT12H00M05.000124S",
+                "-P50DT12H00M04.123456S",
+                "-P50DT12H00M04.000124S",
+                "P50DT12H00M04.000124S",
+                "P50DT12H00M04.123456S",
+                "P50DT12H00M05.000124S",
+                "P50DT13H00M05.000124S",
+                "P51DT13H00M05.000124S",
+                "P62DT13H00M05.000124S",
+            ],
+        )
+        for duration in self.field_values["duration_field"]:
+            self.assertEqual(
+                json.loads(
+                    call_command(
+                        "model_fields",
+                        "test",
+                        "--duration",
+                        duration_iso_string(duration),
+                    )
+                ),
+                {
+                    "duration": {
+                        str(
+                            ShellCompleteTester.objects.get(duration_field=duration).pk
+                        ): str(duration)
                     }
                 },
             )

@@ -19,7 +19,7 @@ types:
 import os
 import sys
 import typing as t
-from datetime import date, time
+from datetime import date, time, timedelta
 from functools import partial
 from pathlib import Path
 from types import MethodType
@@ -35,6 +35,7 @@ from django.db.models import (
     DateField,
     DateTimeField,
     DecimalField,
+    DurationField,
     Field,
     FileField,
     FilePathField,
@@ -82,6 +83,7 @@ class ModelObjectCompleter:
         - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601: YYYY-MM-DD)**
         - `TimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#timefield>`_ **(Must use ISO 8601: HH:MM:SS.ssssss)**
         - `DateTimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datetimefield>`_ **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
+        - `DurationField <https://docs.djangoproject.com/en/stable/ref/models/fields/#durationfield>`_ **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
         - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
@@ -178,6 +180,10 @@ class ModelObjectCompleter:
             return obj.isoformat()
         elif isinstance(obj, date):
             return obj.isoformat()
+        elif isinstance(obj, timedelta):
+            from django.utils.duration import duration_iso_string
+
+            return duration_iso_string(obj)
         return str(obj)
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
@@ -475,6 +481,27 @@ class ModelObjectCompleter:
             **{f"{self.lookup_field}__lte": upper_bound}
         )
 
+    def duration_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> Q:
+        """
+        Default completion query builder for duratioin fields. This method will return a Q object that
+        will match any value that is greater than the incomplete duraton string (or less if negative).
+        All durations must be in ISO8601 format (YYYY-MM-DD). Week specifiers are not supported.
+
+        :param context: The click context.
+        :param parameter: The click parameter.
+        :param incomplete: The incomplete string.
+        :return: A Q object to use for filtering the queryset.
+        :raises ValueError: If the incomplete string is not a valid partial duration.
+        :raises AssertionError: If the incomplete string is not a valid partial duration.
+        """
+        from django_typer.utils import parse_iso_duration
+
+        duration = parse_iso_duration(incomplete)
+        lookup = "gte" if duration >= timedelta() else "lte"
+        return Q(**{f"{self.lookup_field}__{lookup}": duration})
+
     def __init__(
         self,
         model_or_qry: t.Union[t.Type[Model], QuerySet],
@@ -530,6 +557,8 @@ class ModelObjectCompleter:
                 self.query = self.date_query
             elif isinstance(self._field, TimeField):
                 self.query = self.time_query
+            elif isinstance(self._field, DurationField):
+                self.query = self.duration_query
             else:
                 raise ValueError(
                     _("Unsupported lookup field class: {cls}").format(

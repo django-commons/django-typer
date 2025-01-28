@@ -194,6 +194,15 @@ class Command(TyperCommand):
                 help=t.cast(str, _("Fetch objects by their time fields.")),
             ),
         ] = None,
+        duration: Annotated[
+            t.Optional[ShellCompleteTester],
+            typer.Option(
+                **model_parser_completer(
+                    ShellCompleteTester, "duration_field", order_by="duration_field"
+                ),
+                help=t.cast(str, _("Fetch objects by their duration fields.")),
+            ),
+        ] = None,
     ):
         assert self.__class__ is Command
         objects = {}
@@ -252,4 +261,8 @@ class Command(TyperCommand):
         if time is not None:
             assert isinstance(time, ShellCompleteTester)
             objects["time"] = {time.id: str(time.time_field)}
+
+        if duration is not None:
+            assert isinstance(duration, ShellCompleteTester)
+            objects["duration"] = {duration.id: str(duration.duration_field)}
         return json.dumps(objects)

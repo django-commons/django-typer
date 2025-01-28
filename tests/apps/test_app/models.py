@@ -29,3 +29,5 @@ class ShellCompleteTester(models.Model):
     datetime_field = models.DateTimeField(null=True, default=None, db_index=True)
 
     time_field = models.TimeField(null=True, default=None, db_index=True)
+
+    duration_field = models.DurationField(null=True, default=None, db_index=True)

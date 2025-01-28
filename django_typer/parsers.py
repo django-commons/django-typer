@@ -162,6 +162,10 @@ class ModelObjectParser(ParamType):
                 value = date.fromisoformat(value)
             elif isinstance(self._field, models.TimeField):
                 value = time.fromisoformat(value)
+            elif isinstance(self._field, models.DurationField):
+                from django_typer.utils import parse_iso_duration
+
+                value = parse_iso_duration(value)
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )

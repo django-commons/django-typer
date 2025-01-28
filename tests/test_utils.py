@@ -3,6 +3,7 @@ from django_typer.utils import (
     accepts_var_kwargs,
     get_win_shell,
     detect_shell,
+    parse_iso_duration,
 )
 from django.test import override_settings
 from django.core.management import call_command
@@ -106,3 +107,35 @@ def test_detection_env_fallback():
 
 def test_detect_shell():
     assert detect_shell(max_depth=256)
+
+
+def test_parse_iso_duration():
+    from datetime import timedelta
+    from django.utils.duration import duration_iso_string
+
+    for duration in [
+        timedelta(days=3, hours=4, minutes=30, seconds=15, microseconds=123456),
+        timedelta(days=1, hours=12, minutes=0, seconds=0),
+        timedelta(days=0, hours=23, minutes=45, seconds=30),
+        timedelta(days=5, hours=0, minutes=15, seconds=5, microseconds=987654),
+        timedelta(days=2, hours=8, minutes=0, seconds=0),
+        timedelta(days=-3, hours=-4, minutes=-30, seconds=-15, microseconds=-123456),
+        timedelta(days=-1, hours=-12, minutes=0, seconds=0),
+        timedelta(days=-2, hours=-20, minutes=-10, seconds=-30),
+        timedelta(days=-5, hours=-6, minutes=-0, seconds=-50, microseconds=-123000),
+        timedelta(days=-10, hours=-5, minutes=-55, seconds=-5),
+    ]:
+        assert parse_iso_duration(duration_iso_string(duration)) == duration
+
+    assert parse_iso_duration("") == timedelta()
+    assert parse_iso_duration("-") == -timedelta()
+    assert parse_iso_duration("+") == timedelta()
+
+    with pytest.raises(ValueError):
+        parse_iso_duration("?")
+
+    with pytest.raises(ValueError):
+        parse_iso_duration("=")
+
+    with pytest.raises(ValueError):
+        parse_iso_duration("10D")

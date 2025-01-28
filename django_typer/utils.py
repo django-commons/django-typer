@@ -2,24 +2,20 @@
 A collection of useful utilities.
 """
 
-import importlib
 import inspect
 import os
-import pkgutil
-import shutil
 import sys
 import typing as t
+from datetime import timedelta
 from functools import partial
 from pathlib import Path
 from threading import local
 from types import MethodType, ModuleType
 
-from shellingham import ShellDetectionFailure
-from shellingham import detect_shell as _detect_shell
-
 from .config import traceback_config
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
+
 
 __all__ = [
     "detect_shell",
@@ -40,6 +36,9 @@ def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:
     :raises ShellDetectionFailure: If the shell cannot be detected
     :return: A tuple of the shell name and the shell command
     """
+    from shellingham import ShellDetectionFailure
+    from shellingham import detect_shell as _detect_shell
+
     try:
         return _detect_shell(max_depth=max_depth)
     except ShellDetectionFailure:
@@ -57,6 +56,8 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     :param script: The script name to check. If None the current script is used.
     :return: The script name or the relative path to the script from cwd.
     """
+    import shutil
+
     cmd_pth = Path(script or sys.argv[0])
     on_path: t.Optional[t.Union[str, Path]] = shutil.which(cmd_pth.name)
     on_path = on_path and Path(on_path)
@@ -143,6 +144,8 @@ def register_command_plugins(
     :param commands: The names of the commands/modules, if not provided, all modules
         in the package will be registered as plugins
     """
+    import pkgutil
+
     commands = commands or [
         module[1].split(".")[-1]
         for module in pkgutil.iter_modules(package.__path__, f"{package.__name__}.")
@@ -163,6 +166,8 @@ def _load_command_plugins(command: str) -> int:
     """
     plugins = _command_plugins.get(command, [])
     if plugins:
+        import importlib
+
         for ext_pkg in reversed(plugins):
             try:
                 importlib.import_module(f"{ext_pkg.__name__}.{command}")
@@ -255,6 +260,7 @@ def get_win_shell() -> str:
     :return: The name of the shell, either 'powershell' or 'pwsh'
     """
     import json
+    import shutil
     import subprocess
 
     from shellingham import ShellDetectionFailure
@@ -288,3 +294,37 @@ def get_win_shell() -> str:
             raise ShellDetectionFailure("Unable to detect windows shell") from e
 
     raise ShellDetectionFailure("Unable to detect windows shell")
+
+
+def parse_iso_duration(duration: str) -> timedelta:
+    """
+    Progressively parse an ISO8601 duration type.
+    """
+    import re
+
+    # Define regex pattern for ISO 8601 duration
+    pattern = re.compile(
+        r"([-+])?"
+        r"(P"  # Start with 'P'
+        r"(?:(?P<days>\d+)D)?"  # Capture days (optional)
+        r"(?:T"  # Start time part (optional)
+        r"(?:(?P<hours>\d+)H)?"  # Capture hours (optional)
+        r"(?:(?P<minutes>\d+)M)?"  # Capture minutes (optional)
+        r"(?:(?P<seconds>\d+(?:\.\d+)?)S)?)?)?"  # Capture seconds (optional, with optional fraction)
+    )
+
+    # Match the input string to the pattern
+    match = pattern.fullmatch(duration)
+    if not match:
+        raise ValueError(f"Invalid ISO 8601 duration format: {duration}")
+
+    # Extract matched groups and convert to float/int
+    days = int(match.group("days")) if match.group("days") else 0
+    hours = int(match.group("hours")) if match.group("hours") else 0
+    minutes = int(match.group("minutes")) if match.group("minutes") else 0
+    seconds = float(match.group("seconds")) if match.group("seconds") else 0.0
+
+    td = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+    if duration.startswith("-"):
+        return -td
+    return td
