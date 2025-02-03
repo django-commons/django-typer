@@ -149,6 +149,7 @@ class ModelObjectParser(ParamType):
         :raises CommandError: If the lookup fails and no error handler is
             provided.
         """
+        original = value
         try:
             if isinstance(value, self.model_cls):
                 return value
@@ -167,18 +168,29 @@ class ModelObjectParser(ParamType):
             elif isinstance(self._field, models.DurationField):
                 from django_typer.utils import parse_iso_duration
 
-                value, ambiguous = parse_iso_duration(value)
+                parsed, ambiguous = parse_iso_duration(value)
                 if ambiguous:
-                    raise ValueError(f"Ambiguous duration: {value}")
+                    raise ValueError(f"Invalid duration: {value}")
+                value = parsed
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )
-        except (self.model_cls.DoesNotExist, ValueError) as err:
+        except ValueError as err:
             if self.on_error:
-                return self.on_error(self.model_cls, str(value), err)
+                return self.on_error(self.model_cls, original, err)
             raise CommandError(
-                _('{model} "{value}" does not exist!').format(
-                    model=self.model_cls.__name__, value=value
+                _("{value} is not a valid {field}").format(
+                    value=original, field=self._field.__class__.__name__
+                )
+            ) from err
+        except self.model_cls.DoesNotExist as err:
+            if self.on_error:
+                return self.on_error(self.model_cls, original, err)
+            raise CommandError(
+                _('{model}:{lookup_field} "{value}" does not exist!').format(
+                    model=self.model_cls.__name__,
+                    lookup_field=self.lookup_field,
+                    value=original,
                 )
             ) from err
 

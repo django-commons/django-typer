@@ -181,15 +181,16 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             # we add some random values. neat little trick to explore more edge
             # cases each time the tests are run! - make sure hard coded tests
             # 100% coverage
-            # *[
-            #     timedelta(
-            #         days=random.randint(0, 6000),
-            #         hours=random.randint(0, 23),
-            #         minutes=random.randint(0, 59),
-            #         seconds=random.randint(0, 59),
-            #         microseconds=random.randint(0, 999999)
-            #     ) for _ in range(20)
-            # ]
+            *[
+                timedelta(
+                    days=random.randint(0, 6000),
+                    hours=random.randint(0, 23),
+                    minutes=random.randint(0, 59),
+                    seconds=random.randint(0, 59),
+                    microseconds=random.randint(0, 999999),
+                )
+                for _ in range(20)
+            ],
         ],
     }
 
@@ -834,6 +835,12 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
 
         # try some non-matches
         # self.assertEqual(completions("P5D"), [])
+        call_command(
+            "model_fields",
+            "test",
+            "--duration",
+            "P5DT1",
+        )
 
         for duration in self.field_values["duration_field"]:
             self.assertEqual(
