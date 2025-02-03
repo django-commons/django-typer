@@ -16,7 +16,6 @@ types:
 
 # pylint: disable=line-too-long
 
-import math
 import os
 import sys
 import typing as t
@@ -57,10 +56,6 @@ from django.utils.translation import gettext as _
 
 Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
 Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
-
-
-def power_of_ten(n: int) -> int:
-    return math.floor(math.log10(abs(n)))
 
 
 class ModelObjectCompleter:
@@ -206,10 +201,7 @@ class ModelObjectCompleter:
         ranges = [(-upper, -lower)] if neg else [(lower, upper)]
         while (lower := lower * 10) <= max_val:
             upper *= 10
-            if neg:
-                ranges.append((-upper, -lower))
-            else:
-                ranges.append((lower, upper))
+            ranges.append((-upper, -lower) if neg else (lower, upper))
         return ranges
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:

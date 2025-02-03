@@ -835,12 +835,21 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
 
         # try some non-matches
         # self.assertEqual(completions("P5D"), [])
-        call_command(
-            "model_fields",
-            "test",
-            "--duration",
-            "P5DT1",
-        )
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields",
+                "test",
+                "--duration",
+                "P5DT1",
+            )
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "model_fields",
+                "test",
+                "--duration",
+                "P9999999D",
+            )
 
         for duration in self.field_values["duration_field"]:
             self.assertEqual(
