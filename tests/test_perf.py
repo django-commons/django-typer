@@ -2,8 +2,14 @@ import os
 from tests.utils import run_command
 import time
 import pytest
+from pprint import pformat
+from .utils import rich_installed
 
 
+@pytest.mark.no_rich
+@pytest.mark.skipif(
+    rich_installed, reason="Rich should not be installed to test module bloat."
+)
 def test_performance_regression():
     env = dict(os.environ)
 
@@ -18,7 +24,7 @@ def test_performance_regression():
         env.pop(var, None)
 
     start = time.perf_counter()
-    stdout, stderr, retcode = run_command(
+    result, stderr, retcode = run_command(
         "perf",
         "5",
         "--test-option",
@@ -27,13 +33,13 @@ def test_performance_regression():
     end = time.perf_counter()
     if retcode:
         pytest.fail(stderr)
-    assert "test_option=True" in stdout
-    assert "no_typer: 5" in stdout
-    mods_no_typer = int(stdout.split(",")[-1].strip())
+    assert result["test_option"]
+    assert result["no_typer"] == 5
+    mods_no_typer = result["modules"]
     no_typer_time = end - start
 
     start = time.perf_counter()
-    stdout, stderr, retcode = run_command(
+    result, stderr, retcode = run_command(
         "perf",
         "5",
         "--test-option",
@@ -42,13 +48,13 @@ def test_performance_regression():
     end = time.perf_counter()
     if retcode:
         pytest.fail(stderr)
-    assert "test_option=True" in stdout
-    assert "typer: 5" in stdout
-    mods_typer = int(stdout.split(",")[-1].strip())
+    assert result["test_option"]
+    assert result["typer"] == 5
+    mods_typer = result["modules"]
     typer_time = end - start
 
     start = time.perf_counter()
-    stdout, stderr, retcode = run_command(
+    result, stderr, retcode = run_command(
         "perf",
         "5",
         "--test-option",
@@ -57,27 +63,31 @@ def test_performance_regression():
     end = time.perf_counter()
     if retcode:
         pytest.fail(stderr)
-    assert "test_option=True" in stdout
-    assert "typer: 5" in stdout
-    mods_typer_no_app = int(stdout.split(",")[-1].strip())
+    assert result["test_option"]
+    assert result["typer"] == 5
+    mods_typer_no_app = result["modules"]
     typer_no_app_time = end - start
 
     # print the stats
     print("\nWithout typer:\n\t")
     print(f"\ttime: {no_typer_time:0.4f}")
-    print(f"\tmodules: {mods_no_typer}")
+    print(f"\tmodules: {len(mods_no_typer)}")
 
     print("\nWith typer:\n\t")
     print(f"\ttime: {typer_time:0.4f}")
-    print(f"\tmodules: {mods_typer}")
+    print(f"\tmodules: {len(mods_typer)}")
 
     print("\nWith typer, but app not installed:\n\t")
     print(f"\ttime: {typer_no_app_time:0.4f}")
-    print(f"\tmodules: {mods_typer_no_app}")
+    print(f"\tmodules: {len(mods_typer_no_app)}")
 
     # notify us if adding typer inflates module count by more than 10 percent
-    assert mods_no_typer / mods_typer > 0.9
-    assert mods_no_typer / mods_typer_no_app > 0.9
+    assert len(mods_no_typer) / len(mods_typer) > 0.9, (
+        f"Typer modules added: \n{pformat(set(mods_typer) - set(mods_no_typer))}"
+    )
+    assert len(mods_no_typer) / len(mods_typer_no_app) > 0.9, (
+        f"Typer modules added: \n{pformat(set(mods_typer_no_app) - set(mods_no_typer))}"
+    )
 
     # notify us if adding typer inflates command exec time by more than 50 percent
     assert no_typer_time / typer_time > 0.5

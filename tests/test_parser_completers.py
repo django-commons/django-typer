@@ -232,17 +232,17 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             self.fail(stdout)
 
     def test_model_object_parser_idempotency(self):
-        from django_typer.parsers import ModelObjectParser
+        from django_typer.parsers.model import ModelObjectParser
         from tests.apps.examples.polls.models import Question
 
         parser = ModelObjectParser(Question)
         self.assertEqual(parser.convert(self.q1, None, None), self.q1)
 
     def test_app_label_parser_idempotency(self):
-        from django_typer.parsers import parse_app_label
+        from django_typer.parsers.apps import app_config
 
         poll_app = apps.get_app_config("tests_apps_examples_polls")
-        self.assertEqual(parse_app_label(poll_app), poll_app)
+        self.assertEqual(app_config(poll_app), poll_app)
 
     def test_shellcompletion_stdout(self):
         result = self.shellcompletion.complete("completion ")
@@ -1653,7 +1653,7 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         self.assertFalse(result)
 
     def test_unsupported_field(self):
-        from django_typer.completers import ModelObjectCompleter
+        from django_typer.completers.model import ModelObjectCompleter
 
         with self.assertRaises(ValueError):
             ModelObjectCompleter(ShellCompleteTester, "binary_field")
@@ -1934,9 +1934,9 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             self.assertIn(f"/{pth}", result)
 
         result = self.shellcompletion.complete(
-            "completion --path django_typer/completers.py"
+            "completion --path django_typer/completers"
         )
-        self.assertIn("django_typer/completers.py", result)
+        self.assertIn("django_typer/completers", result)
 
         result = self.shellcompletion.complete(
             "completion --path django_typer/does_not_exist"
@@ -2043,7 +2043,7 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         self.assertTrue("default" in result)
 
     def test_model_completer_argument_test(self):
-        from django_typer.completers import ModelObjectCompleter
+        from django_typer.completers.model import ModelObjectCompleter
 
         class NotAModel:
             pass

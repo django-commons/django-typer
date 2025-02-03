@@ -1,61 +1,14 @@
-"""
-Typer_ and click_ provide tab-completion hooks for individual parameters. As with
-:mod:`~django_typer.parsers` custom completion logic can be implemented for custom
-parameter types and added to the annotation of the parameter. Previous versions of
-Typer_ supporting click_ 7 used the autocompletion argument to provide completion
-logic, Typer_ still supports this, but passing ``shell_complete`` to the annotation is
-the preferred way to do this.
-
-This module provides some completer functions and classes that work with common Django_
-types:
-
-- **Model Objects**: Complete model object field strings using :class:`ModelObjectCompleter`.
-- **App Labels**: Complete app labels or names using :func:`complete_app_label`.
-
-"""
-
-# pylint: disable=line-too-long
-
-import os
-import sys
 import typing as t
 from datetime import date, time, timedelta
-from functools import partial
-from pathlib import Path
 from types import MethodType
 
 from click import Context, Parameter
 from click.core import ParameterSource
 from click.shell_completion import CompletionItem
-from django.apps import apps
 from django.conf import settings
-from django.core.management import get_commands
-from django.db.models import (
-    CharField,
-    DateField,
-    DateTimeField,
-    DecimalField,
-    DurationField,
-    Field,
-    FileField,
-    FilePathField,
-    FloatField,
-    GenericIPAddressField,
-    IntegerField,
-    Manager,
-    Max,
-    Min,
-    Model,
-    Q,
-    TextField,
-    TimeField,
-    UUIDField,
-)
+from django.db import models
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext as _
-
-Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
-Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
 
 
 class ModelObjectCompleter:
@@ -150,13 +103,15 @@ class ModelObjectCompleter:
         the default queryset ordering will be used for the model.
     """
 
-    QueryBuilder = t.Callable[["ModelObjectCompleter", Context, Parameter, str], Q]
+    QueryBuilder = t.Callable[
+        ["ModelObjectCompleter", Context, Parameter, str], models.Q
+    ]
 
-    model_cls: t.Type[Model]
+    model_cls: t.Type[models.Model]
     _queryset: t.Optional[QuerySet] = None
     lookup_field: str
     help_field: t.Optional[str] = None
-    query: t.Callable[[Context, Parameter, str], Q]
+    query: t.Callable[[Context, Parameter, str], models.Q]
     limit: t.Optional[int] = 50
     case_insensitive: bool = False
     distinct: bool = True
@@ -167,10 +122,10 @@ class ModelObjectCompleter:
     # to allow for - to be missing
     _offset: int = 0
 
-    _field: Field
+    _field: models.Field
 
     @property
-    def queryset(self) -> t.Union[QuerySet, Manager[Model]]:
+    def queryset(self) -> t.Union[QuerySet, models.Manager[models.Model]]:
         return self._queryset or self.model_cls.objects
 
     def to_str(self, obj: t.Any) -> str:
@@ -204,7 +159,9 @@ class ModelObjectCompleter:
             ranges.append((-upper, -lower) if neg else (lower, upper))
         return ranges
 
-    def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def int_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         The default completion query builder for integer fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -218,20 +175,22 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is not a valid integer.
         :raises TypeError: If the incomplete string is not a valid integer.
         """
-        qry = Q()
+        qry = models.Q()
         neg = incomplete.startswith("-")
         for lower, upper in self.int_ranges(
             incomplete,
-            self.model_cls.objects.aggregate(Max(self.lookup_field))[
+            self.model_cls.objects.aggregate(models.Max(self.lookup_field))[
                 f"{self.lookup_field}__max"
             ],
         ):
-            qry |= Q(**{f"{self.lookup_field}__gt{'' if neg else 'e'}": lower}) & Q(
-                **{f"{self.lookup_field}__lt{'e' if neg else ''}": upper}
-            )
+            qry |= models.Q(
+                **{f"{self.lookup_field}__gt{'' if neg else 'e'}": lower}
+            ) & models.Q(**{f"{self.lookup_field}__lt{'e' if neg else ''}": upper})
         return qry
 
-    def float_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def float_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         The default completion query builder for float fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -253,11 +212,13 @@ class ModelObjectCompleter:
             )
         else:
             return self.int_query(context, parameter, incomplete)
-        return Q(**{f"{self.lookup_field}__gte": lower}) & Q(
+        return models.Q(**{f"{self.lookup_field}__gte": lower}) & models.Q(
             **{f"{self.lookup_field}__lt": upper}
         )
 
-    def text_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def text_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         The default completion query builder for text-based fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -269,10 +230,12 @@ class ModelObjectCompleter:
         :return: A Q object to use for filtering the queryset.
         """
         if self.case_insensitive:
-            return Q(**{f"{self.lookup_field}__istartswith": incomplete})
-        return Q(**{f"{self.lookup_field}__startswith": incomplete})
+            return models.Q(**{f"{self.lookup_field}__istartswith": incomplete})
+        return models.Q(**{f"{self.lookup_field}__startswith": incomplete})
 
-    def uuid_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def uuid_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         The default completion query builder for UUID fields. This method will
         return a Q object that will match any value that starts with the incomplete
@@ -318,7 +281,7 @@ class ModelObjectCompleter:
             )
         min_uuid = UUID(uuid + "0" * (32 - len(uuid)))
         max_uuid = UUID(uuid + "f" * (32 - len(uuid)))
-        return Q(**{f"{self.lookup_field}__gte": min_uuid}) & Q(
+        return models.Q(**{f"{self.lookup_field}__gte": min_uuid}) & models.Q(
             **{f"{self.lookup_field}__lte": max_uuid}
         )
 
@@ -410,7 +373,9 @@ class ModelObjectCompleter:
             )
         return time.min, time.max
 
-    def date_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def date_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         Default completion query builder for date fields. This method will return a Q object that
         will match any value that starts with the incomplete date string. All dates must be in
@@ -424,11 +389,13 @@ class ModelObjectCompleter:
         :raises AssertionError: If the incomplete string is not a valid partial date.
         """
         lower_bound, upper_bound = self._get_date_bounds(incomplete)
-        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+        return models.Q(**{f"{self.lookup_field}__gte": lower_bound}) & models.Q(
             **{f"{self.lookup_field}__lte": upper_bound}
         )
 
-    def time_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
+    def time_query(
+        self, context: Context, parameter: Parameter, incomplete: str
+    ) -> models.Q:
         """
         Default completion query builder for time fields. This method will return a Q object that
         will match any value that starts with the incomplete time string. All times must be in
@@ -442,13 +409,13 @@ class ModelObjectCompleter:
         :raises AssertionError: If the incomplete string is not a valid partial time.
         """
         lower_bound, upper_bound = self._get_time_bounds(incomplete)
-        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+        return models.Q(**{f"{self.lookup_field}__gte": lower_bound}) & models.Q(
             **{f"{self.lookup_field}__lte": upper_bound}
         )
 
     def datetime_query(
         self, context: Context, parameter: Parameter, incomplete: str
-    ) -> Q:
+    ) -> models.Q:
         """
         Default completion query builder for datetime fields. This method will return a Q object that
         will match any value that starts with the incomplete datetime string. All dates must be in
@@ -493,13 +460,13 @@ class ModelObjectCompleter:
             assert db_tz_part.startswith(tz_part)
         else:
             assert not tz_part
-        return Q(**{f"{self.lookup_field}__gte": lower_bound}) & Q(
+        return models.Q(**{f"{self.lookup_field}__gte": lower_bound}) & models.Q(
             **{f"{self.lookup_field}__lte": upper_bound}
         )
 
     def duration_query(
         self, context: Context, parameter: Parameter, incomplete: str
-    ) -> Q:
+    ) -> models.Q:
         """
         Default completion query builder for duration fields. This method will return a Q object
         that will match any value that is greater than the incomplete duration string (or less if
@@ -518,35 +485,35 @@ class ModelObjectCompleter:
 
         duration, ambiguity = parse_iso_duration(incomplete)
         if incomplete.endswith("S") or (duration.microseconds and not ambiguity):
-            return Q(**{f"{self.lookup_field}": duration})
+            return models.Q(**{f"{self.lookup_field}": duration})
         neg = incomplete.startswith("-")
 
-        qry = Q()
+        qry = models.Q()
         horizon = None  # time horizon is exclusive!
 
         if ambiguity and "T" not in incomplete and "D" not in incomplete:
             # days is unbounded
             # if days == 5, we want to match 5-<6, 50-<60, 500-<600, etc
             max_val = (
-                self.model_cls.objects.filter(qry).aggregate(Min(self.lookup_field))[
-                    f"{self.lookup_field}__min"
-                ]
+                self.model_cls.objects.filter(qry).aggregate(
+                    models.Min(self.lookup_field)
+                )[f"{self.lookup_field}__min"]
                 if neg
                 else self.model_cls.objects.filter(qry).aggregate(
-                    Max(self.lookup_field)
+                    models.Max(self.lookup_field)
                 )[f"{self.lookup_field}__max"]
             )
             for lower, upper in self.int_ranges(
                 ambiguity,
                 max_val.days,
             ):
-                qry |= Q(
+                qry |= models.Q(
                     **{
                         f"{self.lookup_field}__gt{'' if neg else 'e'}": timedelta(
                             days=lower
                         )
                     }
-                ) & Q(
+                ) & models.Q(
                     **{
                         f"{self.lookup_field}__lt{'e' if neg else ''}": timedelta(
                             days=upper
@@ -635,9 +602,9 @@ class ModelObjectCompleter:
                                     min(int(f"{ambiguity}9") + 1, 24) * 3600,
                                 )
                             )
-                    c_qry = Q()
+                    c_qry = models.Q()
                     for lower, upper in compound_horizon:
-                        lower, upper = (
+                        lwr, upr = (
                             (
                                 duration - timedelta(seconds=upper),
                                 duration - timedelta(seconds=lower),
@@ -648,30 +615,32 @@ class ModelObjectCompleter:
                                 duration + timedelta(seconds=upper),
                             )
                         )
-                        h_qry = Q(
-                            **{f"{self.lookup_field}__gt{'' if neg else 'e'}": lower}
-                        ) & Q(**{f"{self.lookup_field}__lt{'e' if neg else ''}": upper})
+                        h_qry = models.Q(
+                            **{f"{self.lookup_field}__gt{'' if neg else 'e'}": lwr}
+                        ) & models.Q(
+                            **{f"{self.lookup_field}__lt{'e' if neg else ''}": upr}
+                        )
                         c_qry |= h_qry
                     qry &= c_qry
 
         inclusive = "" if incomplete.endswith("T") and duration.days else "e"
         qry &= (
-            Q(**{f"{self.lookup_field}__lt{inclusive}": duration})
+            models.Q(**{f"{self.lookup_field}__lt{inclusive}": duration})
             if neg
-            else Q(**{f"{self.lookup_field}__gt{inclusive}": duration})
+            else models.Q(**{f"{self.lookup_field}__gt{inclusive}": duration})
         )
 
         if horizon:
             qry &= (
-                Q(**{f"{self.lookup_field}__gt": duration - horizon})
+                models.Q(**{f"{self.lookup_field}__gt": duration - horizon})
                 if neg
-                else Q(**{f"{self.lookup_field}__lt": duration + horizon})
+                else models.Q(**{f"{self.lookup_field}__lt": duration + horizon})
             )
         return qry
 
     def __init__(
         self,
-        model_or_qry: t.Union[t.Type[Model], QuerySet],
+        model_or_qry: t.Union[t.Type[models.Model], QuerySet],
         lookup_field: t.Optional[str] = None,
         help_field: t.Optional[str] = help_field,
         query: t.Optional[QueryBuilder] = None,
@@ -682,7 +651,7 @@ class ModelObjectCompleter:
     ):
         import inspect
 
-        if inspect.isclass(model_or_qry) and issubclass(model_or_qry, Model):
+        if inspect.isclass(model_or_qry) and issubclass(model_or_qry, models.Model):
             self.model_cls = model_or_qry
         elif isinstance(model_or_qry, QuerySet):
             self.model_cls = model_or_qry.model
@@ -701,30 +670,34 @@ class ModelObjectCompleter:
         if order_by:
             self.order_by = [order_by] if isinstance(order_by, str) else list(order_by)
 
-        self._field = self.model_cls._meta.get_field(  # pylint: disable=protected-access
-            self.lookup_field
-        )
+        self._field = self.model_cls._meta.get_field(self.lookup_field)
         if query:
             self.query = MethodType(query, self)
         else:
-            if isinstance(self._field, IntegerField):
+            if isinstance(self._field, models.IntegerField):
                 self.query = self.int_query
             elif isinstance(
                 self._field,
-                (CharField, TextField, GenericIPAddressField, FileField, FilePathField),
+                (
+                    models.CharField,
+                    models.TextField,
+                    models.GenericIPAddressField,
+                    models.FileField,
+                    models.FilePathField,
+                ),
             ):
                 self.query = self.text_query
-            elif isinstance(self._field, UUIDField):
+            elif isinstance(self._field, models.UUIDField):
                 self.query = self.uuid_query
-            elif isinstance(self._field, (FloatField, DecimalField)):
+            elif isinstance(self._field, (models.FloatField, models.DecimalField)):
                 self.query = self.float_query
-            elif isinstance(self._field, DateTimeField):
+            elif isinstance(self._field, models.DateTimeField):
                 self.query = self.datetime_query
-            elif isinstance(self._field, DateField):
+            elif isinstance(self._field, models.DateField):
                 self.query = self.date_query
-            elif isinstance(self._field, TimeField):
+            elif isinstance(self._field, models.TimeField):
                 self.query = self.time_query
-            elif isinstance(self._field, DurationField):
+            elif isinstance(self._field, models.DurationField):
                 self.query = self.duration_query
             else:
                 raise ValueError(
@@ -750,13 +723,11 @@ class ModelObjectCompleter:
         :return: A list of CompletionItem objects.
         """
 
-        completion_qry = Q(**{self.lookup_field + "__isnull": False})
+        completion_qry = models.Q(**{self.lookup_field + "__isnull": False})
 
         if incomplete:
             try:
-                completion_qry &= self.query(  # pylint: disable=not-callable
-                    context, parameter, incomplete
-                )
+                completion_qry &= self.query(context, parameter, incomplete)
             except (ValueError, TypeError, AssertionError):
                 return []
 
@@ -764,7 +735,7 @@ class ModelObjectCompleter:
         if self.help_field:
             columns.append(self.help_field)
 
-        excluded: t.List[Model] = []
+        excluded: t.List[models.Model] = []
         if (
             self.distinct
             and parameter.name
@@ -791,281 +762,3 @@ class ModelObjectCompleter:
                     )
                 )
         return completions
-
-
-def complete_app_label(
-    ctx: Context, param: Parameter, incomplete: str
-) -> t.List[CompletionItem]:
-    """
-    A case-sensitive completer for Django app labels or names. The completer
-    prefers labels but names will also work.
-
-    .. code-block:: python
-
-        import typing as t
-        import typer
-        from django_typer.management import TyperCommand
-        from django_typer.parsers import parse_app_label
-        from django_typer.completers import complete_app_label
-
-        class Command(TyperCommand):
-
-            def handle(
-                self,
-                django_apps: t.Annotated[
-                    t.List[AppConfig],
-                    typer.Argument(
-                        parser=parse_app_label,
-                        shell_complete=complete_app_label,
-                        help=_("One or more application labels.")
-                    )
-                ]
-            ):
-                ...
-
-    :param ctx: The click context.
-    :param param: The click parameter.
-    :param incomplete: The incomplete string.
-    :return: A list of matching app labels or names. Labels already present for the
-        parameter on the command line will be filtered out.
-    """
-    present = []
-    if (
-        param.name
-        and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
-    ):
-        present = [app.label for app in (ctx.params.get(param.name) or [])]
-    ret = [
-        CompletionItem(app.label)
-        for app in apps.get_app_configs()
-        if app.label.startswith(incomplete) and app.label not in present
-    ]
-    if not ret and incomplete:
-        ret = [
-            CompletionItem(app.name)
-            for app in apps.get_app_configs()
-            if app.name.startswith(incomplete)
-            and app.name not in present
-            and app.label not in present
-        ]
-    return ret
-
-
-def complete_import_path(
-    ctx: Context, param: Parameter, incomplete: str
-) -> t.List[CompletionItem]:
-    """
-    A completer that completes a python dot import path string based on sys.path.
-
-    :param ctx: The click context.
-    :param param: The click parameter.
-    :param incomplete: The incomplete string.
-    :return: A list of available matching import paths
-    """
-    import pkgutil
-
-    incomplete = incomplete.strip()
-    completions = []
-    packages = [pkg for pkg in incomplete.split(".") if pkg]
-    pkg_complete = not incomplete or incomplete.endswith(".")
-    module_import = ".".join(packages) if pkg_complete else ".".join(packages[:-1])
-    module_path = Path(module_import.replace(".", "/"))
-    search_paths = []
-    for pth in sys.path:
-        if (Path(pth) / module_path).exists():
-            search_paths.append(str(Path(pth) / module_path))
-
-    prefix = "" if pkg_complete else packages[-1]
-    for module in pkgutil.iter_modules(path=search_paths):
-        if module.name.startswith(prefix):
-            completions.append(
-                CompletionItem(
-                    f"{module_import}{'.' if module_import else ''}{module.name}",
-                    type="plain",
-                )
-            )
-    if len(completions) == 1 and not completions[0].value.endswith("."):
-        return (
-            complete_import_path(ctx, param, f"{completions[0].value}.") or completions
-        )
-    return completions
-
-
-def complete_path(
-    ctx: Context, param: Parameter, incomplete: str, dir_only: t.Optional[bool] = None
-) -> t.List[CompletionItem]:
-    """
-    A completer that completes a path. Relative incomplete paths are interpreted relative to
-    the current working directory.
-
-    :param ctx: The click context.
-    :param param: The click parameter.
-    :param incomplete: The incomplete string.
-    :param dir_only: Restrict completions to paths to directories only, otherwise complete
-        directories or files.
-    :return: A list of available matching directories
-    """
-
-    def exists(pth: Path) -> bool:
-        if dir_only:
-            return pth.is_dir()
-        return pth.exists() or pth.is_symlink()
-
-    separator = os.sep
-    if "/" in incomplete:
-        if "\\" not in incomplete:
-            separator = "/"
-    elif "\\" in incomplete:
-        separator = "\\"
-
-    completions = []
-    incomplete_path = Path(incomplete.replace(separator, os.path.sep))
-    partial_dir = ""
-    if not exists(incomplete_path) and not incomplete.endswith(separator):
-        partial_dir = incomplete_path.name
-        incomplete_path = incomplete_path.parent
-    elif incomplete_path.is_file() and not dir_only:
-        return [CompletionItem(incomplete, type="file")]
-    if incomplete_path.is_dir():
-        for child in os.listdir(incomplete_path):
-            if not exists(incomplete_path / child):
-                continue
-            if child.startswith(partial_dir):
-                to_complete = incomplete[0 : (-len(partial_dir) or None)]
-                completions.append(
-                    CompletionItem(
-                        f"{to_complete}"
-                        f"{'' if not to_complete or to_complete.endswith(separator) else separator}"
-                        f"{child}",
-                        type="dir" if (incomplete_path / child).is_dir() else "file",
-                    )
-                )
-    if (
-        len(completions) == 1
-        and Path(completions[0].value).is_dir()
-        and [
-            child
-            for child in os.listdir(completions[0].value)
-            if exists(Path(completions[0].value) / child)
-        ]
-    ):
-        # recurse because we can go futher
-        return complete_path(ctx, param, completions[0].value, dir_only=dir_only)
-    return completions
-
-
-complete_directory = partial(complete_path, dir_only=True)
-"""
-A completer that completes a directory path (but not files). Relative incomplete paths
-are interpreted relative to the current working directory.
-
-:param ctx: The click context.
-:param param: The click parameter.
-:param incomplete: The incomplete string.
-:return: A list of available matching directories
-"""
-
-
-def these_strings(
-    strings: t.Union[t.Callable[[], Strings], Strings],
-    allow_duplicates: bool = False,
-):
-    """
-    Get a completer that provides completion logic that matches the allowed strings.
-
-    :param strings: A sequence of allowed strings or a callable that generates a sequence of
-        allowed strings.
-    :param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
-    :return: A completer function.
-    """
-
-    def complete(ctx: Context, param: Parameter, incomplete: str):
-        present = []
-        if (
-            not allow_duplicates
-            and param.name
-            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
-        ):
-            present = [value for value in (ctx.params.get(param.name) or [])]
-        return [
-            CompletionItem(item)
-            for item in (strings() if callable(strings) else strings)
-            if item.startswith(incomplete) and item not in present
-        ]
-
-    return complete
-
-
-# use a function that returns a generator because we should not access settings on import
-databases = partial(these_strings, lambda: settings.DATABASES.keys())
-"""
-A completer that completes Django database aliases configured in settings.DATABASES.
-
-:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
-:return: A completer function.
-"""
-
-commands = partial(these_strings, lambda: get_commands().keys())
-"""
-A completer that completes management command names.
-
-:param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
-:return: A completer function.
-"""
-
-
-def chain(
-    completer: Completer,
-    *completers: Completer,
-    first_match: bool = False,
-    allow_duplicates: bool = False,
-):
-    """
-    Run through the given completers and return the items from the first one, or all
-    of them if first_match is False.
-
-    .. note::
-
-        This function is also useful for filtering out previously supplied duplicate
-        values for completers that do not natively support that:
-
-        .. code-block:: python
-
-            shell_complete=chain(
-                complete_import_path,
-                allow_duplicates=False
-            )
-
-    :param completer: The first completer to use (must be at least one!)
-    :param completers: The completers to use
-    :param first_match: If true, return only the matches from the first completer that
-        finds completions. Default: False
-    :param allow_duplicates: If False (default) remove completions from previously provided
-        values.
-    """
-
-    def complete(ctx: Context, param: Parameter, incomplete: str):
-        completions = []
-        present = []
-        if (
-            not allow_duplicates
-            and param.name
-            and ctx.get_parameter_source(param.name) is not ParameterSource.DEFAULT
-        ):
-            present = [value for value in (ctx.params.get(param.name) or [])]
-        for cmpltr in [completer, *completers]:
-            completions.extend(cmpltr(ctx, param, incomplete))
-            if first_match and completions:
-                break
-
-        # eliminate duplicates
-        return list(
-            {
-                ci.value: ci
-                for ci in completions
-                if ci.value
-                if ci.value not in present
-            }.values()
-        )
-
-    return complete

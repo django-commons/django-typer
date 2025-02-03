@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from typer import Argument, Option
 
 from django_typer.management import Typer
-from django_typer.parsers import ModelObjectParser
+from django_typer.parsers.model import ModelObjectParser
 from tests.apps.examples.polls.models import Question as Poll
 
 app = Typer()

@@ -8,6 +8,7 @@ v3.0.0 (202X-XX-XX)
 ===================
 
 * Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
+* BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`
 * Fixed `Model objects with null lookup fields should not be included in model field completion output <https://github.com/django-commons/django-typer/issues/160>`_
 * Implemented `Add security scans to CI. <https://github.com/django-commons/django-typer/issues/158>`_
 * Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
@@ -47,6 +48,18 @@ Migrating from 2.x to 3.x
 
 Shell Completions
 ~~~~~~~~~~~~~~~~~
+* Parser import paths have changed:
+  - ``django.parsers.ModelObjectParser`` -> ``django.parsers.model.ModelObjectParser``
+  - ``django.parsers.parse_app_label`` -> ``django.parsers.apps.app_config``
+
+* Completer paths have changed:
+  - ``django.completers.complete_app_label`` -> ``django.completers.apps.app_labels``
+  - ``django.completers.commands`` -> ``django.completers.cmd.commands``
+  - ``django.completers.databases`` -> ``django.completers.db.databases``
+  - ``django.completers.ModelObjectCompleter`` -> ``django.completers.model.ModelObjectCompleter``
+  - ``django.completers.complete_path`` -> ``django.completers.path.paths``
+  - ``django.completers.complete_directory`` -> ``django.completers.path.directories``
+  - ``django.completers.complete_import_path`` -> ``django.completers.path.import_paths``
 
 * If you are using shell tab completions you will need to reinstall the completion scripts. Using
   the `shellcompletion install` command. To be extra safe you may want to uninstall the old

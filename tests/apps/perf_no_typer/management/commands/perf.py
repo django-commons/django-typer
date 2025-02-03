@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandParser
 import sys
+import json
 
 
 class Command(BaseCommand):
@@ -12,4 +13,10 @@ class Command(BaseCommand):
         return super().add_arguments(parser)
 
     def handle(self, test_arg, test_option, **_):
-        return f"no_typer: {test_arg}, test_option={test_option}, {len(sys.modules)}"
+        return json.dumps(
+            {
+                "no_typer": test_arg,
+                "test_option": test_option,
+                "modules": list(sys.modules.keys()),
+            }
+        )

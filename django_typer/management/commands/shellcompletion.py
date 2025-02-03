@@ -38,7 +38,8 @@ from shellingham import ShellDetectionFailure
 from typer import Argument, Option
 from typer.main import get_command as get_typer_command
 
-from django_typer.completers import complete_import_path, these_strings
+from django_typer.completers import these_strings
+from django_typer.completers.path import import_paths
 from django_typer.management import TyperCommand, command, get_command, initialize
 from django_typer.shells import _completers
 from django_typer.types import COMMON_PANEL
@@ -293,7 +294,7 @@ class Command(TyperCommand):
                         "the completion command is not a TyperCommand."
                     ),
                 ),
-                shell_complete=complete_import_path,
+                shell_complete=import_paths,
             ),
         ] = None,
         template: t.Annotated[
@@ -432,7 +433,7 @@ class Command(TyperCommand):
                         "django autocomplete function is used."
                     ),
                 ),
-                shell_complete=complete_import_path,
+                shell_complete=import_paths,
             ),
         ] = None,
     ):

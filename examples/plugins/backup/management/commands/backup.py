@@ -13,7 +13,8 @@ from django_typer.management import (
     command,
     initialize,
 )
-from django_typer import completers
+from django_typer.completers.db import databases as complete_db
+from django_typer.completers.path import directories
 
 
 class Command(TyperCommand):
@@ -44,7 +45,7 @@ class Command(TyperCommand):
             typer.Option(
                 "-o",
                 "--output",
-                shell_complete=completers.complete_directory,
+                shell_complete=directories,
                 help="The directory to write backup artifacts to.",
             ),
         ] = Path(os.getcwd()),
@@ -117,7 +118,7 @@ class Command(TyperCommand):
                     "The name of the database(s) to backup. If not provided, "
                     "all databases will be backed up."
                 ),
-                shell_complete=completers.databases,
+                shell_complete=complete_db(),
             ),
         ] = databases,
     ):

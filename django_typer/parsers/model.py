@@ -1,38 +1,13 @@
-"""
-Typer_ supports custom parsers for options and arguments. If you would
-like to type a parameter with a type that isn't supported by Typer_ you can
-`implement your own parser <https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_
-, or `ParamType <https://click.palletsprojects.com/en/8.1.x/api/#click.ParamType>`_
-in click_ parlance.
-
-This module contains a collection of parsers that turn strings into useful
-Django types. Pass these parsers to the `parser` argument of typer.Option and
-typer.Argument. Parsers are provided for:
-
-- **Model Objects**: Turn a string into a model object instance using :class:`ModelObjectParser`.
-- **App Labels**: Turn a string into an AppConfig instance using :func:`parse_app_label`.
-
-
-.. warning::
-
-    If you implement a custom parser, please take care to ensure that it:
-        - Handles the case where the value is already the expected type.
-        - Returns None if the value is None (already implemented if subclassing ParamType).
-        - Raises a CommandError if the value is invalid.
-        - Handles the case where the param and context are None.
-"""
-
 import typing as t
 from datetime import date, datetime, time
 from uuid import UUID
 
 from click import Context, Parameter, ParamType
-from django.apps import AppConfig, apps
 from django.core.management import CommandError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from django_typer.completers import ModelObjectCompleter
+from django_typer.completers.model import ModelObjectCompleter
 
 
 class ModelObjectParser(ParamType):
@@ -42,7 +17,7 @@ class ModelObjectParser(ParamType):
 
     .. code-block:: python
 
-        from django_typer.parsers import ModelObjectParser
+        from django_typer.parsers.model import ModelObjectParser
 
         class Command(TyperCommand):
             def handle(
@@ -187,56 +162,9 @@ class ModelObjectParser(ParamType):
             if self.on_error:
                 return self.on_error(self.model_cls, original, err)
             raise CommandError(
-                _('{model}:{lookup_field} "{value}" does not exist!').format(
+                _('{model}.{lookup_field}="{value}" does not exist!').format(
                     model=self.model_cls.__name__,
                     lookup_field=self.lookup_field,
                     value=original,
                 )
             ) from err
-
-
-def parse_app_label(label: t.Union[str, AppConfig]):
-    """
-    A parser for app labels. If the label is already an AppConfig instance,
-    the instance is returned. The label will be tried first, if that fails
-    the label will be treated as the app name.
-
-    .. code-block:: python
-
-        import typing as t
-        import typer
-        from django_typer.management import TyperCommand
-        from django_typer.parsers import parse_app_label
-
-        class Command(TyperCommand):
-
-            def handle(
-                self,
-                django_apps: t.Annotated[
-                    t.List[AppConfig],
-                    typer.Argument(
-                        parser=parse_app_label,
-                        help=_("One or more application labels.")
-                    )
-                ]
-            ):
-                ...
-
-    :param label: The label to map to an AppConfig instance.
-    :raises CommandError: If no matching app can be found.
-    """
-    if isinstance(label, AppConfig):
-        return label
-    try:
-        return apps.get_app_config(label)
-    except LookupError as err:
-        for cfg in apps.get_app_configs():
-            if cfg.name == label:
-                return cfg
-
-        raise CommandError(
-            _("{label} does not match any installed app label.").format(label=label)
-        ) from err
-
-
-parse_app_label.__name__ = "APP_LABEL"

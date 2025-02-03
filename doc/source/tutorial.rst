@@ -213,13 +213,13 @@ look like if we used the Poll class as our type hint:
 |
 
 django-typer_ offers some built-in :mod:`~django_typer.parsers` that can be used for
-common Django_ types. For example, the :class:`~django_typer.parsers.ModelObjectParser` can
+common Django_ types. For example, the :class:`~django_typer.parsers.model.ModelObjectParser` can
 be used to fetch a model object from a given field. By default it will use the primary key,
 so we could rewrite the relevant lines above like so:
 
 .. code-block:: python
 
-    from django_typer.parsers import ModelObjectParser
+    from django_typer.parsers.model import ModelObjectParser
 
     # ...
 
@@ -244,8 +244,8 @@ make this easy. Let's see what the relevant updates to our closepoll command wou
 
 .. code-block:: python
 
-    from django_typer.parsers import ModelObjectParser
-    from django_typer.completers import ModelObjectCompleter
+    from django_typer.parsers.model import ModelObjectParser
+    from django_typer.completers.model import ModelObjectCompleter
 
     # ...
 
@@ -269,9 +269,9 @@ make this easy. Let's see what the relevant updates to our closepoll command wou
 Putting it all together
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When we're using a :class:`~django_typer.parsers.ModelObjectParser` and
-:class:`~django_typer.completers.ModelObjectCompleter` we can use the
-:func:`~django_typer.model_parser_completer` convenience function to reduce the amount
+When we're using a :class:`~django_typer.parsers.model.ModelObjectParser` and
+:class:`~django_typer.completers.model.ModelObjectCompleter` we can use the
+:func:`~django_typer.management.model_parser_completer` convenience function to reduce the amount
 of boiler plate. Let's put everything together and see what our full-featured refactored
 closepoll command looks like:
 

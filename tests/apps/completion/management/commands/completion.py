@@ -8,7 +8,12 @@ from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 
 from django_typer.management import TyperCommand
-from django_typer import completers, parsers
+from django_typer.completers.apps import app_labels
+from django_typer.parsers.apps import app_config
+from django_typer.completers.path import directories, paths, import_paths
+from django_typer.completers.db import databases
+from django_typer.completers.cmd import commands
+from django_typer.completers import these_strings, chain
 
 
 class Command(TyperCommand, rich_markup_mode="rich"):
@@ -17,31 +22,31 @@ class Command(TyperCommand, rich_markup_mode="rich"):
         django_apps: Annotated[
             t.List[AppConfig],
             typer.Argument(
-                parser=parsers.parse_app_label,
                 help=t.cast(str, _("One or more application labels.")),
-                shell_complete=completers.complete_app_label,
+                parser=app_config,
+                shell_complete=app_labels,
             ),
         ],
         option: Annotated[
             t.Optional[AppConfig],
             typer.Option(
-                parser=parsers.parse_app_label,
+                parser=app_config,
                 help=t.cast(str, _("An app given as an option.")),
-                shell_complete=completers.complete_app_label,
+                shell_complete=app_labels,
             ),
         ] = None,
         path: Annotated[
             t.Optional[Path],
             typer.Option(
                 help=t.cast(str, _("A path given as an option.")),
-                shell_complete=completers.complete_path,
+                shell_complete=paths,
             ),
         ] = None,
         dir: Annotated[
             t.Optional[Path],
             typer.Option(
                 help=t.cast(str, _("A directory given as an option.")),
-                shell_complete=completers.complete_directory,
+                shell_complete=directories,
             ),
         ] = None,
         strings_unique: Annotated[
@@ -49,7 +54,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             typer.Option(
                 "--str",
                 help=t.cast(str, _("A list of unique strings.")),
-                shell_complete=completers.these_strings(["str1", "str2", "ustr"]),
+                shell_complete=these_strings(["str1", "str2", "ustr"]),
             ),
         ] = None,
         strings_duplicates: Annotated[
@@ -57,7 +62,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             typer.Option(
                 "--dup",
                 help=t.cast(str, _("A list of strings that can have duplicates.")),
-                shell_complete=completers.these_strings(
+                shell_complete=these_strings(
                     ["str1", "str2", "ustr"], allow_duplicates=True
                 ),
             ),
@@ -70,9 +75,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                     str,
                     _("A command by [bold]import path[/bold] or [bold]name[/bold]."),
                 ),
-                shell_complete=completers.chain(
-                    completers.complete_import_path, completers.commands()
-                ),
+                shell_complete=chain(import_paths, commands()),
             ),
         ] = [],
         command_dups: Annotated[
@@ -83,10 +86,8 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                     str,
                     _("A list of [reverse]commands[/reverse] by import path or name."),
                 ),
-                shell_complete=completers.chain(
-                    completers.complete_import_path,
-                    completers.commands(allow_duplicates=True),
-                    allow_duplicates=True,
+                shell_complete=chain(
+                    import_paths, commands(allow_duplicates=True), allow_duplicates=True
                 ),
             ),
         ] = [],
@@ -100,10 +101,8 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                         "A list of [yellow][underline]commands[/underline][/yellow] by either import path or name."
                     ),
                 ),
-                shell_complete=completers.chain(
-                    completers.complete_import_path,
-                    completers.commands(allow_duplicates=True),
-                    first_match=True,
+                shell_complete=chain(
+                    import_paths, commands(allow_duplicates=True), first_match=True
                 ),
             ),
         ] = [],
@@ -111,7 +110,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             t.List[str],
             typer.Option(
                 help=t.cast(str, _("One or more application labels.")),
-                shell_complete=completers.complete_app_label,
+                shell_complete=app_labels,
             ),
         ] = ["test_app"],
         databases: Annotated[
@@ -119,7 +118,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
             typer.Option(
                 "--db",
                 help=t.cast(str, _("One or more database aliases.")),
-                shell_complete=completers.databases(),
+                shell_complete=databases(),
             ),
         ] = [],
     ):

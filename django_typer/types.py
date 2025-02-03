@@ -2,8 +2,6 @@
 Common types for command line argument specification.
 """
 
-# pylint: disable=pointless-string-statement, line-too-long
-
 import sys
 from pathlib import Path
 from typing import Annotated, Optional, cast
@@ -12,7 +10,7 @@ from django.core.management import CommandError
 from django.utils.translation import gettext_lazy as _
 from typer import Option
 
-from .completers import complete_directory, complete_import_path
+from .completers.path import directories, import_paths
 
 COMMON_PANEL = "Django"
 
@@ -109,7 +107,7 @@ Settings = Annotated[
             ),
         ),
         rich_help_panel=COMMON_PANEL,
-        shell_complete=complete_import_path,
+        shell_complete=import_paths,
     ),
 ]
 """
@@ -132,7 +130,7 @@ PythonPath = Annotated[
             ),
         ),
         rich_help_panel=COMMON_PANEL,
-        shell_complete=complete_directory,
+        shell_complete=directories,
     ),
 ]
 """

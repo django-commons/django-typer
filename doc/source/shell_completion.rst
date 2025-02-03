@@ -215,7 +215,7 @@ Django_ app labels like this:
 
 .. tip::
 
-    See the :class:`~django_typer.completers.ModelObjectCompleter` for a completer that works
+    See the :class:`~django_typer.completers.model.ModelObjectCompleter` for a completer that works
     for many Django_ model field types.
 
 
@@ -245,15 +245,16 @@ Provided Completers
 Django Apps
 -----------
 
-* completer: :func:`~django_typer.completers.complete_app_label`
-* parser: :func:`~django_typer.parsers.parse_app_label`
+* completer: :func:`~django_typer.completers.apps.app_labels`
+* parser: :func:`~django_typer.parsers.apps.app_config`
 
 .. code-block:: python
 
     import typing as t
     import typer
     from django.apps import AppConfig
-    from django_typer import completers, parsers
+    from django_typer.completers.apps import app_labels
+    from django_typer.parsers.apps import app_config
 
     ...
 
@@ -262,10 +263,10 @@ Django Apps
         django_app: t.Annotated[
             AppConfig,
             typer.Argument(
-                parser=parsers.parse_app_label,
-                shell_complete=completers.complete_app_label,
-            ),
-        ],
+                parser=app_config,
+                shell_complete=app_labels
+            )
+        ]
     )
 
 Constant Strings
@@ -293,21 +294,21 @@ Constant Strings
         shell: t.Annotated[
             Shells,
             typer.Argument(
-                shell_complete=these_strings(list(Shells)),
-            ),
-        ],
+                shell_complete=these_strings(list(Shells))
+            )
+        ]
     )
 
 Database Aliases
 ----------------
 
-* completer: :func:`~django_typer.completers.databases`
+* completer: :func:`~django_typer.completers.db.databases`
 
 .. code-block:: python
 
     import typing as t
     import typer
-    from django_typer.completers import databases
+    from django_typer.completers.db import databases
 
     ...
 
@@ -315,22 +316,20 @@ Database Aliases
         self,
         database: t.Annotated[
             str,
-            typer.Argument(
-                shell_complete=databases,
-            ),
-        ],
+            typer.Argument(shell_complete=databases())
+        ]
     )
 
 Management Commands
 -------------------
 
-* completer: :func:`~django_typer.completers.commands`
+* completer: :func:`~django_typer.completers.cmd.commands`
 
 .. code-block:: python
 
     import typing as t
     import typer
-    from django_typer.completers import commands
+    from django_typer.completers.cmd import commands
 
     ...
 
@@ -338,24 +337,22 @@ Management Commands
         self,
         command: t.Annotated[
             str,
-            typer.Argument(
-                shell_complete=commands,
-            ),
-        ],
+            typer.Argument(shell_complete=commands())
+        ]
     )
 
 
 Paths (Files & Directories)
 ---------------------------
 
-* completer: :func:`~django_typer.completers.complete_path`
+* completer: :func:`~django_typer.completers.path.paths`
 
 .. code-block:: python
 
     import typing as t
     import typer
     from pathlib import Path
-    from django_typer.completers import complete_path
+    from django_typer.completers.path import paths
 
     ...
 
@@ -363,23 +360,21 @@ Paths (Files & Directories)
         self,
         path: t.Annotated[
             Path,
-            typer.Argument(
-                shell_complete=complete_path,
-            ),
-        ],
+            typer.Argument(shell_complete=paths)
+        ]
     )
 
 Directories
 -----------
 
-* completer: :func:`~django_typer.completers.complete_directory`
+* completer: :func:`~django_typer.completers.path.directories`
 
 .. code-block:: python
 
     import typing as t
     import typer
     from pathlib import Path
-    from django_typer.completers import complete_directory
+    from django_typer.completers.path import directories
 
     ...
 
@@ -387,10 +382,8 @@ Directories
         self,
         directory: t.Annotated[
             Path,
-            typer.Argument(
-                shell_complete=complete_directory,
-            ),
-        ],
+            typer.Argument(shell_complete=directories)
+        ]
     )
 
 
@@ -399,13 +392,13 @@ Import Paths
 
 Complete python.import.paths - uses sys.path. This completer is used for --settings
 
-* completer: :func:`~django_typer.completers.complete_import_path`
+* completer: :func:`~django_typer.completers.path.import_paths`
 
 .. code-block:: python
 
     import typing as t
     import typer
-    from django_typer.completers import complete_import_path
+    from django_typer.completers.path import import_paths
 
     ...
 
@@ -413,17 +406,15 @@ Complete python.import.paths - uses sys.path. This completer is used for --setti
         self,
         import_path: t.Annotated[
             str,
-            typer.Argument(
-                shell_complete=complete_import_path,
-            ),
-        ],
+            typer.Argument(shell_complete=import_paths)
+        ]
     )
 
 Model Objects
 -------------
 
-* completer: :class:`~django_typer.completers.ModelObjectCompleter`
-* parser: :class:`~django_typer.parsers.ModelObjectParser`
+* completer: :class:`~django_typer.completers.model.ModelObjectCompleter`
+* parser: :class:`~django_typer.parsers.model.ModelObjectParser`
 * convenience: :func:`~django_typer.management.model_parser_completer`
 
 This completer/parser pairing provides the ability to fetch a model object from one of its fields.
@@ -454,9 +445,9 @@ shells support. Refer to the reference documentation and the
                     ModelClass,  # may also accept a QuerySet for pre-filtering
                     'field_name',  # the field that should be matched (defaults to id)
                     help_field='other_field'  # optionally provide some additional help text
-                ),
+                )
                 help=_("Fetch objects by their field_names.")
-            ),
+            )
         ]
     ):
         ...
@@ -474,7 +465,9 @@ be returned, or only the first completer that generates matches.
 
     import typing as t
     import typer
-    from django_typer import completers
+    from django_typer.completers import chain
+    from django_typer.completers.path import import_paths
+    from django_typer.completers.cmd import commands
 
     ...
 
@@ -484,12 +477,9 @@ be returned, or only the first completer that generates matches.
             str,
             typer.Argument(
                 # allow commands to be specified by name or import path
-                shell_complete=completers.chain(
-                    completers.complete_import_path,
-                    completers.commands
-                )
-            ),
-        ],
+                shell_complete=chain(import_paths, commands())
+            )
+        ]
     )
 
 

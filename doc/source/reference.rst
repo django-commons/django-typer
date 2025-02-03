@@ -46,6 +46,12 @@ parsers
 .. automodule:: django_typer.parsers
     :members:
 
+.. automodule:: django_typer.parsers.apps
+    :members:
+
+.. automodule:: django_typer.parsers.model
+    :members:
+
 .. _completers:
 
 completers
@@ -54,12 +60,26 @@ completers
 .. automodule:: django_typer.completers
     :members:
 
+.. automodule:: django_typer.completers.apps
+    :members:
+
+.. automodule:: django_typer.completers.cmd
+    :members:
+
+.. automodule:: django_typer.completers.db
+    :members:
+
+.. automodule:: django_typer.completers.model
+    :members:
+
+.. automodule:: django_typer.completers.path
+    :members:
 
 utils
 -----
 
 .. automodule:: django_typer.utils
-    :members: traceback_config, get_current_command, register_command_plugins, is_method
+    :members: traceback_config, get_current_command, register_command_plugins, is_method, parse_iso_duration, duration_iso_string
 
 .. _shellcompletion:
 
