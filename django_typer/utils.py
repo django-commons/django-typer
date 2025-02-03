@@ -296,35 +296,112 @@ def get_win_shell() -> str:
     raise ShellDetectionFailure("Unable to detect windows shell")
 
 
-def parse_iso_duration(duration: str) -> timedelta:
+def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
     """
-    Progressively parse an ISO8601 duration type.
+    Progressively parse an ISO8601 duration type - can be a partial
+    duration string. If it is a partial duration string with an ambiguous
+    trailing number, the number will be returned as the second value of the
+    tuple.
+
+    .. note::
+        We use a subset of ISO8601, the supported markers are D, H, M, S.
+
+    :return: A tuple of the parsed duration and the ambiguous trailing number
     """
     import re
 
-    # Define regex pattern for ISO 8601 duration
-    pattern = re.compile(
-        r"([-+])?"
-        r"(P"  # Start with 'P'
-        r"(?:(?P<days>\d+)D)?"  # Capture days (optional)
-        r"(?:T"  # Start time part (optional)
-        r"(?:(?P<hours>\d+)H)?"  # Capture hours (optional)
-        r"(?:(?P<minutes>\d+)M)?"  # Capture minutes (optional)
-        r"(?:(?P<seconds>\d+(?:\.\d+)?)S)?)?)?"  # Capture seconds (optional, with optional fraction)
-    )
+    original = duration
+    duration = duration.upper()
 
-    # Match the input string to the pattern
-    match = pattern.fullmatch(duration)
-    if not match:
-        raise ValueError(f"Invalid ISO 8601 duration format: {duration}")
+    sign = -1 if duration.startswith("-") else 1
+    duration = duration.lstrip("-").lstrip("+").lstrip("P")
 
-    # Extract matched groups and convert to float/int
-    days = int(match.group("days")) if match.group("days") else 0
-    hours = int(match.group("hours")) if match.group("hours") else 0
-    minutes = int(match.group("minutes")) if match.group("minutes") else 0
-    seconds = float(match.group("seconds")) if match.group("seconds") else 0.0
+    ambiguous: t.Optional[str] = None
 
-    td = timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
-    if duration.startswith("-"):
-        return -td
-    return td
+    class Incomplete(Exception):
+        value: str
+
+        def __init__(self, value: str):
+            self.value = value
+
+    def eat(markers: t.Sequence[str], interpret=lambda x: (int(x), True)) -> int:
+        nonlocal duration
+        if duration:
+            match = re.match(r"(\d+)(.)?", duration)
+            if match and match.group(2) in markers:
+                duration = duration[match.end() :]
+                return interpret(match.group(1))[0]
+            if match and not match.group(2):
+                duration = duration[match.end() :]
+                value, ambig = interpret(match.group(1))
+                if not ambig:
+                    return value
+                raise Incomplete(match.group(1))
+        return 0
+
+    days = 0
+    hours = 0
+    minutes = 0
+    seconds = 0
+    microseconds = 0
+
+    # examples: 1 T1
+    try:
+        days = eat(("D",))
+    except Incomplete as incomplete:
+        ambiguous = incomplete.value
+
+    duration = duration.lstrip("T")
+
+    try:
+        hours = eat(("H",))
+        minutes = eat(("M",))
+        seconds = eat((".", "S"))
+        microseconds = eat(("S",), lambda x: (int(f"{x:0<6}"), len(x) < 6))
+    except Incomplete as incomplete:
+        ambiguous = incomplete.value
+
+    if duration:
+        # if the string was a valid full or partial duration all characters
+        # should have been consumed
+        raise ValueError(f"Invalid ISO 8601 duration format: {original}")
+
+    return sign * timedelta(
+        days=days,
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds,
+        microseconds=microseconds,
+    ), ambiguous
+
+
+def duration_iso_string(duration: timedelta) -> str:
+    """
+    Return an ISO8601 duration string from a timedelta. This differs from
+    the Django implementation in that zeros are elided.
+    """
+    if not duration:
+        return "PT0S"
+    sign = "-" if duration < timedelta() else ""
+    if sign:
+        duration *= -1
+    days = duration.days
+    hours, seconds = divmod(duration.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    time_parts = []
+    day_str = ""
+    if days:
+        day_str = f"{abs(days)}D"
+    if hours:
+        time_parts.append(f"{abs(hours)}H")
+    if minutes:
+        time_parts.append(f"{abs(minutes)}M")
+    if seconds or duration.microseconds:
+        if duration.microseconds:
+            time_parts.append(f"{abs(seconds)}.{abs(duration.microseconds):0>6}S")
+        else:
+            time_parts.append(f"{abs(seconds)}S")
+    time_str = ""
+    if time_parts:
+        time_str = "T" + "".join(time_parts)
+    return f"{sign}P{day_str}{time_str}"

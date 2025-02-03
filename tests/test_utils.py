@@ -4,6 +4,7 @@ from django_typer.utils import (
     get_win_shell,
     detect_shell,
     parse_iso_duration,
+    duration_iso_string,
 )
 from django.test import override_settings
 from django.core.management import call_command
@@ -111,7 +112,6 @@ def test_detect_shell():
 
 def test_parse_iso_duration():
     from datetime import timedelta
-    from django.utils.duration import duration_iso_string
 
     for duration in [
         timedelta(days=3, hours=4, minutes=30, seconds=15, microseconds=123456),
@@ -119,17 +119,23 @@ def test_parse_iso_duration():
         timedelta(days=0, hours=23, minutes=45, seconds=30),
         timedelta(days=5, hours=0, minutes=15, seconds=5, microseconds=987654),
         timedelta(days=2, hours=8, minutes=0, seconds=0),
-        timedelta(days=-3, hours=-4, minutes=-30, seconds=-15, microseconds=-123456),
-        timedelta(days=-1, hours=-12, minutes=0, seconds=0),
-        timedelta(days=-2, hours=-20, minutes=-10, seconds=-30),
-        timedelta(days=-5, hours=-6, minutes=-0, seconds=-50, microseconds=-123000),
-        timedelta(days=-10, hours=-5, minutes=-55, seconds=-5),
+        -timedelta(days=3, hours=4, minutes=30, seconds=15, microseconds=123456),
+        -timedelta(days=1, hours=12, minutes=0, seconds=0),
+        -timedelta(days=2, hours=20, minutes=10, seconds=30),
+        -timedelta(days=5, hours=6, minutes=0, seconds=50, microseconds=123000),
+        -timedelta(days=10, hours=5, minutes=55, seconds=5),
+        timedelta(),
+        timedelta(days=1),
+        timedelta(hours=2),
+        timedelta(minutes=3),
+        timedelta(seconds=4),
+        timedelta(microseconds=5),
     ]:
-        assert parse_iso_duration(duration_iso_string(duration)) == duration
+        assert parse_iso_duration(duration_iso_string(duration)) == (duration, None)
 
-    assert parse_iso_duration("") == timedelta()
-    assert parse_iso_duration("-") == -timedelta()
-    assert parse_iso_duration("+") == timedelta()
+    assert parse_iso_duration("") == (timedelta(), None)
+    assert parse_iso_duration("-") == (-timedelta(), None)
+    assert parse_iso_duration("+") == (timedelta(), None)
 
     with pytest.raises(ValueError):
         parse_iso_duration("?")
@@ -138,4 +144,75 @@ def test_parse_iso_duration():
         parse_iso_duration("=")
 
     with pytest.raises(ValueError):
-        parse_iso_duration("10D")
+        parse_iso_duration("P10DX1S")
+
+    with pytest.raises(ValueError):
+        parse_iso_duration("P10DT5H.43S")
+
+    assert parse_iso_duration("-P2DT12H") == (-timedelta(days=2, hours=12), None)
+    assert parse_iso_duration("P1") == (timedelta(), "1")
+    assert parse_iso_duration("PT1") == (timedelta(), "1")
+    assert parse_iso_duration("P2DT2H4") == (timedelta(days=2, hours=2), "4")
+    assert parse_iso_duration("P2DT2H4M5") == (
+        timedelta(days=2, hours=2, minutes=4),
+        "5",
+    )
+    assert parse_iso_duration("P2DT2H4M5.") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5),
+        None,
+    )
+
+    # microseconds are weird
+    assert parse_iso_duration("P2DT2H4M5.000123") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=123),
+        None,
+    )
+    assert parse_iso_duration("P2DT2H4M5.123456") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=123456),
+        None,
+    )
+
+    assert parse_iso_duration("P2DT2H4M5.000123S") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=123),
+        None,
+    )
+    assert parse_iso_duration("P2DT2H4M5.123456S") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=123456),
+        None,
+    )
+
+    assert parse_iso_duration("P2DT2H4M5.00012") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5),
+        "00012",
+    )
+    assert parse_iso_duration("P2DT2H4M5.12") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5),
+        "12",
+    )
+
+    assert parse_iso_duration("P2DT2H4M5.00012S") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=120),
+        None,
+    )
+    assert parse_iso_duration("P2DT2H4M5.12S") == (
+        timedelta(days=2, hours=2, minutes=4, seconds=5, microseconds=120000),
+        None,
+    )
+
+    assert parse_iso_duration("P2DT5.00012S") == (
+        timedelta(days=2, seconds=5, microseconds=120),
+        None,
+    )
+    assert parse_iso_duration("P2DT5.12S") == (
+        timedelta(days=2, seconds=5, microseconds=120000),
+        None,
+    )
+
+    assert parse_iso_duration("P2DT5.00012") == (timedelta(days=2, seconds=5), "00012")
+    assert parse_iso_duration("P2DT5.12") == (timedelta(days=2, seconds=5), "12")
+
+    assert parse_iso_duration("P2DT5.") == (timedelta(days=2, seconds=5), None)
+    assert parse_iso_duration("P2DT5.") == (timedelta(days=2, seconds=5), None)
+
+    assert parse_iso_duration("PT5") == (timedelta(), "5")
+    assert parse_iso_duration("-PT5") == (-timedelta(), "5")
