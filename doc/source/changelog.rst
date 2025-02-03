@@ -7,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
 * Fixed `Model objects with null lookup fields should not be included in model field completion output <https://github.com/django-commons/django-typer/issues/160>`_
 * Implemented `Add security scans to CI. <https://github.com/django-commons/django-typer/issues/158>`_
 * Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
@@ -26,6 +27,7 @@ v3.0.0 (202X-XX-XX)
 * Fixed `Installed shellcompletion scripts do not pass values of --settings or --pythonpath <https://github.com/django-commons/django-typer/issues/68>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
 * Implemented `Add completer/parser for FileField and FilePathField <https://github.com/django-commons/django-typer/issues/17>`_
+* Implemented `Add completer/parser for DurationField <https://github.com/django-commons/django-typer/issues/16>`_
 * Implemented `Add completer/parser for DateTimeField <https://github.com/django-commons/django-typer/issues/15>`_
 * Implemented `Add completer/parser for DateField <https://github.com/django-commons/django-typer/issues/14>`_
 * Implemented `Add completer/parser for TimeField <https://github.com/django-commons/django-typer/issues/13>`_
