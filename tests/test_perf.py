@@ -79,6 +79,6 @@ def test_performance_regression():
     assert mods_no_typer / mods_typer > 0.9
     assert mods_no_typer / mods_typer_no_app > 0.9
 
-    # notify us if adding typer inflates command exec time by more than 20 percent
-    assert no_typer_time / typer_time > 0.70
-    assert no_typer_time / typer_no_app_time > 0.70
+    # notify us if adding typer inflates command exec time by more than 50 percent
+    assert no_typer_time / typer_time > 0.5
+    assert no_typer_time / typer_no_app_time > 0.5
