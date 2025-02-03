@@ -16,6 +16,7 @@ types:
 
 # pylint: disable=line-too-long
 
+import math
 import os
 import sys
 import typing as t
@@ -44,6 +45,7 @@ from django.db.models import (
     IntegerField,
     Manager,
     Max,
+    Min,
     Model,
     Q,
     TextField,
@@ -55,6 +57,10 @@ from django.utils.translation import gettext as _
 
 Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
 Strings = t.Union[t.Sequence[str], t.KeysView[str], t.Generator[str, None, None]]
+
+
+def power_of_ten(n: int) -> int:
+    return math.floor(math.log10(abs(n)))
 
 
 class ModelObjectCompleter:
@@ -88,6 +94,11 @@ class ModelObjectCompleter:
         - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
         - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
         - `GenericIPAddressField <https://docs.djangoproject.com/en/stable/ref/models/fields/#genericipaddressfield>`_
+
+    .. note::
+
+        The queries used by this completer will make use of column indexes. Completions should be
+        fast even for large data.
 
     The completer query logic is pluggable, but the defaults cover most use cases. The
     limit field is important. It defaults to 50 meaning if more than 50 potential completions
@@ -181,10 +192,25 @@ class ModelObjectCompleter:
         elif isinstance(obj, date):
             return obj.isoformat()
         elif isinstance(obj, timedelta):
-            from django.utils.duration import duration_iso_string
+            from django_typer.utils import duration_iso_string
 
             return duration_iso_string(obj)
         return str(obj)
+
+    @staticmethod
+    def int_ranges(incomplete: str, max_val: int) -> t.List[t.Tuple[int, int]]:
+        lower = int(incomplete)
+        neg = lower < 0
+        lower = abs(lower)
+        upper = abs(lower + 1)
+        ranges = [(-upper, -lower)] if neg else [(lower, upper)]
+        while (lower := lower * 10) <= max_val:
+            upper *= 10
+            if neg:
+                ranges.append((-upper, -lower))
+            else:
+                ranges.append((lower, upper))
+        return ranges
 
     def int_query(self, context: Context, parameter: Parameter, incomplete: str) -> Q:
         """
@@ -200,18 +226,16 @@ class ModelObjectCompleter:
         :raises ValueError: If the incomplete string is not a valid integer.
         :raises TypeError: If the incomplete string is not a valid integer.
         """
-        lower = int(incomplete)
-        upper = lower + 1
-        max_val = self.model_cls.objects.aggregate(Max(self.lookup_field))[
-            f"{self.lookup_field}__max"
-        ]
-        qry = Q(**{f"{self.lookup_field}__gte": lower}) & Q(
-            **{f"{self.lookup_field}__lt": upper}
-        )
-        while (lower := lower * 10) <= max_val:
-            upper *= 10
-            qry |= Q(**{f"{self.lookup_field}__gte": lower}) & Q(
-                **{f"{self.lookup_field}__lt": upper}
+        qry = Q()
+        neg = incomplete.startswith("-")
+        for lower, upper in self.int_ranges(
+            incomplete,
+            self.model_cls.objects.aggregate(Max(self.lookup_field))[
+                f"{self.lookup_field}__max"
+            ],
+        ):
+            qry |= Q(**{f"{self.lookup_field}__gt{'' if neg else 'e'}": lower}) & Q(
+                **{f"{self.lookup_field}__lt{'e' if neg else ''}": upper}
             )
         return qry
 
@@ -485,9 +509,11 @@ class ModelObjectCompleter:
         self, context: Context, parameter: Parameter, incomplete: str
     ) -> Q:
         """
-        Default completion query builder for duratioin fields. This method will return a Q object that
-        will match any value that is greater than the incomplete duraton string (or less if negative).
-        All durations must be in ISO8601 format (YYYY-MM-DD). Week specifiers are not supported.
+        Default completion query builder for duration fields. This method will return a Q object
+        that will match any value that is greater than the incomplete duration string (or less if
+        negative). Duration strings are formatted in a subset of the ISO8601 standard. Only day,
+        hours, minutes and fractional seconds are supported. Year, week and month specifiers are
+        not.
 
         :param context: The click context.
         :param parameter: The click parameter.
@@ -498,9 +524,158 @@ class ModelObjectCompleter:
         """
         from django_typer.utils import parse_iso_duration
 
-        duration = parse_iso_duration(incomplete)
-        lookup = "gte" if duration >= timedelta() else "lte"
-        return Q(**{f"{self.lookup_field}__{lookup}": duration})
+        duration, ambiguity = parse_iso_duration(incomplete)
+        if incomplete.endswith("S") or (duration.microseconds and not ambiguity):
+            return Q(**{f"{self.lookup_field}": duration})
+        neg = incomplete.startswith("-")
+
+        qry = Q()
+        horizon = None  # time horizon is exclusive!
+
+        if ambiguity and "T" not in incomplete and "D" not in incomplete:
+            # days is unbounded
+            # if days == 5, we want to match 5-<6, 50-<60, 500-<600, etc
+            max_val = (
+                self.model_cls.objects.filter(qry).aggregate(Min(self.lookup_field))[
+                    f"{self.lookup_field}__min"
+                ]
+                if neg
+                else self.model_cls.objects.filter(qry).aggregate(
+                    Max(self.lookup_field)
+                )[f"{self.lookup_field}__max"]
+            )
+            for lower, upper in self.int_ranges(
+                ambiguity,
+                max_val.days,
+            ):
+                qry |= Q(
+                    **{
+                        f"{self.lookup_field}__gt{'' if neg else 'e'}": timedelta(
+                            days=lower
+                        )
+                    }
+                ) & Q(
+                    **{
+                        f"{self.lookup_field}__lt{'e' if neg else ''}": timedelta(
+                            days=upper
+                        )
+                    }
+                )
+        elif duration.days or "D" in incomplete or "T" in incomplete:
+            horizon = timedelta(days=1)
+
+        if "T" in incomplete:
+            hours, seconds = divmod(duration.seconds, 3600)
+            minutes, seconds = divmod(seconds, 60)
+
+            # if we are here, we may or may not have an ambiguous time component
+            # or (exclusively) we may be missing time components
+            if ambiguity is None:
+                # handle no ambiguity first
+                # there's no way to be here and have any ambiguity or non-ambiguous microseconds
+                # ex: PT PT1. PT1M PT1H PT1H1M
+                if incomplete.endswith("M"):
+                    horizon = timedelta(minutes=1)
+                elif incomplete.endswith("H"):
+                    horizon = timedelta(hours=1)
+                elif not incomplete.endswith("T"):
+                    horizon = timedelta(seconds=1)
+            else:
+                # we have a trailing ambiguity
+                if "." in incomplete or seconds:
+                    # microsecond ambiguity
+                    # 5.000 -> the most this could be is 5.000999
+                    floor = int(f"{ambiguity:0<6}")
+                    duration = timedelta(
+                        days=abs(duration.days),
+                        seconds=abs(duration.seconds),
+                        microseconds=floor,
+                    )
+                    duration = -duration if neg else duration
+                    horizon = timedelta(
+                        microseconds=int(ambiguity + "9" * (6 - len(ambiguity)))
+                        + 1
+                        - floor
+                    )
+                else:
+                    # ambiguity is at least a seconds ambiguity
+                    int_amb = int(ambiguity)
+                    compound_horizon: t.List[
+                        t.Tuple[int, int]
+                    ] = []  # seconds horizons small -> large
+                    compound_horizon.append(
+                        (
+                            int_amb,
+                            int_amb + 1,
+                        )
+                    )
+                    compound_horizon.append(
+                        (int(f"{ambiguity}0"), min(int(f"{ambiguity}9") + 1, 60))
+                    )
+                    if "M" not in incomplete:
+                        # ambiguity is minutes or seconds
+                        compound_horizon.append(
+                            (
+                                int_amb * 60,
+                                int_amb * 60 + 60,
+                            )
+                        )
+                        if len(ambiguity) == 1:
+                            compound_horizon.append(
+                                (
+                                    int(f"{ambiguity}0") * 60,
+                                    min(int(f"{ambiguity}9") + 1, 60) * 60,
+                                )
+                            )
+                    if "H" not in incomplete:
+                        # ambiguity is hours or minutes or seconds
+                        # bug here T1 could be T1H or T10H-T19H
+                        compound_horizon.append(
+                            (
+                                int_amb * 3600,
+                                int_amb * 3600 + 3600,
+                            )
+                        )
+                        if len(ambiguity) == 1:
+                            compound_horizon.append(
+                                (
+                                    int(f"{ambiguity}0") * 3600,
+                                    min(int(f"{ambiguity}9") + 1, 24) * 3600,
+                                )
+                            )
+                    c_qry = Q()
+                    for lower, upper in compound_horizon:
+                        lower, upper = (
+                            (
+                                duration - timedelta(seconds=upper),
+                                duration - timedelta(seconds=lower),
+                            )
+                            if neg
+                            else (
+                                duration + timedelta(seconds=lower),
+                                duration + timedelta(seconds=upper),
+                            )
+                        )
+                        h_qry = Q(
+                            **{f"{self.lookup_field}__gt{'' if neg else 'e'}": lower}
+                        ) & Q(**{f"{self.lookup_field}__lt{'e' if neg else ''}": upper})
+                        c_qry |= h_qry
+                    qry &= c_qry
+
+        inclusive = "" if incomplete.endswith("T") and duration.days else "e"
+        qry &= (
+            Q(**{f"{self.lookup_field}__lt{inclusive}": duration})
+            if neg
+            else Q(**{f"{self.lookup_field}__gt{inclusive}": duration})
+        )
+
+        if horizon:
+            qry &= (
+                Q(**{f"{self.lookup_field}__gt": duration - horizon})
+                if neg
+                else Q(**{f"{self.lookup_field}__lt": duration + horizon})
+            )
+        return qry
 
     def __init__(
         self,

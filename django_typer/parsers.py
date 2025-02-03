@@ -105,6 +105,8 @@ class ModelObjectParser(ParamType):
             return "YYYY-MM-DD"
         elif isinstance(self._field, models.TimeField):
             return "HH:MM:SS.sss"
+        elif isinstance(self._field, models.DurationField):
+            return "ISO 8601"
         return "TXT"
 
     def __init__(
@@ -165,7 +167,9 @@ class ModelObjectParser(ParamType):
             elif isinstance(self._field, models.DurationField):
                 from django_typer.utils import parse_iso_duration
 
-                value = parse_iso_duration(value)
+                value, ambiguous = parse_iso_duration(value)
+                if ambiguous:
+                    raise ValueError(f"Ambiguous duration: {value}")
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )
