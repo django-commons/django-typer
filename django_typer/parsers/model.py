@@ -1,5 +1,6 @@
 import typing as t
 from datetime import date, datetime, time
+from enum import Enum
 from uuid import UUID
 
 from click import Context, Parameter, ParamType
@@ -8,6 +9,12 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from django_typer.completers.model import ModelObjectCompleter
+
+
+class ReturnType(Enum):
+    MODEL_INSTANCE = 0
+    FIELD_VALUE = 1
+    QUERY_SET = 2
 
 
 class ModelObjectParser(ParamType):
@@ -44,6 +51,9 @@ class ModelObjectParser(ParamType):
         The callable should accept three arguments: the model class, the
         value that failed to lookup, and the exception that was raised.
         If not provided, a CommandError will be raised.
+    :param return_type: The model object parser can return types other than the model
+        instance (default) - use the ReturnType enumeration to return other types
+        from the parser including QuerySets or the primitive values of the model fields.
     """
 
     error_handler = t.Callable[[t.Type[models.Model], str, Exception], None]
@@ -52,6 +62,7 @@ class ModelObjectParser(ParamType):
     lookup_field: str
     case_insensitive: bool = False
     on_error: t.Optional[error_handler] = None
+    return_type: ReturnType = ReturnType.MODEL_INSTANCE
 
     _lookup: str = ""
     _field: models.Field
@@ -90,6 +101,7 @@ class ModelObjectParser(ParamType):
         lookup_field: t.Optional[str] = None,
         case_insensitive: bool = case_insensitive,
         on_error: t.Optional[error_handler] = on_error,
+        return_type: ReturnType = return_type,
     ):
         from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -98,6 +110,7 @@ class ModelObjectParser(ParamType):
             lookup_field or getattr(self.model_cls._meta.pk, "name", "id")
         )
         self.on_error = on_error
+        self.return_type = return_type
         self.case_insensitive = case_insensitive
         field = self.model_cls._meta.get_field(self.lookup_field)
         assert not isinstance(field, (models.ForeignObjectRel, GenericForeignKey)), _(
@@ -126,7 +139,7 @@ class ModelObjectParser(ParamType):
         """
         original = value
         try:
-            if isinstance(value, self.model_cls):
+            if not isinstance(value, str):
                 return value
             elif isinstance(self._field, models.UUIDField):
                 uuid = ""
@@ -147,6 +160,12 @@ class ModelObjectParser(ParamType):
                 if ambiguous:
                     raise ValueError(f"Invalid duration: {value}")
                 value = parsed
+            if self.return_type is ReturnType.QUERY_SET:
+                return self.model_cls.objects.filter(
+                    **{f"{self.lookup_field}{self._lookup}": value}
+                )
+            elif self.return_type is ReturnType.FIELD_VALUE:
+                return value
             return self.model_cls.objects.get(
                 **{f"{self.lookup_field}{self._lookup}": value}
             )

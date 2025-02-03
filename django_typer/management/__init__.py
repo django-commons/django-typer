@@ -34,7 +34,7 @@ from typer.models import Default, DefaultPlaceholder  # noqa: E402
 
 from ..completers.model import ModelObjectCompleter  # noqa: E402
 from ..config import traceback_config  # noqa: E402
-from ..parsers.model import ModelObjectParser  # noqa: E402
+from ..parsers.model import ModelObjectParser, ReturnType  # noqa: E402
 from ..types import (  # noqa: E402
     ForceColor,
     NoColor,
@@ -126,6 +126,7 @@ def model_parser_completer(
     distinct: bool = ModelObjectCompleter.distinct,
     on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
     order_by: t.Optional[t.Union[str, t.Sequence[str]]] = None,
+    return_type: ReturnType = ModelObjectParser.return_type,
 ) -> t.Dict[str, t.Any]:
     """
     A factory function that returns a dictionary that can be used to specify
@@ -161,6 +162,8 @@ def model_parser_completer(
         completion suggestions, True by default
     :param on_error: a callable that will be called if the parser lookup fails
         to produce a matching object - by default a CommandError will be raised
+    :param return_type: An enumeration switch to return either a model instance,
+        queryset or model field value type.
     """
     return {
         "parser": ModelObjectParser(
@@ -168,6 +171,7 @@ def model_parser_completer(
             lookup_field,
             case_insensitive=case_insensitive,
             on_error=on_error,
+            return_type=return_type,
         ),
         "shell_complete": ModelObjectCompleter(
             model_or_qry,
