@@ -389,7 +389,7 @@ class _CompleteTestCase:
         completions = self.get_completions(
             self.launch_script, "completion", "--dir", "./django_typer/"
         )
-        self.assertNotIn("completers", completions)
+        self.assertNotIn("utils.py", completions)
         self.assertNotIn("config.py", completions)
         self.assertIn("templates", completions)
         self.assertIn("management", completions)
