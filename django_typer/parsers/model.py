@@ -6,7 +6,6 @@ from uuid import UUID
 from click import Context, Parameter, ParamType
 from django.core.management import CommandError
 from django.db import models
-from django.utils.translation import gettext as _
 
 from django_typer.completers.model import ModelObjectCompleter
 
@@ -118,7 +117,7 @@ class ModelObjectParser(ParamType):
         self.return_type = return_type
         self.case_insensitive = case_insensitive
         field = self.model_cls._meta.get_field(self.lookup_field)
-        assert not isinstance(field, (models.ForeignObjectRel, GenericForeignKey)), _(
+        assert not isinstance(field, (models.ForeignObjectRel, GenericForeignKey)), (
             "{cls} is not a supported lookup field."
         ).format(cls=self._field.__class__.__name__)
         self._field = field
@@ -178,17 +177,11 @@ class ModelObjectParser(ParamType):
             if self.on_error:
                 return self.on_error(self.model_cls, original, err)
             raise CommandError(
-                _("{value} is not a valid {field}").format(
-                    value=original, field=self._field.__class__.__name__
-                )
+                f"{original} is not a valid {self._field.__class__.__name__}"
             ) from err
         except self.model_cls.DoesNotExist as err:
             if self.on_error:
                 return self.on_error(self.model_cls, original, err)
             raise CommandError(
-                _('{model}.{lookup_field}="{value}" does not exist!').format(
-                    model=self.model_cls.__name__,
-                    lookup_field=self.lookup_field,
-                    value=original,
-                )
+                f'{self.model_cls.__name__}.{self.lookup_field}="{original}" does not exist!'
             ) from err

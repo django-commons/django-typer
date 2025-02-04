@@ -2,7 +2,6 @@ import typing as t
 
 from django.apps import AppConfig, apps
 from django.core.management import CommandError
-from django.utils.translation import gettext as _
 
 
 def app_config(label: t.Union[str, AppConfig]):
@@ -44,9 +43,7 @@ def app_config(label: t.Union[str, AppConfig]):
             if cfg.name == label:
                 return cfg
 
-        raise CommandError(
-            _("{label} does not match any installed app label.").format(label=label)
-        ) from err
+        raise CommandError(f"{label} does not match any installed app label.") from err
 
 
 app_config.__name__ = "APP_LABEL"

@@ -33,7 +33,7 @@ def set_no_color(context, param, value):
         context.django_command.no_color = value
         if context.params.get("force_color", False):
             raise CommandError(
-                _("The --no-color and --force-color options can't be used together.")
+                "The --no-color and --force-color options can't be used together."
             )
     return value
 

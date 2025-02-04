@@ -17,7 +17,6 @@ from django.core.management.color import Style as ColorStyle
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.utils.functional import Promise, classproperty
-from django.utils.translation import gettext as _
 
 from django_typer import patch
 
@@ -2512,7 +2511,7 @@ class TyperParser:
         add_argument() is disabled for TyperCommands because all arguments
         and parameters are specified as args and kwargs on the function calls.
         """
-        raise NotImplementedError(_("add_argument() is not supported"))
+        raise NotImplementedError("add_argument() is not supported")
 
 
 class OutputWrapper(BaseOutputWrapper):
@@ -3073,7 +3072,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             sys.exit(exc_val.exit_code)
         if isinstance(exc_val, click.exceptions.UsageError):
             err_msg = (
-                _(self.missing_args_message).format(
+                self.missing_args_message.format(
                     parameter=getattr(getattr(exc_val, "param", None), "name", "")
                 )
                 if isinstance(exc_val, click.exceptions.MissingParameter)
@@ -3132,9 +3131,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 assert get_typer_command(self.typer_app)
             except RuntimeError as rerr:
                 raise NotImplementedError(
-                    _(
-                        "No commands or command groups were registered on {command}"
-                    ).format(command=self._name)
+                    f"No commands or command groups were registered on {self._name}"
                 ) from rerr
 
     def get_subcommand(self, *command_path: str) -> CommandNode:
@@ -3248,10 +3245,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             if callable(handle):
                 return handle(*args, **kwargs)
             raise NotImplementedError(
-                _(
-                    "{cls} does not implement handle(), you must call the other command "
-                    "functions directly."
-                ).format(cls=self.__class__)
+                f"{self.__class__} does not implement handle(), you must call the other command "
+                "functions directly."
             )
 
     @t.no_type_check

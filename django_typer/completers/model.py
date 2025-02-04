@@ -8,7 +8,6 @@ from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
-from django.utils.translation import gettext as _
 
 
 class ModelObjectCompleter:
@@ -274,11 +273,7 @@ class ModelObjectCompleter:
             self._offset += 1
 
         if len(uuid) > 32:
-            raise ValueError(
-                _("Too many UUID characters: {incomplete}").format(
-                    incomplete=incomplete
-                )
-            )
+            raise ValueError(f"Too many UUID characters: {incomplete}")
         min_uuid = UUID(uuid + "0" * (32 - len(uuid)))
         max_uuid = UUID(uuid + "f" * (32 - len(uuid)))
         return models.Q(**{f"{self.lookup_field}__gte": min_uuid}) & models.Q(
@@ -302,11 +297,11 @@ class ModelObjectCompleter:
         day_low = 1
         day_high = None
         if len(parts) > 1:
-            assert len(parts[0]) > 3, _("Year must be 4 digits")
+            assert len(parts[0]) > 3, "Year must be 4 digits"
             month_high = min(int(parts[1] + "9" * (2 - len(parts[1]))), 12)
             month_low = max(int(parts[1] + "0" * (2 - len(parts[1]))), 1)
             if len(parts) > 2:
-                assert len(parts[1]) > 1, _("Month must be 2 digits")
+                assert len(parts[1]) > 1, "Month must be 2 digits"
                 day_low = max(int(parts[2] + "0" * (2 - len(parts[2]))), 1)
                 day_high = min(
                     int(parts[2] + "9" * (2 - len(parts[2]))),
@@ -658,7 +653,7 @@ class ModelObjectCompleter:
             self._queryset = model_or_qry
         else:
             raise ValueError(
-                _("ModelObjectCompleter requires a Django model class or queryset.")
+                "ModelObjectCompleter requires a Django model class or queryset."
             )
         self.lookup_field = str(
             lookup_field or getattr(self.model_cls._meta.pk, "name", "id")
@@ -701,9 +696,7 @@ class ModelObjectCompleter:
                 self.query = self.duration_query
             else:
                 raise ValueError(
-                    _("Unsupported lookup field class: {cls}").format(
-                        cls=self._field.__class__.__name__
-                    )
+                    f"Unsupported lookup field class: {self._field.__class__.__name__}"
                 )
 
     def __call__(

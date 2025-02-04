@@ -12,7 +12,6 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import CheckMessage, register
 from django.core.checks import Warning as CheckWarning
-from django.utils.translation import gettext as _
 
 from .config import traceback_config
 
@@ -86,7 +85,7 @@ def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
                 warnings.append(
                     CheckWarning(
                         "DT_RICH_TRACEBACK_CONFIG",
-                        hint=_("Unexpected parameters encountered: {keys}.").format(
+                        hint="Unexpected parameters encountered: {keys}.".format(
                             keys=", ".join(unexpected)
                         ),
                         obj=settings.SETTINGS_MODULE,
