@@ -54,8 +54,10 @@ def read_all_from_fd_with_timeout(fd, timeout=3):
 
 def scrub(output: str) -> str:
     """Scrub control code characters and ansi escape sequences for terminal colors from output"""
-    return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output, flags=re.IGNORECASE).replace(
-        "\t", ""
+    return (
+        re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output, flags=re.IGNORECASE)
+        .replace("\t", "")
+        .replace("\x08", "")
     )
 
 
