@@ -1,0 +1,183 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Sakinisha kukamilisha kiotomatiki kwa ganda la sasa."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Gamba la kutumia."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Kichujio cha mpangilio wa udhibiti wa uumbizaji nje ya maandishi kukamilika."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Ruhusu mpangilio wa udhibiti wa uumbizaji wa mwisho katika maandishi ya "
+"kukamilisha."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Sakinisha kukamilisha kiotomatiki kwa ganda la sasa au lililotolewa."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Jina la django dhibiti hati ya kusakinisha ukamilishaji kiotomatiki ikiwa ni"
+" tofauti na hati iliyotumika kuteta amri hii."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Njia ya kuingiza chatu kwa kazi kamili ya kurudi nyuma kutumia wakati amri "
+"ya kukamilisha sio TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "Jina la kiolezo cha kutumia kwa hati ya kukamilisha ganda."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Sanidua ukamilishaji kiotomatiki kwa ganda la sasa au lililotolewa."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Jina la hati ya kudhibiti django ili kuondoa ukamilishaji wa ganda ikiwa ni "
+"tofauti na hati iliyotumiwa kuteua amri hii."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Tengeneza ukamilishaji kiotomatiki kwa mfuatano wa amri."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Kamba ya amri ya kutoa mapendekezo ya kukamilisha."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Njia ya kuingiza chatu kwa kazi kamili ya kurudi nyuma kutumia wakati amri "
+"ya kukamilisha sio TyperCommand. Kwa chaguo-msingi, kitendakazi cha "
+"kukamilisha kiotomatiki cha django kinatumika."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Onyesha nambari ya toleo la programu na uondoke."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Kiwango cha Verbosity; 0=matokeo kidogo, 1=tokeo la kawaida, 2=tokeo la "
+"kitenzi, 3=tokeo la kitenzi sana"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Njia ya Python kwa moduli ya mipangilio, kwa mfano "
+"&quot;myproject.settings.main&quot;. Ikiwa hii haijatolewa, utofauti wa "
+"mazingira wa DJANGO_SETTINGS_MODULE utatumika."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Saraka ya kuongeza kwenye njia ya Python, kwa mfano "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Onyesha isipokuwa kwa CommandError"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Usitie rangi kwenye pato la amri."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Lazimisha uwekaji rangi wa pato la amri."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Ruka ukaguzi wa mfumo."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Haikuweza kuleta fomula ya kukamilisha urejeshaji nyuma: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Tafadhali bainisha ganda la kusakinisha au kuondoa ukamilishaji kiotomatiki."
+#~ " Haiwezi kutambua shell."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Ganda lisilotumika: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Shell {shell} haitumii ukamilishaji otomatiki kwa hati ambazo "
+#~ "hazijasakinishwa kwenye njia. Lazima uunde mahali pa kuingilia kwa "
+#~ "{script_name}. Angalia {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Haipendekezi kusakinisha ukamilishaji wa kichupo kwa hati ambayo haiko "
+#~ "kwenye njia kwa sababu ukamilishaji unaweza tu kufanya kazi ikiwa hati "
+#~ "imealikwa kutoka eneo moja na kutumia njia sawa. Unaweza kutaka kuunda "
+#~ "mahali pa kuingilia kwa {script_name}. Angalia {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "Ukamilishaji otomatiki wa {shell} @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "Ukamilishaji otomatiki wa {shell} ulioondolewa."

@@ -27,6 +27,11 @@ install-docs:
     poetry lock
     poetry install --with docs
 
+install-translate:
+    poetry env use python
+    poetry lock
+    poetry install --with translate
+
 pin-dependency +PACKAGES:
     poetry run pip install -U {{ PACKAGES }}
 
@@ -160,3 +165,6 @@ coverage:
 
 run +ARGS:
     poetry run {{ ARGS }}
+
+translate: install-translate
+    poetry run ./manage.py translate --settings tests.settings.translate

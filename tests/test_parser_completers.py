@@ -1858,10 +1858,8 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             else:
                 self.assertNotIn(f"/{pth}", result)
 
-        result = self.shellcompletion.complete(
-            "multi --pythonpath django_typer/completers"
-        )
-        self.assertNotIn("django_typer/completers", result)
+        result = self.shellcompletion.complete("multi --pythonpath django_typer/utils")
+        self.assertNotIn("django_typer/utils.py", result)
 
         result = self.shellcompletion.complete(
             "multi --pythonpath django_typer/does_not_exist"

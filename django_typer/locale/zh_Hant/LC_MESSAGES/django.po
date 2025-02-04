@@ -1,0 +1,160 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:09-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "為目前 shell 安裝自動完成功能。"
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "要使用的 shell。"
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "從完成文字中過濾終端格式化控制序列。"
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "允許在完成文字中設定終端格式化控制序列。"
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "為目前或給定的 shell 安裝自動完成功能。"
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr "如果與用於呼叫此指令的腳本不同，則安裝自動完成功能的 django 管理腳本的名稱。"
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr "當完成指令不是 TyperCommand 時所使用的後備完成函數的 python 導入路徑。"
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "用於 shell 完成腳本的模板的名稱。"
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "卸載目前或給定 shell 的自動完成功能。"
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr "如果與用於呼叫此指令的腳本不同，則刪除 shell 補全的 django 管理腳本的名稱。"
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "為命令字串產生自動完成。"
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "產生完成建議的命令字串。"
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"當完成指令不是 TyperCommand 時所使用的後備完成函數的 python 導入路徑。預設情況下，使用內建的 django 自動完成功能。"
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "顯示程式的版本號並退出。"
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr "詳細程度； 0=最小輸出，1=正常輸出，2=詳細輸出，3=非常詳細輸出"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"設定模組的 Python 路徑，例如「myproject.settings.main」。如果未提供，則將使用 "
+"DJANGO_SETTINGS_MODULE 環境變數。"
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr "新增至 Python 路徑的目錄，例如「/home/djangoprojects/myproject」。"
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "引發 CommandError 異常"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "不要給命令輸出添加顏色。"
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "強制對命令輸出進行彩色化。"
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "跳過系統檢查。"
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "無法匯入後備完成功能：{err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr "請指定要安裝或刪除自動完成功能的 shell。無法偵測到外殼。"
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "不受支援的 shell：{shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr "Shell {shell} 不支援未安裝在路徑上的腳本的自動完成。您必須為 {script_name} 建立一個入口點。參見{link}。"
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "不建議為不在路徑上的腳本安裝製表符補全，因為僅當從相同位置並使用相同相對路徑呼叫腳本時，補全才會起作用。您可能希望為 {script_name} "
+#~ "建立一個入口點。參見{link}。"
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "已安裝 {shell} @ {install_path} 的自動完成功能"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "卸載 {shell} 的自動完成功能。"

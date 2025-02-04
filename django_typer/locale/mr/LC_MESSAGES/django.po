@@ -1,0 +1,180 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "सध्याच्या शेलसाठी ऑटोकंप्लीशन स्थापित करा."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "वापरण्यासाठी शेल."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"पूर्णत्वाच्या मजकुराबाहेर टर्मिनल स्वरूपण नियंत्रण अनुक्रम फिल्टर करा."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"पूर्णत्वाच्या मजकुरात टर्मिनल स्वरूपण नियंत्रण अनुक्रमांना परवानगी द्या."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "चालू किंवा दिलेल्या शेलसाठी ऑटोकंप्लीशन स्थापित करा."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ही कमांड वापरण्यासाठी वापरल्या जाणाऱ्या स्क्रिप्टपेक्षा जर ऑटोकंप्लीशन "
+"इंस्टॉल करायचे असेल तर त्या django मॅनेज स्क्रिप्टचे नाव."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"जेव्हा कम्प्लीशन कमांड टायपरकमांड नसतो तेव्हा वापरण्यासाठी फॉलबॅक कम्प्लीट "
+"फंक्शनचा पायथॉन इम्पोर्ट पाथ."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "शेल पूर्णता स्क्रिप्टसाठी वापरायच्या टेम्पलेटचे नाव."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "सध्याच्या किंवा दिलेल्या शेलसाठी ऑटोकंप्लीशन अनइंस्टॉल करा."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ही कमांड वापरण्यासाठी वापरल्या जाणाऱ्या स्क्रिप्टपेक्षा जर वेगळे असेल तर शेल"
+" कम्प्लीशन काढून टाकण्यासाठी django मॅनेज स्क्रिप्टचे नाव."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "कमांड स्ट्रिंगसाठी ऑटोकंप्लीशन जनरेट करा."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "पूर्णत्व सूचना निर्माण करण्यासाठी कमांड स्ट्रिंग."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"जेव्हा कम्प्लीशन कमांड टायपरकमांड नसेल तेव्हा फॉलबॅक कम्प्लीट फंक्शनचा "
+"पायथॉन इम्पोर्ट पाथ वापरला जातो. डिफॉल्टनुसार, बिल्टइन डीजेंगो ऑटोकम्प्लीट "
+"फंक्शन वापरले जाते."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "प्रोग्रामचा आवृत्ती क्रमांक दाखवा आणि बाहेर पडा."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"शब्दसंग्रह पातळी; ० = किमान आउटपुट, १ = सामान्य आउटपुट, २ = शब्दसंग्रह "
+"आउटपुट, ३ = खूप शब्दसंग्रह आउटपुट"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"सेटिंग्ज मॉड्यूलचा पायथॉन मार्ग, उदा. &quot;myproject.settings.main&quot;. "
+"जर हे प्रदान केले नसेल, तर DJANGO_SETTINGS_MODULE पर्यावरण चल वापरला जाईल."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"पायथॉन मार्गात जोडण्यासाठी एक निर्देशिका, उदा. "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError वर अपवाद वाढवा"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "कमांड आउटपुट रंगीत करू नका."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "कमांड आउटपुटचे सक्तीने रंगीकरण करा."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "सिस्टम तपासणी वगळा."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "फॉलबॅक पूर्णता कार्य आयात करण्यात अक्षम: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "कृपया स्वयंपूर्णता स्थापित करण्यासाठी किंवा काढून टाकण्यासाठी शेल निर्दिष्ट "
+#~ "करा. शेल शोधण्यात अक्षम."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "असमर्थित शेल: {शेल}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "पथावर स्थापित नसलेल्या स्क्रिप्टसाठी शेल {शेल} ऑटोकंप्लीशनला समर्थन देत "
+#~ "नाही. तुम्ही {स्क्रिप्ट_नाव} साठी एक एंट्री पॉइंट तयार करणे आवश्यक आहे. "
+#~ "{लिंक} पहा."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "पथावर नसलेल्या स्क्रिप्टसाठी टॅब पूर्णता स्थापित करण्याची शिफारस केलेली नाही"
+#~ " कारण पूर्णता केवळ त्याच स्थानावरून आणि समान सापेक्ष पथ वापरल्यासच कार्य "
+#~ "करेल. तुम्ही {script_name} साठी एक एंट्री पॉइंट तयार करू शकता. {link} पहा."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "{shell} @ {install_path} साठी स्वयंपूर्णता स्थापित केली."
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "{shell} साठी ऑटोकंप्लीशन अनइंस्टॉल केले."

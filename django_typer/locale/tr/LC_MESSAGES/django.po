@@ -1,0 +1,182 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Mevcut kabuk için otomatik tamamlamayı yükleyin."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Kullanılacak kabuk."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Tamamlama metninden terminal biçimlendirme kontrol dizilerini filtrele."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Tamamlama metninde terminal biçimlendirme kontrol dizilerine izin ver."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Mevcut veya belirtilen kabuk için otomatik tamamlamayı yükleyin."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Bu komutu çağırmak için kullanılan betikten farklıysa, otomatik tamamlamayı "
+"yüklemek için kullanılacak django yönetim betiğinin adı."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Tamamlama komutu bir TyperCommand olmadığında kullanılacak bir geri dönüş "
+"tamamlama fonksiyonunun python içe aktarma yolu."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "Kabuk tamamlama betiği için kullanılacak şablonun adı."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Mevcut veya belirtilen kabuk için otomatik tamamlamayı kaldırın."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Bu komutu çağırmak için kullanılan betikten farklıysa, kabuk tamamlamayı "
+"kaldırmak için kullanılacak django yönetim betiğinin adı."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Komut dizesi için otomatik tamamlamayı oluştur."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Tamamlama önerilerinin üretileceği komut dizesi."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Tamamlama komutu bir TyperCommand olmadığında kullanılacak bir geri dönüş "
+"tamamlama işlevine giden python içe aktarma yolu. Varsayılan olarak, "
+"yerleşik django otomatik tamamlama işlevi kullanılır."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Programın versiyon numarasını göster ve çık."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Ayrıntılılık düzeyi; 0=asgari çıktı, 1=normal çıktı, 2=ayrıntılı çıktı, "
+"3=çok ayrıntılı çıktı"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Bir ayarlar modülüne giden Python yolu, örneğin "
+"&quot;myproject.settings.main&quot;. Bu sağlanmazsa, DJANGO_SETTINGS_MODULE "
+"ortam değişkeni kullanılacaktır."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Python yoluna eklenecek bir dizin, örneğin "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError istisnalarında artış"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Komut çıktısını renklendirmeyin."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Komut çıktısının renklendirilmesini zorla."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Sistem kontrollerini atla."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Geri dönüş tamamlama işlevi içe aktarılamıyor: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Lütfen otomatik tamamlamayı yüklemek veya kaldırmak için kabuğu belirtin. "
+#~ "Kabuk algılanamıyor."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Desteklenmeyen kabuk: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "{shell} kabuğu, yola yüklenmemiş betikler için otomatik tamamlamayı "
+#~ "desteklemez. {script_name} için bir giriş noktası oluşturmalısınız. "
+#~ "{link}&#39;e bakın."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Yolda olmayan bir betik için sekme tamamlamayı yüklemeniz önerilmez çünkü "
+#~ "tamamlamalar muhtemelen yalnızca betik aynı konumdan ve aynı bağıl yolu "
+#~ "kullanarak çağrılırsa çalışacaktır. {script_name} için bir giriş noktası "
+#~ "oluşturmak isteyebilirsiniz. Bkz. {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "{shell} @ {install_path} için otomatik tamamlama yüklendi"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "{shell} için otomatik tamamlama kaldırıldı."

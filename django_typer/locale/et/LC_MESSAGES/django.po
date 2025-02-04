@@ -1,0 +1,180 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Installige praeguse kesta jaoks automaatne lõpetamine."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Kasutatav kest."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Filtreerige lõpetatud tekstist välja terminali vormindamise juhtjärjestused."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Luba terminali vormingu juhtjadad lõpetatud tekstis."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Installige praeguse või antud kesta automaatne lõpetamine."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django haldamise skripti nimi, mille jaoks automaatse lõpetamise "
+"installimiseks kasutatakse, kui see erineb selle käsu käivitamiseks "
+"kasutatud skriptist."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Pythoni imporditee varu lõpetamise funktsioonile, mida kasutatakse juhul, "
+"kui lõpetamiskäsk ei ole TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "Shelli lõpetamise skripti jaoks kasutatava malli nimi."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Desinstallige praeguse või antud kesta automaatne lõpetamine."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django haldusskripti nimi, mis eemaldab kesta lõpetamise, kui see erineb "
+"selle käsu käivitamiseks kasutatud skriptist."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Loo käsustringi automaatne lõpetamine."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Käsu jada, mille jaoks lõpetamissoovitusi luua."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Pythoni imporditee varu lõpetamise funktsioonile, mida kasutatakse juhul, "
+"kui lõpetamiskäsk ei ole TyperCommand. Vaikimisi kasutatakse sisseehitatud "
+"django automaatse täitmise funktsiooni."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Näidake programmi versiooninumbrit ja väljuge."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Paljusõnalisuse tase; 0 = minimaalne väljund, 1 = tavaline väljund, 2 = "
+"paljusõnaline väljund, 3 = väga üksikasjalik väljund"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Pythoni tee seadete moodulisse, nt &quot;myproject.settings.main&quot;. Kui "
+"seda ei pakuta, kasutatakse keskkonnamuutujat DJANGO_SETTINGS_MODULE."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Kataloog, mis lisatakse Pythoni teele, nt "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Suurendage CommandErrori erandeid"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Ärge värvige käsu väljundit."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Käsu väljundi värvimine."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Jäta süsteemikontrollid vahele."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Varu lõpetamise funktsiooni ei saa importida: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Määrake kest, mille puhul automaatse lõpetamise installida või eemaldada. "
+#~ "Kesta ei õnnestu tuvastada."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Toetamata kest: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Shell {shell} ei toeta skriptide automaatset lõpetamist, mida pole teele "
+#~ "installitud. Peate looma {script_name} jaoks sisestuspunkti. Vaadake {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Ei ole soovitatav installida vahekaardi lõpetamist skripti jaoks, mis ei ole"
+#~ " teel, sest lõpud toimivad tõenäoliselt ainult siis, kui skript kutsutakse "
+#~ "välja samast asukohast ja kasutades sama suhtelist teed. Võimalik, et "
+#~ "soovite luua {script_name} jaoks sisestuspunkti. Vaadake {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "Installitud automaatne lõpetamine {shell} jaoks @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "Desinstallitud automaatne lõpetamine {shell} jaoks."

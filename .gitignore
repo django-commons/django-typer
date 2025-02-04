@@ -166,3 +166,5 @@ django_typer/tests/dj_params.json
 **/.DS_Store
 .ruff_cache
 **/tests/*.json
+**/tests/apps/util/*.key
+

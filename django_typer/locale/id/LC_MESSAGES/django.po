@@ -1,0 +1,183 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Instal pelengkapan otomatis untuk shell saat ini."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Cangkang yang akan digunakan."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Filter urutan kontrol pemformatan terminal dari teks yang lengkap."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Izinkan urutan kontrol pemformatan terminal dalam teks pelengkap."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Instal pelengkapan otomatis untuk shell saat ini atau yang diberikan."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Nama skrip manajemen django untuk memasang pelengkapan otomatis jika berbeda"
+" dengan skrip yang digunakan untuk menjalankan perintah ini."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Jalur impor python ke fungsi pelengkap fallback untuk digunakan saat "
+"perintah pelengkapan bukan TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "Nama templat yang akan digunakan untuk skrip pelengkapan shell."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"Copot pemasangan pelengkapan otomatis untuk shell saat ini atau yang "
+"diberikan."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Nama skrip manajemen django untuk menghapus pelengkapan shell jika berbeda "
+"dengan skrip yang digunakan untuk menjalankan perintah ini."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Hasilkan pelengkapan otomatis untuk string perintah."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Rangkaian perintah untuk menghasilkan saran penyelesaian."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Jalur impor python ke fungsi fallback complete yang akan digunakan saat "
+"perintah completion bukan TyperCommand. Secara default, fungsi bawaan django"
+" autocomplete digunakan."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Tampilkan nomor versi program dan keluar."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Tingkat verbositas; 0=output minimal, 1=output normal, 2=output verbositas, "
+"3=output sangat verbositas"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Jalur Python ke modul pengaturan, misalnya "
+"&quot;myproject.settings.main&quot;. Jika ini tidak disediakan, variabel "
+"lingkungan DJANGO_SETTINGS_MODULE akan digunakan."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Direktori untuk ditambahkan ke jalur Python, misalnya "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Munculkan pengecualian CommandError"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Jangan mewarnai keluaran perintah."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Paksa pewarnaan keluaran perintah."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Lewati pemeriksaan sistem."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Tidak dapat mengimpor fungsi penyelesaian fallback: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Harap tentukan shell yang akan dipasang atau dihapus pelengkapan "
+#~ "otomatisnya. Tidak dapat mendeteksi shell."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Shell tidak didukung: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Shell {shell} tidak mendukung pelengkapan otomatis untuk skrip yang tidak "
+#~ "diinstal pada jalur tersebut. Anda harus membuat titik masuk untuk "
+#~ "{script_name}. Lihat {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Tidak disarankan untuk memasang pelengkapan tab untuk skrip yang tidak ada "
+#~ "di jalur tersebut karena pelengkapan kemungkinan hanya akan berfungsi jika "
+#~ "skrip dipanggil dari lokasi yang sama dan menggunakan jalur relatif yang "
+#~ "sama. Anda mungkin ingin membuat titik masuk untuk {script_name}. Lihat "
+#~ "{link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "Pelengkapan otomatis terpasang untuk {shell} @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "Pelengkapan otomatis telah dihapus untuk {shell}."

@@ -29,7 +29,6 @@ dependencies = [
     # we need this on 3.9 for ParamSpec
     "typing-extensions>=3.7.4.3; python_version < '3.10'"
 ]
-exclude = ["django_typer/locale"]
 classifiers = [
     "Environment :: Console",
     "Framework :: Django",
@@ -111,6 +110,13 @@ Sphinx = [
 ]
 docutils = "^0.21"
 sphinx-autobuild = "2024.10.3"
+
+[tool.poetry.group.translate]
+optional = true
+
+[tool.poetry.group.translate.dependencies]
+django-autotranslate = "^1.3.0"
+google-api-python-client = "^2.160.0"
 
 [tool.poetry.group.psycopg3]
 optional = true

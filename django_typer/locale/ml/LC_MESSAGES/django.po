@@ -1,0 +1,188 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "നിലവിലുള്ള ഷെല്ലിനായി ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "ഉപയോഗിക്കാനുള്ള ഷെൽ."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"ഫിൽട്ടർ ടെർമിനൽ ഫോർമാറ്റിംഗ് നിയന്ത്രണ സീക്വൻസുകൾ പൂർത്തീകരണ വാചകത്തിന് "
+"പുറത്താണ്."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"പൂർത്തീകരണ വാചകത്തിൽ ടെർമിനൽ ഫോർമാറ്റിംഗ് നിയന്ത്രണ ശ്രേണികൾ അനുവദിക്കുക."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr ""
+"നിലവിലുള്ളതോ നൽകിയിരിക്കുന്നതോ ആയ ഷെല്ലിൽ ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ഈ കമാൻഡ് പ്രവർത്തിപ്പിക്കാൻ ഉപയോഗിച്ച സ്ക്രിപ്റ്റിൽ നിന്ന് "
+"വ്യത്യസ്തമാണെങ്കിൽ, ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുന്നതിനുള്ള django മാനേജ് "
+"സ്ക്രിപ്റ്റിന്റെ പേര്."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"കംപ്ലീഷൻ കമാൻഡ് ഒരു TyperCommand അല്ലാത്തപ്പോൾ ഉപയോഗിക്കേണ്ട ഒരു ഫാൾബാക്ക് "
+"കംപ്ലീറ്റ് ഫംഗ്ഷനിലേക്കുള്ള പൈത്തൺ ഇംപോർട്ട് പാത്ത്."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "ഷെൽ പൂർത്തീകരണ സ്ക്രിപ്റ്റിന് ഉപയോഗിക്കേണ്ട ടെംപ്ലേറ്റിന്റെ പേര്."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"നിലവിലുള്ളതോ നൽകിയിരിക്കുന്നതോ ആയ ഷെല്ലിൽ ഓട്ടോകംപ്ലീഷൻ അൺഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ഈ കമാൻഡ് ഇൻവോക്ക് ചെയ്യാൻ ഉപയോഗിച്ച സ്ക്രിപ്റ്റിൽ നിന്ന് വ്യത്യസ്തമാണെങ്കിൽ,"
+" ഷെൽ കംപ്ലീഷൻ നീക്കം ചെയ്യുന്നതിനുള്ള django മാനേജ്മെന്റ് സ്ക്രിപ്റ്റിന്റെ "
+"പേര്."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "കമാൻഡ് സ്ട്രിംഗിനായി ഓട്ടോകംപ്ലീഷൻ സൃഷ്ടിക്കുക."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "പൂർത്തീകരണ നിർദ്ദേശങ്ങൾ സൃഷ്ടിക്കുന്നതിനുള്ള കമാൻഡ് സ്ട്രിംഗ്."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"കംപ്ലീഷൻ കമാൻഡ് ഒരു TyperCommand അല്ലാത്തപ്പോൾ ഉപയോഗിക്കേണ്ട ഫാൾബാക്ക് "
+"കംപ്ലീറ്റ് ഫംഗ്ഷനിലേക്കുള്ള പൈത്തൺ ഇംപോർട്ട് പാത്ത്. ഡിഫോൾട്ടായി, ബിൽറ്റ്-ഇൻ"
+" django ഓട്ടോകംപ്ലീറ്റ് ഫംഗ്ഷൻ ഉപയോഗിക്കുന്നു."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "പ്രോഗ്രാമിന്റെ പതിപ്പ് നമ്പർ കാണിച്ച് പുറത്തുകടക്കുക."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"വെർബോസിറ്റി ലെവൽ; 0=മിനിമൽ ഔട്ട്‌പുട്ട്, 1=നോർമൽ ഔട്ട്‌പുട്ട്, 2=വെർബോസ് "
+"ഔട്ട്‌പുട്ട്, 3=വളരെ വെർബോസ് ഔട്ട്‌പുട്ട്"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"ഒരു ക്രമീകരണ മൊഡ്യൂളിലേക്കുള്ള പൈത്തൺ പാത, ഉദാ: "
+"&quot;myproject.settings.main&quot;. ഇത് നൽകിയിട്ടില്ലെങ്കിൽ, "
+"DJANGO_SETTINGS_MODULE എൻവയോൺമെന്റ് വേരിയബിൾ ഉപയോഗിക്കും."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"പൈത്തൺ പാതയിലേക്ക് ചേർക്കുന്നതിനുള്ള ഒരു ഡയറക്ടറി, ഉദാ: "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "കമാൻഡ് എറർ എക്സെപ്ഷനുകളിൽ ഉയർത്തുക"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "കമാൻഡ് ഔട്ട്‌പുട്ട് വർണ്ണമാക്കരുത്."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "കമാൻഡ് ഔട്ട്‌പുട്ടിന്റെ നിർബന്ധിത വർണ്ണീകരണം."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "സിസ്റ്റം പരിശോധനകൾ ഒഴിവാക്കുക."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "ഫോൾബാക്ക് പൂർത്തീകരണ ഫംഗ്ഷൻ ഇറക്കുമതി ചെയ്യാൻ കഴിയുന്നില്ല: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "ഇൻസ്റ്റാൾ ചെയ്യേണ്ട ഷെൽ അല്ലെങ്കിൽ ഓട്ടോകംപ്ലീഷൻ നീക്കം ചെയ്യേണ്ട ഷെൽ ദയവായി"
+#~ " വ്യക്തമാക്കുക. ഷെൽ കണ്ടെത്താനായില്ല."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "പിന്തുണയ്ക്കാത്ത ഷെൽ: {ഷെൽ}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "ഷെൽ {ഷെൽ} പാത്തിൽ ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ലാത്ത സ്ക്രിപ്റ്റുകൾക്ക് "
+#~ "ഓട്ടോകംപ്ലീറ്റേഷൻ പിന്തുണയ്ക്കുന്നില്ല. {script_name} എന്നതിനായി നിങ്ങൾ ഒരു "
+#~ "എൻട്രി പോയിന്റ് സൃഷ്ടിക്കണം. {link} കാണുക."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "പാത്തിൽ ഇല്ലാത്ത ഒരു സ്ക്രിപ്റ്റിന് ടാബ് പൂർത്തീകരണം ഇൻസ്റ്റാൾ ചെയ്യാൻ "
+#~ "ശുപാർശ ചെയ്യുന്നില്ല, കാരണം സ്ക്രിപ്റ്റ് ഒരേ ലൊക്കേഷനിൽ നിന്ന് അതേ റിലേഷണൽ "
+#~ "പാത്ത് ഉപയോഗിച്ചാൽ മാത്രമേ പൂർത്തീകരണങ്ങൾ പ്രവർത്തിക്കൂ. {script_name} "
+#~ "എന്നതിനായി ഒരു എൻട്രി പോയിന്റ് സൃഷ്ടിക്കാൻ നിങ്ങൾ ആഗ്രഹിച്ചേക്കാം. {link} "
+#~ "കാണുക."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "{shell} @ {install_path}-നുള്ള ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്തു."
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "{shell}-നുള്ള ഓട്ടോകംപ്ലീഷൻ അൺഇൻസ്റ്റാൾ ചെയ്തു."

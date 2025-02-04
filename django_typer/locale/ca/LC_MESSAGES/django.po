@@ -1,0 +1,194 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr ""
+"Instal·leu l&#39;autocompleció per a l&#39;intèrpret d&#39;ordres actual."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "La closca a utilitzar."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Filtreu les seqüències de control de format del terminal fora del text de "
+"finalització."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Permet seqüències de control de format del terminal en el text de "
+"finalització."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr ""
+"Instal·leu l&#39;autocompleció per a l&#39;intèrpret d&#39;ordres actual o "
+"donat."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"El nom de l&#39;script django manage per instal·lar l&#39;autocompleció si "
+"és diferent de l&#39;script utilitzat per invocar aquesta ordre."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"La ruta d&#39;importació de Python a una funció completa alternativa per "
+"utilitzar-la quan l&#39;ordre de finalització no és un TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr ""
+"El nom de la plantilla que s&#39;utilitzarà per a l&#39;script de "
+"finalització de l&#39;intèrpret d&#39;ordres."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"Desinstal·leu l&#39;autocompleció per a l&#39;intèrpret d&#39;ordres actual "
+"o donat."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"El nom de l&#39;script django manage per eliminar la finalització de "
+"l&#39;intèrpret d&#39;ordres, si és diferent de l&#39;script utilitzat per "
+"invocar aquesta ordre."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Genereu l&#39;autocompleció per a la cadena d&#39;ordres."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "La cadena d&#39;ordres per generar suggeriments de finalització."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"La ruta d&#39;importació de Python a una funció completa alternativa per "
+"utilitzar-la quan l&#39;ordre de finalització no és un TyperCommand. Per "
+"defecte, s&#39;utilitza la funció d&#39;autocompletar django integrada."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Mostra el número de versió del programa i surt."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Nivell de verbositat; 0 = sortida mínima, 1 = sortida normal, 2 = sortida "
+"detallada, 3 = sortida molt detallada"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"La ruta de Python a un mòdul de configuració, per exemple, "
+"&quot;myproject.settings.main&quot;. Si no es proporciona, s&#39;utilitzarà "
+"la variable d&#39;entorn DJANGO_SETTINGS_MODULE."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Un directori per afegir a la ruta de Python, per exemple "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Augmenta les excepcions de CommandError"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "No acoloreixis la sortida de l&#39;ordre."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Força la colorització de la sortida de l&#39;ordre."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Omet les comprovacions del sistema."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "No es pot importar la funció de finalització alternativa: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Si us plau, especifiqueu l&#39;intèrpret d&#39;ordres per instal·lar o "
+#~ "eliminar l&#39;emplenament automàtic. No es pot detectar shell."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Shell no compatible: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Shell {shell} no admet la compleció automàtica per als scripts que no estan "
+#~ "instal·lats al camí. Heu de crear un punt d&#39;entrada per a {script_name}."
+#~ " Vegeu {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "No es recomana instal·lar la finalització de la pestanya per a un script que"
+#~ " no es troba al camí perquè és probable que només funcionin si l&#39;script "
+#~ "s&#39;invoca des de la mateixa ubicació i utilitza el mateix camí relatiu. "
+#~ "És possible que vulgueu crear un punt d&#39;entrada per a {script_name}. "
+#~ "Vegeu {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr ""
+#~ "S&#39;ha instal·lat la compleció automàtica per a {shell} @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "S&#39;ha desinstal·lat l&#39;autocompleció per a {shell}."

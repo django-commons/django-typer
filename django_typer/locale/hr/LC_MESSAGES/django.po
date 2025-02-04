@@ -1,0 +1,181 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Instalirajte automatsko dovršavanje za trenutnu ljusku."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Ljuska za korištenje."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Filtrirajte kontrolne sekvence oblikovanja terminala iz teksta završetka."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Dopusti kontrolne sekvence oblikovanja terminala u dovršenom tekstu."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Instalirajte automatsko dovršavanje za trenutnu ili danu ljusku."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Naziv skripte za upravljanje djangom za instaliranje automatskog dovršavanja"
+" ako se razlikuje od skripte korištene za pozivanje ove naredbe."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Python uvozna staza do zamjenske dovršene funkcije koja se koristi kada "
+"naredba dovršetka nije TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr "Naziv predloška koji se koristi za skriptu dovršetka ljuske."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Deinstalirajte automatsko dovršavanje za trenutnu ili danu ljusku."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Naziv skripte za upravljanje djangom za uklanjanje dovršetka ljuske ako se "
+"razlikuje od skripte korištene za pozivanje ove naredbe."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Generiraj automatsko dovršavanje za naredbeni niz."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Naredbeni niz za generiranje prijedloga završetka."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Python uvozna staza do zamjenske dovršene funkcije koja se koristi kada "
+"naredba dovršetka nije TyperCommand. Prema zadanim postavkama koristi se "
+"ugrađena funkcija django autocomplete."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Prikaži broj verzije programa i izađi."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Razina opširnosti; 0=minimalni izlaz, 1=normalan izlaz, 2=opširni izlaz, "
+"3=vrlo opširan izlaz"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Put Pythona do modula postavki, npr. &quot;myproject.settings.main&quot;. "
+"Ako ovo nije navedeno, koristit će se varijabla okruženja "
+"DJANGO_SETTINGS_MODULE."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Direktorij za dodavanje u Python stazu, npr. "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Pokreni kod iznimki CommandError"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Nemojte bojati izlaz naredbe."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Prisilno bojenje izlaza naredbe."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Preskočite provjere sustava."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Nije moguće uvesti rezervnu funkciju dovršetka: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Navedite ljusku za instalaciju ili uklanjanje automatskog dovršavanja. Nije "
+#~ "moguće otkriti školjku."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Nepodržana ljuska: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Školjka {shell} ne podržava automatsko dovršavanje za skripte koje nisu "
+#~ "instalirane na stazi. Morate stvoriti ulaznu točku za {script_name}. "
+#~ "Pogledajte {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Ne preporučuje se instalirati dovršavanje tabulatorom za skriptu koja nije "
+#~ "na stazi jer će dovršavanja vjerojatno raditi samo ako se skripta poziva s "
+#~ "iste lokacije i koristi istu relativnu stazu. Možda želite stvoriti ulaznu "
+#~ "točku za {script_name}. Pogledajte {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "Instalirano automatsko dovršavanje za {shell} @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "Deinstalirano automatsko dovršavanje za {shell}."

@@ -32,7 +32,6 @@ from click.parser import split_arg_string
 from click.shell_completion import CompletionItem
 from django.core.management import CommandError, ManagementUtility
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure
 from typer import Argument, Option
@@ -132,9 +131,7 @@ class Command(TyperCommand):
             self._fallback = import_string(fb) if fb else django_autocomplete
         except ImportError as err:
             raise CommandError(
-                gettext("Unable to import fallback completion function: {err}").format(
-                    err=str(err)
-                )
+                f"Unable to import fallback completion function: {err}"
             ) from err
 
     @property
@@ -198,10 +195,8 @@ class Command(TyperCommand):
             self._shell = shell
         if self._shell is None:
             raise CommandError(
-                gettext(
-                    "Please specify the shell to install or remove "
-                    "autocompletion for. Unable to detect shell."
-                )
+                "Unable to detect shell. Please specify the shell to install or "
+                "remove autocompletion for."
             )
         elif self._shell == "cmd" and platform.system() == "Windows":
             try:
@@ -214,9 +209,7 @@ class Command(TyperCommand):
         try:
             return _completers[self.shell]
         except KeyError as err:
-            raise CommandError(
-                gettext("Unsupported shell: {shell}").format(shell=self.shell)
-            ) from err
+            raise CommandError(f"Unsupported shell: {self.shell}") from err
 
     @initialize()
     def init(
@@ -325,28 +318,18 @@ class Command(TyperCommand):
         if isinstance(self.manage_script, Path):
             if not self.shell_class.supports_scripts:
                 raise CommandError(
-                    gettext(
-                        "Shell {shell} does not support autocompletion for scripts that are not "
-                        "installed on the path. You must create an entry point for {script_name}. "
-                        "See {link}."
-                    ).format(
-                        shell=self.shell,
-                        script_name=self.manage_script_name,
-                        link="https://setuptools.pypa.io/en/latest/userguide/entry_point.html",
-                    )
+                    f"Shell {self.shell} does not support autocompletion for scripts "
+                    f"that are not installed on the path. You must create an entry "
+                    f"point for {self.manage_script_name}. See "
+                    f"https://setuptools.pypa.io/en/latest/userguide/entry_point.html."
                 )
             else:
                 self.stdout.write(
                     self.style.WARNING(
-                        gettext(
-                            "It is not recommended to install tab completion for a script not on "
-                            "the path because completions will likely only work if the script is "
-                            "invoked from the same location and using the same relative path. You "
-                            "may wish to create an entry point for {script_name}. See {link}."
-                        ).format(
-                            script_name=self.manage_script_name,
-                            link="https://setuptools.pypa.io/en/latest/userguide/entry_point.html",
-                        ),
+                        f"It is not recommended to install tab completion for a script "
+                        f"that is not installed on the path. This can be brittle. You "
+                        f"should create an entry point for {self.manage_script_name}. "
+                        f"See https://setuptools.pypa.io/en/latest/userguide/entry_point.html."
                     )
                 )
 
@@ -358,9 +341,7 @@ class Command(TyperCommand):
         ).install()
         self.stdout.write(
             self.style.SUCCESS(
-                gettext("Installed autocompletion for {shell} @ {install_path}").format(
-                    shell=self.shell, install_path=install_path
-                )
+                f"Installed autocompletion for {self.shell} @ {install_path}"
             )
         )
 
@@ -402,11 +383,7 @@ class Command(TyperCommand):
             color=not self.no_color or self.force_color,
         ).uninstall()
         self.stdout.write(
-            self.style.WARNING(
-                gettext("Uninstalled autocompletion for {shell}.").format(
-                    shell=self.shell
-                )
-            )
+            self.style.WARNING(f"Uninstalled autocompletion for {self.shell}.")
         )
 
     @command(

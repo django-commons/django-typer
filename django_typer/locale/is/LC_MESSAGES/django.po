@@ -1,0 +1,181 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+
+#: management/commands/shellcompletion.py:101
+msgid "Install autocompletion for the current shell."
+msgstr "Settu upp sjálfvirka útfyllingu fyrir núverandi skel."
+
+#: management/commands/shellcompletion.py:222
+msgid "The shell to use."
+msgstr "Skelin til að nota."
+
+#: management/commands/shellcompletion.py:235
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Sía flugstöðvarsniðsstýringarraðir úr fullkomnum texta."
+
+#: management/commands/shellcompletion.py:248
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Leyfa flugstöðvarsniðsstýringarraðir í útfyllingartexta."
+
+#: management/commands/shellcompletion.py:264
+msgid "Install autocompletion for the current or given shell."
+msgstr "Settu upp sjálfvirka útfyllingu fyrir núverandi eða gefna skel."
+
+#: management/commands/shellcompletion.py:274
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Nafn django stjórna handritsins til að setja upp sjálfvirka útfyllingu fyrir"
+" ef annað en forskriftin sem notuð var til að kalla fram þessa skipun."
+
+#: management/commands/shellcompletion.py:286
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Python-innflutningsslóðin að fullkomnu fallbackfalli til að nota þegar "
+"frágangsskipunin er ekki TyperCommand."
+
+#: management/commands/shellcompletion.py:299
+msgid "The name of the template to use for the shell completion script."
+msgstr ""
+"Heiti sniðmátsins sem á að nota fyrir forskriftina til að ljúka við skel."
+
+#: management/commands/shellcompletion.py:349
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Fjarlægðu sjálfvirka útfyllingu fyrir núverandi eða gefna skel."
+
+#: management/commands/shellcompletion.py:359
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Nafn django manage script til að fjarlægja skel frágang ef það er annað en "
+"scriptið sem notað var til að kalla fram þessa skipun."
+
+#: management/commands/shellcompletion.py:392
+msgid "Generate autocompletion for command string."
+msgstr "Búðu til sjálfvirka útfyllingu fyrir skipanastreng."
+
+#: management/commands/shellcompletion.py:400
+msgid "The command string to generate completion suggestions for."
+msgstr "Skipunarstrengurinn til að búa til tillögur um frágang fyrir."
+
+#: management/commands/shellcompletion.py:410
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Python-innflutningsslóðin að fullkomnu fallbackfalli til að nota þegar "
+"frágangsskipunin er ekki TyperCommand. Sjálfgefið er að innbyggða django "
+"sjálfvirka útfyllingaraðgerðin er notuð."
+
+#: types.py:54
+msgid "Show program's version number and exit."
+msgstr "Sýna útgáfunúmer forritsins og hætta."
+
+#: types.py:74
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Orðræðnistig; 0=lágmarksframleiðsla, 1=venjuleg framleiðsla, 2=mörg "
+"framleiðsla, 3=mjög margræð framleiðsla"
+
+#: types.py:104
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Python slóðin að stillingareiningu, td &quot;myproject.settings.main&quot;. "
+"Ef þetta er ekki gefið upp verður DJANGO_SETTINGS_MODULE umhverfisbreytan "
+"notuð."
+
+#: types.py:128
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Skrá til að bæta við Python slóðina, td "
+"&quot;/home/djangoprojects/myproject&quot;."
+
+#: types.py:149
+msgid "Raise on CommandError exceptions"
+msgstr "Hækka á CommandError undantekningum"
+
+#: types.py:166
+msgid "Don't colorize the command output."
+msgstr "Ekki lita skipanaúttakið."
+
+#: types.py:185
+msgid "Force colorization of the command output."
+msgstr "Þvingaðu litun á skipunarúttakinu."
+
+#: types.py:204
+msgid "Skip system checks."
+msgstr "Slepptu kerfisskoðunum."
+
+#, python-brace-format
+#~ msgid "Unable to import fallback completion function: {err}"
+#~ msgstr "Ekki er hægt að flytja inn falllokunaraðgerð: {err}"
+
+#~ msgid ""
+#~ "Please specify the shell to install or remove autocompletion for. Unable to "
+#~ "detect shell."
+#~ msgstr ""
+#~ "Vinsamlegast tilgreindu skelina sem á að setja upp eða fjarlægja sjálfvirka "
+#~ "útfyllingu fyrir. Get ekki greint skel."
+
+#, python-brace-format
+#~ msgid "Unsupported shell: {shell}"
+#~ msgstr "Óstudd skel: {shell}"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Shell {shell} does not support autocompletion for scripts that are not "
+#~ "installed on the path. You must create an entry point for {script_name}. See"
+#~ " {link}."
+#~ msgstr ""
+#~ "Skel {shell} styður ekki sjálfvirka útfyllingu fyrir forskriftir sem eru "
+#~ "ekki uppsettar á slóðinni. Þú verður að búa til aðgangsstað fyrir "
+#~ "{script_name}. Sjá {link}."
+
+#, python-brace-format
+#~ msgid ""
+#~ "It is not recommended to install tab completion for a script not on the path"
+#~ " because completions will likely only work if the script is invoked from the"
+#~ " same location and using the same relative path. You may wish to create an "
+#~ "entry point for {script_name}. See {link}."
+#~ msgstr ""
+#~ "Ekki er mælt með því að setja upp flipaútfyllingu fyrir smáforrit sem er "
+#~ "ekki á slóðinni vegna þess að útfyllingar munu líklega aðeins virka ef "
+#~ "forskriftin er kölluð frá sama stað og með sömu hlutfallslegu slóð. Þú gætir"
+#~ " viljað búa til aðgangsstað fyrir {script_name}. Sjá {link}."
+
+#, python-brace-format
+#~ msgid "Installed autocompletion for {shell} @ {install_path}"
+#~ msgstr "Uppsett sjálfvirk útfylling fyrir {shell} @ {install_path}"
+
+#, python-brace-format
+#~ msgid "Uninstalled autocompletion for {shell}."
+#~ msgstr "Fjarlægð sjálfvirk útfylling fyrir {shell}."
