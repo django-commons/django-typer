@@ -36,22 +36,21 @@
     done < <( $1 {{ django_command }} --shell bash ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete {{ fallback }} "${COMP_WORDS[*]}" )
     
     COMPREPLY=()
+    set_mode=true
     for completion in "${response[@]}"; do
         IFS=',' read type value <<< "$completion"
 
         {% if use_compopt %}
-        if [[ $type == 'dir' ]]; then
-            COMPREPLY=()
-            compopt -o dirnames
-        elif [[ $type == 'file' ]]; then
-            COMPREPLY=()
-            compopt -o default
-        else
-            COMPREPLY+=($value)
+        if $set_mode; then
+            if [[ $type == 'dir' ]]; then
+                compopt -o dirnames
+            elif [[ $type == 'file' ]]; then
+                compopt -o default
+                set_mode=false
+            fi
         fi
-        {% else %}
-        COMPREPLY+=($value)
         {% endif %}
+        COMPREPLY+=($value)
     done
 
     return 0
