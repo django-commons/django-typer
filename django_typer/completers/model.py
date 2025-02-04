@@ -76,7 +76,7 @@ class ModelObjectCompleter:
 
     .. note::
 
-        See also :func:`~django_typer.model_parser_completer` for a convenience
+        See also :func:`~django_typer.utils.model_parser_completer` for a convenience
         function that returns a configured parser and completer for a model object
         and helps reduce boilerplate.
 

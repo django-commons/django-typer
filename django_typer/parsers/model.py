@@ -46,7 +46,7 @@ class ModelObjectParser(ParamType):
 
         Typer_ does not respect the shell_complete functions on ParamTypes passed as
         parsers. To add shell_completion see :class:`~django_typer.completers.ModelObjectCompleter`
-        or the :func:`~django_typer.model_parser_completer` convenience
+        or the :func:`~django_typer.utils.model_parser_completer` convenience
         function.
 
     :param model_cls: The model class to use for lookup.

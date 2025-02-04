@@ -5,10 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 from django.core.management.base import CommandError
 
-from django_typer.management import TyperCommand, model_parser_completer
+from django_typer.management import TyperCommand
 from django_typer.parsers.model import ReturnType
 from tests.apps.test_app.models import ShellCompleteTester
-from django_typer.utils import duration_iso_string
+from django_typer.utils import duration_iso_string, model_parser_completer
 
 
 def test_custom_error_message(model_cls, field_value: str, exception: Exception):

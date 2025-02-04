@@ -2,7 +2,8 @@ import typing as t
 
 from typer import Argument, Option
 
-from django_typer.management import Typer, model_parser_completer
+from django_typer.management import Typer
+from django_typer.utils import model_parser_completer
 from tests.apps.examples.polls.models import Question as Poll
 
 app = Typer(help="Closes the specified poll for voting")

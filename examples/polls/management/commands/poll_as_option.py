@@ -2,7 +2,8 @@ import typing as t
 
 from typer import Option
 
-from django_typer.management import TyperCommand, model_parser_completer
+from django_typer.management import TyperCommand
+from django_typer.utils import model_parser_completer
 from tests.apps.examples.polls.models import Question as Poll
 
 

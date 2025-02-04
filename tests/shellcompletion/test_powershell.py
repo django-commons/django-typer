@@ -59,7 +59,7 @@ class _PowerShellMixin:
         self.install()
         self.verify_install()
         self.assertIn(
-            "django_typer\\completers.py",
+            "django_typer\\completers",
             self.get_completions("completion", "--path", "./django_typer\\comp"),
         )
         self.remove()
@@ -156,7 +156,7 @@ class PWSHExeTests(_PowerShellMixin, _InstalledScriptCompleteTestCase, TestCase)
         self.install()
         self.verify_install()
         self.assertIn(
-            "django_typer\\completers.py",
+            "django_typer\\completers",
             self.get_completions("completion", "--path", "./django_typer\\comp"),
         )
         self.remove()

@@ -14,8 +14,6 @@ from django.core.management import get_commands
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.core.management.color import Style as ColorStyle
-from django.db.models import Model
-from django.db.models.query import QuerySet
 from django.utils.functional import Promise, classproperty
 
 from django_typer import patch
@@ -31,9 +29,7 @@ from typer.main import get_params_convertors_ctx_param_name_from_function  # noq
 from typer.models import Context as TyperContext  # noqa: E402
 from typer.models import Default, DefaultPlaceholder  # noqa: E402
 
-from ..completers.model import ModelObjectCompleter  # noqa: E402
 from ..config import traceback_config  # noqa: E402
-from ..parsers.model import ModelObjectParser, ReturnType  # noqa: E402
 from ..types import (  # noqa: E402
     ForceColor,
     NoColor,
@@ -80,7 +76,6 @@ __all__ = [
     "command",
     "group",
     "get_command",
-    "model_parser_completer",
 ]
 
 P = ParamSpec("P")
@@ -113,76 +108,6 @@ if sys.version_info < (3, 10):
 
         def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
             return self.__func__(*args, **kwargs)
-
-
-def model_parser_completer(
-    model_or_qry: t.Union[t.Type[Model], QuerySet],
-    lookup_field: t.Optional[str] = None,
-    case_insensitive: bool = False,
-    help_field: t.Optional[str] = ModelObjectCompleter.help_field,
-    query: t.Optional[ModelObjectCompleter.QueryBuilder] = None,
-    limit: t.Optional[int] = ModelObjectCompleter.limit,
-    distinct: bool = ModelObjectCompleter.distinct,
-    on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
-    order_by: t.Optional[t.Union[str, t.Sequence[str]]] = None,
-    return_type: ReturnType = ModelObjectParser.return_type,
-) -> t.Dict[str, t.Any]:
-    """
-    A factory function that returns a dictionary that can be used to specify
-    a parser and completer for a typer.Option or typer.Argument. This is a
-    convenience function that can be used to specify the parser and completer
-    for a model object in one go.
-
-    .. code-block:: python
-
-        def handle(
-            self,
-            obj: t.Annotated[
-                ModelClass,
-                typer.Argument(
-                    **model_parser_completer(ModelClass, 'field_name'),
-                    help=_("Fetch objects by their field_names.")
-                ),
-            ]
-        ):
-            ...
-
-
-    :param model_or_qry: the model class or QuerySet to use for lookup
-    :param lookup_field: the field to use for lookup, by default the primary key
-    :param case_insensitive: whether to perform case insensitive lookups and
-        completions, default: False
-    :param help_field: the field to use for help output in completion suggestions,
-        by default no help will be provided
-    :param query: a callable that will be used to build the query for completions,
-        by default the query will be reasonably determined by the field type
-    :param limit: the maximum number of completions to return, default: 50
-    :param distinct: whether to filter out already provided parameters in the
-        completion suggestions, True by default
-    :param on_error: a callable that will be called if the parser lookup fails
-        to produce a matching object - by default a CommandError will be raised
-    :param return_type: An enumeration switch to return either a model instance,
-        queryset or model field value type.
-    """
-    return {
-        "parser": ModelObjectParser(
-            model_or_qry if inspect.isclass(model_or_qry) else model_or_qry.model,  # type: ignore
-            lookup_field,
-            case_insensitive=case_insensitive,
-            on_error=on_error,
-            return_type=return_type,
-        ),
-        "shell_complete": ModelObjectCompleter(
-            model_or_qry,
-            lookup_field,
-            case_insensitive=case_insensitive,
-            help_field=help_field,
-            query=query,
-            limit=limit,
-            distinct=distinct,
-            order_by=order_by,
-        ),
-    }
 
 
 @t.overload  # pragma: no cover

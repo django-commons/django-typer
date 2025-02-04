@@ -384,12 +384,12 @@ class _CompleteTestCase:
         completions = self.get_completions(
             self.launch_script, "completion", "--path", "./django_typer/co"
         )
-        self.assertIn("completers.py", completions)
+        self.assertIn("completers", completions)
         self.assertIn("config.py", completions)
         completions = self.get_completions(
             self.launch_script, "completion", "--dir", "./django_typer/"
         )
-        self.assertNotIn("completers.py", completions)
+        self.assertNotIn("completers", completions)
         self.assertNotIn("config.py", completions)
         self.assertIn("templates", completions)
         self.assertIn("management", completions)

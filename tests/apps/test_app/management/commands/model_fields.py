@@ -14,8 +14,8 @@ from django_typer.management import (
     TyperCommand,
     command,
     initialize,
-    model_parser_completer,
 )
+from django_typer.utils import model_parser_completer
 from django_typer import types
 from django_typer.completers.model import ModelObjectCompleter
 from tests.apps.test_app.models import ShellCompleteTester

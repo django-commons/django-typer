@@ -12,7 +12,12 @@ from pathlib import Path
 from threading import local
 from types import MethodType, ModuleType
 
+from django.db.models import Model
+from django.db.models.query import QuerySet
+
+from .completers.model import ModelObjectCompleter
 from .config import traceback_config
+from .parsers.model import ModelObjectParser, ReturnType
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
 
@@ -26,6 +31,9 @@ __all__ = [
     "register_command_plugins",
     "called_from_module",
     "called_from_command_definition",
+    "duration_iso_string",
+    "parse_iso_duration",
+    "model_parser_completer",
 ]
 
 
@@ -405,3 +413,73 @@ def duration_iso_string(duration: timedelta) -> str:
     if time_parts:
         time_str = "T" + "".join(time_parts)
     return f"{sign}P{day_str}{time_str}"
+
+
+def model_parser_completer(
+    model_or_qry: t.Union[t.Type[Model], QuerySet],
+    lookup_field: t.Optional[str] = None,
+    case_insensitive: bool = False,
+    help_field: t.Optional[str] = ModelObjectCompleter.help_field,
+    query: t.Optional[ModelObjectCompleter.QueryBuilder] = None,
+    limit: t.Optional[int] = ModelObjectCompleter.limit,
+    distinct: bool = ModelObjectCompleter.distinct,
+    on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
+    order_by: t.Optional[t.Union[str, t.Sequence[str]]] = None,
+    return_type: ReturnType = ModelObjectParser.return_type,
+) -> t.Dict[str, t.Any]:
+    """
+    A factory function that returns a dictionary that can be used to specify
+    a parser and completer for a typer.Option or typer.Argument. This is a
+    convenience function that can be used to specify the parser and completer
+    for a model object in one go.
+
+    .. code-block:: python
+
+        def handle(
+            self,
+            obj: t.Annotated[
+                ModelClass,
+                typer.Argument(
+                    **model_parser_completer(ModelClass, 'field_name'),
+                    help=_("Fetch objects by their field_names.")
+                ),
+            ]
+        ):
+            ...
+
+
+    :param model_or_qry: the model class or QuerySet to use for lookup
+    :param lookup_field: the field to use for lookup, by default the primary key
+    :param case_insensitive: whether to perform case insensitive lookups and
+        completions, default: False
+    :param help_field: the field to use for help output in completion suggestions,
+        by default no help will be provided
+    :param query: a callable that will be used to build the query for completions,
+        by default the query will be reasonably determined by the field type
+    :param limit: the maximum number of completions to return, default: 50
+    :param distinct: whether to filter out already provided parameters in the
+        completion suggestions, True by default
+    :param on_error: a callable that will be called if the parser lookup fails
+        to produce a matching object - by default a CommandError will be raised
+    :param return_type: An enumeration switch to return either a model instance,
+        queryset or model field value type.
+    """
+    return {
+        "parser": ModelObjectParser(
+            model_or_qry if inspect.isclass(model_or_qry) else model_or_qry.model,  # type: ignore
+            lookup_field,
+            case_insensitive=case_insensitive,
+            on_error=on_error,
+            return_type=return_type,
+        ),
+        "shell_complete": ModelObjectCompleter(
+            model_or_qry,
+            lookup_field,
+            case_insensitive=case_insensitive,
+            help_field=help_field,
+            query=query,
+            limit=limit,
+            distinct=distinct,
+            order_by=order_by,
+        ),
+    }

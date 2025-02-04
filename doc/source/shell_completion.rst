@@ -415,7 +415,7 @@ Model Objects
 
 * completer: :class:`~django_typer.completers.model.ModelObjectCompleter`
 * parser: :class:`~django_typer.parsers.model.ModelObjectParser`
-* convenience: :func:`~django_typer.management.model_parser_completer`
+* convenience: :func:`~django_typer.utils.model_parser_completer`
 
 This completer/parser pairing provides the ability to fetch a model object from one of its fields.
 Most field types are supported. Additionally any other field can be set as the help text that some
@@ -432,7 +432,7 @@ shells support. Refer to the reference documentation and the
 
     import typing as t
     import typer
-    from django_typer.management import model_parser_completer
+    from django_typer.utils import model_parser_completer
 
     ...
 
@@ -461,7 +461,8 @@ parameter and the :class:`~django_typer.parsers.model.ReturnType` enumeration:
 
 .. code-block:: python
 
-    from django_typer.management import TyperCommand, model_parser_completer
+    from django_typer.management import TyperCommand
+    from django_typer.utils import model_parser_completer
     from django_typer.parsers.model import ReturnType
     from django.db.models import QuerySet
 

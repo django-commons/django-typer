@@ -1859,9 +1859,9 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
                 self.assertNotIn(f"/{pth}", result)
 
         result = self.shellcompletion.complete(
-            "multi --pythonpath django_typer/completers.py"
+            "multi --pythonpath django_typer/completers"
         )
-        self.assertNotIn("django_typer/completers.py", result)
+        self.assertNotIn("django_typer/completers", result)
 
         result = self.shellcompletion.complete(
             "multi --pythonpath django_typer/does_not_exist"
@@ -1955,7 +1955,7 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             "completion --path ./django_typer\\compl"
         )
         if platform.system() == "Windows":
-            self.assertIn("./django_typer\\completers.py", completions)
+            self.assertIn("./django_typer\\completers", completions)
         else:
             self.assertFalse(completions.strip())
 

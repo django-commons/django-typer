@@ -3,9 +3,9 @@ from typing import Annotated
 import typer
 import json
 
-from django_typer.management import TyperCommand, model_parser_completer
+from django_typer.management import TyperCommand
 from django_typer.parsers.model import ReturnType
-from django_typer.utils import duration_iso_string
+from django_typer.utils import duration_iso_string, model_parser_completer
 from tests.apps.test_app.models import ShellCompleteTester
 from django.db.models import QuerySet
 

@@ -271,7 +271,7 @@ Putting it all together
 
 When we're using a :class:`~django_typer.parsers.model.ModelObjectParser` and
 :class:`~django_typer.completers.model.ModelObjectCompleter` we can use the
-:func:`~django_typer.management.model_parser_completer` convenience function to reduce the amount
+:func:`~django_typer.utils.model_parser_completer` convenience function to reduce the amount
 of boiler plate. Let's put everything together and see what our full-featured refactored
 closepoll command looks like:
 

@@ -50,18 +50,33 @@ Migrating from 2.x to 3.x
 
 Shell Completions
 ~~~~~~~~~~~~~~~~~
-* Parser import paths have changed:
-  - ``django.parsers.ModelObjectParser`` -> ``django.parsers.model.ModelObjectParser``
-  - ``django.parsers.parse_app_label`` -> ``django.parsers.apps.app_config``
 
-* Completer paths have changed:
-  - ``django.completers.complete_app_label`` -> ``django.completers.apps.app_labels``
-  - ``django.completers.commands`` -> ``django.completers.cmd.commands``
-  - ``django.completers.databases`` -> ``django.completers.db.databases``
-  - ``django.completers.ModelObjectCompleter`` -> ``django.completers.model.ModelObjectCompleter``
-  - ``django.completers.complete_path`` -> ``django.completers.path.paths``
-  - ``django.completers.complete_directory`` -> ``django.completers.path.directories``
-  - ``django.completers.complete_import_path`` -> ``django.completers.path.import_paths``
+.. list-table:: **Some imports have changed in the django_typer namespace!**
+  :widths: 50 50
+  :header-rows: 1
+
+  * - old
+    - new
+  * - ``management.model_parser_completer``
+    - ``utils.model_parser_completer``
+  * - ``parsers.ModelObjectParser``
+    - ``parsers.model.ModelObjectParser``
+  * - ``parsers.parse_app_label``
+    - ``parsers.apps.app_config``
+  * - ``completers.complete_app_label``
+    - ``completers.apps.app_labels``
+  * - ``completers.commands``
+    - ``completers.cmd.commands``
+  * - ``completers.databases``
+    - ``completers.db.databases``
+  * - ``completers.ModelObjectCompleter``
+    - ``completers.model.ModelObjectCompleter``
+  * - ``completers.complete_path``
+    - ``completers.path.paths``
+  * - ``completers.complete_directory``
+    - ``completers.path.directories``
+  * - ``completers.complete_import_path``
+    - ``completers.path.import_paths``
 
 * If you are using shell tab completions you will need to reinstall the completion scripts. Using
   the `shellcompletion install` command. To be extra safe you may want to uninstall the old
