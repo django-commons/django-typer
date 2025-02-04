@@ -452,6 +452,37 @@ shells support. Refer to the reference documentation and the
     ):
         ...
 
+QuerySets and Field Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django_typer.parsers.model.ModelObjectParser` can be configured to return queryset
+types or the primitive field values instead of a model instance, using the ``return_type``
+parameter and the :class:`~django_typer.parsers.model.ReturnType` enumeration:
+
+.. code-block:: python
+
+    from django_typer.management import TyperCommand, model_parser_completer
+    from django_typer.parsers.model import ReturnType
+    from django.db.models import QuerySet
+
+
+    class Command(TyperCommand):
+        def handle(
+            self,
+            query: Annotated[
+                QuerySet[ModelClass],
+                typer.Argument(
+                    **model_parser_completer(
+                        ModelClass,
+                        lookup_field="field_name",
+                        return_type=ReturnType.QUERY_SET,
+                    )
+                ),
+            ],
+        ):
+            ...
+
+
 
 Completer Chains
 ----------------

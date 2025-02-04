@@ -13,8 +13,13 @@ from django_typer.completers.model import ModelObjectCompleter
 
 class ReturnType(Enum):
     MODEL_INSTANCE = 0
+    """Return the model instance with the matching field value."""
+
     FIELD_VALUE = 1
+    """Return the value of the field that was matched."""
+
     QUERY_SET = 2
+    """Return a queryset of model instances that match the field value."""
 
 
 class ModelObjectParser(ParamType):

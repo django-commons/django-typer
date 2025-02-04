@@ -73,7 +73,7 @@ open-docs:
 docs: build-docs-html open-docs
 
 docs-live:
-    poetry run sphinx-autobuild doc/source doc/build --open-browser --watch django_typer --port 8000
+    poetry run sphinx-autobuild doc/source doc/build --open-browser --watch django_typer --port 8000 --delay 1
 
 check-docs-links:
     -poetry run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build

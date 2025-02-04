@@ -2058,6 +2058,23 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         self.assertIn("makemigrations", self.shellcompletion.complete())
         self.assertEqual(env, os.environ)
 
+    def test_return_field_value(self):
+        completions = get_values(self.shellcompletion.complete("field_value P54"))
+        self.assertTrue("P541D" in completions)
+        self.assertEqual(call_command("field_value", "P541D"), "P541D")
+        self.assertEqual(run_command("field_value", "P541D")[0].strip(), "P541D")
+
+        with self.assertRaisesMessage(CommandError, "Test custom error"):
+            call_command("field_value", "P541X")
+
+    def test_return_queryset(self):
+        completions = get_values(self.shellcompletion.complete("queryset P54"))
+        self.assertTrue("P541D" in completions)
+        objects = ShellCompleteTester.objects.filter(duration_field=timedelta(days=541))
+        data1 = json.loads(call_command("queryset", "P541D"))
+        for obj in objects:
+            self.assertEqual(data1[str(obj.id)], "P541D")
+
 
 class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
     tz_info = None
