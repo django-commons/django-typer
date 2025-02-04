@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:09-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,15 +64,15 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr "如果與用於呼叫此指令的腳本不同，則刪除 shell 補全的 django 管理腳本的名稱。"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "為命令字串產生自動完成。"
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "產生完成建議的命令字串。"
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -120,41 +120,3 @@ msgstr "強制對命令輸出進行彩色化。"
 #: types.py:204
 msgid "Skip system checks."
 msgstr "跳過系統檢查。"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "無法匯入後備完成功能：{err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr "請指定要安裝或刪除自動完成功能的 shell。無法偵測到外殼。"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "不受支援的 shell：{shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr "Shell {shell} 不支援未安裝在路徑上的腳本的自動完成。您必須為 {script_name} 建立一個入口點。參見{link}。"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "不建議為不在路徑上的腳本安裝製表符補全，因為僅當從相同位置並使用相同相對路徑呼叫腳本時，補全才會起作用。您可能希望為 {script_name} "
-#~ "建立一個入口點。參見{link}。"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "已安裝 {shell} @ {install_path} 的自動完成功能"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "卸載 {shell} 的自動完成功能。"

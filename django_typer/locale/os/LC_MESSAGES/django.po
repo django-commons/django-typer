@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,15 +74,15 @@ msgstr ""
 "django manage скрипты ном, цæмæй аиуварс кæна оболочкæйы кæронбæттæн, кæд "
 "æмæ хицæн кæны скриптæй, кæцыйæ спайда кодтой ацы фæдзæхст æрбахонынæн."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Фæдзæхсты рæнхъæн автокомплект скæнын."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Фæдзæхсты рæнхъ, кæцыйы тыххæй æрцæудзæн æххæстгæнæн фæндæттæ."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -111,8 +111,8 @@ msgid ""
 " used."
 msgstr ""
 "Python-ы фæндаг параметрты модульмæ, зæгъæм, "
-"&quot;myproject.settings.main&quot;. Кæд æмæ уый нæ лæвæрд цæуы, уæд спайда "
-"кæндзысты DJANGO_SETTINGS_MODULE æрдзы ивæнæй."
+"\"myproject.settings.main\". Кæд æмæ уый нæ лæвæрд цæуы, уæд спайда "
+"кæндзысты DJANGO_SETTINGS_MODULE æрдзон ивæнæй."
 
 #: types.py:128
 msgid ""
@@ -120,7 +120,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Каталог, кæцыйы хъæуы бафтауын Python-ы фæндагмæ, зæгъæм, "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -137,47 +137,3 @@ msgstr "Фæдзæхсты рауагъды тыхæй цъæх кæнын."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Системæйы бæрæггæнæнтæ ныууадзын."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Нæй гæнæн импорт кæнын фæстæмæ æххæстгæнæн функци: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Дæ хорзæхæй, нысан кæн æмбæрзæн, кæцыйæн хъæуы æвæрын кæнæ аиуварс кæнын "
-#~ "автокомплект. Нæй гæнæн рабæрæг кæнын снаряд."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Æнæххуысгонд æмбæрзæн: {æмбæрзæн}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} нæ æххуыс кæны автоæххæст кæнын скрипттæн, кæцытæ нæ сты æвæрд"
-#~ " фæндагыл. Хъуамæ саразай бацæуæн бынат {script_name}-æн. Кæс {ссылкæ}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Нæй рекомендацигонд æвæрын tab completion скриптæн, кæцы нæй фæндагыл, уымæн"
-#~ " æмæ æххæст кæнын æрмæстдæр уæд кусдзæн, кæд æмæ скрипт æрбахонынц уыцы иу "
-#~ "бынатæй æмæ уыцы иу æнгæс фæндагæй пайда кæнгæйæ. Дæ бон у саразын бацæуæн "
-#~ "бынат {script_name}-æн. Кæс {ссылкæ}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Æвæрд æрцыд автоæххæстгæнæн {shell} @ {install_path}-æн"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell}-æн автокомплектаци раппæрстой."

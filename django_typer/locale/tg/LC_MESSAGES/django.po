@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,15 +72,15 @@ msgstr ""
 "Номи скрипти идоракунандаи django барои нест кардани анҷоми ҷабҳа, агар аз "
 "скрипте, ки барои даъват кардани ин фармон истифода мешавад, фарқ мекунад."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Эҷоди худкорпуркунӣ барои сатри фармон."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Сатри фармон барои тавлиди пешниҳодҳои анҷомёбӣ барои."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -108,7 +108,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Роҳи Python ба модули танзимот, масалан &quot;myproject.settings.main&quot;."
+"Роҳи Python ба модули танзимот, масалан \"myproject.settings.main\"."
 " Агар ин таъмин набошад, тағирёбандаи муҳити DJANGO_SETTINGS_MODULE истифода"
 " мешавад."
 
@@ -118,7 +118,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Феҳрист барои илова кардан ба роҳи Python, масалан "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -135,49 +135,3 @@ msgstr "Рангкунии маҷбурии баромади фармон."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Санҷишҳои системаро гузаред."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Функсияи анҷоми такрориро ворид кардан ғайриимкон аст: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Лутфан, қабати насб ё хориҷ кардани худкорро барои худ муайян кунед. Муайян "
-#~ "кардани ҷабҳа."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "қабати дастгирнашаванда: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} худкорпуркунии скриптҳоеро, ки дар роҳ насб нашудаанд, "
-#~ "дастгирӣ намекунад. Шумо бояд барои {script_name} нуқтаи вуруд эҷод кунед. "
-#~ "Ба {link} нигаред."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Тавсия дода намешавад, ки ба итмом расонидани ҷадвал барои скрипте, ки дар "
-#~ "роҳ нест, насб карда шавад, зеро анҷомҳо эҳтимол танҳо дар сурате кор хоҳанд"
-#~ " кард, ки скрипт аз ҳамон макон ва бо истифода аз ҳамон роҳи нисбӣ даъват "
-#~ "карда шавад. Шумо метавонед барои {script_name} нуқтаи вуруд эҷод кунед. Ба "
-#~ "{link} нигаред."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Барои {shell} @ {install_path} пуркунии худкор насбшуда"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Автопуркунии насбнашуда барои {shell}."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,15 +70,15 @@ msgstr ""
 "La nomo de la django administri skripton por forigi ŝelkompletigon por se "
 "malsama ol la skripto uzata por alvoki ĉi tiun komandon."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generu aŭtomatan kompleton por komanda ĉeno."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "La komanda ĉeno por generi kompletigajn sugestojn."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,7 +106,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"La Python-vojo al agorda modulo, ekz. &quot;myproject.settings.main&quot;. "
+"La Python-vojo al agorda modulo, ekz. \"myproject.settings.main\". "
 "Se ĉi tio ne estas provizita, la mediovariablo DJANGO_SETTINGS_MODULE estos "
 "uzata."
 
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Dosierujo por aldoni al la Python-vojo, ekz. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "Devigi kolorigon de la komanda eligo."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Preterpasi sistemajn kontrolojn."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Ne eblas importi rezervan kompletigan funkcion: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Bonvolu specifi la ŝelon por instali aŭ forigi aŭtomatan kompleton. Ne eblas"
-#~ " detekti ŝelon."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nesubtenata ŝelo: {ŝelo}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Ŝelo {ŝelo} ne subtenas aŭtomatan kompletigon por skriptoj kiuj ne estas "
-#~ "instalitaj sur la vojo. Vi devas krei enirpunkton por {script_name}. Vidu "
-#~ "{ligilo}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Ne rekomendas instali klapeton-kompletigon por skripto ne sur la vojo ĉar "
-#~ "kompletigoj verŝajne nur funkcios se la skripto estas alvokita de la sama "
-#~ "loko kaj uzante la saman relativan vojon. Vi eble volas krei enirpunkton por"
-#~ " {script_name}. Vidu {ligilo}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Instalita aŭtomata kompletigo por {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Malinstalita aŭtomata kompletigo por {shell}."

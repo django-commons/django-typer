@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,8 +50,8 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr ""
 "Der Name des Django-Verwaltungsskripts, für das die automatische "
-"Vervollständigung installiert werden soll, sofern er sich von dem zum "
-"Aufrufen dieses Befehls verwendeten Skript unterscheidet."
+"Vervollständigung installiert werden soll, sofern er sich von dem Skript "
+"unterscheidet, das zum Aufrufen dieses Befehls verwendet wird."
 
 #: management/commands/shellcompletion.py:286
 msgid ""
@@ -83,17 +83,17 @@ msgstr ""
 "entfernt werden soll, sofern er sich von dem zum Aufrufen dieses Befehls "
 "verwendeten Skript unterscheidet."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Autovervollständigung für Befehlszeichenfolge generieren."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr ""
 "Die Befehlszeichenfolge, für die Vervollständigungsvorschläge generiert "
 "werden sollen."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -149,53 +149,3 @@ msgstr "Erzwingt die Farbgebung der Befehlsausgabe."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Systemprüfungen überspringen."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr ""
-#~ "Fallback-Vervollständigungsfunktion kann nicht importiert werden: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Bitte geben Sie die Shell an, für die die Autovervollständigung installiert "
-#~ "oder entfernt werden soll. Shell kann nicht erkannt werden."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nicht unterstützte Shell: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} unterstützt keine automatische Vervollständigung für Skripts, "
-#~ "die nicht im Pfad installiert sind. Sie müssen einen Einstiegspunkt für "
-#~ "{script_name} erstellen. Siehe {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Es wird nicht empfohlen, die Tab-Vervollständigung für ein Skript zu "
-#~ "installieren, das sich nicht im Pfad befindet, da die Vervollständigung "
-#~ "wahrscheinlich nur funktioniert, wenn das Skript vom selben Ort aus und "
-#~ "unter demselben relativen Pfad aufgerufen wird. Möglicherweise möchten Sie "
-#~ "einen Einstiegspunkt für {script_name} erstellen. Siehe {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Autovervollständigung für {shell} @ {install_path} installiert"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Autovervollständigung für {shell} deinstalliert."
-
-#~ msgid "Show this message and exit."
-#~ msgstr "Zeige diese Nachricht und beende."

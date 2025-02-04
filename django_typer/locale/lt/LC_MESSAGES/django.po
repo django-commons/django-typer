@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,15 +71,15 @@ msgstr ""
 "Django valdymo scenarijaus pavadinimas, skirtas pašalinti apvalkalo "
 "užbaigimą, jei skiriasi nuo scenarijaus, naudojamo šiai komandai iškviesti."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Sugeneruokite automatinį komandų eilutės užbaigimą."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Komandos eilutė, skirta užbaigimo pasiūlymams generuoti."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -133,47 +133,3 @@ msgstr "Priverstinis komandos išvesties spalvinimas."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Praleiskite sistemos patikrinimus."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nepavyko importuoti atsarginės užbaigimo funkcijos: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Nurodykite apvalkalą, kurį norite įdiegti arba pašalinti automatinį "
-#~ "užbaigimą. Nepavyko aptikti apvalkalo."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nepalaikomas apvalkalas: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} nepalaiko scenarijų, kurie neįdiegti kelyje, automatinio "
-#~ "užbaigimo. Turite sukurti {script_name} įvesties tašką. Žr. {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nerekomenduojama įdiegti tabuliavimo užbaigimo scenarijui, kuris nėra "
-#~ "kelyje, nes greičiausiai užbaigimai veiks tik tuo atveju, jei scenarijus bus"
-#~ " iškviestas iš tos pačios vietos ir naudojant tą patį santykinį kelią. "
-#~ "Galbūt norėsite sukurti {script_name} įvesties tašką. Žr. {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Įdiegtas automatinis užbaigimas, skirtas {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Pašalintas {shell} automatinis užbaigimas."

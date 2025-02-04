@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,15 +71,15 @@ msgstr ""
 "Enw&#39;r sgript rheoli django i ddileu cwblhau cragen ar gyfer os yw&#39;n "
 "wahanol i&#39;r sgript a ddefnyddir i alw&#39;r gorchymyn hwn."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Cynhyrchu awtolenwi ar gyfer llinyn gorchymyn."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Y llinyn gorchymyn i gynhyrchu awgrymiadau cwblhau ar ei gyfer."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Y llwybr Python i fodiwl gosodiadau, ee &quot;myproject.settings.main&quot;."
+"Y llwybr Python i fodiwl gosodiadau, ee \"myproject.settings.main\"."
 " Os na ddarperir hwn, bydd y newidyn amgylchedd DJANGO_SETTINGS_MODULE yn "
 "cael ei ddefnyddio."
 
@@ -117,7 +117,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Cyfeiriadur i&#39;w ychwanegu at y llwybr Python, ee "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -134,49 +134,3 @@ msgstr "Gorfodi lliwio&#39;r allbwn gorchymyn."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Hepgor gwiriadau system."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Methu mewnforio swyddogaeth cwblhau wrth gefn: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Nodwch y gragen i osod neu ddileu awtogwblhau ar ei gyfer. Methu canfod "
-#~ "plisgyn."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Cragen heb ei chynnal: {cragen}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Nid yw Shell {shell} yn cefnogi awtolenwi ar gyfer sgriptiau nad ydynt "
-#~ "wedi&#39;u gosod ar y llwybr. Rhaid i chi greu pwynt mynediad ar gyfer "
-#~ "{script_name}. Gweler {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nid yw&#39;n cael ei argymell i osod cwblhau tab ar gyfer sgript nad yw ar y"
-#~ " llwybr oherwydd mae&#39;n debygol y bydd cwblhad yn gweithio dim ond os "
-#~ "yw&#39;r sgript yn cael ei gweithredu o&#39;r un lleoliad ac yn "
-#~ "defnyddio&#39;r un llwybr cymharol. Efallai yr hoffech greu pwynt mynediad "
-#~ "ar gyfer {script_name}. Gweler {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Wedi gosod awtogwblhau ar gyfer {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Awtogwblhau wedi&#39;i ddadosod ar gyfer {shell}."

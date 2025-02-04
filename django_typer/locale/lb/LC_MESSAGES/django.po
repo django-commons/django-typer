@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,8 +44,8 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr ""
 "Den Numm vum django verwalten Skript fir d&#39;Autocompletion "
-"z&#39;installéieren fir wann et anescht ass wéi de Skript deen benotzt gouf "
-"fir dëse Kommando opzeruffen."
+"z&#39;installéieren fir wann et anescht ass wéi d&#39;Skript benotzt fir "
+"dëse Kommando opzeruffen."
 
 #: management/commands/shellcompletion.py:286
 msgid ""
@@ -73,15 +73,15 @@ msgstr ""
 "läschen fir wann et anescht ass wéi de Skript deen benotzt gouf fir dëse "
 "Kommando opzeruffen."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generéiere autocompletion fir Kommando String."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "De Kommando String fir Ofschlossvirschléi ze generéieren."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -110,7 +110,7 @@ msgid ""
 " used."
 msgstr ""
 "De Python Wee zu engem Astellungsmodul, zB "
-"&quot;myproject.settings.main&quot;. Wann dëst net geliwwert gëtt, gëtt "
+"\"myproject.settings.main\". Wann dëst net geliwwert gëtt, gëtt "
 "d&#39;DJANGO_SETTINGS_MODULE Ëmfeldvariabel benotzt."
 
 #: types.py:128
@@ -119,7 +119,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "E Verzeichnis fir op de Python Wee ze addéieren, zB "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -136,49 +136,3 @@ msgstr "Force Colorization vum Kommando Output."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Sprangen System Kontrollen."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Kann net d&#39;Fuerderungsfunktioun importéieren: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Gitt w.e.g. d&#39;Shell un fir d&#39;Autocompletion z&#39;installéieren oder"
-#~ " ze läschen. Kann de Shell net erkennen."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Net ënnerstëtzte Shell: {Shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {Shell} ënnerstëtzt keng Autokomplementéierung fir Scripten déi net um"
-#~ " Wee installéiert sinn. Dir musst en Entréespunkt fir {script_name} "
-#~ "erstellen. Kuckt {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Et ass net recommandéiert d&#39;Tab-Fäerdegstellung fir e Skript net um Wee "
-#~ "z&#39;installéieren, well Vervollstännegunge wäerte wahrscheinlech nëmme "
-#~ "funktionnéieren wann de Skript vun der selwechter Plaz opgeruff gëtt an dee "
-#~ "selwechte relative Wee benotzt. Dir wëllt vläicht en Entréespunkt fir "
-#~ "{script_name} erstellen. Kuckt {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Installéiert Autocompletion fir {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Deinstalléiert Autocompletion fir {Shell}."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr "Бүрхүүлийг дуусгах скриптэд ашиглах за
 
 #: management/commands/shellcompletion.py:349
 msgid "Uninstall autocompletion for the current or given shell."
-msgstr "Одоогийн эсвэл өгөгдсөн бүрхүүлд автоматаар дуусгахыг устгана уу."
+msgstr "Одоогийн эсвэл өгөгдсөн бүрхүүлд автоматаар гүйцээхийг устгана уу."
 
 #: management/commands/shellcompletion.py:359
 msgid ""
@@ -70,15 +70,15 @@ msgstr ""
 "Хэрэв энэ командыг дуудахад ашигласан скриптээс өөр бол бүрхүүлийн "
 "гүйцээлтийг арилгахын тулд django удирдах скриптийн нэр."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Командын мөрөнд автоматаар гүйцээх үйлдлийг үүсгэнэ үү."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Дуусгах зөвлөмжийг үүсгэх командын мөр."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,7 +106,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"&quot;myproject.settings.main&quot; гэх мэт тохиргооны модулийн Python зам. "
+"\"myproject.settings.main\" гэх мэт тохиргооны модулийн Python зам. "
 "Хэрэв үүнийг өгөөгүй бол DJANGO_SETTINGS_MODULE орчны хувьсагчийг ашиглана."
 
 #: types.py:128
@@ -115,7 +115,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Python замд нэмэх лавлах, жишээ нь "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -127,52 +127,8 @@ msgstr "Тушаалын гаралтыг өнгөөр бүү хар."
 
 #: types.py:185
 msgid "Force colorization of the command output."
-msgstr "Тушаалын гаралтыг хүчээр өнгөөр ялгах."
+msgstr "Командын гаралтыг хүчээр өнгөөр ялгах."
 
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Системийн шалгалтыг алгасах."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Нөхөн сэргээх функцийг импортлох боломжгүй: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Автоматаар гүйцээхийг суулгах эсвэл устгах бүрхүүлийг зааж өгнө үү. "
-#~ "Бүрхүүлийг илрүүлэх боломжгүй."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Дэмжигдээгүй бүрхүүл: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} нь зам дээр суулгаагүй скриптийг автоматаар гүйцээхийг "
-#~ "дэмждэггүй. Та {script_name}-д нэвтрэх цэг үүсгэх ёстой. {link} харна уу."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Зам дээр байхгүй скриптэд tab бөглөх програмыг суулгахыг зөвлөдөггүй, учир "
-#~ "нь скриптийг ижил байрлалаас дуудаж, ижил харьцангуй замыг ашигласан "
-#~ "тохиолдолд л гүйцээлтүүд ажиллах болно. Та {script_name}-д нэвтрэх цэг "
-#~ "үүсгэж болно. {link} харна уу."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path}-д автоматаар гүйцээх суулгасан"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell}-д автоматаар дуусгахыг устгасан."

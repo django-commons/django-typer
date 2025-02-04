@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Колдонуу үчүн кабык."
 #: management/commands/shellcompletion.py:235
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Аяктаган тексттен терминалдык форматтоо башкаруу ырааттуулугун чыпкалоо."
+"Аяктаган тексттен терминалды форматтоо башкаруу ырааттуулугун чыпкалоо."
 
 #: management/commands/shellcompletion.py:248
 msgid "Allow terminal formatting control sequences in completion text."
@@ -73,23 +73,23 @@ msgstr ""
 "Джанго башкаруу скриптинин аталышы, эгерде бул буйрукту чакыруу үчүн "
 "колдонулган скрипттен башкача болсо, кабыктын аяктоосун алып салуу үчүн."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Буйрук сабы үчүн автотолтурууну жаратыңыз."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "аяктоо сунуштарын түзүү үчүн буйрук сабы."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
 "autocomplete function is used."
 msgstr ""
 "Аяктоо буйругу TyperCommand болбогондо колдонуу үчүн кайра толук функцияга "
-"python импорттоо жолу. Демейки боюнча, курулган джанго автотолтуру функциясы"
-" колдонулат."
+"python импорттоо жолу. Демейки боюнча, орнотулган джанго автотолтуру "
+"функциясы колдонулат."
 
 #: types.py:54
 msgid "Show program's version number and exit."
@@ -109,7 +109,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Орнотуу модулуна Python жолу, мисалы, &quot;myproject.settings.main&quot;. "
+"Орнотуу модулуна Python жолу, мисалы, \"myproject.settings.main\". "
 "Эгер бул камсыздалбаса, DJANGO_SETTINGS_MODULE чөйрө өзгөрмөсү колдонулат."
 
 #: types.py:128
@@ -118,7 +118,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Python жолуна кошуу үчүн каталог, мисалы, "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -135,47 +135,3 @@ msgstr "Буйрук чыгарууну күчтөп түстүү."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Системалык текшерүүлөрдү өткөрүп жиберүү."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Толуктоо функциясын импорттоо мүмкүн эмес: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Автотолтурууну орнотуу же алып салуу үчүн кабыкты көрсөтүңүз. кабык аныктоо "
-#~ "мүмкүн эмес."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Колдоого алынбаган кабык: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} жолдо орнотулбаган скрипттер үчүн автотолтурууну колдобойт. "
-#~ "{script_name} үчүн кирүү чекити түзүшүңүз керек. {link} караңыз."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Жолдо эмес скрипт үчүн өтмөктүн аяктоосун орнотуу сунушталбайт, анткени "
-#~ "аяктоо скрипт бир жерден чакырылып, ошол эле салыштырмалуу жолду колдонгондо"
-#~ " гана иштейт. {script_name} үчүн кирүү чекит түзгүңүз келиши мүмкүн. {link} "
-#~ "караңыз."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} үчүн автотолуктоо орнотулду"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} үчүн автоматтык түрдө бүтүрүү алынып салынды."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,15 +72,15 @@ msgstr ""
 "Navnet på django management-skriptet for å fjerne skallfullføringen hvis det"
 " er forskjellig fra skriptet som ble brukt til å påkalle denne kommandoen."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generer autofullføring for kommandostreng."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Kommandostrengen for å generere fullføringsforslag for."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -109,7 +109,7 @@ msgid ""
 " used."
 msgstr ""
 "Python-banen til en innstillingsmodul, f.eks. "
-"&quot;myproject.settings.main&quot;. Hvis dette ikke er gitt, vil "
+"\"myproject.settings.main\". Hvis dette ikke er gitt, vil "
 "DJANGO_SETTINGS_MODULE miljøvariabelen bli brukt."
 
 #: types.py:128
@@ -118,7 +118,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "En katalog å legge til i Python-banen, f.eks. "
-"&quot;/home/djangoprojects/mittprosjekt&quot;."
+"\"/home/djangoprojects/mittprosjekt\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -135,47 +135,3 @@ msgstr "Tving fargelegging av kommandoutgangen."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Hopp over systemsjekker."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Kan ikke importere reservefullføringsfunksjonen: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Vennligst spesifiser skallet du vil installere eller fjerne autofullføring "
-#~ "for. Kan ikke oppdage skallet."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Ustøttet skall: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} støtter ikke autofullføring for skript som ikke er installert "
-#~ "på banen. Du må opprette et inngangspunkt for {script_name}. Se {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Det anbefales ikke å installere tabulatorfullføring for et skript som ikke "
-#~ "er på banen, fordi fullføringer sannsynligvis bare vil fungere hvis skriptet"
-#~ " påkalles fra samme sted og bruker samme relative bane. Det kan være lurt å "
-#~ "opprette et inngangspunkt for {script_name}. Se {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Installert autofullføring for {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Avinstallert autofullføring for {shell}."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,15 +64,15 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr "이 명령을 호출하는 데 사용된 스크립트와 다른 경우 셸 완성을 제거하기 위한 django 관리 스크립트의 이름입니다."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "명령 문자열에 대한 자동 완성을 생성합니다."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "완성 제안을 생성하는 명령 문자열입니다."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -121,44 +121,3 @@ msgstr "명령 출력을 강제로 색칠합니다."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "시스템 검사를 건너뜁니다."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "폴백 완료 기능을 가져올 수 없습니다: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr "자동완성을 설치하거나 제거할 셸을 지정하세요. 셸을 감지할 수 없습니다."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "지원되지 않는 셸: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell}은 경로에 설치되지 않은 스크립트에 대한 자동 완성을 지원하지 않습니다. {script_name}에 대한 진입점을"
-#~ " 만들어야 합니다. {link}를 참조하세요."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "경로에 없는 스크립트에 탭 완성을 설치하는 것은 권장되지 않습니다. 완성은 스크립트가 동일한 위치에서 동일한 상대 경로를 사용하여 "
-#~ "호출되는 경우에만 작동할 가능성이 높기 때문입니다. {script_name}에 대한 진입점을 만들고 싶을 수 있습니다. {link}를 "
-#~ "참조하세요."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell}에 대한 자동완성 기능이 {install_path}에 설치되었습니다."
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell}에 대한 자동완성 기능이 제거되었습니다."

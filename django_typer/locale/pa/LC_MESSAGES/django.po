@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,18 +67,18 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"ਸ਼ੈੱਲ ਕੰਪਲੀਸ਼ਨਸ ਨੂੰ ਹਟਾਉਣ ਲਈ django ਮੈਨੇਜ ਸਕ੍ਰਿਪਟ ਦਾ ਨਾਮ, ਜੇਕਰ ਇਸ ਕਮਾਂਡ ਨੂੰ "
-"ਇਨਵੋਕ ਕਰਨ ਲਈ ਵਰਤੀ ਗਈ ਸਕ੍ਰਿਪਟ ਤੋਂ ਵੱਖਰਾ ਹੈ।"
+"ਜੇ ਇਸ ਕਮਾਂਡ ਨੂੰ ਇਨਵੋਕ ਕਰਨ ਲਈ ਵਰਤੀ ਗਈ ਸਕ੍ਰਿਪਟ ਤੋਂ ਵੱਖਰਾ ਹੈ, ਤਾਂ ਸ਼ੈੱਲ "
+"ਕੰਪਲੀਸ਼ਨਸ ਨੂੰ ਹਟਾਉਣ ਲਈ django ਮੈਨੇਜ ਸਕ੍ਰਿਪਟ ਦਾ ਨਾਮ।"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
-msgstr "ਕਮਾਂਡ ਸਟ੍ਰਿੰਗ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਤਿਆਰ ਕਰੋ।"
+msgstr "ਕਮਾਂਡ ਸਤਰ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਤਿਆਰ ਕਰੋ।"
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "ਕਮਾਂਡ ਸਤਰ ਜਿਸ ਲਈ ਸੰਪੂਰਨਤਾ ਸੁਝਾਅ ਤਿਆਰ ਕੀਤੇ ਜਾਣਗੇ।"
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,7 +106,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"ਸੈਟਿੰਗ ਮੋਡੀਊਲ ਲਈ ਪਾਈਥਨ ਮਾਰਗ, ਜਿਵੇਂ ਕਿ &quot;myproject.settings.main&quot;। "
+"ਸੈਟਿੰਗ ਮੋਡੀਊਲ ਲਈ ਪਾਈਥਨ ਮਾਰਗ, ਜਿਵੇਂ ਕਿ \"myproject.settings.main\"। "
 "ਜੇਕਰ ਇਹ ਪ੍ਰਦਾਨ ਨਹੀਂ ਕੀਤਾ ਜਾਂਦਾ ਹੈ, ਤਾਂ DJANGO_SETTINGS_MODULE ਵਾਤਾਵਰਣ "
 "ਵੇਰੀਏਬਲ ਵਰਤਿਆ ਜਾਵੇਗਾ।"
 
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "ਪਾਈਥਨ ਮਾਰਗ ਵਿੱਚ ਜੋੜਨ ਲਈ ਇੱਕ ਡਾਇਰੈਕਟਰੀ, ਜਿਵੇਂ ਕਿ "
-"&quot;/home/djangoprojects/myproject&quot;।"
+"\"/home/djangoprojects/myproject\"।"
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "ਕਮਾਂਡ ਆਉਟਪੁੱਟ ਨੂੰ ਜ਼ਬਰਦਸਤੀ
 #: types.py:204
 msgid "Skip system checks."
 msgstr "ਸਿਸਟਮ ਜਾਂਚਾਂ ਛੱਡੋ।"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "ਫਾਲਬੈਕ ਕੰਪਲੀਸ਼ਨ ਫੰਕਸ਼ਨ ਨੂੰ ਆਯਾਤ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "ਕਿਰਪਾ ਕਰਕੇ ਉਹ ਸ਼ੈੱਲ ਦੱਸੋ ਜਿਸ ਨੂੰ ਇੰਸਟਾਲ ਕਰਨਾ ਹੈ ਜਾਂ ਆਟੋਕੰਪਲੀਸ਼ਨ ਨੂੰ ਹਟਾਉਣਾ "
-#~ "ਹੈ। ਸ਼ੈੱਲ ਖੋਜਣ ਵਿੱਚ ਅਸਮਰੱਥ।"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "ਅਸਮਰਥਿਤ ਸ਼ੈੱਲ: {ਸ਼ੈੱਲ}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "ਸ਼ੈੱਲ {ਸ਼ੈੱਲ} ਉਹਨਾਂ ਸਕ੍ਰਿਪਟਾਂ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ ਜੋ ਪਾਥ "
-#~ "&#39;ਤੇ ਸਥਾਪਤ ਨਹੀਂ ਹਨ। ਤੁਹਾਨੂੰ {ਸਕ੍ਰਿਪਟ_ਨਾਮ} ਲਈ ਇੱਕ ਐਂਟਰੀ ਪੁਆਇੰਟ ਬਣਾਉਣਾ "
-#~ "ਚਾਹੀਦਾ ਹੈ। {ਲਿੰਕ} ਵੇਖੋ।"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "ਪਾਥ &#39;ਤੇ ਨਾ ਹੋਣ ਵਾਲੀ ਸਕ੍ਰਿਪਟ ਲਈ ਟੈਬ ਕੰਪਲੀਸ਼ਨ ਸਥਾਪਤ ਕਰਨ ਦੀ ਸਿਫ਼ਾਰਸ਼ ਨਹੀਂ "
-#~ "ਕੀਤੀ ਜਾਂਦੀ ਕਿਉਂਕਿ ਕੰਪਲੀਸ਼ਨ ਸਿਰਫ਼ ਤਾਂ ਹੀ ਕੰਮ ਕਰਨਗੇ ਜੇਕਰ ਸਕ੍ਰਿਪਟ ਨੂੰ ਉਸੇ ਸਥਾਨ "
-#~ "ਤੋਂ ਬੁਲਾਇਆ ਜਾਂਦਾ ਹੈ ਅਤੇ ਉਸੇ ਰਿਲੇਟਿਵ ਪਾਥ ਦੀ ਵਰਤੋਂ ਕੀਤੀ ਜਾਂਦੀ ਹੈ। ਤੁਸੀਂ "
-#~ "{script_name} ਲਈ ਇੱਕ ਐਂਟਰੀ ਪੁਆਇੰਟ ਬਣਾਉਣਾ ਚਾਹ ਸਕਦੇ ਹੋ। {link} ਵੇਖੋ।"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਸਥਾਪਤ ਕੀਤਾ ਗਿਆ"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{ਸ਼ੈੱਲ} ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਅਣਇੰਸਟੌਲ ਕੀਤਾ ਗਿਆ।"

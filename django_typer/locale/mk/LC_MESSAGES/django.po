@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,15 +79,15 @@ msgstr ""
 "на школка за ако е различно од скриптата што се користи за повикување на "
 "оваа команда."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Генерирајте автоматско комплетирање за командната низа."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Командната низа за генерирање предлози за завршување."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -142,49 +142,3 @@ msgstr "Насилно обојување на излезот на команд�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Прескокнете ги системските проверки."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Не може да се увезе резервна функција за завршување: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Ве молиме наведете ја школката за која треба да се инсталира или отстрани "
-#~ "автоматското комплетирање. Не може да се открие школка."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Неподдржана школка: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} не поддржува автоматско комплетирање за скрипти што не се "
-#~ "инсталирани на патеката. Мора да креирате влезна точка за {script_name}. "
-#~ "Видете {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Не е препорачливо да се инсталира комплетирање на јазичето за скрипта што не"
-#~ " е на патеката бидејќи завршувањата најверојатно ќе функционираат само ако "
-#~ "скриптата се повикува од истата локација и се користи истата релативна "
-#~ "патека. Можеби ќе сакате да креирате влезна точка за {script_name}. Видете "
-#~ "{link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Инсталирано автоматско комплетирање за {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Деинсталирано автоматско комплетирање за {shell}."

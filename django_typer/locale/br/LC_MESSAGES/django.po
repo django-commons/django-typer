@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,15 +71,15 @@ msgstr ""
 "Anv ar skript django manage evit lemel echuiñ ar c&#39;helc&#39;h ma vez "
 "disheñvel diouzh ar skript implijet evit galv ar gemennadenn-mañ."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Krouiñ an echuiñ emgefre evit an teul urzhiañ."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "An teul urzhiañ evit sevel alioù echuiñ."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -108,7 +108,7 @@ msgid ""
 " used."
 msgstr ""
 "An hent Python d&#39;ur modul arventennoù, da skouer "
-"&quot;myproject.settings.main&quot;. Ma n&#39;eo ket pourchaset e vo arveret"
+"\"myproject.settings.main\". Ma n&#39;eo ket pourchaset e vo arveret"
 " an argemmenn endro DJANGO_SETTINGS_MODULE."
 
 #: types.py:128
@@ -117,7 +117,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Ur c&#39;havlec&#39;h da ouzhpennañ d&#39;an hent Python, da skouer "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -134,49 +134,3 @@ msgstr "Livañ dre nerzh an disoc&#39;h urzhiad."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Dilezel ar gwiriadurioù reizhiad."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "N&#39;haller ket enporzhiañ an arc&#39;hwel echuiñ en-dro : {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Mar plij, spisait ar c&#39;helc&#39;h da staliañ pe da lemel an emgefre. "
-#~ "N&#39;haller ket detektiñ ar c&#39;helc&#39;h."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Shell dic&#39;houestlet : {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "N&#39;eo ket skoret gant Shell {shell} an echuiñ emgefre evit ar skriptoù "
-#~ "n&#39;int ket staliet war an hent. Ret eo deoc&#39;h krouiñ ur poent mont "
-#~ "e-barzh evit {script_name}. Gwelet {liamm}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "N&#39;eo ket erbedet staliañ an echuiñ ivinelloù evit ur skript n&#39;emañ "
-#~ "ket war an hent rak ne vo ket graet gant an echuiñ nemet ma vo galvet ar "
-#~ "skript eus ar memes lec&#39;h hag en ur implijout ar memes hent keñverel. "
-#~ "Marteze e fell deoc&#39;h krouiñ ur poent mont e-barzh evit {script_name}. "
-#~ "Gwelet {liamm}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Staliet eo bet an emgefre evit {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Distaliet eo bet an echuiñ emgefre evit {shell}."

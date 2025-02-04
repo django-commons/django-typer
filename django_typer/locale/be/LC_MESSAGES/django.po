@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,15 +74,15 @@ msgstr ""
 "Назва сцэнарыя кіравання django для выдалення завяршэння абалонкі, калі "
 "адрозніваецца ад скрыпта, які выкарыстоўваецца для выкліку гэтай каманды."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Стварыць аўтазапаўненне для каманднага радка."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Камандны радок для стварэння прапаноў завяршэння."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -110,7 +110,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Шлях Python да модуля налад, напрыклад, &quot;myproject.settings.main&quot;."
+"Шлях Python да модуля налад, напрыклад, \"myproject.settings.main\"."
 " Калі гэта не прадугледжана, будзе выкарыстоўвацца зменная асяроддзя "
 "DJANGO_SETTINGS_MODULE."
 
@@ -137,49 +137,3 @@ msgstr "Прымусовае афарбоўванне вываду каманд�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Прапусціць праверку сістэмы."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Немагчыма імпартаваць рэзервовую функцыю завяршэння: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Калі ласка, укажыце абалонку, для якой трэба ўсталяваць або выдаліць "
-#~ "аўтазапаўненне. Немагчыма выявіць абалонку."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Не падтрымліваецца абалонка: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Абалонка {shell} не падтрымлівае аўтазапаўненне для сцэнарыяў, якія не "
-#~ "ўсталяваны на шляху. Вы павінны стварыць кропку ўваходу для {script_name}. "
-#~ "Глядзіце {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Не рэкамендуецца ўсталёўваць завяршэнне па табуляцыі для сцэнарыя, які не "
-#~ "знаходзіцца на шляху, таму што завяршэнні, хутчэй за ўсё, будуць працаваць, "
-#~ "толькі калі скрыпт выклікаецца з таго ж месца і з выкарыстаннем таго ж "
-#~ "адноснага шляху. Вы можаце стварыць кропку ўваходу для {script_name}. "
-#~ "Глядзіце {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Усталявана аўтазапаўненне для {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Выдалена аўтазапаўненне для {shell}."

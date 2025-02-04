@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,15 +75,15 @@ msgstr ""
 "O nome do script de gerenciamento do django para remover a conclusão do "
 "shell, caso seja diferente do script usado para invocar este comando."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Gerar preenchimento automático para sequência de comando."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "A sequência de comando para gerar sugestões de conclusão."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -112,7 +112,7 @@ msgid ""
 " used."
 msgstr ""
 "O caminho Python para um módulo de configurações, por exemplo, "
-"&quot;myproject.settings.main&quot;. Se isso não for fornecido, a variável "
+"\"myproject.settings.main\". Se isso não for fornecido, a variável "
 "de ambiente DJANGO_SETTINGS_MODULE será usada."
 
 #: types.py:128
@@ -121,7 +121,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Um diretório para adicionar ao caminho do Python, por exemplo "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -138,48 +138,3 @@ msgstr "Força a colorização da saída do comando."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Ignore as verificações do sistema."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Não é possível importar a função de conclusão de fallback: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Por favor, especifique o shell para instalar ou remover o autocompletar. Não"
-#~ " foi possível detectar o shell."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Shell não suportado: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "O shell {shell} não suporta autocompletar para scripts que não estão "
-#~ "instalados no caminho. Você deve criar um ponto de entrada para "
-#~ "{script_name}. Veja {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Não é recomendado instalar a conclusão de tabulação para um script que não "
-#~ "esteja no caminho porque as conclusões provavelmente só funcionarão se o "
-#~ "script for invocado do mesmo local e usando o mesmo caminho relativo. Você "
-#~ "pode desejar criar um ponto de entrada para {script_name}. Veja {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Preenchimento automático instalado para {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Desinstalação do autocompletar para {shell}."

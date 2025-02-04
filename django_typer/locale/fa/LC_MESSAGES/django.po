@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,15 +70,15 @@ msgstr ""
 "نام اسکریپت مدیریت جنگو برای حذف تکمیل پوسته برای اگر متفاوت از اسکریپت مورد"
 " استفاده برای فراخوانی این دستور باشد."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "تکمیل خودکار برای رشته فرمان ایجاد کنید."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "رشته فرمان برای ایجاد پیشنهادات تکمیل برای."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 " used."
 msgstr ""
 "مسیر پایتون به یک ماژول تنظیمات، به عنوان مثال "
-"&quot;myproject.settings.main&quot;. اگر این ارائه نشده باشد، از متغیر محیطی"
+"\"myproject.settings.main\". اگر این ارائه نشده باشد، از متغیر محیطی"
 " DJANGO_SETTINGS_MODULE استفاده خواهد شد."
 
 #: types.py:128
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "دایرکتوری برای اضافه کردن به مسیر پایتون، به عنوان مثال "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -132,49 +132,4 @@ msgstr "رنگ آمیزی اجباری خروجی فرمان."
 
 #: types.py:204
 msgid "Skip system checks."
-msgstr "رد شدن از بررسی های سیستم"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "وارد کردن تابع تکمیل بازگشتی امکان‌پذیر نیست: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "لطفاً پوسته ای را برای نصب یا حذف تکمیل خودکار مشخص کنید. قادر به تشخیص "
-#~ "پوسته نیست."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "پوسته پشتیبانی نشده: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} از تکمیل خودکار برای اسکریپت هایی که در مسیر نصب نشده اند "
-#~ "پشتیبانی نمی کند. شما باید یک نقطه ورودی برای {script_name} ایجاد کنید. به "
-#~ "{link} مراجعه کنید."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "نصب تکمیل برگه برای اسکریپتی که در مسیر نیست، توصیه نمی‌شود، زیرا تکمیل‌ها "
-#~ "احتمالاً تنها در صورتی کار می‌کنند که اسکریپت از یک مکان و با استفاده از "
-#~ "مسیر نسبی یکسان فراخوانی شود. ممکن است بخواهید یک نقطه ورودی برای "
-#~ "{script_name} ایجاد کنید. به {link} مراجعه کنید."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "تکمیل خودکار برای {shell} @ {install_path} نصب شده است"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "تکمیل خودکار برای {shell} حذف نصب شد."
+msgstr "رد شدن از بررسی سیستم"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,15 +70,15 @@ msgstr ""
 "django manage скриптлэн нимыз, оболочкаез быдэстон понна, та командаез "
 "ӧтьыны кутӥськись скриптлэсь пӧртэм ке."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Команда строка понна автозаполнение генерировать карыны."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Команда строка, кудзэ лэсьтоно быдэстон понна ӵектонъёс."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 " used."
 msgstr ""
 "Python-лэн сюресэз настройкаос модуль, кылсярысь, "
-"&quot;myproject.settings.main&quot;. Та уг ке сётӥськы, "
+"\"myproject.settings.main\". Та уг ке сётӥськы, "
 "DJANGO_SETTINGS_MODULE инкуазь переменной кутӥськоз."
 
 #: types.py:128
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Каталог, кудзэ ватсано Python сюрес вылэ, кылсярысь, "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "Командалэсь потэмзэ кужымен буёлэн пус
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Системаез эскеронъёсты ортчыны."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Уг быгаты импортировать fallback быдэстон функцизэс: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Пожалуйста, пусъе, кыӵе оболочкаез пуктыны яке автозаполнениез поттыны. Шелл"
-#~ " шедьтыны уг луы."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Неподдерживаемый оболочка: {оболочка}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} уг юртты автозаполнение понна скриптъёс, кудъёсыз сюрес вылын "
-#~ "уг пукто. Тӥледлы {script_name} понна пырон инты кылдытыны кулэ. Учке "
-#~ "{ссылка}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Сюрес вылын ӧвӧл скрипт понна вкладкаез быдэстонэз пуктыны уг ӵектӥськы, "
-#~ "малы ке шуоно быдэстонъёс, оло, ужалозы, скрипт одӥг интыысь но одӥг ӵыжы-"
-#~ "выжы сюресэз уже кутыса гинэ ӧтемын ке. Тӥляд потэ ке, {script_name} понна "
-#~ "пырон инты кылдытыны. Учке {ссылка}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} понна автозаполнение пуктэмын"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} понна автозаполнение поттэмын."

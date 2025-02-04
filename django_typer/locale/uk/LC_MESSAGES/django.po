@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,15 +74,15 @@ msgstr ""
 "Ім’я сценарію керування django для видалення завершення оболонки, якщо воно "
 "відрізняється від сценарію, використаного для виклику цієї команди."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Створити автозавершення для командного рядка."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Командний рядок для створення пропозицій завершення."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -111,7 +111,7 @@ msgid ""
 " used."
 msgstr ""
 "Шлях Python до модуля налаштувань, наприклад, "
-"&quot;myproject.settings.main&quot;. Якщо цього не вказано, буде "
+"\"myproject.settings.main\". Якщо цього не вказано, буде "
 "використовуватися змінна середовища DJANGO_SETTINGS_MODULE."
 
 #: types.py:128
@@ -120,7 +120,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Каталог, який потрібно додати до шляху Python, наприклад, "
-"«/home/djangoprojects/myproject»."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -137,49 +137,3 @@ msgstr "Примусове розфарбовування виводу кома�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Пропустити системні перевірки."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Не вдалося імпортувати резервну функцію завершення: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Укажіть оболонку, для якої потрібно встановити або видалити автозавершення. "
-#~ "Не вдалося виявити оболонку."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Непідтримувана оболонка: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Оболонка {shell} не підтримує автозавершення для сценаріїв, які не "
-#~ "встановлено на шляху. Ви повинні створити точку входу для {script_name}. "
-#~ "Перегляньте {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Не рекомендується встановлювати завершення табуляції для сценарію, який не "
-#~ "знаходиться на шляху, тому що завершення, ймовірно, працюватимуть, лише якщо"
-#~ " сценарій викликається з того самого місця та використовує той самий "
-#~ "відносний шлях. Ви можете створити точку входу для {script_name}. "
-#~ "Перегляньте {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Установлено автозаповнення для {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Видалено автозавершення для {shell}."

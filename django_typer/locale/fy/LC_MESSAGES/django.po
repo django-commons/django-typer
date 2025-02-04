@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,8 +43,8 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"De namme fan it django beheare skript om autofolling te ynstallearjen foar "
-"as oars as it skript dat brûkt wurdt om dit kommando op te roppen."
+"De namme fan it django beheare skript om autofoltôging te ynstallearjen foar"
+" as oars as it skript dat brûkt wurdt om dit kommando op te roppen."
 
 #: management/commands/shellcompletion.py:286
 msgid ""
@@ -67,18 +67,18 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"De namme fan it django beheare skript om shell-foltôging te ferwiderjen foar"
-" as oars as it skript dat brûkt wurdt om dit kommando op te roppen."
+"De namme fan it django beheare skript om shellfoltôging te ferwiderjen foar "
+"as oars as it skript dat brûkt wurdt om dit kommando op te roppen."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generearje autofolling foar kommandostring."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "De kommandostring foar it generearjen fan suggestjes foar foltôging."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 " used."
 msgstr ""
 "It Python-paad nei in ynstellingsmodule, bygelyks "
-"&quot;myproject.settings.main&quot;. As dit net oanbean wurdt, sil de "
+"\"myproject.settings.main\". As dit net oanbean wurdt, sil de "
 "omjouwingsfariabele DJANGO_SETTINGS_MODULE brûkt wurde."
 
 #: types.py:128
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "In map om ta te foegjen oan it Python-paad, bygelyks "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "Force colorization fan de kommando útfier."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Sla systeemkontrôles oer."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Koe fallback foltôgingsfunksje net ymportearje: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Spesifisearje asjebleaft de shell foar ynstallearjen of ferwiderjen fan "
-#~ "autofolling. De shell kin net ûntdekke."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Net-stipe shell: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} stipet gjin autofolling foar skripts dy&#39;t net ynstalleare "
-#~ "binne op it paad. Jo moatte in yngongspunt meitsje foar {script_name}. Sjoch"
-#~ " {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "It is net oan te rieden om ljepblêdfoltôging te ynstallearjen foar in skript"
-#~ " dat net op it paad is, om&#39;t foltôgings wierskynlik allinich wurkje as "
-#~ "it skript wurdt oproppen fan deselde lokaasje en mei itselde relative paad. "
-#~ "Jo kinne in yngongspunt meitsje foar {script_name}. Sjoch {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Ynstallearre autofolling foar {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Unynstallearre autofoltôging foar {shell}."

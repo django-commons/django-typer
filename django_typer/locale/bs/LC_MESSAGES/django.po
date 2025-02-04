@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,7 +55,7 @@ msgid ""
 "completion command is not a TyperCommand."
 msgstr ""
 "Putanja za uvoz python-a do funkcije dovršetka zamjene za korištenje kada "
-"naredba dovršetka nije TyperCommand."
+"naredba dovršavanja nije TyperCommand."
 
 #: management/commands/shellcompletion.py:299
 msgid "The name of the template to use for the shell completion script."
@@ -73,15 +73,15 @@ msgstr ""
 "Ime skripte za upravljanje django za uklanjanje završetka ljuske ako se "
 "razlikuje od skripte koja se koristi za pozivanje ove komande."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generirajte automatsko dovršavanje za komandni niz."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Komandni niz za generiranje prijedloga za završetak."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -100,7 +100,7 @@ msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
 msgstr ""
-"Nivo opširnosti; 0 = minimalni izlaz, 1 = normalan izlaz, 2 = opsežan izlaz,"
+"Nivo opširnosti; 0 = minimalan izlaz, 1 = normalan izlaz, 2 = opsežan izlaz,"
 " 3 = vrlo opsežan izlaz"
 
 #: types.py:104
@@ -109,7 +109,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Python putanja do modula postavki, npr. &quot;myproject.settings.main&quot;."
+"Python putanja do modula postavki, npr. \"myproject.settings.main\"."
 " Ako ovo nije navedeno, koristit će se varijabla okruženja "
 "DJANGO_SETTINGS_MODULE."
 
@@ -119,7 +119,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Direktorij za dodavanje Python putanji, npr. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -136,48 +136,3 @@ msgstr "Prisilno kolorizaciju izlaza naredbe."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Preskočite sistemske provjere."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nije moguće uvesti zamjensku funkciju završetka: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Molimo navedite shell za instaliranje ili uklanjanje automatskog "
-#~ "dovršavanja. Nije moguće otkriti školjku."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nepodržana ljuska: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} ne podržava automatsko dovršavanje za skripte koje nisu "
-#~ "instalirane na stazi. Morate kreirati ulaznu tačku za {script_name}. "
-#~ "Pogledajte {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nije preporučljivo instalirati dovršetak kartice za skriptu koja nije na "
-#~ "putanji jer će dovršenja vjerovatno raditi samo ako se skripta pozove sa "
-#~ "iste lokacije i koristi istu relativnu putanju. Možda ćete željeti kreirati "
-#~ "ulaznu tačku za {script_name}. Pogledajte {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Instalirano automatsko dovršavanje za {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Deinstalirano automatsko dovršavanje za {shell}."

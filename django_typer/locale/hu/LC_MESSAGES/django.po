@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,15 +76,15 @@ msgstr ""
 "A django manager szkript neve, amely eltávolítja a shell befejezését, ha "
 "eltér a parancs meghívásához használt szkripttől."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Automatikus kiegészítést generál a parancssorhoz."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "A parancssor a befejezési javaslatok generálásához."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -93,7 +93,7 @@ msgstr ""
 "A python importálási elérési útja egy tartalék teljes függvényhez, amelyet "
 "akkor kell használni, ha a befejezési parancs nem TyperCommand. "
 "Alapértelmezés szerint a beépített django automatikus kiegészítés funkciót "
-"használja."
+"használják."
 
 #: types.py:54
 msgid "Show program's version number and exit."
@@ -114,7 +114,7 @@ msgid ""
 " used."
 msgstr ""
 "Egy beállítási modul Python elérési útja, pl. "
-"&quot;myproject.settings.main&quot;. Ha ez nincs megadva, akkor a "
+"\"myproject.settings.main\". Ha ez nincs megadva, akkor a "
 "DJANGO_SETTINGS_MODULE környezeti változó kerül felhasználásra."
 
 #: types.py:128
@@ -123,7 +123,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "A Python elérési úthoz hozzáadandó könyvtár, pl. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -140,50 +140,3 @@ msgstr "A parancs kimenetének színezésének kényszerítése."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Rendszerellenőrzések kihagyása."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nem sikerült importálni a tartalék befejező függvényt: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Kérjük, adja meg az automatikus kiegészítést telepíteni vagy eltávolítani "
-#~ "kívánt parancsértelmezőt. A shell nem észlelhető."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nem támogatott shell: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "A(z) {shell} shell nem támogatja az automatikus kiegészítést azon "
-#~ "szkripteknél, amelyek nincsenek telepítve az elérési útra. Létre kell hoznia"
-#~ " egy belépési pontot a {script_name} számára. Lásd: {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nem ajánlott tabulátor-kiegészítést telepíteni olyan szkripteknél, amelyek "
-#~ "nincsenek az elérési útban, mert a befejezések valószínűleg csak akkor "
-#~ "működnek, ha a szkriptet ugyanarról a helyről hívják meg, és ugyanazt a "
-#~ "relatív elérési utat használja. Létrehozhat egy belépési pontot a "
-#~ "{script_name} számára. Lásd: {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr ""
-#~ "Automatikus kiegészítés telepítve a következőhöz: {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "A(z) {shell} automatikus kiegészítése eltávolítva."

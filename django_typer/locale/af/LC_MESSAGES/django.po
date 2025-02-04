@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand."
 msgstr ""
-"Die luislang-invoerpad na &#39;n terugval-volledige funksie om te gebruik "
+"Die python-invoerpad na &#39;n terugval-volledige funksie om te gebruik "
 "wanneer die voltooiingsopdrag nie &#39;n TyperCommand is nie."
 
 #: management/commands/shellcompletion.py:299
@@ -70,15 +70,15 @@ msgstr ""
 "Die naam van die django-bestuurskrip om dopvoltooiing te verwyder vir indien"
 " anders as die skrip wat gebruik is om hierdie opdrag op te roep."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Genereer outovoltooiing vir opdragstring."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Die opdragstring om voltooiingsvoorstelle te genereer."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 " used."
 msgstr ""
 "Die Python-pad na &#39;n instellingsmodule, bv "
-"&quot;myproject.settings.main&quot;. As dit nie verskaf word nie, sal die "
+"\"myproject.settings.main\". As dit nie verskaf word nie, sal die "
 "DJANGO_SETTINGS_MODULE omgewingsveranderlike gebruik word."
 
 #: types.py:128
@@ -115,8 +115,8 @@ msgid ""
 "A directory to add to the Python path, e.g. "
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
-"&#39;n Gids om by die Python-pad te voeg, bv. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"&#39;n Gids om by die Python-pad te voeg, bv "
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "Dwing inkleuring van die opdraguitset."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Slaan stelselkontroles oor."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Kan nie terugvalvoltooiingsfunksie invoer nie: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Spesifiseer asseblief die dop om outovoltooiing te installeer of te "
-#~ "verwyder. Kan nie dop bespeur nie."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Onondersteunde dop: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} ondersteun nie outovoltooiing vir skrifte wat nie op die pad "
-#~ "geïnstalleer is nie. Jy moet &#39;n toegangspunt vir {script_name} skep. "
-#~ "Sien {skakel}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Dit word nie aanbeveel om oortjievoltooiing te installeer vir &#39;n skrip "
-#~ "wat nie op die pad is nie, want voltooiings sal waarskynlik net werk as die "
-#~ "skrip vanaf dieselfde plek opgeroep word en dieselfde relatiewe pad gebruik."
-#~ " Jy wil dalk &#39;n toegangspunt vir {script_name} skep. Sien {skakel}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Geïnstalleerde outovoltooiing vir {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Gedeïnstalleerde outovoltooiing vir {shell}."

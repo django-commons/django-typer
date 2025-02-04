@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,15 +73,15 @@ msgstr ""
 "এই কমান্ডটি ব্যবহার করার জন্য ব্যবহৃত স্ক্রিপ্টের থেকে ভিন্ন হলে, শেল "
 "কমপ্লিশন অপসারণের জন্য django manage স্ক্রিপ্টের নাম।"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "কমান্ড স্ট্রিংয়ের জন্য স্বয়ংসম্পূর্ণতা তৈরি করুন।"
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "সমাপ্তির পরামর্শ তৈরি করার জন্য কমান্ড স্ট্রিং।"
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -109,7 +109,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"একটি সেটিংস মডিউলের পাইথন পাথ, যেমন &quot;myproject.settings.main&quot;। যদি"
+"একটি সেটিংস মডিউলের পাইথন পাথ, যেমন \"myproject.settings.main\"। যদি"
 " এটি প্রদান না করা হয়, তাহলে DJANGO_SETTINGS_MODULE পরিবেশ ভেরিয়েবল "
 "ব্যবহার করা হবে।"
 
@@ -119,7 +119,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "পাইথন পাথে যোগ করার জন্য একটি ডিরেক্টরি, যেমন "
-"&quot;/home/djangoprojects/myproject&quot;।"
+"\"/home/djangoprojects/myproject\"।"
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -136,49 +136,3 @@ msgstr "কমান্ড আউটপুট জোর করে রঙিন �
 #: types.py:204
 msgid "Skip system checks."
 msgstr "সিস্টেম চেক এড়িয়ে যান।"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "ফলব্যাক সমাপ্তি ফাংশন আমদানি করতে অক্ষম: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "অনুগ্রহ করে কোন শেলটি ইনস্টল করতে হবে বা স্বয়ংক্রিয়ভাবে সম্পূর্ণ করতে হবে "
-#~ "তা নির্দিষ্ট করুন। শেল সনাক্ত করা যায়নি।"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "অসমর্থিত শেল: {শেল}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "পাথে ইনস্টল না থাকা স্ক্রিপ্টগুলির জন্য শেল {shell} স্বয়ংক্রিয় সমাপ্তি "
-#~ "সমর্থন করে না। আপনাকে {script_name} এর জন্য একটি এন্ট্রি পয়েন্ট তৈরি করতে "
-#~ "হবে। {link} দেখুন।"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "পাথে নেই এমন স্ক্রিপ্টের জন্য ট্যাব কমপ্লিশন ইনস্টল করার পরামর্শ দেওয়া হয় "
-#~ "না কারণ কমপ্লিশনগুলি সম্ভবত তখনই কাজ করবে যদি স্ক্রিপ্টটি একই অবস্থান থেকে "
-#~ "এবং একই আপেক্ষিক পাথ ব্যবহার করে আহ্বান করা হয়। আপনি {script_name} এর জন্য "
-#~ "একটি এন্ট্রি পয়েন্ট তৈরি করতে চাইতে পারেন। {link} দেখুন।"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr ""
-#~ "{shell} @ {install_path} এর জন্য স্বয়ংক্রিয় সমাপ্তি ইনস্টল করা হয়েছে"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} এর জন্য স্বয়ংক্রিয় সমাপ্তি আনইনস্টল করা হয়েছে।"

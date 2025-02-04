@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,25 +61,25 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:349
 msgid "Uninstall autocompletion for the current or given shell."
-msgstr "Fjarlægðu sjálfvirka útfyllingu fyrir núverandi eða gefna skel."
+msgstr "Fjarlægðu sjálfvirka útfyllingu fyrir núverandi eða tiltekna skel."
 
 #: management/commands/shellcompletion.py:359
 msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Nafn django manage script til að fjarlægja skel frágang ef það er annað en "
-"scriptið sem notað var til að kalla fram þessa skipun."
+"Nafn django stjórna handritsins til að fjarlægja skeljaútfyllingu ef það er "
+"annað en forskriftin sem notuð var til að kalla fram þessa skipun."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Búðu til sjálfvirka útfyllingu fyrir skipanastreng."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Skipunarstrengurinn til að búa til tillögur um frágang fyrir."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Python slóðin að stillingareiningu, td &quot;myproject.settings.main&quot;. "
+"Python slóðin að stillingareiningu, td \"myproject.settings.main\". "
 "Ef þetta er ekki gefið upp verður DJANGO_SETTINGS_MODULE umhverfisbreytan "
 "notuð."
 
@@ -117,7 +117,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Skrá til að bæta við Python slóðina, td "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -134,48 +134,3 @@ msgstr "Þvingaðu litun á skipunarúttakinu."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Slepptu kerfisskoðunum."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Ekki er hægt að flytja inn falllokunaraðgerð: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Vinsamlegast tilgreindu skelina sem á að setja upp eða fjarlægja sjálfvirka "
-#~ "útfyllingu fyrir. Get ekki greint skel."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Óstudd skel: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Skel {shell} styður ekki sjálfvirka útfyllingu fyrir forskriftir sem eru "
-#~ "ekki uppsettar á slóðinni. Þú verður að búa til aðgangsstað fyrir "
-#~ "{script_name}. Sjá {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Ekki er mælt með því að setja upp flipaútfyllingu fyrir smáforrit sem er "
-#~ "ekki á slóðinni vegna þess að útfyllingar munu líklega aðeins virka ef "
-#~ "forskriftin er kölluð frá sama stað og með sömu hlutfallslegu slóð. Þú gætir"
-#~ " viljað búa til aðgangsstað fyrir {script_name}. Sjá {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Uppsett sjálfvirk útfylling fyrir {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Fjarlægð sjálfvirk útfylling fyrir {shell}."

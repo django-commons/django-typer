@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,15 +75,15 @@ msgstr ""
 "Nazwa skryptu Django Manage, dla którego ma zostać usunięte dopełnianie "
 "powłoki, jest inna niż nazwa skryptu użytego do wywołania tego polecenia."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generuj autouzupełnianie dla ciągu poleceń."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Ciąg poleceń służący do generowania sugestii uzupełnienia."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -137,49 +137,3 @@ msgstr "Wymuś kolorowanie wyniku polecenia."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Pomiń sprawdzanie systemu."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nie można zaimportować funkcji uzupełniania zapasowego: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Proszę określić powłokę, dla której ma zostać zainstalowane lub usunięte "
-#~ "autouzupełnianie. Nie można wykryć powłoki."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nieobsługiwana powłoka: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} nie obsługuje autouzupełniania dla skryptów, które nie są "
-#~ "zainstalowane na ścieżce. Musisz utworzyć punkt wejścia dla {script_name}. "
-#~ "Zobacz {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nie zaleca się instalowania uzupełniania tabulatorem dla skryptu, który nie "
-#~ "znajduje się na ścieżce, ponieważ uzupełnianie prawdopodobnie będzie działać"
-#~ " tylko wtedy, gdy skrypt zostanie wywołany z tej samej lokalizacji i przy "
-#~ "użyciu tej samej ścieżki względnej. Możesz utworzyć punkt wejścia dla "
-#~ "{script_name}. Zobacz {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Zainstalowano automatyczne uzupełnianie dla {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Odinstalowano funkcję automatycznego uzupełniania dla {shell}."

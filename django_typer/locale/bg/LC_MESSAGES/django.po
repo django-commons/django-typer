@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,15 +79,15 @@ msgstr ""
 "обвивката, ако е различно от скрипта, използван за извикване на тази "
 "команда."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Генериране на автоматично довършване за команден низ."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Командният низ за генериране на предложения за завършване."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,8 +106,8 @@ msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
 msgstr ""
-"Ниво на многословност; 0=минимален изход, 1=нормален изход, 2=подробен "
-"изход, 3=много подробен изход"
+"Ниво на многословие; 0=минимален изход, 1=нормален изход, 2=подробен изход, "
+"3=много подробен изход"
 
 #: types.py:104
 msgid ""
@@ -142,48 +142,3 @@ msgstr "Принудително оцветяване на изхода на к�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Пропуснете системните проверки."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Не може да се импортира резервна функция за завършване: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Моля, посочете обвивката, за която да инсталирате или премахнете "
-#~ "автоматичното довършване. Не може да се открие черупката."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Неподдържана обвивка: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} не поддържа автоматично довършване за скриптове, които не са "
-#~ "инсталирани на пътя. Трябва да създадете входна точка за {script_name}. "
-#~ "Вижте {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Не се препоръчва да инсталирате довършване на табулатор за скрипт, който не "
-#~ "е на пътя, тъй като довършванията вероятно ще работят само ако скриптът е "
-#~ "извикан от същото местоположение и използвайки същия относителен път. Може "
-#~ "да пожелаете да създадете входна точка за {script_name}. Вижте {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Инсталирано автоматично довършване за {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Деинсталирано автоматично довършване за {shell}."

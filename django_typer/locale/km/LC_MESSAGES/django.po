@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,15 +71,15 @@ msgstr ""
 "ឈ្មោះរបស់ django គ្រប់គ្រងស្គ្រីប ដើម្បីលុបការបំពេញសែល "
 "ប្រសិនបើខុសពីស្គ្រីបដែលប្រើដើម្បីហៅពាក្យបញ្ជានេះ។"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "បង្កើតការបំពេញដោយស្វ័យប្រវត្តិសម្រាប់ខ្សែពាក្យបញ្ជា។"
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "ខ្សែអក្សរពាក្យបញ្ជាដើម្បីបង្កើតការផ្ដល់យោបល់សម្រាប់ការបំពេញ។"
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"ផ្លូវ Python ទៅកាន់ម៉ូឌុលការកំណត់ឧទាហរណ៍ &quot;myproject.settings.main&quot;"
+"ផ្លូវ Python ទៅកាន់ម៉ូឌុលការកំណត់ឧទាហរណ៍ \"myproject.settings.main\""
 " ។ ប្រសិនបើវាមិនត្រូវបានផ្តល់ឱ្យទេ អថេរបរិស្ថាន DJANGO_SETTINGS_MODULE "
 "នឹងត្រូវបានប្រើ។"
 
@@ -117,7 +117,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "ថតដែលត្រូវបន្ថែមទៅផ្លូវ Python ឧទាហរណ៍ "
-"&quot;/home/djangoprojects/myproject&quot; ។"
+"\"/home/djangoprojects/myproject\" ។"
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -134,48 +134,3 @@ msgstr "បង្ខំ​ពណ៌​នៃ​លទ្ធផល​ពាក្
 #: types.py:204
 msgid "Skip system checks."
 msgstr "រំលងការត្រួតពិនិត្យប្រព័ន្ធ។"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "មិន​អាច​នាំចូល​មុខងារ​បំពេញ​ការ​ជំនួស​មកវិញ​បាន៖ {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "សូមបញ្ជាក់សែលដើម្បីដំឡើង ឬលុបការបំពេញដោយស្វ័យប្រវត្តិសម្រាប់។ "
-#~ "មិនអាចរកឃើញសែល។"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "សែលមិនគាំទ្រ៖ {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} "
-#~ "មិនគាំទ្រការបំពេញដោយស្វ័យប្រវត្តិសម្រាប់ស្គ្រីបដែលមិនត្រូវបានដំឡើងនៅលើផ្លូវនោះទេ។"
-#~ " អ្នកត្រូវតែបង្កើតចំណុចចូលសម្រាប់ {script_name} ។ សូមមើល {link} ។"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "វាមិនត្រូវបានណែនាំឱ្យដំឡើងការបំពេញផ្ទាំងសម្រាប់ស្គ្រីបដែលមិននៅលើផ្លូវទេ "
-#~ "ពីព្រោះការបំពេញទំនងជានឹងដំណើរការលុះត្រាតែស្គ្រីបត្រូវបានហៅចេញពីទីតាំងដូចគ្នា"
-#~ " និងប្រើផ្លូវដែលទាក់ទងដូចគ្នា។ អ្នកប្រហែលជាចង់បង្កើតចំណុចចូលសម្រាប់ "
-#~ "{script_name}។ សូមមើល {link} ។"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "បានដំឡើងការបំពេញដោយស្វ័យប្រវត្តិសម្រាប់ {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "បានលុបការបំពេញដោយស្វ័យប្រវត្តិសម្រាប់ {shell}។"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr "Predha për t&#39;u përdorur."
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
 "Filtro sekuencat e kontrollit të formatimit të terminalit jashtë tekstit të "
-"përfunduar."
+"plotë."
 
 #: management/commands/shellcompletion.py:248
 msgid "Allow terminal formatting control sequences in completion text."
@@ -56,7 +56,7 @@ msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand."
 msgstr ""
-"Rruga e importimit të python në një funksion të plotë kthimi për t&#39;u "
+"Rruga e importimit të python në një funksion të plotë rezervë për t&#39;u "
 "përdorur kur komanda e përfundimit nuk është një TyperCommand."
 
 #: management/commands/shellcompletion.py:299
@@ -76,15 +76,15 @@ msgstr ""
 "Emri i skriptit të menaxhimit të django për të hequr kompletimin e guaskës "
 "nëse është i ndryshëm nga skripti i përdorur për të thirrur këtë komandë."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Gjeneroni plotësimin automatik për vargun e komandës."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Vargu i komandës për të gjeneruar sugjerime për përfundimin."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -114,7 +114,7 @@ msgid ""
 " used."
 msgstr ""
 "Rruga e Python drejt një moduli të cilësimeve, p.sh. "
-"&quot;myproject.settings.main&quot;. Nëse kjo nuk ofrohet, do të përdoret "
+"\"myproject.settings.main\". Nëse kjo nuk ofrohet, do të përdoret "
 "ndryshorja e mjedisit DJANGO_SETTINGS_MODULE."
 
 #: types.py:128
@@ -123,7 +123,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Një direktori për të shtuar në shtegun e Python, p.sh. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -140,49 +140,3 @@ msgstr "Forco ngjyrosjen e daljes së komandës."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Kapërceni kontrollet e sistemit."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Funksioni i përfundimit të rikthimit nuk mund të importohet: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Ju lutemi specifikoni shell për të instaluar ose hequr plotësimin automatik."
-#~ " I paaftë për të zbuluar guaskën."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "guaskë e pambështetur: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} nuk mbështet plotësimin automatik për skriptet që nuk janë "
-#~ "instaluar në shteg. Duhet të krijoni një pikë hyrjeje për {script_name}. "
-#~ "Shihni {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nuk rekomandohet instalimi i plotësimit të skedës për një skript që nuk "
-#~ "është në rrugë, sepse përfundimet ka të ngjarë të funksionojnë vetëm nëse "
-#~ "skripti thirret nga i njëjti vend dhe duke përdorur të njëjtën rrugë "
-#~ "relative. Ju mund të dëshironi të krijoni një pikë hyrjeje për "
-#~ "{script_name}. Shihni {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Plotësimi automatik i instaluar për {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Plotësimi automatik i çinstaluar për {shell}."

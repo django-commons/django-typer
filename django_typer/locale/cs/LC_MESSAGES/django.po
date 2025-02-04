@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,15 +70,15 @@ msgstr ""
 "Název řídicího skriptu django pro odstranění dokončení shellu, pokud se liší"
 " od skriptu použitého k vyvolání tohoto příkazu."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generovat automatické dokončování pro řetězec příkazů."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Příkazový řetězec, pro který se mají vygenerovat návrhy dokončení."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,7 +106,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Cesta Pythonu k modulu nastavení, např. &quot;myproject.settings.main&quot;."
+"Cesta Pythonu k modulu nastavení, např. \"myproject.settings.main\"."
 " Pokud to není uvedeno, použije se proměnná prostředí "
 "DJANGO_SETTINGS_MODULE."
 
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Adresář, který se má přidat do cesty Pythonu, např. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,48 +133,3 @@ msgstr "Vynutit zabarvení výstupu příkazu."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Přeskočit systémové kontroly."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nelze importovat záložní funkci dokončení: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Zadejte prostředí, pro které se má automatické dokončování nainstalovat nebo"
-#~ " odebrat. Nelze detekovat shell."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Nepodporovaný shell: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} nepodporuje automatické dokončování pro skripty, které nejsou "
-#~ "na cestě nainstalovány. Musíte vytvořit vstupní bod pro {script_name}. Viz "
-#~ "{link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nedoporučuje se instalovat dokončování tabulátoru pro skript, který není na "
-#~ "cestě, protože dokončení bude pravděpodobně fungovat pouze v případě, že je "
-#~ "skript vyvolán ze stejného umístění a pomocí stejné relativní cesty. Možná "
-#~ "budete chtít vytvořit vstupní bod pro {script_name}. Viz {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Nainstalováno automatické dokončování pro {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Odinstalováno automatické dokončování pro {shell}."

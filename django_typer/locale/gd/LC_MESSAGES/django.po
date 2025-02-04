@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:101
 msgid "Install autocompletion for the current shell."
-msgstr "Stàlaich fèin-choileanadh airson an t-slige làithreach."
+msgstr "Stàlaich fèin-chrìochnachadh airson an t-slige làithreach."
 
 #: management/commands/shellcompletion.py:222
 msgid "The shell to use."
@@ -38,16 +38,16 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:264
 msgid "Install autocompletion for the current or given shell."
-msgstr "Stàlaich fèin-choileanadh airson an t-slige làithreach no ainmichte."
+msgstr "Stàlaich fèin-choileanadh airson an t-slige gnàthach no ainmichte."
 
 #: management/commands/shellcompletion.py:274
 msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Ainm an sgriobt riaghlaidh django gus fèin-chrìochnachadh a chuir a-steach "
-"ma tha e eadar-dhealaichte bhon sgriobt a chaidh a chleachdadh gus an àithne"
-" seo a chuir a-steach."
+"Ainm an sgriobt riaghlaidh django gus fèin-choileanadh a chuir a-steach ma "
+"tha e eadar-dhealaichte bhon sgriobt a chaidh a chleachdadh gus an àithne "
+"seo a chuir a-steach."
 
 #: management/commands/shellcompletion.py:286
 msgid ""
@@ -78,15 +78,15 @@ msgstr ""
 "air falbh ma tha e eadar-dhealaichte bhon sgriobt a chaidh a chleachdadh gus"
 " an àithne seo a chuir a-steach."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Cruthaich fèin-chrìochnachadh airson sreang àithne."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "An t-sreath àithne gus molaidhean crìochnachaidh a ghineadh airson."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -115,7 +115,7 @@ msgid ""
 " used."
 msgstr ""
 "An t-slighe Python gu modal roghainnean, me "
-"&quot;myproject.settings.main&quot;. Mur eil seo air a sholar, thèid "
+"\"myproject.settings.main\". Mur eil seo air a sholar, thèid "
 "caochladair àrainneachd DJANGO_SETTINGS_MODULE a chleachdadh."
 
 #: types.py:128
@@ -124,7 +124,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Eòlaire a chuireas ri slighe Python, me "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -141,51 +141,3 @@ msgstr "Feachd dathadh toradh an àithne."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Thoir air falbh sgrùdaidhean siostam."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr ""
-#~ "Cha b&#39; urrainn dhuinn gnìomh crìochnachaidh cùl-taice a thoirt a-steach:"
-#~ " {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Sònraich an t-slige airson fèin-chrìochnachadh a stàladh no a thoirt air "
-#~ "falbh. Cha b&#39; urrainn dhuinn slige a lorg."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Slige gun taic: {slige}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Chan eil Shell {shell} a&#39; cur taic ri fèin-chrìochnachadh airson "
-#~ "sgriobtaichean nach eil air an stàladh air an t-slighe. Feumaidh tu puing "
-#~ "inntrigidh a chruthachadh airson {script_name}. Faic {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Chan eilear a’ moladh crìochnachadh taba a chuir a-steach airson sgriobt "
-#~ "nach eil air an t-slighe oir tha coltas ann nach obraich crìochnachaidhean "
-#~ "ach ma thèid an sgriobt a chuir a-steach bhon aon àite agus a’ cleachdadh an"
-#~ " aon shlighe càirdeach. Is dòcha gum bi thu airson puing inntrigidh a "
-#~ "chruthachadh airson {script_name}. Faic {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "fèin-chrìochnachadh air a stàladh airson {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Fèin-chrìochnachadh neo-stàlaichte airson {shell}."

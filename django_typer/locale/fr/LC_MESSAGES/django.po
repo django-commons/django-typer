@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,16 +75,16 @@ msgstr ""
 "Le nom du script de gestion Django pour supprimer la complétion du shell "
 "s&#39;il est différent du script utilisé pour appeler cette commande."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Générer la saisie semi-automatique pour la chaîne de commande."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr ""
 "La chaîne de commande pour laquelle générer des suggestions de complétion."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -140,51 +140,3 @@ msgstr "Forcer la colorisation de la sortie de commande."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Ignorer les vérifications du système."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr ""
-#~ "Impossible d&#39;importer la fonction de complétion de secours : {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Veuillez spécifier le shell pour lequel installer ou supprimer la saisie "
-#~ "semi-automatique. Impossible de détecter le shell."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Shell non pris en charge : {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Le shell {shell} ne prend pas en charge la saisie semi-automatique pour les "
-#~ "scripts qui ne sont pas installés sur le chemin. Vous devez créer un point "
-#~ "d&#39;entrée pour {script_name}. Voir {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Il n&#39;est pas recommandé d&#39;installer la saisie semi-automatique par "
-#~ "tabulation pour un script qui ne se trouve pas sur le chemin, car les "
-#~ "saisies semi-automatiques ne fonctionneront probablement que si le script "
-#~ "est appelé depuis le même emplacement et en utilisant le même chemin "
-#~ "relatif. Vous souhaiterez peut-être créer un point d&#39;entrée pour "
-#~ "{script_name}. Voir {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Complétion automatique installée pour {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Complétion automatique désinstallée pour {shell}."

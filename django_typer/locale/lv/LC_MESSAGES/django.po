@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,15 +70,15 @@ msgstr ""
 "Django pārvaldības skripta nosaukums, lai noņemtu čaulas pabeigšanu, ja tas "
 "atšķiras no skripta, kas tika izmantots šīs komandas izsaukšanai."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Ģenerējiet komandu virknes automātisko pabeigšanu."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Komandu virkne, lai ģenerētu pabeigšanas ieteikumus."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +107,7 @@ msgid ""
 " used."
 msgstr ""
 "Python ceļš uz iestatījumu moduli, piemēram, "
-"&quot;myproject.settings.main&quot;. Ja tas nav nodrošināts, tiks izmantots "
+"\"myproject.settings.main\". Ja tas nav nodrošināts, tiks izmantots "
 "vides mainīgais DJANGO_SETTINGS_MODULE."
 
 #: types.py:128
@@ -116,7 +116,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Direktorija, kas jāpievieno Python ceļam, piemēram, "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,47 +133,3 @@ msgstr "Piespiedu komandas izvades krāsošana."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Izlaist sistēmas pārbaudes."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nevar importēt rezerves pabeigšanas funkciju: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Lūdzu, norādiet čaulu, kurai instalēt vai noņemt automātisko pabeigšanu. "
-#~ "Nevar noteikt apvalku."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Neatbalstīts apvalks: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} neatbalsta automātisko pabeigšanu skriptiem, kas nav instalēti"
-#~ " ceļā. Jums ir jāizveido {script_name} ievades punkts. Skatiet {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nav ieteicams instalēt cilnes pabeigšanu skriptam, kas neatrodas ceļā, jo "
-#~ "pabeigšana, visticamāk, darbosies tikai tad, ja skripts tiks izsaukts no tās"
-#~ " pašas vietas un izmantojot to pašu relatīvo ceļu. Iespējams, vēlēsities "
-#~ "izveidot {script_name} ievades punktu. Skatiet {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Instalēta automātiskā pabeigšana vietnei {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} automātiskā pabeigšana ir atinstalēta."

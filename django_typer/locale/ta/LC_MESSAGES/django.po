@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,15 +76,15 @@ msgstr ""
 "இந்தக் கட்டளையை செயல்படுத்தப் பயன்படுத்தப்படும் ஸ்கிரிப்டை விட django manage"
 " script பெயர் வேறுபட்டால், shell completion ஐ நீக்குவதற்கான பெயர்."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "கட்டளை சரத்திற்கு தானியங்குநிரப்புதலை உருவாக்கு."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "நிறைவு பரிந்துரைகளை உருவாக்குவதற்கான கட்டளை சரம்."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -114,7 +114,7 @@ msgid ""
 " used."
 msgstr ""
 "அமைப்புகள் தொகுதிக்கான பைதான் பாதை, எ.கா. "
-"&quot;myproject.settings.main&quot;. இது வழங்கப்படவில்லை என்றால், "
+"\"myproject.settings.main\". இது வழங்கப்படவில்லை என்றால், "
 "DJANGO_SETTINGS_MODULE சூழல் மாறி பயன்படுத்தப்படும்."
 
 #: types.py:128
@@ -123,7 +123,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "பைதான் பாதையில் சேர்க்க வேண்டிய ஒரு கோப்பகம், எ.கா. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -140,49 +140,3 @@ msgstr "கட்டளை வெளியீட்டின் வண்ணம�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "கணினி சரிபார்ப்புகளைத் தவிர்க்கவும்."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "ஃபால்பேக் நிறைவு செயல்பாட்டை இறக்குமதி செய்ய முடியவில்லை: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "தானியங்குநிரப்புதலை நிறுவ அல்லது அகற்ற ஷெல்லை குறிப்பிடவும். ஷெல்லைக் "
-#~ "கண்டறிய முடியவில்லை."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "ஆதரிக்கப்படாத ஷெல்: {ஷெல்}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "பாதையில் நிறுவப்படாத ஸ்கிரிப்டுகளுக்கு ஷெல் {ஷெல்} தானியங்குநிரப்புதலை "
-#~ "ஆதரிக்காது. நீங்கள் {script_name} க்கு ஒரு நுழைவுப் புள்ளியை உருவாக்க "
-#~ "வேண்டும். {link} ஐப் பார்க்கவும்."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "பாதையில் இல்லாத ஸ்கிரிப்ட்டுக்கு டேப் முடிப்பை நிறுவுவது "
-#~ "பரிந்துரைக்கப்படவில்லை, ஏனெனில் ஸ்கிரிப்ட் அதே இடத்திலிருந்து "
-#~ "செயல்படுத்தப்பட்டு அதே தொடர்புடைய பாதையைப் பயன்படுத்தினால் மட்டுமே நிறைவுகள்"
-#~ " செயல்படும். நீங்கள் {script_name} க்கு ஒரு நுழைவுப் புள்ளியை உருவாக்க "
-#~ "விரும்பலாம். {link} ஐப் பார்க்கவும்."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path}-க்கு தானியங்குநிரப்புதல் நிறுவப்பட்டது."
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell}-க்கான தானியங்குநிரப்புதல் நிறுவல் நீக்கப்பட்டது."

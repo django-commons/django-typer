@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgid ""
 "completion command is not a TyperCommand."
 msgstr ""
 "Calea de import python către o funcție de rezervă completă de utilizat "
-"atunci când comanda de finalizare nu este un TyperCommand."
+"atunci când comanda de finalizare nu este o comandă TyperCommand."
 
 #: management/commands/shellcompletion.py:299
 msgid "The name of the template to use for the shell completion script."
@@ -76,15 +76,15 @@ msgstr ""
 "ului, dacă este diferit de scriptul utilizat pentru a invoca această "
 "comandă."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generați completarea automată pentru șirul de comandă."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Șirul de comandă pentru care se generează sugestii de finalizare."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -139,49 +139,3 @@ msgstr "Forțați colorarea ieșirii comenzii."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Omite verificările sistemului."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Nu se poate importa funcția de finalizare alternativă: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Vă rugăm să specificați shell-ul pentru care să instalați sau să eliminați "
-#~ "completarea automată. Imposibil de detectat shell."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Shell neacceptat: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} nu acceptă completarea automată pentru scripturile care nu "
-#~ "sunt instalate pe cale. Trebuie să creați un punct de intrare pentru "
-#~ "{script_name}. Vedeți {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Nu este recomandat să instalați completarea filei pentru un script care nu "
-#~ "este pe cale, deoarece completările vor funcționa probabil numai dacă "
-#~ "scriptul este invocat din aceeași locație și folosind aceeași cale relativă."
-#~ " Poate doriți să creați un punct de intrare pentru {script_name}. Vedeți "
-#~ "{link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Completare automată instalată pentru {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Completare automată dezinstalată pentru {shell}."

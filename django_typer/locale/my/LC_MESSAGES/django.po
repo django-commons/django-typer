@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,15 +78,15 @@ msgstr ""
 "ဤအမိန့်ကိုခေါ်ဆိုရန်အသုံးပြုသည့် script နှင့်ကွဲပြားပါက shell completion "
 "ကိုဖယ်ရှားရန် django စီမံခန့်ခွဲသည့် script ၏အမည်။"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "အမိန့်ပေးစာကြောင်းအတွက် အလိုအလျောက်ဖြည့်စွက်မှုကို ဖန်တီးပါ။"
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "ပြီးစီးမှုဆိုင်ရာ အကြံပြုချက်များကို ထုတ်ပေးရန်အတွက် အမိန့်စာတန်း။"
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -106,8 +106,8 @@ msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
 msgstr ""
-"စကားအပြောအဆိုအဆင့်; 0=အထွက်နှုန်းအနည်းဆုံး၊ 1=သာမန်အထွက်၊ 2=အကျုံးဝင်သော "
-"အထွက်နှုန်း၊ 3=အလွန်အကျွံထွက်ရှိမှု"
+"စကားအပြောအဆိုအဆင့်; 0=အထွက်နှုန်းအနည်းဆုံး၊ 1=သာမန်အထွက်၊ 2=စကားအထွက်နှုန်း၊"
+" 3=အလွန်အကျွံထွက်ပေါက်"
 
 #: types.py:104
 msgid ""
@@ -116,8 +116,8 @@ msgid ""
 " used."
 msgstr ""
 "ဆက်တင် module တစ်ခုသို့ Python လမ်းကြောင်း၊ ဥပမာ "
-"&quot;myproject.settings.main&quot;။ ၎င်းကို မပေးပါက၊ DJANGO_SETTINGS_MODULE"
-" ပတ်ဝန်းကျင် ကိန်းရှင်ကို အသုံးပြုပါမည်။"
+"\"myproject.settings.main\"။ ၎င်းကို မပေးပါက၊ DJANGO_SETTINGS_MODULE"
+" ပတ်၀န်းကျင် ပြောင်းလဲမှုအား အသုံးပြုပါမည်။"
 
 #: types.py:128
 msgid ""
@@ -125,7 +125,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Python လမ်းကြောင်းတွင် ထည့်ရန် လမ်းညွှန်တစ်ခု ဥပမာ "
-"&quot;/home/djangoprojects/myproject&quot;။"
+"\"/home/djangoprojects/myproject\"။"
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -142,49 +142,3 @@ msgstr "အမိန့်ပေးသည့်အထွက်ကို အရ�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "စနစ်စစ်ဆေးမှုများကို ကျော်သွားပါ။"
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr ""
-#~ "နောက်ပြန်ဆုတ်ခြင်း ပြီးဆုံးခြင်းလုပ်ဆောင်ချက်ကို ထည့်သွင်း၍မရပါ- {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "အလိုအလျောက်ဖြည့်သွင်းမှုကို ထည့်သွင်းရန် သို့မဟုတ် ဖယ်ရှားရန် အခွံကို "
-#~ "သတ်မှတ်ပေးပါ။ အခွံကို ထောက်လှမ်း၍မရပါ။"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "ပံ့ပိုးမထားသော အခွံ- {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} သည် လမ်းကြောင်းပေါ်တွင် ထည့်သွင်းမထားသည့် scripts များအတွက် "
-#~ "အလိုအလျောက်ဖြည့်စွက်မှုကို မပံ့ပိုးပါ။ သင်သည် {script_name} အတွက် "
-#~ "ဝင်ခွင့်အမှတ်ကို ဖန်တီးရပါမည်။ {link} ကိုကြည့်ပါ။"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "ဇာတ်ညွှန်းကို တည်နေရာတစ်ခုတည်းမှ ခေါ်ဆိုပြီး တူညီသော ဆက်စပ်လမ်းကြောင်းကို "
-#~ "အသုံးပြုမှသာ လမ်းကြောင်းပေါ်တွင် မရှိသော ဇာတ်ညွှန်းတစ်ခုအတွက် "
-#~ "တက်ဘ်ပြီးစီးမှုကို ထည့်သွင်းရန် အကြံပြုထားခြင်း မရှိပါ။ သင်သည် {script_name}"
-#~ " အတွက် ဝင်ခွင့်အမှတ်ကို ဖန်တီးလိုပေမည်။ {link} ကိုကြည့်ပါ။"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} အတွက် အလိုအလျောက် ဖြည့်သွင်းခြင်း"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} အတွက် အလိုအလျောက် ဖြည့်သွင်းမှုကို ဖယ်ရှားခဲ့သည်။"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,15 +74,15 @@ msgstr ""
 "ఈ కమాండ్‌ను అమలు చేయడానికి ఉపయోగించిన స్క్రిప్ట్ కంటే భిన్నంగా ఉంటే, django "
 "manage script to remove shell completion పేరు."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "కమాండ్ స్ట్రింగ్ కోసం ఆటోకంప్లీషన్‌ను రూపొందించండి."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "పూర్తి సూచనలను రూపొందించడానికి కమాండ్ స్ట్రింగ్."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -111,7 +111,7 @@ msgid ""
 " used."
 msgstr ""
 "సెట్టింగుల మాడ్యూల్‌కు పైథాన్ మార్గం, ఉదా. "
-"&quot;myproject.settings.main&quot;. ఇది అందించకపోతే, DJANGO_SETTINGS_MODULE"
+"\"myproject.settings.main\". ఇది అందించకపోతే, DJANGO_SETTINGS_MODULE"
 " ఎన్విరాన్మెంట్ వేరియబుల్ ఉపయోగించబడుతుంది."
 
 #: types.py:128
@@ -120,7 +120,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "పైథాన్ పాత్ కు జోడించడానికి ఒక డైరెక్టరీ, ఉదా. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -137,48 +137,3 @@ msgstr "కమాండ్ అవుట్‌పుట్ యొక్క బల
 #: types.py:204
 msgid "Skip system checks."
 msgstr "సిస్టమ్ తనిఖీలను దాటవేయి."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "ఫాల్‌బ్యాక్ కంప్లీషన్ ఫంక్షన్‌ను దిగుమతి చేయడం సాధ్యం కాలేదు: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "దయచేసి ఆటోకంప్లీషన్‌ను ఇన్‌స్టాల్ చేయడానికి లేదా తీసివేయడానికి షెల్‌ను "
-#~ "పేర్కొనండి. షెల్‌ను గుర్తించడం సాధ్యం కాలేదు."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "మద్దతు లేని షెల్: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "షెల్ {shell} మార్గంలో ఇన్‌స్టాల్ చేయని స్క్రిప్ట్‌ల కోసం ఆటోకంప్లీషన్‌కు "
-#~ "మద్దతు ఇవ్వదు. మీరు {script_name} కోసం ఎంట్రీ పాయింట్‌ను సృష్టించాలి. {link}"
-#~ " చూడండి."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "స్క్రిప్ట్‌ను ఒకే స్థానం నుండి ప్రారంభించి, అదే సాపేక్ష మార్గాన్ని "
-#~ "ఉపయోగిస్తేనే కంప్లీషన్‌లు పని చేస్తాయి కాబట్టి, పాత్‌లో లేని స్క్రిప్ట్ కోసం"
-#~ " ట్యాబ్ కంప్లీషన్‌ను ఇన్‌స్టాల్ చేయడం సిఫార్సు చేయబడలేదు. మీరు {script_name}"
-#~ " కోసం ఎంట్రీ పాయింట్‌ను సృష్టించాలనుకోవచ్చు. {link} చూడండి."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} కోసం ఆటోకంప్లీషన్ ఇన్‌స్టాల్ చేయబడింది."
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} కోసం ఆటోకంప్లీషన్ అన్‌ఇన్‌స్టాల్ చేయబడింది."

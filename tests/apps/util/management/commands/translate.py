@@ -25,14 +25,19 @@ class Command(TyperCommand):
             os.chdir(django_typer)
 
             for lang in languages:
+                locale_dir = Path(django_typer) / f"locale/{lang}"
                 call_command("makemessages", "-l", lang)
                 try:
                     call_command("translate_messages", "-l", lang)
+                    po_file = locale_dir / "LC_MESSAGES" / "django.po"
+                    if po_file.is_file():
+                        po = po_file.read_text()
+                        if "&quot;" in po:
+                            po_file.write_text(po.replace("&quot;", '\\"'))
                 except Exception as e:
                     self.secho(
                         f"Failed to translate messages for {lang}: {e}", fg="red"
                     )
-                    locale_dir = Path(django_typer) / f"locale/{lang}"
                     if locale_dir.is_dir():
                         shutil.rmtree(Path(django_typer) / f"locale/{lang}")
             call_command("compilemessages")

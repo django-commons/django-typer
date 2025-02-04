@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Skalet att använda."
 #: management/commands/shellcompletion.py:235
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Filtrera kontrollsekvenser för terminalformatering utan kompletteringstext."
+"Filtrera kontrollsekvenser för terminalformatering utan slutförande text."
 
 #: management/commands/shellcompletion.py:248
 msgid "Allow terminal formatting control sequences in completion text."
@@ -46,7 +46,7 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr ""
 "Namnet på django management-skriptet för att installera autokomplettering "
-"för om det skiljer sig från skriptet som användes för att anropa detta "
+"för om det är annorlunda än skriptet som användes för att anropa detta "
 "kommando."
 
 #: management/commands/shellcompletion.py:286
@@ -70,18 +70,18 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Namnet på django manage script för att ta bort skalkomplettering om det är "
-"annorlunda än skriptet som användes för att anropa detta kommando."
+"Namnet på django management-skriptet för att ta bort skalkomplettering om "
+"det är annorlunda än skriptet som användes för att anropa detta kommando."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Generera autokomplettering för kommandosträng."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Kommandosträngen att generera slutförandeförslag för."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -110,7 +110,7 @@ msgid ""
 " used."
 msgstr ""
 "Python-sökvägen till en inställningsmodul, t.ex. "
-"&quot;myproject.settings.main&quot;. Om detta inte tillhandahålls kommer "
+"\"myproject.settings.main\". Om detta inte tillhandahålls kommer "
 "miljövariabeln DJANGO_SETTINGS_MODULE att användas."
 
 #: types.py:128
@@ -119,7 +119,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "En katalog att lägga till i Python-sökvägen, t.ex. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -136,48 +136,3 @@ msgstr "Framtvinga färgläggning av kommandoutgången."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Hoppa över systemkontroller."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Det gick inte att importera reservfunktion för slutförande: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Vänligen ange skalet att installera eller ta bort autokomplettering för. Kan"
-#~ " inte upptäcka skalet."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Skal som inte stöds: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} stöder inte autokomplettering för skript som inte är "
-#~ "installerade på sökvägen. Du måste skapa en ingångspunkt för {script_name}. "
-#~ "Se {länk}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Det rekommenderas inte att installera flikkomplettering för ett skript som "
-#~ "inte finns på sökvägen eftersom kompletteringar sannolikt bara fungerar om "
-#~ "skriptet anropas från samma plats och använder samma relativa sökväg. Du "
-#~ "kanske vill skapa en ingångspunkt för {script_name}. Se {länk}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Installerade autoslutförande för {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Avinstallerad autokomplettering för {shell}."

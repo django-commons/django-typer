@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,15 +77,15 @@ msgstr ""
 " ഷെൽ കംപ്ലീഷൻ നീക്കം ചെയ്യുന്നതിനുള്ള django മാനേജ്മെന്റ് സ്ക്രിപ്റ്റിന്റെ "
 "പേര്."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "കമാൻഡ് സ്ട്രിംഗിനായി ഓട്ടോകംപ്ലീഷൻ സൃഷ്ടിക്കുക."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "പൂർത്തീകരണ നിർദ്ദേശങ്ങൾ സൃഷ്ടിക്കുന്നതിനുള്ള കമാൻഡ് സ്ട്രിംഗ്."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -114,7 +114,7 @@ msgid ""
 " used."
 msgstr ""
 "ഒരു ക്രമീകരണ മൊഡ്യൂളിലേക്കുള്ള പൈത്തൺ പാത, ഉദാ: "
-"&quot;myproject.settings.main&quot;. ഇത് നൽകിയിട്ടില്ലെങ്കിൽ, "
+"\"myproject.settings.main\". ഇത് നൽകിയിട്ടില്ലെങ്കിൽ, "
 "DJANGO_SETTINGS_MODULE എൻവയോൺമെന്റ് വേരിയബിൾ ഉപയോഗിക്കും."
 
 #: types.py:128
@@ -123,7 +123,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "പൈത്തൺ പാതയിലേക്ക് ചേർക്കുന്നതിനുള്ള ഒരു ഡയറക്ടറി, ഉദാ: "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -140,49 +140,3 @@ msgstr "കമാൻഡ് ഔട്ട്‌പുട്ടിന്റെ ന�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "സിസ്റ്റം പരിശോധനകൾ ഒഴിവാക്കുക."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "ഫോൾബാക്ക് പൂർത്തീകരണ ഫംഗ്ഷൻ ഇറക്കുമതി ചെയ്യാൻ കഴിയുന്നില്ല: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "ഇൻസ്റ്റാൾ ചെയ്യേണ്ട ഷെൽ അല്ലെങ്കിൽ ഓട്ടോകംപ്ലീഷൻ നീക്കം ചെയ്യേണ്ട ഷെൽ ദയവായി"
-#~ " വ്യക്തമാക്കുക. ഷെൽ കണ്ടെത്താനായില്ല."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "പിന്തുണയ്ക്കാത്ത ഷെൽ: {ഷെൽ}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "ഷെൽ {ഷെൽ} പാത്തിൽ ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ലാത്ത സ്ക്രിപ്റ്റുകൾക്ക് "
-#~ "ഓട്ടോകംപ്ലീറ്റേഷൻ പിന്തുണയ്ക്കുന്നില്ല. {script_name} എന്നതിനായി നിങ്ങൾ ഒരു "
-#~ "എൻട്രി പോയിന്റ് സൃഷ്ടിക്കണം. {link} കാണുക."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "പാത്തിൽ ഇല്ലാത്ത ഒരു സ്ക്രിപ്റ്റിന് ടാബ് പൂർത്തീകരണം ഇൻസ്റ്റാൾ ചെയ്യാൻ "
-#~ "ശുപാർശ ചെയ്യുന്നില്ല, കാരണം സ്ക്രിപ്റ്റ് ഒരേ ലൊക്കേഷനിൽ നിന്ന് അതേ റിലേഷണൽ "
-#~ "പാത്ത് ഉപയോഗിച്ചാൽ മാത്രമേ പൂർത്തീകരണങ്ങൾ പ്രവർത്തിക്കൂ. {script_name} "
-#~ "എന്നതിനായി ഒരു എൻട്രി പോയിന്റ് സൃഷ്ടിക്കാൻ നിങ്ങൾ ആഗ്രഹിച്ചേക്കാം. {link} "
-#~ "കാണുക."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path}-നുള്ള ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്തു."
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell}-നുള്ള ഓട്ടോകംപ്ലീഷൻ അൺഇൻസ്റ്റാൾ ചെയ്തു."

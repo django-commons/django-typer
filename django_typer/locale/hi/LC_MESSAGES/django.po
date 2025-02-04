@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,15 +71,15 @@ msgstr ""
 "यदि शेल पूर्णता को हटाने के लिए django प्रबंधन स्क्रिप्ट का नाम इस आदेश को "
 "लागू करने के लिए प्रयुक्त स्क्रिप्ट से भिन्न है।"
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "कमांड स्ट्रिंग के लिए स्वतः पूर्णता उत्पन्न करें."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "पूर्णता सुझाव उत्पन्न करने के लिए कमांड स्ट्रिंग."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -108,7 +108,7 @@ msgid ""
 " used."
 msgstr ""
 "सेटिंग्स मॉड्यूल के लिए पायथन पथ, उदाहरण के लिए "
-"&quot;myproject.settings.main&quot;। यदि यह प्रदान नहीं किया गया है, तो "
+"\"myproject.settings.main\"। यदि यह प्रदान नहीं किया गया है, तो "
 "DJANGO_SETTINGS_MODULE पर्यावरण चर का उपयोग किया जाएगा।"
 
 #: types.py:128
@@ -117,7 +117,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "पायथन पथ में जोड़ने के लिए एक निर्देशिका, उदाहरण के लिए "
-"&quot;/home/djangoprojects/myproject&quot;।"
+"\"/home/djangoprojects/myproject\"।"
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -134,48 +134,3 @@ msgstr "कमांड आउटपुट का रंगीकरण बल�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "सिस्टम जाँच छोड़ें."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "फ़ॉलबैक पूर्णता फ़ंक्शन आयात करने में असमर्थ: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "कृपया स्वतःपूर्णता स्थापित करने या निकालने के लिए शेल निर्दिष्ट करें। शेल का"
-#~ " पता लगाने में असमर्थ।"
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "असमर्थित शेल: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "शेल {shell} उन स्क्रिप्ट के लिए स्वतः पूर्णता का समर्थन नहीं करता है जो पथ "
-#~ "पर स्थापित नहीं हैं। आपको {script_name} के लिए एक प्रवेश बिंदु बनाना होगा। "
-#~ "{link} देखें।"
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "पथ पर न होने वाली स्क्रिप्ट के लिए टैब पूर्णता स्थापित करने की अनुशंसा नहीं "
-#~ "की जाती है क्योंकि पूर्णताएँ संभवतः तभी काम करेंगी जब स्क्रिप्ट को उसी स्थान"
-#~ " से और उसी सापेक्ष पथ का उपयोग करके बुलाया जाएगा। आप {script_name} के लिए एक"
-#~ " प्रवेश बिंदु बनाना चाह सकते हैं। {link} देखें।"
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{shell} @ {install_path} के लिए स्वतः पूर्णता स्थापित की गई"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{shell} के लिए स्वतःपूर्णता अनइंस्टॉल की गई."

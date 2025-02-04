@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,15 +74,15 @@ msgstr ""
 "django management სკრიპტის სახელი, რათა წაშალოს shell completion თუ "
 "განსხვავდება ამ ბრძანების გამოსაძახებლად გამოყენებული სკრიპტისგან."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "შექმენით ავტომატური დასრულება ბრძანების სტრიქონისთვის."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "ბრძანების სტრიქონი დასრულების წინადადებების გენერირებისთვის."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -111,7 +111,7 @@ msgid ""
 " used."
 msgstr ""
 "პითონის გზა პარამეტრების მოდულისკენ, მაგ., "
-"&quot;myproject.settings.main&quot;. თუ ეს არ არის მოწოდებული, გამოყენებული "
+"\"myproject.settings.main\". თუ ეს არ არის მოწოდებული, გამოყენებული "
 "იქნება DJANGO_SETTINGS_MODULE გარემოს ცვლადი."
 
 #: types.py:128
@@ -120,7 +120,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "დირექტორია პითონის ბილიკზე დასამატებლად, მაგ: "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -137,49 +137,3 @@ msgstr "ბრძანების გამომავალი იძულ�
 #: types.py:204
 msgid "Skip system checks."
 msgstr "გამოტოვეთ სისტემის შემოწმებები."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "სარეზერვო დასრულების ფუნქციის იმპორტი შეუძლებელია: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "გთხოვთ, მიუთითოთ გარსი, რომლისთვისაც უნდა დააინსტალიროთ ან წაშალოთ "
-#~ "ავტომატური დასრულება. ჭურვის აღმოჩენა შეუძლებელია."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "მხარდაუჭერელი გარსი: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell} არ უჭერს მხარს ავტომატურ დასრულებას იმ სკრიპტებისთვის, "
-#~ "რომლებიც არ არის დაინსტალირებული გზაზე. თქვენ უნდა შექმნათ შესვლის წერტილი "
-#~ "{script_name}-ისთვის. იხილეთ {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "არ არის რეკომენდირებული ჩანართის შევსების დაყენება იმ სკრიპტისთვის, რომელიც "
-#~ "გზაზე არ არის, რადგან დასრულებები სავარაუდოდ იმუშავებს მხოლოდ იმ "
-#~ "შემთხვევაში, თუ სკრიპტი გამოიძახება იმავე მდებარეობიდან და იმავე ფარდობითი "
-#~ "გზის გამოყენებით. შეგიძლიათ შექმნათ შესვლის წერტილი {script_name}-ისთვის. "
-#~ "იხილეთ {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "დაინსტალირებულია ავტომატური დასრულება {shell}-ისთვის @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "დეინსტალირებული ავტომატური დასრულება {shell}-ისთვის."

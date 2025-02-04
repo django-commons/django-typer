@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,8 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:248
 msgid "Allow terminal formatting control sequences in completion text."
-msgstr "Терминалны форматлау контроле эзлеклелеген рөхсәт итегез."
+msgstr ""
+"Терминал форматлау контроль эзлеклелеген тәмамлау текстында рөхсәт итегез."
 
 #: management/commands/shellcompletion.py:264
 msgid "Install autocompletion for the current or given shell."
@@ -71,15 +72,15 @@ msgstr ""
 "Django исеме скрипт белән идарә итә, бу боерыкны куллану өчен кулланылган "
 "скрипттан аерылып торса."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Команда сызыгы өчен автокомплекция булдыру."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Тәмамлау тәкъдимнәрен ясау өчен боерык сызыгы."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -107,7 +108,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Python көйләү модулына юл, мәсәлән, &quot;myproject.settings.main&quot;. Бу "
+"Python көйләү модулына юл, мәсәлән, \"myproject.settings.main\". Бу "
 "тәэмин ителмәсә, DJANGO_SETTINGS_MODULE мохит үзгәрүчесе кулланылачак."
 
 #: types.py:128
@@ -115,8 +116,8 @@ msgid ""
 "A directory to add to the Python path, e.g. "
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
-"Python юлына өстәргә каталог, мәсәлән &quot;/ home / djangoprojects / "
-"myproject&quot;."
+"Python юлына өстәргә каталог, мәсәлән \"/ home / djangoprojects / "
+"myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -133,47 +134,3 @@ msgstr "Команда чыгаруны көчләү."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Система тикшерүләрен үткәреп җибәрү."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Кире кайту функциясен кертә алмый: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Зинһар, автоматны урнаштыру яки бетерү өчен кабыгын күрсәтегез. Кабыкны таба"
-#~ " алмый."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Ярдәм ителмәгән кабык: {кабык}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell path юлга куелмаган сценарийлар өчен автоматлаштыруны хупламый."
-#~ " Сез {script_name for өчен керү ноктасын булдырырга тиеш. Карагыз {сылтама}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Сценарий өчен юлны түгел, ә скриптны тулыландыру тәкъдим ителми, чөнки "
-#~ "сценарий бер үк урыннан чакырылган һәм шул ук чагыштырма юлны кулланган "
-#~ "очракта гына эшләячәк. Сез {script_name for өчен керү ноктасын булдырырга "
-#~ "теләрсез. Карагыз {сылтама}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "{Шел} @ {install_path} өчен автокомплекция урнаштырылган"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "{Кабык for өчен бетерелмәгән автокомплекция."

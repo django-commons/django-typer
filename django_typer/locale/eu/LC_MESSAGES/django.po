@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,15 +73,15 @@ msgstr ""
 "Shell-osaketa kentzeko django manage script-aren izena komando hau deitzeko "
 "erabilitako script-a ez bada."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
-msgstr "Sortu komando-katearen osatze automatikoa."
+msgstr "Sortu komando katearen osatze automatikoa."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Osatzeko iradokizunak sortzeko komando-katea."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -110,7 +110,7 @@ msgid ""
 " used."
 msgstr ""
 "Ezarpen modulu baterako Python-en bidea, adibidez, "
-"&quot;myproject.settings.main&quot;. Hau ematen ez bada, "
+"\"myproject.settings.main\". Hau ematen ez bada, "
 "DJANGO_SETTINGS_MODULE ingurune-aldagaia erabiliko da."
 
 #: types.py:128
@@ -119,7 +119,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Python bidera gehitzeko direktorio bat, adibidez, "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -136,48 +136,3 @@ msgstr "Behartu komandoaren irteeraren koloreztatzea."
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Saltatu sistemaren egiaztapenak."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr "Ezin da inportatu ordezko osatze-funtzioa: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Mesedez, zehaztu osatze automatikoa instalatu edo kentzeko shell-a. Ezin da "
-#~ "shell detektatu."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Onartu gabeko shell: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Shell {shell}-k ez du osatze automatikoa onartzen bidean instalatuta ez "
-#~ "dauden scriptetarako. {script_name} sarrera-puntu bat sortu behar duzu. "
-#~ "Ikusi {esteka}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Ez da gomendagarria fitxa osatzea bidetik ez dagoen script batean "
-#~ "instalatzea, ziurrenik osatzeek soilik funtzionatuko dutelako scripta "
-#~ "kokapen beretik deitzen bada eta bide erlatibo bera erabiliz. Baliteke "
-#~ "{script_name}-rako sarrera-puntu bat sortu nahi izatea. Ikusi {esteka}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Osatze automatikoa instalatu da {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Desinstalatu da {shell}-rako osatze automatikoa."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:08-0600\n"
+"POT-Creation-Date: 2025-02-04 03:42-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,7 +48,7 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Το όνομα του σεναρίου διαχείρισης django για την εγκατάσταση της αυτόματης "
+"Το όνομα του σεναρίου διαχείρισης django για την εγκατάσταση αυτόματης "
 "συμπλήρωσης, εάν είναι διαφορετικό από το σενάριο που χρησιμοποιήθηκε για "
 "την επίκληση αυτής της εντολής."
 
@@ -80,15 +80,15 @@ msgstr ""
 "του κελύφους για αν είναι διαφορετικό από το σενάριο που χρησιμοποιήθηκε για"
 " την επίκληση αυτής της εντολής."
 
-#: management/commands/shellcompletion.py:392
+#: management/commands/shellcompletion.py:390
 msgid "Generate autocompletion for command string."
 msgstr "Δημιουργία αυτόματης συμπλήρωσης για συμβολοσειρά εντολών."
 
-#: management/commands/shellcompletion.py:400
+#: management/commands/shellcompletion.py:398
 msgid "The command string to generate completion suggestions for."
 msgstr "Η συμβολοσειρά εντολών για τη δημιουργία προτάσεων ολοκλήρωσης."
 
-#: management/commands/shellcompletion.py:410
+#: management/commands/shellcompletion.py:408
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -117,7 +117,7 @@ msgid ""
 " used."
 msgstr ""
 "Η διαδρομή Python σε μια ενότητα ρυθμίσεων, π.χ. "
-"&quot;myproject.settings.main&quot;. Εάν αυτό δεν παρέχεται, θα "
+"\"myproject.settings.main\". Εάν αυτό δεν παρέχεται, θα "
 "χρησιμοποιηθεί η μεταβλητή περιβάλλοντος DJANGO_SETTINGS_MODULE."
 
 #: types.py:128
@@ -126,7 +126,7 @@ msgid ""
 "\"/home/djangoprojects/myproject\"."
 msgstr ""
 "Ένας κατάλογος για προσθήκη στη διαδρομή Python, π.χ. "
-"&quot;/home/djangoprojects/myproject&quot;."
+"\"/home/djangoprojects/myproject\"."
 
 #: types.py:149
 msgid "Raise on CommandError exceptions"
@@ -143,50 +143,3 @@ msgstr "Αναγκαστικός χρωματισμός της εξόδου εν
 #: types.py:204
 msgid "Skip system checks."
 msgstr "Παράλειψη ελέγχων συστήματος."
-
-#, python-brace-format
-#~ msgid "Unable to import fallback completion function: {err}"
-#~ msgstr ""
-#~ "Δεν είναι δυνατή η εισαγωγή εναλλακτικής λειτουργίας ολοκλήρωσης: {err}"
-
-#~ msgid ""
-#~ "Please specify the shell to install or remove autocompletion for. Unable to "
-#~ "detect shell."
-#~ msgstr ""
-#~ "Καθορίστε το κέλυφος για την εγκατάσταση ή κατάργηση της αυτόματης "
-#~ "συμπλήρωσης. Δεν είναι δυνατός ο εντοπισμός του κελύφους."
-
-#, python-brace-format
-#~ msgid "Unsupported shell: {shell}"
-#~ msgstr "Μη υποστηριζόμενο κέλυφος: {shell}"
-
-#, python-brace-format
-#~ msgid ""
-#~ "Shell {shell} does not support autocompletion for scripts that are not "
-#~ "installed on the path. You must create an entry point for {script_name}. See"
-#~ " {link}."
-#~ msgstr ""
-#~ "Το Shell {shell} δεν υποστηρίζει αυτόματη συμπλήρωση για σενάρια που δεν "
-#~ "είναι εγκατεστημένα στη διαδρομή. Πρέπει να δημιουργήσετε ένα σημείο εισόδου"
-#~ " για το {script_name}. Δείτε {link}."
-
-#, python-brace-format
-#~ msgid ""
-#~ "It is not recommended to install tab completion for a script not on the path"
-#~ " because completions will likely only work if the script is invoked from the"
-#~ " same location and using the same relative path. You may wish to create an "
-#~ "entry point for {script_name}. See {link}."
-#~ msgstr ""
-#~ "Δεν συνιστάται η εγκατάσταση της ολοκλήρωσης καρτέλας για ένα σενάριο που "
-#~ "δεν βρίσκεται στη διαδρομή, επειδή οι ολοκληρώσεις πιθανότατα θα "
-#~ "λειτουργήσουν μόνο εάν το σενάριο κληθεί από την ίδια θέση και "
-#~ "χρησιμοποιώντας την ίδια σχετική διαδρομή. Ίσως θέλετε να δημιουργήσετε ένα "
-#~ "σημείο εισόδου για το {script_name}. Δείτε {link}."
-
-#, python-brace-format
-#~ msgid "Installed autocompletion for {shell} @ {install_path}"
-#~ msgstr "Εγκατεστημένη αυτόματη συμπλήρωση για το {shell} @ {install_path}"
-
-#, python-brace-format
-#~ msgid "Uninstalled autocompletion for {shell}."
-#~ msgstr "Απεγκαταστάθηκε η αυτόματη συμπλήρωση για το {shell}."
