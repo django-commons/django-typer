@@ -1936,6 +1936,9 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         )
         self.assertIn("django_typer/completers", result)
 
+        result = self.shellcompletion.complete("completion --path django_typer/apps.py")
+        self.assertIn("django_typer/apps.py", result)
+
         result = self.shellcompletion.complete(
             "completion --path django_typer/does_not_exist"
         )
