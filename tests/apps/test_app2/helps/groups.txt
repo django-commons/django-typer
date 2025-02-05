@@ -22,7 +22,6 @@
 │ --pythonpath         PATH                     A directory to add to the      │
 │                                               Python path, e.g.              │
 │                                               "/home/djangoprojects/myproje… │
-│                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
 │ --show-locals                                 Print local variables in       │

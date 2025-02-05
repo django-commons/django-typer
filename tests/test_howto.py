@@ -52,7 +52,6 @@ class TestGroupsHowto(TestCase):
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
 │ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
@@ -173,7 +172,6 @@ class TestDefaultOptionsHowto(TestCase):
 │ --pythonpath         PATH                     A directory to add to the      │
 │                                               Python path, e.g.              │
 │                                               "/home/djangoprojects/myproje… │
-│                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
 │ --show-locals                                 Print local variables in       │

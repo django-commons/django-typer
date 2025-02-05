@@ -190,7 +190,6 @@ native_tweaks_help_rich = """
 │ --pythonpath        PATH                     A directory to add to the       │
 │                                              Python path, e.g.               │
 │                                              "/home/djangoprojects/myprojec… │
-│                                              [default: None]                 │
 │ --no-color                                   Don't colorize the command      │
 │                                              output.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯

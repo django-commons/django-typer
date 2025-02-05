@@ -118,6 +118,7 @@ Settings = Annotated[
         ),
         rich_help_panel=COMMON_PANEL,
         shell_complete=import_paths,
+        show_default=False,
     ),
 ]
 """
@@ -141,6 +142,7 @@ PythonPath = Annotated[
         ),
         rich_help_panel=COMMON_PANEL,
         shell_complete=directories,
+        show_default=False,
     ),
 ]
 """

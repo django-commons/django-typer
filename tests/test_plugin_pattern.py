@@ -54,7 +54,6 @@ adapted_rich_help = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
 │ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
@@ -123,7 +122,6 @@ adapted_help_no_adapters = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
 │ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │

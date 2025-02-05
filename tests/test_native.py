@@ -30,7 +30,6 @@ native_help_rich = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
 │ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
@@ -83,7 +82,6 @@ native_groups_help_rich = """
 │ --pythonpath         PATH                     A directory to add to the      │
 │                                               Python path, e.g.              │
 │                                               "/home/djangoprojects/myproje… │
-│                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
 │ --show-locals                                 Print local variables in       │
@@ -382,7 +380,6 @@ native_tweaks_help_rich = """
 │ --pythonpath        PATH                     A directory to add to the       │
 │                                              Python path, e.g.               │
 │                                              "/home/djangoprojects/myprojec… │
-│                                              [default: None]                 │
 │ --no-color                                   Don't colorize the command      │
 │                                              output.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
