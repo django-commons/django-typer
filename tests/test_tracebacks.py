@@ -27,7 +27,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
             # by default we get only the last frame
             self.assertEqual(len(re.findall(r"\.py:\d+", result) or []), 1)
 
-            hlp = run_command("test_command1", "--help")[0]
+            hlp = run_command("test_command1", "--no-color", "--help")[0]
             self.assertNotIn("--hide-locals", hlp)
             self.assertIn("--show-locals", hlp)
 
@@ -44,7 +44,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         else:
             self.assertNotIn("────────", result)
 
-            hlp = run_command("test_command1", "--help")[0]
+            hlp = run_command("test_command1", "--no-color", "--help")[0]
             self.assertNotIn("--hide-locals", hlp)
             self.assertNotIn("--show-locals", hlp)
 
@@ -62,7 +62,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
             # should get a stack trace with files and line numbers
             self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
 
-            hlp = run_command("test_tb_overrides", "--help")[0]
+            hlp = run_command("test_tb_overrides", "--no-color", "--help")[0]
             self.assertIn("--hide-locals", hlp)
             self.assertNotIn("--show-locals", hlp)
 
@@ -79,7 +79,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         else:
             self.assertNotIn("────────", result)
 
-            hlp = run_command("test_tb_overrides", "--help")[0]
+            hlp = run_command("test_tb_overrides", "--no-color", "--help")[0]
             self.assertNotIn("--hide-locals", hlp)
             self.assertNotIn("--show-locals", hlp)
 
@@ -97,7 +97,11 @@ class TracebackConfigTests(with_typehint(TestCase)):
         self.assertIn("Exception: This is a test exception", result)
 
         hlp = run_command(
-            "test_command1", "--settings", "tests.settings.settings_tb_false", "--help"
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_false",
+            "--no-color",
+            "--help",
         )[0]
         self.assertFalse("--show-locals" in hlp)
         self.assertFalse("--hide-locals" in hlp)
@@ -131,7 +135,11 @@ class TracebackConfigTests(with_typehint(TestCase)):
         self.assertIn("Exception: This is a test exception", result)
 
         hlp = run_command(
-            "test_command1", "--settings", "tests.settings.settings_tb_none", "--help"
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_none",
+            "--no-color",
+            "--help",
         )[0]
         self.assertFalse("--show-locals" in hlp)
         self.assertFalse("--hide-locals" in hlp)
@@ -160,6 +168,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
                 "test_command1",
                 "--settings",
                 "tests.settings.settings_tb_change_defaults",
+                "--no-color",
                 "--help",
             )[0]
             self.assertFalse("--show-locals" in hlp)
