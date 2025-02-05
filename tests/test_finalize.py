@@ -5,24 +5,32 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from django_typer.management import get_command
-from tests.utils import run_command
+from tests.utils import run_command, rich_installed
 
 
 class TestFinalize(TestCase):
-    def test_finalize_multi_kwargs_run(self, command="finalize_multi_kwargs"):
+    def test_finalize_multi_kwargs_run(
+        self, command="finalize_multi_kwargs", show_locals=rich_installed
+    ):
         stdout, _, _ = run_command(command, "cmd1")
         self.assertEqual(
             stdout.strip(),
-            "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
+            "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}"
+            if show_locals
+            else "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
         )
         stdout, _, _ = run_command(command, "cmd2", "3", "cmd1")
         self.assertEqual(
             stdout.strip(),
-            "finalized: ['cmd2 3', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
+            "finalized: ['cmd2 3', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}"
+            if show_locals
+            else "finalized: ['cmd2 3', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
         )
 
     def test_finalize_multi_named_param_run(self):
-        self.test_finalize_multi_kwargs_run(command="finalize_multi_named_param")
+        self.test_finalize_multi_kwargs_run(
+            command="finalize_multi_named_param", show_locals=True
+        )
 
     def test_finalize_no_params_run(self):
         stdout, _, _ = run_command("finalize_multi_no_params", "cmd1")
@@ -37,14 +45,18 @@ class TestFinalize(TestCase):
             "finalized: ['cmd2 3', 'cmd1 1']",
         )
 
-    def test_finalize_multi_kwargs_call(self, command="finalize_multi_kwargs"):
+    def test_finalize_multi_kwargs_call(
+        self, command="finalize_multi_kwargs", show_locals=rich_installed
+    ):
         # todo - excluded common options should not appear?
         call_command(command, "cmd1")
         with contextlib.redirect_stdout(StringIO()) as out:
             call_command(command, "cmd1")
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
+                "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}"
+                if show_locals
+                else "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
             )
 
             out.truncate(0)
@@ -53,7 +65,9 @@ class TestFinalize(TestCase):
             call_command(command, "cmd2", "5", "cmd1")
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd2 5', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
+                "finalized: ['cmd2 5', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}"
+                if show_locals
+                else "finalized: ['cmd2 5', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
             )
 
             out.truncate(0)
@@ -70,11 +84,15 @@ class TestFinalize(TestCase):
             )
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd2 3', 'cmd1 2'] | {'force_color': False, 'no_color': False, 'traceback': True, 'show_locals': None}",
+                "finalized: ['cmd2 3', 'cmd1 2'] | {'force_color': False, 'no_color': False, 'traceback': True, 'show_locals': None}"
+                if show_locals
+                else "finalized: ['cmd2 3', 'cmd1 2'] | {'force_color': False, 'no_color': False, 'traceback': True}",
             )
 
     def test_finalize_multi_named_param_call(self):
-        self.test_finalize_multi_kwargs_call(command="finalize_multi_named_param")
+        self.test_finalize_multi_kwargs_call(
+            command="finalize_multi_named_param", show_locals=True
+        )
 
     def test_finalize_multi_no_params(self):
         # todo - excluded common options should not appear?

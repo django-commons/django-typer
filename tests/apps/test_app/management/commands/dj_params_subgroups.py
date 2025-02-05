@@ -7,6 +7,7 @@ from django_typer.management import (
     group,
 )
 from typer.models import Context as TyperContext
+from tests.utils import rich_installed
 
 
 class Command(TyperCommand):
@@ -42,7 +43,12 @@ class Command(TyperCommand):
             else "skip_checks" in ctx.params
         )
         assert "traceback" in ctx.params
-        for param in [key for key in COMMON_DEFAULTS.keys() if key != "hide_locals"]:
+        for param in [
+            key
+            for key in COMMON_DEFAULTS.keys()
+            if key
+            not in ["hide_locals", *(["show_locals"] if not rich_installed else [])]
+        ]:
             if param not in self.suppressed_base_arguments:
                 assert param in ctx.params
         return f"traceback={traceback}, skipchecks={skip_checks}"

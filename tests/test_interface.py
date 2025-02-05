@@ -236,6 +236,8 @@ class InterfaceTests(TestCase):
     def test_action_nargs(self):
         # unclear if nargs is even necessary - no other test seems to exercise it, leaving in for
         # base class compat reasons
+        from tests.utils import rich_installed
+
         self.assertEqual(
             get_command("basic")
             .create_parser("./manage.py", "basic")
@@ -251,10 +253,14 @@ class InterfaceTests(TestCase):
             -1,
         )
         multi_parser = get_command("multi").create_parser("./manage.py", "multi")
-        self.assertEqual(multi_parser._actions[8].param.name, "files")
-        self.assertEqual(multi_parser._actions[8].nargs, -1)
-        self.assertEqual(multi_parser._actions[9].param.name, "flag1")
-        self.assertEqual(multi_parser._actions[9].nargs, 0)
+        self.assertEqual(
+            multi_parser._actions[8 if rich_installed else 7].param.name, "files"
+        )
+        self.assertEqual(multi_parser._actions[8 if rich_installed else 7].nargs, -1)
+        self.assertEqual(
+            multi_parser._actions[9 if rich_installed else 8].param.name, "flag1"
+        )
+        self.assertEqual(multi_parser._actions[9 if rich_installed else 8].nargs, 0)
 
     def test_cmd_getattr(self):
         from django_typer.management import TyperCommand
