@@ -294,13 +294,9 @@ def _get_common_params(
             _common_options
         )[0]
     suppressed = _normalize_suppressed_arguments(command)
-    if suppressed:
-        return [
-            param
-            for param in _common_params
-            if param.name and param.name not in suppressed
-        ]
-    return _common_params
+    return [
+        param for param in _common_params if param.name and param.name not in suppressed
+    ]
 
 
 COMMON_DEFAULTS = {
