@@ -32,6 +32,7 @@ native_help_rich = """
 │                            "/home/djangoprojects/myproject".                 │
 │                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -85,6 +86,8 @@ native_groups_help_rich = """
 │                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
+│ --show-locals                                 Print local variables in       │
+│                                               tracebacks.                    │
 │ --no-color                                    Don't colorize the command     │
 │                                               output.                        │
 │ --force-color                                 Force colorization of the      │

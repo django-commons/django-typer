@@ -12,7 +12,9 @@ class Command(TyperCommand, chain=True):
     }
 
     @finalize()
-    def final(self, result, force_color=None, no_color=None, traceback=None):
+    def final(
+        self, result, force_color=None, no_color=None, traceback=None, show_locals=None
+    ):
         assert isinstance(self, Command)
         try:
             click_params = getattr(get_current_context(silent=False), "params", {})
@@ -22,11 +24,18 @@ class Command(TyperCommand, chain=True):
             assert click_params["no_color"] == no_color
             assert "traceback" in click_params
             assert click_params["traceback"] == traceback
+            assert "show_locals" in click_params
+            assert click_params["show_locals"] == traceback
         except Exception:
             pass
         return "finalized: {} | {}".format(
             result,
-            {"force_color": force_color, "no_color": no_color, "traceback": traceback},
+            {
+                "force_color": force_color,
+                "no_color": no_color,
+                "traceback": traceback,
+                "show_locals": show_locals,
+            },
         )
 
     @command()

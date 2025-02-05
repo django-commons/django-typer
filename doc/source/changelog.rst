@@ -7,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
 * Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
 * BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`
 * Implemented `Model completer/parser should support returning the field value <https://github.com/django-commons/django-typer/issues/162>`_
@@ -47,6 +48,16 @@ Migrating from 2.x to 3.x
   This change was forced by `upstream changes <https://github.com/fastapi/typer/pull/1052>`_ in
   Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to define commands across
   multiple files.
+
+* Rich tracebacks will not include local variables by default. To replicate the old behavior
+  you will need to add this to your settings:
+
+  .. code-block:: python
+
+      RICH_TRACEBACK_CONFIG={"show_locals": True}
+
+  --show-locals and --hide-locals common parameters are added to toggle local variables on
+  and off in the stack trace output.
 
 Shell Completions
 ~~~~~~~~~~~~~~~~~

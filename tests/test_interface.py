@@ -103,6 +103,7 @@ class InterfaceTests(TestCase):
         dt_params.remove("django_command")
         dt_params.remove("parent")
         self.assertFalse(dt_params.symmetric_difference(typer_params))
+        dt_params.remove("pretty_exceptions_show_locals")
         self.assertEqual(
             self.compare_defaults(dt_params, Typer.__init__, typer.Typer.__init__),
             len(dt_params),
@@ -164,14 +165,14 @@ class InterfaceTests(TestCase):
             self.compare_defaults(
                 [
                     "pretty_exceptions_enable",
-                    "pretty_exceptions_show_locals",
+                    # "pretty_exceptions_show_locals",
                     "pretty_exceptions_short",
                 ],
                 TyperCommandMeta.__new__,
                 typer.Typer.__init__,
                 require_placeholder_match=False,
             ),
-            3,
+            2,
         )
 
     def test_typer_group_interface_matches(self):
@@ -250,10 +251,10 @@ class InterfaceTests(TestCase):
             -1,
         )
         multi_parser = get_command("multi").create_parser("./manage.py", "multi")
-        self.assertEqual(multi_parser._actions[7].param.name, "files")
-        self.assertEqual(multi_parser._actions[7].nargs, -1)
-        self.assertEqual(multi_parser._actions[8].param.name, "flag1")
-        self.assertEqual(multi_parser._actions[8].nargs, 0)
+        self.assertEqual(multi_parser._actions[8].param.name, "files")
+        self.assertEqual(multi_parser._actions[8].nargs, -1)
+        self.assertEqual(multi_parser._actions[9].param.name, "flag1")
+        self.assertEqual(multi_parser._actions[9].nargs, 0)
 
     def test_cmd_getattr(self):
         from django_typer.management import TyperCommand

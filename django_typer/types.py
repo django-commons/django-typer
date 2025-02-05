@@ -25,7 +25,7 @@ def print_version(context, _, value):
         sys.exit()
 
 
-def set_no_color(context, param, value):
+def set_no_color(context, _, value):
     """
     If the value was provided set it on the command.
     """
@@ -38,13 +38,23 @@ def set_no_color(context, param, value):
     return value
 
 
-def set_force_color(context, param, value):
+def set_force_color(context, _, value):
     """
     If the value was provided set it on the command.
     """
     if value:
         context.django_command.force_color = value
     return value
+
+
+def show_locals(context, param, value):
+    from click.core import ParameterSource
+
+    if context.get_parameter_source(param.name) is not ParameterSource.DEFAULT:
+        from .config import traceback_config
+        from .utils import install_traceback
+
+        install_traceback({**traceback_config(), "show_locals": value})
 
 
 Version = Annotated[
@@ -158,6 +168,41 @@ The --traceback option is included by default and behaves the same as on BaseCom
 allow CommandError exceptions to propagate out of the command and produce a stack trace.
 """
 
+
+ShowLocals = Annotated[
+    bool,
+    Option(
+        "--show-locals",
+        help=cast(
+            str,
+            _("Print local variables in tracebacks."),
+        ),
+        callback=show_locals,
+        is_eager=True,
+        rich_help_panel=COMMON_PANEL,
+        show_default=False,
+    ),
+]
+"""
+A toggle to turn on exception traceback local variable rendering in rich
+tracebacks.
+"""
+
+HideLocals = Annotated[
+    bool,
+    Option(
+        "--hide-locals",
+        help=cast(str, _("Hide local variables in tracebacks.")),
+        callback=show_locals,
+        is_eager=True,
+        rich_help_panel=COMMON_PANEL,
+        show_default=False,
+    ),
+]
+"""
+A toggle to turn off exception traceback local variable rendering in rich
+tracebacks.
+"""
 
 NoColor = Annotated[
     bool,

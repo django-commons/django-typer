@@ -8,6 +8,7 @@ import sys
 import typing as t
 from datetime import timedelta
 from functools import partial
+from importlib.util import find_spec
 from pathlib import Path
 from threading import local
 from types import MethodType, ModuleType
@@ -21,11 +22,9 @@ from .parsers.model import ModelObjectParser, ReturnType
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
 
-
 __all__ = [
     "detect_shell",
     "get_usage_script",
-    "traceback_config",
     "get_current_command",
     "with_typehint",
     "register_command_plugins",
@@ -35,6 +34,9 @@ __all__ = [
     "parse_iso_duration",
     "model_parser_completer",
 ]
+
+
+rich_installed = find_spec("rich") is not None
 
 
 def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:
@@ -483,3 +485,45 @@ def model_parser_completer(
             order_by=order_by,
         ),
     }
+
+
+def install_traceback(tb_config: t.Optional[t.Dict[str, t.Any]] = None):
+    from .config import use_rich_tracebacks
+
+    if not use_rich_tracebacks():
+        return
+
+    import rich
+    from rich import traceback
+    from typer import main as typer_main
+
+    tb_config = tb_config or traceback_config()
+
+    # install rich tracebacks if we've been configured to do so (default)
+    no_color = "NO_COLOR" in os.environ
+    force_color = "FORCE_COLOR" in os.environ
+    traceback.install(
+        console=tb_config.pop(
+            "console",
+            (
+                rich.console.Console(
+                    stderr=True,
+                    no_color=no_color,
+                    force_terminal=(
+                        False if no_color else force_color if force_color else None
+                    ),
+                )
+                if no_color or force_color
+                else None
+            ),
+        ),
+        **{
+            param: value
+            for param, value in tb_config.items()
+            if param in set(inspect.signature(traceback.install).parameters.keys())
+        },
+    )
+    # typer installs its own exception hook and it falls back to the sys hook - depending
+    # on when typer was imported it may have the original fallback system hook or our
+    # installed rich one - we patch it here to make sure!
+    typer_main._original_except_hook = sys.excepthook

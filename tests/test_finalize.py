@@ -13,13 +13,12 @@ class TestFinalize(TestCase):
         stdout, _, _ = run_command(command, "cmd1")
         self.assertEqual(
             stdout.strip(),
-            "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
+            "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
         )
-
         stdout, _, _ = run_command(command, "cmd2", "3", "cmd1")
         self.assertEqual(
             stdout.strip(),
-            "finalized: ['cmd2 3', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
+            "finalized: ['cmd2 3', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
         )
 
     def test_finalize_multi_named_param_run(self):
@@ -45,7 +44,7 @@ class TestFinalize(TestCase):
             call_command(command, "cmd1")
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
+                "finalized: ['cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
             )
 
             out.truncate(0)
@@ -54,7 +53,7 @@ class TestFinalize(TestCase):
             call_command(command, "cmd2", "5", "cmd1")
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd2 5', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False}",
+                "finalized: ['cmd2 5', 'cmd1 1'] | {'force_color': False, 'no_color': False, 'traceback': False, 'show_locals': None}",
             )
 
             out.truncate(0)
@@ -71,7 +70,7 @@ class TestFinalize(TestCase):
             )
             self.assertEqual(
                 out.getvalue().strip(),
-                "finalized: ['cmd2 3', 'cmd1 2'] | {'force_color': False, 'no_color': False, 'traceback': True}",
+                "finalized: ['cmd2 3', 'cmd1 2'] | {'force_color': False, 'no_color': False, 'traceback': True, 'show_locals': None}",
             )
 
     def test_finalize_multi_named_param_call(self):
@@ -130,7 +129,7 @@ class TestFinalize(TestCase):
     def test_finalize_multi_named_param_obj(self):
         self.test_finalize_multi_kwargs_obj(
             command="finalize_multi_named_param",
-            kwargs="'force_color': None, 'no_color': None, 'traceback': None",
+            kwargs="'force_color': None, 'no_color': None, 'traceback': None, 'show_locals': None",
         )
 
     def test_finalize_multi_no_params_obj(

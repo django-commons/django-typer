@@ -28,6 +28,7 @@ basic_help = """
 │                            "/home/djangoprojects/myproject".                 │
 │                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -124,6 +125,7 @@ multi_help = """
 │                            "/home/djangoprojects/myproject".                 │
 │                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -180,6 +182,7 @@ hierarchy_help = """
 │                            "/home/djangoprojects/myproject".                 │
 │                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │

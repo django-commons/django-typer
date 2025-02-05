@@ -36,4 +36,6 @@ Command.suppressed_base_arguments = {
     "--traceback",
     "--skip-checks",
     "--pythonpath",
+    "--show-locals",
+    "--hide-locals",
 }

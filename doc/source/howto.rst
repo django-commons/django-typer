@@ -664,7 +664,7 @@ This provides a common hook for configuring rich_ that you can control on a per-
         "extra_lines": 3,                  # default is 3
         "theme": None,                     # predefined themes
         "word_wrap": False,                # default is False
-        "show_locals": True,               # rich default is False, but we turn this on
+        "show_locals": True,               # default is False
         "locals_max_length": 10            # default is 10
         "locals_max_string": 80            # default is 80
         "locals_hide_dunder": True,        # default is True

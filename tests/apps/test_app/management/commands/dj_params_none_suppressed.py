@@ -10,4 +10,6 @@ class Command(TyperCommand):
     def handle(self, ctx: TyperContext):
         assert self.__class__ is Command
         assert isinstance(ctx, TyperContext)
-        assert not set(ctx.params.keys()).symmetric_difference(COMMON_DEFAULTS.keys())
+        assert not set(ctx.params.keys()).symmetric_difference(
+            [key for key in COMMON_DEFAULTS.keys() if key != "hide_locals"]
+        )

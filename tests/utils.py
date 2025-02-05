@@ -12,16 +12,12 @@ import time
 from collections import Counter
 import pexpect
 from django.core.management.color import no_style
+from django_typer import utils
 
 # from charset_normalizer import from_bytes
 import platform
 
-try:
-    import rich
-
-    rich_installed = True
-except ImportError:
-    rich_installed = False
+rich_installed = utils.rich_installed
 
 
 TESTS_DIR = Path(__file__).parent

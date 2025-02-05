@@ -42,7 +42,7 @@ class Command(TyperCommand):
             else "skip_checks" in ctx.params
         )
         assert "traceback" in ctx.params
-        for param in COMMON_DEFAULTS.keys():
+        for param in [key for key in COMMON_DEFAULTS.keys() if key != "hide_locals"]:
             if param not in self.suppressed_base_arguments:
                 assert param in ctx.params
         return f"traceback={traceback}, skipchecks={skip_checks}"

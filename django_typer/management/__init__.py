@@ -29,12 +29,14 @@ from typer.main import get_params_convertors_ctx_param_name_from_function  # noq
 from typer.models import Context as TyperContext  # noqa: E402
 from typer.models import Default, DefaultPlaceholder  # noqa: E402
 
-from ..config import traceback_config  # noqa: E402
+from ..config import show_locals, traceback_config, use_rich_tracebacks  # noqa: E402
 from ..types import (  # noqa: E402
     ForceColor,
+    HideLocals,
     NoColor,
     PythonPath,
     Settings,
+    ShowLocals,
     SkipChecks,
     Traceback,
     Verbosity,
@@ -49,6 +51,7 @@ from ..utils import (  # noqa: E402
     get_current_command,
     get_usage_script,
     is_method,
+    rich_installed,
     with_typehint,
 )
 
@@ -237,12 +240,14 @@ def get_command(
     return cmd
 
 
-def _common_options(
+def _common_options(  # pyright: ignore[reportRedeclaration]
     version: Version = False,
     verbosity: Verbosity = 1,
     settings: Settings = "",
     pythonpath: PythonPath = None,
     traceback: Traceback = False,
+    show_locals: ShowLocals = False,
+    hide_locals: HideLocals = True,
     no_color: NoColor = False,
     force_color: ForceColor = False,
     skip_checks: SkipChecks = False,
@@ -260,14 +265,23 @@ _common_params: t.Sequence[t.Union[click.Argument, click.Option]] = []
 def _normalize_suppressed_arguments(
     command: t.Union[t.Type["TyperCommand"], "TyperCommand"],
 ) -> t.Set[str]:
+    suppressed = set()
     if command.suppressed_base_arguments:
-        return set(
+        suppressed = set(
             [
                 arg.lstrip("--").replace("-", "_")
                 for arg in command.suppressed_base_arguments
             ]
         )
-    return set()
+    if not rich_installed or not use_rich_tracebacks():
+        suppressed.update({"show_locals", "hide_locals"})
+    else:
+        suppressed.add(
+            "show_locals"
+            if show_locals() or command.typer_app.pretty_exceptions_show_locals
+            else "hide_locals"
+        )
+    return suppressed
 
 
 def _get_common_params(
@@ -930,7 +944,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: bool = True,
-        pretty_exceptions_show_locals: bool = True,
+        pretty_exceptions_show_locals: bool = False,
         pretty_exceptions_short: bool = True,
         parent: t.Optional["Typer"] = None,
         django_command: t.Optional[t.Type["TyperCommand"]] = None,
@@ -1996,7 +2010,7 @@ class TyperCommandMeta(type):
         rich_help_panel: t.Union[str, None] = Default(None),
         pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
         pretty_exceptions_show_locals: t.Union[DefaultPlaceholder, bool] = Default(
-            True
+            False
         ),
         pretty_exceptions_short: t.Union[DefaultPlaceholder, bool] = Default(True),
         **kwargs: t.Any,
@@ -2016,9 +2030,8 @@ class TyperCommandMeta(type):
             # conform the pretty exception defaults to the settings traceback config
             tb_config = traceback_config()
             if isinstance(pretty_exceptions_enable, DefaultPlaceholder):
-                pretty_exceptions_enable = isinstance(tb_config, dict)
+                pretty_exceptions_enable = use_rich_tracebacks()
 
-            tb_config = tb_config if isinstance(tb_config, dict) else {}
             if isinstance(pretty_exceptions_show_locals, DefaultPlaceholder):
                 pretty_exceptions_show_locals = tb_config.get(
                     "show_locals", pretty_exceptions_show_locals

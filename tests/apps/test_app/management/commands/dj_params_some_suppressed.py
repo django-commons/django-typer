@@ -5,7 +5,13 @@ from typer.models import Context as TyperContext
 class Command(TyperCommand):
     help = "Test that django parameter suppression works as expected"
 
-    suppressed_base_arguments = {"verbosity", "skip_checks", "traceback"}
+    suppressed_base_arguments = {
+        "verbosity",
+        "skip_checks",
+        "traceback",
+        "show_locals",
+        "hide_locals",
+    }
 
     def handle(self, ctx: TyperContext, traceback: bool = True):
         assert self.suppressed_base_arguments
