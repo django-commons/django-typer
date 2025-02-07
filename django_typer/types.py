@@ -112,7 +112,7 @@ Settings = Annotated[
             str,
             (
                 "The Python path to a settings module, e.g. "
-                '"myproject.settings.main". If this is not provided the '
+                '"myproject.settings.main". If this isn\'t provided, the '
                 "DJANGO_SETTINGS_MODULE environment variable will be used."
             ),
         ),
