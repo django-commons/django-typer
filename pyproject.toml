@@ -70,8 +70,8 @@ rich = ["rich>=10.11.0,<14.0.0"]
 "Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
 # for testing
-# [project.scripts]
-# manage = "tests.manage:main"
+[project.scripts]
+manage = "tests.manage:main"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"

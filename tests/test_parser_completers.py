@@ -2076,6 +2076,16 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         for obj in objects:
             self.assertEqual(data1[str(obj.id)], "P541D")
 
+    def test_cursor_position(self):
+        completions = get_values(
+            self.shellcompletion.complete("shellcompletion --set  install", 21)
+        )
+        self.assertTrue("--settings" in completions)
+        completions = get_values(
+            self.shellcompletion.complete("shellcompletion --settings  install", 27)
+        )
+        self.assertTrue("tests" in completions)
+
 
 class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
     tz_info = None

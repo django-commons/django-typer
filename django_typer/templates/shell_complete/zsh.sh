@@ -39,7 +39,7 @@
       esac
     done
 
-    response=("${(@f)$("${manage}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete {{ fallback }} "${words[*]}")}")
+    response=("${(@f)$("${manage}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete {{ fallback }} "${words[*]}" "$CURSOR")}")
 
     for type key descr in ${response}; do
         if [[ "$type" == "dir" ]]; then
@@ -56,7 +56,7 @@
     done
 
     if [ -n "$completions_with_descriptions" ]; then
-        _describe -V unsorted completions_with_descriptions -U
+        _describe -V unsorted completions_with_descriptions
     fi
 
     if [ -n "$completions" ]; then

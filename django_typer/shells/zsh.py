@@ -54,20 +54,8 @@ class ZshComplete(DjangoTyperShellCompleter):
         return install_dir
 
     def format_completion(self, item: CompletionItem) -> str:
-        def escape(s: str) -> str:
-            # TODO is any of this necessary?
-            return (
-                s.replace('"', '""')
-                .replace("'", "''")
-                .replace("$", "\\$")
-                .replace("`", "\\`")
-                # .replace(":", r"\\:")
-            )
-
-        return (
-            f"{item.type}\n{escape(self.process_rich_text(item.value))}"
-            f"\n{escape(self.process_rich_text(item.help)) if item.help else '_'}"
-        )
+        hlp = self.process_rich_text(item.help.replace("\n", " ")) if item.help else "_"
+        return f"{item.type}\n{self.process_rich_text(item.value)}\n{hlp}"
 
     def install(self) -> Path:
         assert self.prog_name
@@ -89,7 +77,11 @@ class ZshComplete(DjangoTyperShellCompleter):
             zshrc_source += f"autoload -Uz compinit{os.linesep}"
             zshrc_source += f"compinit{os.linesep}"
 
-        style = f"zstyle ':completion:*:*:{self.prog_name}:*' menu select"
+        style = (
+            f"zstyle ':completion:*:*:{self.prog_name}:*' menu select"
+            if self.is_installed
+            else "zstyle ':completion:*' menu select"
+        )
         if style not in zshrc_source:
             zshrc_source += f"{style}{os.linesep}"
         zshrc.write_text(zshrc_source)

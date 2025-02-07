@@ -3,6 +3,7 @@ import io
 import sys
 import typing as t
 from abc import abstractmethod
+from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
 
@@ -122,7 +123,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         self, args: t.List[str], incomplete: str
     ) -> t.List[CompletionItem]:
         """
-        need to remove the django command name from the arg completions
+        Get the completions for the current command string and incomplete string.
         """
         if self.command.fallback:
             return self.command.fallback(args, incomplete)
@@ -183,9 +184,16 @@ class DjangoTyperShellCompleter(ShellComplete):
             "fallback": f" --fallback {self.command.fallback_import}"
             if self.command.fallback
             else "",
-            "is_installed": not isinstance(self.command.manage_script, Path),
+            "is_installed": self.is_installed,
             "shell": self.name,
         }
+
+    @cached_property
+    def is_installed(self) -> bool:
+        """
+        Whether or not the manage script is a command on the path.
+        """
+        return not isinstance(self.command.manage_script, Path)
 
     def load_template(self) -> t.Union[BaseTemplate, DjangoTemplate]:
         """

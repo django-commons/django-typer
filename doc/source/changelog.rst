@@ -7,6 +7,7 @@ Change Log
 v3.0.0 (202X-XX-XX)
 ===================
 
+* Fixed `Completions before the end of the typed command string do not work. <https://github.com/django-commons/django-typer/issues/168>`_
 * BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
 * Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
 * BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`

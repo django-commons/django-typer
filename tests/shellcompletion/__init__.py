@@ -133,7 +133,7 @@ class _CompleteTestCase:
 
     if platform.system() == "Windows":
 
-        def get_completions(self, *cmds: str, scrub_output=True) -> str:
+        def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
             import winpty
 
             assert self.shell
@@ -163,6 +163,7 @@ class _CompleteTestCase:
             output = read_all() + read_all()
 
             pty.write(" ".join(cmds))
+            pty.write(position * ("\x1b[C" if position > 0 else "\x1b[D"))
             time.sleep(0.1)
             pty.write(self.tabs)
 
@@ -173,7 +174,7 @@ class _CompleteTestCase:
 
     else:
 
-        def get_completions(self, *cmds: str, scrub_output=True) -> str:
+        def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
             import fcntl
             import termios
             import pty
@@ -215,6 +216,12 @@ class _CompleteTestCase:
 
             cmd = " ".join(cmds)
             os.write(master_fd, cmd.encode())
+
+            # positioning does not seem to work :(
+            if position < 0:
+                os.write(master_fd, f"\033[{abs(position)}D".encode())
+            elif position > 0:
+                os.write(master_fd, f"\033[{abs(position)}C".encode())
             time.sleep(0.5)
 
             print(f'"{cmd}"')
@@ -397,6 +404,16 @@ class _CompleteTestCase:
         self.assertIn("management", completions)
         self.remove()
         self.verify_remove()
+
+    # todo - cursor positioning not working
+    # def test_cursor_position(self):
+    #     self.install()
+    #     self.verify_install()
+    #     cmd = [self.launch_script, "shellcompletion", "--set ", "install"]
+    #     completions = self.get_completions(*cmd, position=-9)
+    #     self.assertIn("--settings", completions)
+    #     self.remove()
+    #     self.verify_remove()
 
 
 class _ScriptCompleteTestCase(_CompleteTestCase):

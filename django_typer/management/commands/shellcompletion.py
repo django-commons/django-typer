@@ -406,6 +406,9 @@ class Command(TyperCommand):
                 ),
             ),
         ] = "",
+        cursor: t.Annotated[
+            t.Optional[int], Argument(help=t.cast(str, _("The cursor position.")))
+        ] = None,
         fallback: t.Annotated[
             t.Optional[str],
             Option(
@@ -442,6 +445,7 @@ class Command(TyperCommand):
             :width: 80
             :convert-png: latex
         """
+        command = command[:cursor] if cursor is not None else command
         args = split_arg_string(command.replace("\\", "\\\\"))
         if args:
             try:
