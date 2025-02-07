@@ -9,9 +9,9 @@ from . import DjangoTyperShellCompleter
 
 class ZshComplete(DjangoTyperShellCompleter):
     """
-    This completer class supports Zsh_. Completion scripts are installed to the ``.zfunc``
-    directory in the user's home directory. Style and completion initialization instructions
-    are added to the user's ``.zshrc`` file if needed.
+    This completer class supports Zsh_. Completion scripts are installed to the
+    ``.zfunc`` directory in the user's home directory. Style and completion
+    initialization instructions are added to the user's ``.zshrc`` file if needed.
 
     Returned suggestions are delimited by newlines. Each suggestion is on three lines:
 
@@ -19,7 +19,8 @@ class ZshComplete(DjangoTyperShellCompleter):
     * The second line is the value of the completion.
     * The third line is the help text for the completion.
 
-    See also: https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
+    See also:
+    https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
     """
 
     name = "zsh"
@@ -39,8 +40,8 @@ class ZshComplete(DjangoTyperShellCompleter):
 
     color = False
     """
-    Zsh_ does support ansi control codes in completion suggestions, but we disable them by
-    default.
+    Zsh_ does support ansi control codes in completion suggestions, but we disable them
+    by default.
     """
 
     @cached_property
@@ -63,7 +64,10 @@ class ZshComplete(DjangoTyperShellCompleter):
                 # .replace(":", r"\\:")
             )
 
-        return f"{item.type}\n{escape(self.process_rich_text(item.value))}\n{escape(self.process_rich_text(item.help)) if item.help else '_'}"
+        return (
+            f"{item.type}\n{escape(self.process_rich_text(item.value))}"
+            f"\n{escape(self.process_rich_text(item.help)) if item.help else '_'}"
+        )
 
     def install(self) -> Path:
         assert self.prog_name
@@ -74,7 +78,10 @@ class ZshComplete(DjangoTyperShellCompleter):
             zshrc_source = zshrc.read_text()
         if "fpath" not in zshrc_source:
             zshrc_source += f"if type brew &>/dev/null; then{os.linesep}"
-            zshrc_source += f"\tfpath=(~/.zfunc $(brew --prefix)/share/zsh-completions $fpath){os.linesep}"
+            zshrc_source += (
+                f"\tfpath=(~/.zfunc $(brew --prefix)/share/zsh-completions $fpath)"
+                f"{os.linesep}"
+            )
             zshrc_source += f"else{os.linesep}"
             zshrc_source += f"\tfpath=(~/.zfunc $fpath){os.linesep}"
             zshrc_source += f"fi{os.linesep}{os.linesep}"

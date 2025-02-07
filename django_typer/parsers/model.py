@@ -45,9 +45,9 @@ class ModelObjectParser(ParamType):
     .. note::
 
         Typer_ does not respect the shell_complete functions on ParamTypes passed as
-        parsers. To add shell_completion see :class:`~django_typer.completers.ModelObjectCompleter`
-        or the :func:`~django_typer.utils.model_parser_completer` convenience
-        function.
+        parsers. To add shell_completion see
+        :class:`~django_typer.completers.ModelObjectCompleter` or the
+        :func:`~django_typer.utils.model_parser_completer` convenience function.
 
     :param model_cls: The model class to use for lookup.
     :param lookup_field: The field to use for lookup. Defaults to 'pk'.
@@ -183,5 +183,6 @@ class ModelObjectParser(ParamType):
             if self.on_error:
                 return self.on_error(self.model_cls, original, err)
             raise CommandError(
-                f'{self.model_cls.__name__}.{self.lookup_field}="{original}" does not exist!'
+                f"{self.model_cls.__name__}.{self.lookup_field}='{original}' does not "
+                "exist!"
             ) from err

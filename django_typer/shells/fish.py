@@ -8,11 +8,12 @@ from . import DjangoTyperShellCompleter
 
 class FishComplete(DjangoTyperShellCompleter):
     """
-    This completer class supports the fish_ shell. Completion scripts are installed in the
-    ``~/.config/fish/completions`` directory.
+    This completer class supports the fish_ shell. Completion scripts are installed in
+    the ``~/.config/fish/completions`` directory.
 
-    Returned suggestions are formatted as ``type,value[\thelp]``. Each suggestion is on one line
-    and if no help is provided, the help text including the tab delimiter is omitted.
+    Returned suggestions are formatted as ``type,value[\thelp]``. Each suggestion is on
+    one line and if no help is provided, the help text including the tab delimiter is
+    omitted.
     """
 
     name = "fish"
@@ -43,7 +44,10 @@ class FishComplete(DjangoTyperShellCompleter):
 
     def format_completion(self, item: CompletionItem) -> str:
         if item.help:
-            return f"{item.type},{self.process_rich_text(item.value)}\t{self.process_rich_text(item.help)}"
+            return (
+                f"{item.type},{self.process_rich_text(item.value)}\t"
+                f"{self.process_rich_text(item.help)}"
+            )
         return f"{item.type},{self.process_rich_text(item.value)}"
 
     def install(self) -> Path:

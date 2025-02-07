@@ -68,8 +68,8 @@ Version = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --version option <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version>`_.
+The type hint for the `Django --version option
+<https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.get_version>`_.
 
 The --version option is included by default and behaves the same as on BaseCommand_.
 """
@@ -92,10 +92,10 @@ Verbosity = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --verbosity option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-verbosity>`_.
-:class:`~django_typer.TyperCommand` does not include the verbosity option by default, but it can be
-added to the command like so if needed.
+The type hint for the `Django --verbosity option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-verbosity>`_.
+:class:`~django_typer.TyperCommand` does not include the verbosity option by default,
+but it can be added to the command like so if needed.
 
 .. code-block:: python
     
@@ -122,11 +122,11 @@ Settings = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --settings option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-settings>`_.
+The type hint for the `Django --settings option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-settings>`_.
 
-The --settings option is included by default and behaves the same as on BaseCommand_ use it to
-specify or override the settings module to use.
+The --settings option is included by default and behaves the same as on BaseCommand_ use
+it to specify or override the settings module to use.
 """
 
 
@@ -146,11 +146,11 @@ PythonPath = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --pythonpath option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-pythonpath>`_.
+The type hint for the `Django --pythonpath option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-pythonpath>`_.
 
-The --pythonpath option is included by default and behaves the same as on BaseCommand_ use it to
-specify a directory to add to the Python sys path.
+The --pythonpath option is included by default and behaves the same as on BaseCommand_
+use it to specify a directory to add to the Python sys path.
 """
 
 
@@ -163,11 +163,12 @@ Traceback = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --traceback option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-traceback>`_.
+The type hint for the `Django --traceback option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-traceback>`_.
 
-The --traceback option is included by default and behaves the same as on BaseCommand_ use it to
-allow CommandError exceptions to propagate out of the command and produce a stack trace.
+The --traceback option is included by default and behaves the same as on BaseCommand_
+use it to allow CommandError exceptions to propagate out of the command and produce a
+stack trace.
 """
 
 
@@ -217,12 +218,12 @@ NoColor = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --no-color option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-no-color>`_.
+The type hint for the `Django --no-color option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-no-color>`_.
 
-The --no-color option is included by default and behaves the same as on BaseCommand_ use it to
-force disable colorization of the command. You can check the supplied value of --no-color by
-checking the no_color attribute of the command instance.
+The ``--no-color`` option is included by default and behaves the same as on BaseCommand_
+use it to force disable colorization of the command. You can check the supplied value of
+``--no-color`` by checking the no_color attribute of the command instance.
 """
 
 ForceColor = Annotated[
@@ -236,12 +237,13 @@ ForceColor = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --force-color option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-force-color>`_.
+The type hint for the `Django --force-color option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-force-color>`_.
 
-The --force-color option is included by default and behaves the same as on BaseCommand_ use it to
-force colorization of the command. You can check the supplied value of --force-color by checking
-the force_color attribute of the command instance.
+The ``--force-color`` option is included by default and behaves the same as on
+BaseCommand_ use it to force colorization of the command. You can check the supplied
+value of ``--force-color`` by checking the force_color attribute of the command
+instance.
 """
 
 SkipChecks = Annotated[
@@ -253,9 +255,9 @@ SkipChecks = Annotated[
     ),
 ]
 """
-The type hint for the 
-`Django --skip-checks option <https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-skip-checks>`_.
+The type hint for the `Django --skip-checks option
+<https://docs.djangoproject.com/en/stable/ref/django-admin/#cmdoption-skip-checks>`_.
 
-The --skip-checks option is included by default and behaves the same as on BaseCommand_ use it to
-skip system checks.
+The ``--skip-checks`` option is included by default and behaves the same as on
+BaseCommand_ use it to skip system checks.
 """

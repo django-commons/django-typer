@@ -8,7 +8,8 @@ from . import DjangoTyperShellCompleter
 
 class PowerShellComplete(DjangoTyperShellCompleter):
     """
-    This completer class supports the PowerShell_ versions < 6. See :class:`~PwshComplete` for versions >= 6.
+    This completer class supports the PowerShell_ versions < 6.
+    See :class:`~PwshComplete` for versions >= 6.
 
     Completion scripts are installed into the user's profile file.
 
@@ -32,8 +33,8 @@ class PowerShellComplete(DjangoTyperShellCompleter):
 
     color = False
     """
-    PowerShell_ does support ansi control codes in completion suggestions, but we disable them by
-    default.
+    PowerShell_ does support ansi control codes in completion suggestions, but we
+    disable them by default.
     """
 
     def format_completion(self, item: CompletionItem) -> str:
@@ -123,8 +124,8 @@ class PwshComplete(PowerShellComplete):
     This completer class supports the PowerShell_ versions >= 6. See
     :class:`~PowerShellComplete` for versions < 6.
 
-    All behaviors are the same as :class:`~PowerShellComplete`, except that ``pwsh`` is used
-    instead of ``powershell``.
+    All behaviors are the same as :class:`~PowerShellComplete`, except that ``pwsh`` is
+    used instead of ``powershell``.
     """
 
     name = "pwsh"

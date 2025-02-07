@@ -44,14 +44,14 @@ class ModelObjectCompleter:
 
     .. note::
 
-        The queries used by this completer will make use of column indexes. Completions should be
-        fast even for large data.
+        The queries used by this completer will make use of column indexes. Completions
+        should be fast even for large data.
 
     The completer query logic is pluggable, but the defaults cover most use cases. The
-    limit field is important. It defaults to 50 meaning if more than 50 potential completions
-    are found only the first 50 will be returned and there will be no indication to the user
-    that there are more. This is to prevent the shell from becoming unresponsive when offering
-    completion for large tables.
+    limit field is important. It defaults to 50 meaning if more than 50 potential
+    completions are found only the first 50 will be returned and there will be no
+    indication to the user that there are more. This is to prevent the shell from
+    becoming unresponsive when offering completion for large tables.
 
     To use this completer, pass an instance of this class to the `shell_complete`
     argument of a typer.Option or typer.Argument:
@@ -221,7 +221,8 @@ class ModelObjectCompleter:
         """
         The default completion query builder for text-based fields. This method will
         return a Q object that will match any value that starts with the incomplete
-        string. Case sensitivity is determined by the case_insensitive constructor parameter.
+        string. Case sensitivity is determined by the case_insensitive constructor
+        parameter.
 
         :param context: The click context.
         :param parameter: The click parameter.
@@ -282,7 +283,8 @@ class ModelObjectCompleter:
 
     def _get_date_bounds(self, incomplete: str) -> t.Tuple[date, date]:
         """
-        Turn an incomplete YYYY-MM-DD date string into upper and lower bound date objects.
+        Turn an incomplete YYYY-MM-DD date string into upper and lower bound date
+        objects.
 
         :param incomplete: The incomplete time string.
         :return: A 2-tuple of (lower, upper) date object boundaries.
@@ -372,9 +374,9 @@ class ModelObjectCompleter:
         self, context: Context, parameter: Parameter, incomplete: str
     ) -> models.Q:
         """
-        Default completion query builder for date fields. This method will return a Q object that
-        will match any value that starts with the incomplete date string. All dates must be in
-        ISO8601 format (YYYY-MM-DD).
+        Default completion query builder for date fields. This method will return a Q
+        object that will match any value that starts with the incomplete date string.
+        All dates must be in ISO8601 format (YYYY-MM-DD).
 
         :param context: The click context.
         :param parameter: The click parameter.
@@ -392,9 +394,9 @@ class ModelObjectCompleter:
         self, context: Context, parameter: Parameter, incomplete: str
     ) -> models.Q:
         """
-        Default completion query builder for time fields. This method will return a Q object that
-        will match any value that starts with the incomplete time string. All times must be in
-        ISO 8601 format (HH:MM:SS.ssssss).
+        Default completion query builder for time fields. This method will return a Q
+        object that will match any value that starts with the incomplete time string.
+        All times must be in ISO 8601 format (HH:MM:SS.ssssss).
 
         :param context: The click context.
         :param parameter: The click parameter.
@@ -412,16 +414,17 @@ class ModelObjectCompleter:
         self, context: Context, parameter: Parameter, incomplete: str
     ) -> models.Q:
         """
-        Default completion query builder for datetime fields. This method will return a Q object that
-        will match any value that starts with the incomplete datetime string. All dates must be in
-        ISO8601 format (YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM).
+        Default completion query builder for datetime fields. This method will return a
+        Q object that will match any value that starts with the incomplete datetime
+        string. All dates must be in ISO8601 format (YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM).
 
         :param context: The click context.
         :param parameter: The click parameter.
         :param incomplete: The incomplete string.
         :return: A Q object to use for filtering the queryset.
         :raises ValueError: If the incomplete string is not a valid partial datetime.
-        :raises AssertionError: If the incomplete string is not a valid partial datetime.
+        :raises AssertionError: If the incomplete string is not a valid partial
+          datetime.
         """
         import re
         from datetime import datetime
@@ -440,9 +443,10 @@ class ModelObjectCompleter:
         if len(parts) > 1:
             time_parts = re.split(r"[+-]", parts[1])
             time_lower, time_upper = self._get_time_bounds(time_parts[0])
-            # we punt on the timezones - if the user supplies a partial timezone different than
-            # the default django timezone, its just too complicated to be worth trying to complete,
-            # we ensure it aligns as a prefix to the configured default timezone instead
+            # we punt on the timezones - if the user supplies a partial timezone
+            # different than the default django timezone, its just too complicated to be
+            # worth trying to complete, we ensure it aligns as a prefix to the
+            # configured default timezone instead
             if len(time_parts) > 1 and parts[1]:
                 tz_part = get_tz_part(parts[1])
         lower_bound = datetime.combine(lower_bound, time_lower)
@@ -463,18 +467,19 @@ class ModelObjectCompleter:
         self, context: Context, parameter: Parameter, incomplete: str
     ) -> models.Q:
         """
-        Default completion query builder for duration fields. This method will return a Q object
-        that will match any value that is greater than the incomplete duration string (or less if
-        negative). Duration strings are formatted in a subset of the ISO8601 standard. Only day,
-        hours, minutes and fractional seconds are supported. Year, week and month specifiers are
-        not.
+        Default completion query builder for duration fields. This method will return a
+        Q object that will match any value that is greater than the incomplete duration
+        string (or less if negative). Duration strings are formatted in a subset of the
+        ISO8601 standard. Only day, hours, minutes and fractional seconds are supported.
+        Year, week and month specifiers are not.
 
         :param context: The click context.
         :param parameter: The click parameter.
         :param incomplete: The incomplete string.
         :return: A Q object to use for filtering the queryset.
         :raises ValueError: If the incomplete string is not a valid partial duration.
-        :raises AssertionError: If the incomplete string is not a valid partial duration.
+        :raises AssertionError: If the incomplete string is not a valid partial
+            duration.
         """
         from django_typer.utils import parse_iso_duration
 
@@ -526,8 +531,8 @@ class ModelObjectCompleter:
             # or (exclusively) we may be missing time components
             if ambiguity is None:
                 # handle no ambiguity first
-                # there's no way to be here and have any ambiguity or non-ambiguous microseconds
-                # ex: PT PT1. PT1M PT1H PT1H1M
+                # there's no way to be here and have any ambiguity or non-ambiguous
+                # microseconds ex: PT PT1. PT1M PT1H PT1H1M
                 if incomplete.endswith("M"):
                     horizon = timedelta(minutes=1)
                 elif incomplete.endswith("H"):
@@ -749,7 +754,8 @@ class ModelObjectCompleter:
             if str_value:
                 completions.append(
                     CompletionItem(
-                        # use the incomplete string prefix incase this was a case insensitive match
+                        # use the incomplete string prefix incase this was a case
+                        # insensitive match
                         value=incomplete + str_value[len(incomplete) + self._offset :],
                         help=values[1] if len(values) > 1 else None,
                     )

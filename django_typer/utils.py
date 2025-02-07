@@ -183,7 +183,8 @@ def _load_command_plugins(command: str) -> int:
                 importlib.import_module(f"{ext_pkg.__name__}.{command}")
             except (ImportError, ModuleNotFoundError) as err:
                 raise ValueError(
-                    f"No extension module was found for command {command} in {ext_pkg.__path__}."
+                    f"No extension module was found for command {command} in "
+                    f"{ext_pkg.__path__}."
                 ) from err
         # we only want to do this once
         del _command_plugins[command]
@@ -262,9 +263,9 @@ def accepted_kwargs(
 
 def get_win_shell() -> str:
     """
-    The way installed python scripts are wrapped on Windows means shellingham will detect
-    cmd.exe as the shell. This function will attempt to detect the correct shell, usually
-    either powershell (<=v5) or pwsh (>=v6).
+    The way installed python scripts are wrapped on Windows means shellingham will
+    detect cmd.exe as the shell. This function will attempt to detect the correct shell,
+    usually either powershell (<=v5) or pwsh (>=v6).
 
     :raises ShellDetectionFailure: If the shell cannot be detected
     :return: The name of the shell, either 'powershell' or 'pwsh'
@@ -523,7 +524,7 @@ def install_traceback(tb_config: t.Optional[t.Dict[str, t.Any]] = None):
             if param in set(inspect.signature(traceback.install).parameters.keys())
         },
     )
-    # typer installs its own exception hook and it falls back to the sys hook - depending
-    # on when typer was imported it may have the original fallback system hook or our
-    # installed rich one - we patch it here to make sure!
+    # typer installs its own exception hook and it falls back to the sys hook -
+    # depending on when typer was imported it may have the original fallback system hook
+    # or our installed rich one - we patch it here to make sure!
     typer_main._original_except_hook = sys.excepthook

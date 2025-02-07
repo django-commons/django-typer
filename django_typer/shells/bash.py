@@ -37,8 +37,8 @@ class BashComplete(DjangoTyperShellCompleter):
 
     color = False
     """
-    Zsh_ does support ansi control codes in completion suggestions, but we disable them by
-    default.
+    Zsh_ does support ansi control codes in completion suggestions, but we disable them
+    by default.
     """
 
     @cached_property

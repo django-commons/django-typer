@@ -9,13 +9,20 @@ the preferred way to do this.
 This package provides some completer functions and classes that work with common Django_
 types:
 
-- **models**: Complete model object field strings using :class:`~django_typer.completers.model.ModelObjectCompleter`.
-- **django apps**: Complete app labels or names using :func:`~django_typer.completers.apps.app_labels`.
-- **commands**: Complete Django command names using :func:`~django_typer.completers.cmd.commands`.
-- **databases**: Complete Django database names using :func:`~django_typer.completers.db.databases`.
-- **import paths**: Complete Django database names using :func:`~django_typer.completers.path.import_paths`.
-- **paths**: Complete Django database names using :func:`~django_typer.completers.path.paths`.
-- **directories**: Complete Django database names using :func:`~django_typer.completers.path.directories`.
+- **models**: Complete model object field strings using
+  :class:`~django_typer.completers.model.ModelObjectCompleter`.
+- **django apps**: Complete app labels or names using
+  :func:`~django_typer.completers.apps.app_labels`.
+- **commands**: Complete Django command names using
+  :func:`~django_typer.completers.cmd.commands`.
+- **databases**: Complete Django database names using
+  :func:`~django_typer.completers.db.databases`.
+- **import paths**: Complete Django database names using
+  :func:`~django_typer.completers.path.import_paths`.
+- **paths**: Complete Django database names using
+  :func:`~django_typer.completers.path.paths`.
+- **directories**: Complete Django database names using
+  :func:`~django_typer.completers.path.directories`.
 """
 
 import typing as t
@@ -35,9 +42,10 @@ def these_strings(
     """
     Get a completer that provides completion logic that matches the allowed strings.
 
-    :param strings: A sequence of allowed strings or a callable that generates a sequence of
-        allowed strings.
-    :param allow_duplicates: Whether or not to allow duplicate values. Defaults to False.
+    :param strings: A sequence of allowed strings or a callable that generates a
+        sequence of allowed strings.
+    :param allow_duplicates: Whether or not to allow duplicate values. Defaults to
+        False.
     :return: A completer function.
     """
 
@@ -84,8 +92,8 @@ def chain(
     :param completers: The completers to use
     :param first_match: If true, return only the matches from the first completer that
         finds completions. Default: False
-    :param allow_duplicates: If False (default) remove completions from previously provided
-        values.
+    :param allow_duplicates: If False (default) remove completions from previously
+        provided values.
     """
 
     def complete(ctx: Context, param: Parameter, incomplete: str):

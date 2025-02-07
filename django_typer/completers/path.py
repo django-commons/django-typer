@@ -50,14 +50,14 @@ def paths(
     ctx: Context, param: Parameter, incomplete: str, dir_only: t.Optional[bool] = None
 ) -> t.List[CompletionItem]:
     """
-    A completer that completes a path. Relative incomplete paths are interpreted relative to
-    the current working directory.
+    A completer that completes a path. Relative incomplete paths are interpreted
+    relative to the current working directory.
 
     :param ctx: The click context.
     :param param: The click parameter.
     :param incomplete: The incomplete string.
-    :param dir_only: Restrict completions to paths to directories only, otherwise complete
-        directories or files.
+    :param dir_only: Restrict completions to paths to directories only, otherwise
+        complete directories or files.
     :return: A list of available matching directories
     """
 
@@ -87,11 +87,14 @@ def paths(
                 continue
             if child.startswith(partial_dir):
                 to_complete = incomplete[0 : (-len(partial_dir) or None)]
+                sep = (
+                    ""
+                    if not to_complete or to_complete.endswith(separator)
+                    else separator
+                )
                 completions.append(
                     CompletionItem(
-                        f"{to_complete}"
-                        f"{'' if not to_complete or to_complete.endswith(separator) else separator}"
-                        f"{child}",
+                        f"{to_complete}{sep}{child}",
                         type="dir" if (incomplete_path / child).is_dir() else "file",
                     )
                 )

@@ -28,11 +28,11 @@ class DjangoTyperShellCompleter(ShellComplete):
     :func:`~django_typer.management.commands.shellcompletion.register_completion_class`
 
     :param cli: The click command object to complete
-    :param ctx_args: Additional context arguments to pass to the typer/click context of the
-        management command being completed
+    :param ctx_args: Additional context arguments to pass to the typer/click context of
+        the management command being completed
     :param prog_name: The name of the command to complete
-    :param complete_var: The name of the environment variable to pass the completion string
-        (unused)
+    :param complete_var: The name of the environment variable to pass the completion
+        string (unused)
     :param command: The Django shellcompletion command
     :param command_str: The command string to complete
     :param command_args: The command arguments to complete
@@ -143,7 +143,8 @@ class DjangoTyperShellCompleter(ShellComplete):
 
     def source_vars(self) -> t.Dict[str, t.Any]:
         """
-        This returns the context that will be used to render the completion script template.
+        This returns the context that will be used to render the completion script
+        template.
 
         From the base class we inherit the following variables:
 
@@ -154,14 +155,15 @@ class DjangoTyperShellCompleter(ShellComplete):
 
         We add the following variables:
 
-        * **manage_script**: the manage script object - will be either a string or a Path, if it
-          is a Path it will be absolute and this indicates that the script is not installed on the
-          path
+        * **manage_script**: the manage script object - will be either a string or a
+          Path, if it is a Path it will be absolute and this indicates that the script
+          is not installed on the path
         * **manage_script_name**: the name of the Django manage script
-        * **python**: the path to the python interpreter that is running the shellcompletion
-          command
-        * **django_command**: the name of the Django shellcompletion command - you may change this
-          to something other than 'shellcompletion' to provide custom complete logic
+        * **python**: the path to the python interpreter that is running the
+          shellcompletion command
+        * **django_command**: the name of the Django shellcompletion command - you may
+          change this to something other than 'shellcompletion' to provide custom
+          complete logic
         * **color**: the color flag to pass to shellcompletion i.e. --(force|no)-color
         * **fallback**: the fallback option to pass to ``shellcompletion complete``
         * **is_installed**: whether or not the manage script is a command on the path
@@ -209,8 +211,8 @@ class DjangoTyperShellCompleter(ShellComplete):
         try:
             return self.load_template().render(self.source_vars())  # type: ignore
         except (AttributeError, TypeError, ValueError):
-            # it is annoying that get_template() and DjangoEngine.get_template() return different
-            # interfaces
+            # it is annoying that get_template() and DjangoEngine.get_template() return
+            # different interfaces
             return self.load_template().render(Context(self.source_vars()))  # type: ignore
 
     @abstractmethod
