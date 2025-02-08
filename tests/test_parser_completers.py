@@ -2124,6 +2124,16 @@ class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
         )
         self.assertEqual(completions, ["subdir/static2.txt"])
 
+        completions = get_values(
+            self.shellcompletion.complete("completion --statics /subdir/")
+        )
+        self.assertEqual(completions, ["/subdir/static2.txt"])
+
+    @override_settings(STATIC_ROOT=None)
+    def test_static_root_completer_no_setting(self):
+        completions = get_values(self.shellcompletion.complete("completion --statics "))
+        self.assertEqual(set(completions), set(os.listdir()))
+
 
 class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
     tz_info = None
