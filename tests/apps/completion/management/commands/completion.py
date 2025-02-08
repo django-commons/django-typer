@@ -2,6 +2,7 @@ import json
 import typing as t
 from pathlib import Path
 from typing import Annotated
+from functools import partial
 
 import typer
 from django.apps import AppConfig
@@ -10,10 +11,20 @@ from django.utils.translation import gettext_lazy as _
 from django_typer.management import TyperCommand
 from django_typer.completers.apps import app_labels
 from django_typer.parsers.apps import app_config
-from django_typer.completers.path import directories, paths, import_paths
+from django_typer.completers.path import (
+    directories,
+    paths,
+    import_paths,
+    static_paths,
+    media_paths,
+)
 from django_typer.completers.db import databases
 from django_typer.completers.cmd import commands
 from django_typer.completers import these_strings, chain
+from django_typer.types import COMMON_PANEL
+
+
+settings_dir = Path(__file__).parent.parent.parent.parent.parent / "settings"
 
 
 class Command(TyperCommand, rich_markup_mode="rich"):
@@ -121,6 +132,32 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                 shell_complete=databases(),
             ),
         ] = [],
+        statics: Annotated[
+            t.Optional[Path],
+            typer.Option(
+                help=t.cast(str, _("Static files.")),
+                shell_complete=static_paths,
+            ),
+        ] = None,
+        media: Annotated[
+            t.Optional[Path],
+            typer.Option(
+                help=t.cast(str, _("Media files.")),
+                shell_complete=media_paths,
+            ),
+        ] = None,
+        settings_module: Annotated[
+            str,
+            typer.Option(
+                help=t.cast(
+                    str,
+                    ("The python path to the settings file under tests.settings."),
+                ),
+                rich_help_panel=COMMON_PANEL,
+                shell_complete=partial(import_paths, root=settings_dir),
+                show_default=False,
+            ),
+        ] = "",
     ):
         assert self.__class__ is Command
         for app in django_apps:

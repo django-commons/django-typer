@@ -23,6 +23,10 @@ types:
   :func:`~django_typer.completers.path.paths`.
 - **directories**: Complete Django database names using
   :func:`~django_typer.completers.path.directories`.
+- **media paths**: Complete Django media paths using
+  :func:`~django_typer.completers.path.media_paths`.
+- **static paths**: Complete Django static paths using
+  :func:`~django_typer.completers.path.static_paths`.
 """
 
 import typing as t

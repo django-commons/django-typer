@@ -386,6 +386,31 @@ Directories
         ]
     )
 
+Django Static Files & media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* static completer: :func:`~django_typer.completers.path.static_paths`
+* media completer: :func:`~django_typer.completers.path.media_paths`
+
+Complete paths to static files or media files.
+
+.. code-block:: python
+
+    import typing as t
+    import typer
+    from pathlib import Path
+    from django_typer.completers.path import media_paths
+
+    ...
+
+    def handle(
+        self,
+        directory: t.Annotated[
+            Path,
+            typer.Argument(shell_complete=media_paths)
+        ]
+    )
+
 
 Import Paths
 ------------

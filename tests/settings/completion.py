@@ -11,3 +11,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+MEDIA_ROOT = str(BASE_DIR / "media")
+
+STATIC_ROOT = BASE_DIR / "static"

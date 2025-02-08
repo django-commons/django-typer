@@ -6,10 +6,18 @@ from pathlib import Path
 
 from click import Context, Parameter
 from click.shell_completion import CompletionItem
+from django.conf import settings
+
+
+def _settings_path(name: str) -> t.Optional[Path]:
+    s_pth = getattr(settings, name, None)
+    if s_pth:
+        return Path(s_pth)
+    return None
 
 
 def import_paths(
-    ctx: Context, param: Parameter, incomplete: str
+    ctx: Context, param: Parameter, incomplete: str, root: t.Optional[Path] = None
 ) -> t.List[CompletionItem]:
     """
     A completer that completes a python dot import path string based on sys.path.
@@ -17,6 +25,7 @@ def import_paths(
     :param ctx: The click context.
     :param param: The click parameter.
     :param incomplete: The incomplete string.
+    :param root: The root path to search for modules.
     :return: A list of available matching import paths
     """
     import pkgutil
@@ -28,9 +37,13 @@ def import_paths(
     module_import = ".".join(packages) if pkg_complete else ".".join(packages[:-1])
     module_path = Path(module_import.replace(".", "/"))
     search_paths = []
-    for pth in sys.path:
-        if (Path(pth) / module_path).exists():
-            search_paths.append(str(Path(pth) / module_path))
+
+    if root and (root / module_path).exists():
+        search_paths.append(str(root / module_path))
+    else:
+        for pth in sys.path:
+            if (Path(pth) / module_path).exists():
+                search_paths.append(str(Path(pth) / module_path))
 
     prefix = "" if pkg_complete else packages[-1]
     for module in pkgutil.iter_modules(path=search_paths):
@@ -47,7 +60,11 @@ def import_paths(
 
 
 def paths(
-    ctx: Context, param: Parameter, incomplete: str, dir_only: t.Optional[bool] = None
+    ctx: Context,
+    param: Parameter,
+    incomplete: str,
+    dir_only: t.Optional[bool] = None,
+    root: t.Callable[[], t.Optional[Path]] = lambda: None,
 ) -> t.List[CompletionItem]:
     """
     A completer that completes a path. Relative incomplete paths are interpreted
@@ -58,8 +75,10 @@ def paths(
     :param incomplete: The incomplete string.
     :param dir_only: Restrict completions to paths to directories only, otherwise
         complete directories or files.
+    :param root: Restrict completions to this root path.
     :return: A list of available matching directories
     """
+    rt = root()
 
     def exists(pth: Path) -> bool:
         if dir_only:
@@ -74,7 +93,12 @@ def paths(
         separator = "\\"
 
     completions = []
-    incomplete_path = Path(incomplete.replace(separator, os.path.sep))
+    if rt:
+        incomplete_path = rt / Path(
+            incomplete.replace(separator, os.path.sep).lstrip(os.path.sep)
+        )
+    else:
+        incomplete_path = Path(incomplete.replace(separator, os.path.sep))
     partial_dir = ""
     if not exists(incomplete_path) and not incomplete.endswith(separator):
         partial_dir = incomplete_path.name
@@ -92,10 +116,17 @@ def paths(
                     if not to_complete or to_complete.endswith(separator)
                     else separator
                 )
+                ctype = (
+                    "plain"
+                    if rt
+                    else "dir"
+                    if (incomplete_path / child).is_dir()
+                    else "file"
+                )
                 completions.append(
                     CompletionItem(
                         f"{to_complete}{sep}{child}",
-                        type="dir" if (incomplete_path / child).is_dir() else "file",
+                        type=ctype,
                     )
                 )
     if (
@@ -120,5 +151,30 @@ are interpreted relative to the current working directory.
 :param ctx: The click context.
 :param param: The click parameter.
 :param incomplete: The incomplete string.
+:return: A list of available matching directories
+"""
+
+
+static_paths = partial(paths, root=partial(_settings_path, name="STATIC_ROOT"))
+"""
+Complete static file paths.
+
+:param ctx: The click context.
+:param param: The click parameter.
+:param incomplete: The incomplete string.
+:param dir_only: Restrict completions to paths to directories only, otherwise
+    complete directories or files.
+:return: A list of available matching directories
+"""
+
+media_paths = partial(paths, root=partial(_settings_path, name="MEDIA_ROOT"))
+"""
+Complete media file paths.
+
+:param ctx: The click context.
+:param param: The click parameter.
+:param incomplete: The incomplete string.
+:param dir_only: Restrict completions to paths to directories only, otherwise
+    complete directories or files.
 :return: A list of available matching directories
 """

@@ -2087,6 +2087,44 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         self.assertTrue("tests" in completions)
 
 
+@override_settings(
+    MEDIA_ROOT=Path(__file__).parent / "media",
+    STATIC_ROOT=str(Path(__file__).parent / "static"),
+)
+class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
+    def test_relative_import_path(self):
+        completions = get_values(
+            self.shellcompletion.complete("completion --settings-module ")
+        )
+
+        mods = [
+            mod[:-3]
+            for mod in os.listdir(Path(__file__).parent / "settings")
+            if mod.endswith(".py") and not mod.startswith("__")
+        ]
+        self.assertEqual(
+            len(set(mods) - set(completions)), 0, set(mods) - set(completions)
+        )
+
+    def test_media_root_completer(self):
+        completions = get_values(self.shellcompletion.complete("completion --media "))
+        self.assertEqual(completions, ["file.txt"])
+
+    def test_static_root_completer(self):
+        completions = get_values(self.shellcompletion.complete("completion --statics "))
+        self.assertEqual(completions, ["subdir", "static1.txt"])
+
+        completions = get_values(
+            self.shellcompletion.complete("completion --statics subd")
+        )
+        self.assertEqual(completions, ["subdir"])
+
+        completions = get_values(
+            self.shellcompletion.complete("completion --statics subdir/")
+        )
+        self.assertEqual(completions, ["subdir/static2.txt"])
+
+
 class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
     tz_info = None
 
