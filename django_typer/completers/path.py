@@ -17,7 +17,10 @@ def _settings_path(name: str) -> t.Optional[Path]:
 
 
 def import_paths(
-    ctx: Context, param: Parameter, incomplete: str, root: t.Optional[Path] = None
+    ctx: Context,
+    param: Parameter,
+    incomplete: str,
+    root: t.Union[t.Callable[[], t.Optional[Path]], t.Optional[Path]] = None,
 ) -> t.List[CompletionItem]:
     """
     A completer that completes a python dot import path string based on sys.path.
@@ -30,6 +33,7 @@ def import_paths(
     """
     import pkgutil
 
+    rt = root() if callable(root) else root
     incomplete = incomplete.strip()
     completions = []
     packages = [pkg for pkg in incomplete.split(".") if pkg]
@@ -38,8 +42,8 @@ def import_paths(
     module_path = Path(module_import.replace(".", "/"))
     search_paths = []
 
-    if root and (root / module_path).exists():
-        search_paths.append(str(root / module_path))
+    if rt and (rt / module_path).exists():
+        search_paths.append(str(rt / module_path))
     else:
         for pth in sys.path:
             if (Path(pth) / module_path).exists():
@@ -64,7 +68,7 @@ def paths(
     param: Parameter,
     incomplete: str,
     dir_only: t.Optional[bool] = None,
-    root: t.Callable[[], t.Optional[Path]] = lambda: None,
+    root: t.Union[t.Callable[[], t.Optional[Path]], t.Optional[Path]] = None,
 ) -> t.List[CompletionItem]:
     """
     A completer that completes a path. Relative incomplete paths are interpreted
@@ -78,7 +82,7 @@ def paths(
     :param root: Restrict completions to this root path.
     :return: A list of available matching directories
     """
-    rt = root()
+    rt = root() if callable(root) else root
 
     def exists(pth: Path) -> bool:
         if dir_only:
