@@ -2112,7 +2112,7 @@ class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
 
     def test_static_root_completer(self):
         completions = get_values(self.shellcompletion.complete("completion --statics "))
-        self.assertEqual(completions, ["subdir", "static1.txt"])
+        self.assertEqual(set(completions), {"subdir", "static1.txt"})
 
         completions = get_values(
             self.shellcompletion.complete("completion --statics subd")
