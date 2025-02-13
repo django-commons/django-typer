@@ -1,6 +1,6 @@
 import os
 from django.conf import settings
-from typer import Argument, Option
+import typer
 import json
 import typing as t
 import shutil
@@ -11,6 +11,7 @@ from django.core.management import call_command
 from django.contrib import admindocs
 
 django_typer = Path(__file__).parent.parent.parent.parent.parent.parent / "django_typer"
+# temp_typer_link = django_typer / "typer"
 
 
 class Command(TyperCommand):
@@ -18,6 +19,9 @@ class Command(TyperCommand):
 
     def handle(self):
         cwd = os.getcwd()
+        # if temp_typer_link.is_symlink():
+        #     os.unlink(temp_typer_link)
+        # os.symlink(Path(typer.__file__).parent, temp_typer_link)
         # use the languages that django has admin documentation in
         languages = sorted(os.listdir(Path(admindocs.__file__).parent / "locale"))
         # lang_args = (list(itertools.chain.from_iterable(("-l", lang) for lang in languages)))
@@ -26,7 +30,7 @@ class Command(TyperCommand):
 
             for lang in languages:
                 locale_dir = Path(django_typer) / f"locale/{lang}"
-                call_command("makemessages", "-l", lang)
+                call_command("makemessages", "-l", lang, symlinks=True)
                 try:
                     call_command("translate_messages", "-l", lang)
                     po_file = locale_dir / "LC_MESSAGES" / "django.po"
@@ -43,3 +47,5 @@ class Command(TyperCommand):
             call_command("compilemessages")
         finally:
             os.chdir(cwd)
+            # if temp_typer_link.is_symlink():
+            #    os.unlink(temp_typer_link)

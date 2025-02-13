@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:42-0600\n"
+"POT-Creation-Date: 2025-02-12 22:29-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,31 +18,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
-#: management/commands/shellcompletion.py:101
+#: management/commands/shellcompletion.py:103
 msgid "Install autocompletion for the current shell."
 msgstr "Instalați completarea automată pentru shell-ul curent."
 
-#: management/commands/shellcompletion.py:222
+#: management/commands/shellcompletion.py:225
 msgid "The shell to use."
 msgstr "Carcasa de folosit."
 
-#: management/commands/shellcompletion.py:235
+#: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
 "Filtrați secvențele de control al formatării terminalului din textul de "
 "completare."
 
-#: management/commands/shellcompletion.py:248
+#: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
 msgstr ""
 "Permite secvențele de control al formatării terminalului în textul de "
 "completare."
 
-#: management/commands/shellcompletion.py:264
+#: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
 msgstr "Instalați completarea automată pentru shell-ul curent sau dat."
 
-#: management/commands/shellcompletion.py:274
+#: management/commands/shellcompletion.py:279
 msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
@@ -50,24 +50,24 @@ msgstr ""
 "Numele scriptului django manage pentru a instala completarea automată, dacă "
 "este diferit de scriptul utilizat pentru a invoca această comandă."
 
-#: management/commands/shellcompletion.py:286
+#: management/commands/shellcompletion.py:291
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand."
 msgstr ""
 "Calea de import python către o funcție de rezervă completă de utilizat "
-"atunci când comanda de finalizare nu este o comandă TyperCommand."
+"atunci când comanda de finalizare nu este un TyperCommand."
 
-#: management/commands/shellcompletion.py:299
+#: management/commands/shellcompletion.py:304
 msgid "The name of the template to use for the shell completion script."
 msgstr ""
 "Numele șablonului de utilizat pentru scriptul de completare a shell-ului."
 
-#: management/commands/shellcompletion.py:349
+#: management/commands/shellcompletion.py:355
 msgid "Uninstall autocompletion for the current or given shell."
 msgstr "Dezinstalați completarea automată pentru shell-ul curent sau dat."
 
-#: management/commands/shellcompletion.py:359
+#: management/commands/shellcompletion.py:365
 msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
@@ -76,15 +76,19 @@ msgstr ""
 "ului, dacă este diferit de scriptul utilizat pentru a invoca această "
 "comandă."
 
-#: management/commands/shellcompletion.py:390
+#: management/commands/shellcompletion.py:397
 msgid "Generate autocompletion for command string."
 msgstr "Generați completarea automată pentru șirul de comandă."
 
-#: management/commands/shellcompletion.py:398
+#: management/commands/shellcompletion.py:405
 msgid "The command string to generate completion suggestions for."
 msgstr "Șirul de comandă pentru care se generează sugestii de finalizare."
 
-#: management/commands/shellcompletion.py:408
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Poziția cursorului."
+
+#: management/commands/shellcompletion.py:418
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -94,11 +98,11 @@ msgstr ""
 "atunci când comanda de finalizare nu este un TyperCommand. În mod implicit, "
 "este utilizată funcția de completare automată django încorporată."
 
-#: types.py:54
+#: types.py:64
 msgid "Show program's version number and exit."
 msgstr "Afișați numărul versiunii programului și ieșiți."
 
-#: types.py:74
+#: types.py:84
 msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
@@ -106,7 +110,7 @@ msgstr ""
 "Nivel de verbozitate; 0=ieșire minimă, 1=ieșire normală, 2=ieșire verbală, "
 "3=ieșire foarte pronunțată"
 
-#: types.py:104
+#: types.py:114
 msgid ""
 "The Python path to a settings module, e.g. \"myproject.settings.main\". If "
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
@@ -116,7 +120,7 @@ msgstr ""
 " Dacă aceasta nu este furnizată, va fi utilizată variabila de mediu "
 "DJANGO_SETTINGS_MODULE."
 
-#: types.py:128
+#: types.py:139
 msgid ""
 "A directory to add to the Python path, e.g. "
 "\"/home/djangoprojects/myproject\"."
@@ -124,18 +128,74 @@ msgstr ""
 "Un director de adăugat la calea Python, de exemplu "
 "„/home/djangoprojects/myproject”."
 
-#: types.py:149
+#: types.py:161
 msgid "Raise on CommandError exceptions"
 msgstr "Ridicați excepțiile CommandError"
 
-#: types.py:166
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Imprimați variabilele locale în traceback."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Ascundeți variabilele locale în urmăriri."
+
+#: types.py:214
 msgid "Don't colorize the command output."
 msgstr "Nu colorați ieșirea comenzii."
 
-#: types.py:185
+#: types.py:233
 msgid "Force colorization of the command output."
 msgstr "Forțați colorarea ieșirii comenzii."
 
-#: types.py:204
+#: types.py:253
 msgid "Skip system checks."
 msgstr "Omite verificările sistemului."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamic)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Avortat!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "implicit: {implicit}"
+
+#~ msgid "required"
+#~ msgstr "necesar"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "var var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumente"
+
+#~ msgid "Options"
+#~ msgstr "Opțiuni"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(depreciat) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[implicit: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[necesar]"
+
+#~ msgid "Commands"
+#~ msgstr "Comenzi"
+
+#~ msgid "Error"
+#~ msgstr "Eroare"
+
+#~ msgid "Aborted."
+#~ msgstr "Avortat."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Încercați [albastru] „{command_path} {help_option}”[/] pentru ajutor."

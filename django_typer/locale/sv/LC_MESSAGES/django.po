@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-04 03:42-0600\n"
+"POT-Creation-Date: 2025-02-12 22:29-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,29 +18,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: management/commands/shellcompletion.py:101
+#: management/commands/shellcompletion.py:103
 msgid "Install autocompletion for the current shell."
 msgstr "Installera autokomplettering för det aktuella skalet."
 
-#: management/commands/shellcompletion.py:222
+#: management/commands/shellcompletion.py:225
 msgid "The shell to use."
 msgstr "Skalet att använda."
 
-#: management/commands/shellcompletion.py:235
+#: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Filtrera kontrollsekvenser för terminalformatering utan slutförande text."
+"Filtrera kontrollsekvenser för terminalformatering utan kompletteringstext."
 
-#: management/commands/shellcompletion.py:248
+#: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
 msgstr ""
 "Tillåt kontrollsekvenser för terminalformatering i kompletteringstext."
 
-#: management/commands/shellcompletion.py:264
+#: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
 msgstr "Installera autokomplettering för det aktuella eller givna skalet."
 
-#: management/commands/shellcompletion.py:274
+#: management/commands/shellcompletion.py:279
 msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
@@ -49,7 +49,7 @@ msgstr ""
 "för om det är annorlunda än skriptet som användes för att anropa detta "
 "kommando."
 
-#: management/commands/shellcompletion.py:286
+#: management/commands/shellcompletion.py:291
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand."
@@ -57,31 +57,35 @@ msgstr ""
 "Python-importsökvägen till en komplett reservfunktion som ska användas när "
 "completion-kommandot inte är ett TyperCommand."
 
-#: management/commands/shellcompletion.py:299
+#: management/commands/shellcompletion.py:304
 msgid "The name of the template to use for the shell completion script."
 msgstr "Namnet på mallen som ska användas för skalkompletteringsskriptet."
 
-#: management/commands/shellcompletion.py:349
+#: management/commands/shellcompletion.py:355
 msgid "Uninstall autocompletion for the current or given shell."
 msgstr "Avinstallera autokomplettering för det aktuella eller givna skalet."
 
-#: management/commands/shellcompletion.py:359
+#: management/commands/shellcompletion.py:365
 msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Namnet på django management-skriptet för att ta bort skalkomplettering om "
-"det är annorlunda än skriptet som användes för att anropa detta kommando."
+"Namnet på django manage script för att ta bort skalkomplettering om det är "
+"annorlunda än skriptet som användes för att anropa detta kommando."
 
-#: management/commands/shellcompletion.py:390
+#: management/commands/shellcompletion.py:397
 msgid "Generate autocompletion for command string."
 msgstr "Generera autokomplettering för kommandosträng."
 
-#: management/commands/shellcompletion.py:398
+#: management/commands/shellcompletion.py:405
 msgid "The command string to generate completion suggestions for."
 msgstr "Kommandosträngen att generera slutförandeförslag för."
 
-#: management/commands/shellcompletion.py:408
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Markörens position."
+
+#: management/commands/shellcompletion.py:418
 msgid ""
 "The python import path to a fallback complete function to use when the "
 "completion command is not a TyperCommand. By default, the builtin django "
@@ -91,11 +95,11 @@ msgstr ""
 "completion-kommandot inte är ett TyperCommand. Som standard används den "
 "inbyggda django autocomplete-funktionen."
 
-#: types.py:54
+#: types.py:64
 msgid "Show program's version number and exit."
 msgstr "Visa programmets versionsnummer och avsluta."
 
-#: types.py:74
+#: types.py:84
 msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
@@ -103,7 +107,7 @@ msgstr ""
 "Verbosity nivå; 0=minimal utgång, 1=normal utgång, 2=verbose utgång, "
 "3=mycket utförlig utgång"
 
-#: types.py:104
+#: types.py:114
 msgid ""
 "The Python path to a settings module, e.g. \"myproject.settings.main\". If "
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
@@ -113,7 +117,7 @@ msgstr ""
 "\"myproject.settings.main\". Om detta inte tillhandahålls kommer "
 "miljövariabeln DJANGO_SETTINGS_MODULE att användas."
 
-#: types.py:128
+#: types.py:139
 msgid ""
 "A directory to add to the Python path, e.g. "
 "\"/home/djangoprojects/myproject\"."
@@ -121,18 +125,74 @@ msgstr ""
 "En katalog att lägga till i Python-sökvägen, t.ex. "
 "\"/home/djangoprojects/myproject\"."
 
-#: types.py:149
+#: types.py:161
 msgid "Raise on CommandError exceptions"
 msgstr "Öka på CommandError-undantag"
 
-#: types.py:166
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Skriv ut lokala variabler i spårning."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Dölj lokala variabler i spårning."
+
+#: types.py:214
 msgid "Don't colorize the command output."
 msgstr "Färglägg inte kommandoutgången."
 
-#: types.py:185
+#: types.py:233
 msgid "Force colorization of the command output."
 msgstr "Framtvinga färgläggning av kommandoutgången."
 
-#: types.py:204
+#: types.py:253
 msgid "Skip system checks."
 msgstr "Hoppa över systemkontroller."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dynamisk)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Avbruten!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "standard: {default}"
+
+#~ msgid "required"
+#~ msgstr "nödvändig"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argument"
+
+#~ msgid "Options"
+#~ msgstr "Alternativ"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(utfasad) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[standard: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[nödvändig]"
+
+#~ msgid "Commands"
+#~ msgstr "Kommandon"
+
+#~ msgid "Error"
+#~ msgstr "Fel"
+
+#~ msgid "Aborted."
+#~ msgstr "Avbruten."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Testa [blue]&#39;{command_path} {help_option}&#39;[/] för hjälp."
