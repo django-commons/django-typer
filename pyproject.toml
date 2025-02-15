@@ -11,6 +11,7 @@ authors = [
   {name = "Brian Kohan", email = "bckohan@gmail.com"},
 ]
 license = "MIT"
+license-files = [ "LICENSE" ]
 readme = "README.md"
 repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
@@ -20,7 +21,7 @@ packages = [
 ]
 dependencies = [
     "Django>=3.2,<6.0",
-    "click>=8.1.8,<9.0",
+    "click>=8.1.8,<8.2",
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer
     # version very strictly to bug fix releases for specific minor lines.
