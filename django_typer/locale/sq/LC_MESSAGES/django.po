@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,7 +101,7 @@ msgstr ""
 
 #: types.py:64
 msgid "Show program's version number and exit."
-msgstr "Shfaq numrin e versionit të programit dhe dil."
+msgstr "Trego numrin e versionit të programit dhe dil."
 
 #: types.py:84
 msgid ""

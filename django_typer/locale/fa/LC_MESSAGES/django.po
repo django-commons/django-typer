@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr "فیلتر کردن دنباله‌های کنترل قالب‌بندی
 
 #: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
-msgstr "اجازه دادن به دنباله های کنترل قالب بندی ترمینال در متن کامل."
+msgstr "اجازه دادن به دنباله‌های کنترل قالب‌بندی ترمینال در متن کامل."
 
 #: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
@@ -43,8 +43,8 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"نام اسکریپت مدیریت جنگو برای نصب تکمیل خودکار در صورتی که با اسکریپت مورد "
-"استفاده برای فراخوانی این دستور متفاوت باشد."
+"نام اسکریپت مدیریت جنگو برای نصب تکمیل خودکار در صورتی که با اسکریپت استفاده"
+" شده برای فراخوانی این دستور متفاوت باشد."
 
 #: management/commands/shellcompletion.py:291
 msgid ""
@@ -89,8 +89,8 @@ msgid ""
 "autocomplete function is used."
 msgstr ""
 "مسیر وارد کردن پایتون به یک تابع کامل بازگشتی برای استفاده زمانی که دستور "
-"تکمیل یک TyperCommand نیست. به طور پیش فرض، از تابع داخلی جنگو تکمیل خودکار "
-"استفاده می شود."
+"تکمیل یک TyperCommand نیست. به طور پیش‌فرض، از عملکرد تکمیل خودکار جنگو "
+"داخلی استفاده می‌شود."
 
 #: types.py:64
 msgid "Show program's version number and exit."

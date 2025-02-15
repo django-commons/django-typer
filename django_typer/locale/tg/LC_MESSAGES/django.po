@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,8 @@ msgstr "Шакл барои истифода."
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Пайвандҳои идоракунии форматкунии терминалро аз матни анҷом филтр кунед."
+"Пайдарпайвандҳои идоракунии форматкунии терминалро аз матни анҷом филтр "
+"кунед."
 
 #: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
@@ -96,7 +97,7 @@ msgstr ""
 
 #: types.py:64
 msgid "Show program's version number and exit."
-msgstr "Рақами версияи барномаро нишон диҳед ва баромад кунед."
+msgstr "Рақами версияи барномаро нишон диҳед ва хориҷ шавед."
 
 #: types.py:84
 msgid ""

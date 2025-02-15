@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgid ""
 "different than the script used to invoke this command."
 msgstr ""
 "Django pārvaldības skripta nosaukums automātiskās pabeigšanas instalēšanai, "
-"ja tas atšķiras no skripta, kas tika izmantots šīs komandas izsaukšanai."
+"ja tas atšķiras no šīs komandas izsaukšanai izmantotā skripta."
 
 #: management/commands/shellcompletion.py:291
 msgid ""
@@ -132,7 +132,7 @@ msgstr "Drukājiet vietējos mainīgos izsekošanas sistēmā."
 
 #: types.py:198
 msgid "Hide local variables in tracebacks."
-msgstr "Slēpt vietējos mainīgos izsekošanas ierakstos."
+msgstr "Slēpt lokālos mainīgos izsekošanas ierakstos."
 
 #: types.py:214
 msgid "Don't colorize the command output."
@@ -140,7 +140,7 @@ msgstr "Nekrāsojiet komandas izvadi."
 
 #: types.py:233
 msgid "Force colorization of the command output."
-msgstr "Komandas izvades piespiedu iekrāsošana."
+msgstr "Piespiedu komandas izvades krāsošana."
 
 #: types.py:253
 msgid "Skip system checks."
@@ -193,5 +193,5 @@ msgstr "Izlaist sistēmas pārbaudes."
 #, python-brace-format
 #~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
 #~ msgstr ""
-#~ "Lai saņemtu palīdzību, izmēģiniet [blue]&#39;{command_path} "
+#~ "Lai saņemtu palīdzību, izmēģiniet [zilo]&#39;{command_path} "
 #~ "{help_option}&#39;[/]."

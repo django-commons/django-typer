@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr "Установить автодополнение для текущей 
 
 #: management/commands/shellcompletion.py:225
 msgid "The shell to use."
-msgstr "Оболочка для использования."
+msgstr "Оболочка, которую нужно использовать."
 
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."

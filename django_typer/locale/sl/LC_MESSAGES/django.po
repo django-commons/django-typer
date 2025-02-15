@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,8 +90,8 @@ msgid ""
 "completion command is not a TyperCommand. By default, the builtin django "
 "autocomplete function is used."
 msgstr ""
-"Uvozna pot python do nadomestne popolne funkcije za uporabo, ko ukaz za "
-"dokončanje ni TyperCommand. Privzeto se uporablja vgrajena funkcija "
+"Uvozna pot python do nadomestne dokončane funkcije za uporabo, ko ukaz za "
+"dokončanje ni TyperCommand. Privzeto je uporabljena vgrajena funkcija "
 "samodokončanja django."
 
 #: types.py:64
@@ -103,7 +103,7 @@ msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
 msgstr ""
-"Raven besednosti; 0=minimalni izpis, 1=normalen izpis, 2=podroben izpis, "
+"Raven besednosti; 0=minimalni izhod, 1=normalen izpis, 2=podroben izpis, "
 "3=zelo podroben izpis"
 
 #: types.py:114
@@ -112,7 +112,7 @@ msgid ""
 "this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
 " used."
 msgstr ""
-"Pot Python do modula z nastavitvami, npr. "
+"Pot Python do nastavitvenega modula, npr. "
 "\"myproject.settings.main\". Če to ni na voljo, bo uporabljena "
 "spremenljivka okolja DJANGO_SETTINGS_MODULE."
 
@@ -126,7 +126,7 @@ msgstr ""
 
 #: types.py:161
 msgid "Raise on CommandError exceptions"
-msgstr "Sproži ob izjemah CommandError"
+msgstr "Sproži pri izjemah CommandError"
 
 #: types.py:181
 msgid "Print local variables in tracebacks."

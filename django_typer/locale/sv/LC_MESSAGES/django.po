@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Skalet att använda."
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Filtrera kontrollsekvenser för terminalformatering utan kompletteringstext."
+"Filtrera kontrollsekvenser för terminalformatering utan slutförande text."
 
 #: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
@@ -70,8 +70,8 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Namnet på django manage script för att ta bort skalkomplettering om det är "
-"annorlunda än skriptet som användes för att anropa detta kommando."
+"Namnet på django management-skriptet för att ta bort skalkomplettering om "
+"det är annorlunda än skriptet som användes för att anropa detta kommando."
 
 #: management/commands/shellcompletion.py:397
 msgid "Generate autocompletion for command string."

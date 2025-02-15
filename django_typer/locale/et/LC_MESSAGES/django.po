@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:103
 msgid "Install autocompletion for the current shell."
-msgstr "Installige praeguse kesta jaoks automaatne lõpetamine."
+msgstr "Installige praeguse kesta automaatne lõpetamine."
 
 #: management/commands/shellcompletion.py:225
 msgid "The shell to use."
@@ -29,11 +29,11 @@ msgstr "Kasutatav kest."
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Filtreerige lõpetatud tekstist välja terminali vormindamise juhtjärjestused."
+"Filtreerige lõpetatud tekstist välja terminali vormindamise juhtjadad."
 
 #: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
-msgstr "Luba terminali vormindamise juhtjadad lõpetatud tekstis."
+msgstr "Luba terminali vormingu juhtjadad lõpetatud tekstis."
 
 #: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
@@ -44,8 +44,9 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"django haldamise skripti nimi, mille puhul installitakse automaatne "
-"lõpetamine, kui see erineb selle käsu käivitamiseks kasutatud skriptist."
+"Django haldamise skripti nimi, mille jaoks automaatse lõpetamise "
+"installimiseks kasutatakse, kui see erineb selle käsu käivitamiseks "
+"kasutatud skriptist."
 
 #: management/commands/shellcompletion.py:291
 msgid ""
@@ -132,7 +133,7 @@ msgstr "Kohalike muutujate printimine tracebackides."
 
 #: types.py:198
 msgid "Hide local variables in tracebacks."
-msgstr "Peida kohalikud muutujad jälgimistes."
+msgstr "Peida kohalikud muutujad jälitustes."
 
 #: types.py:214
 msgid "Don't colorize the command output."
@@ -140,7 +141,7 @@ msgstr "Ärge värvige käsu väljundit."
 
 #: types.py:233
 msgid "Force colorization of the command output."
-msgstr "Käsu väljundi värvimine."
+msgstr "Käsu väljundi värvi muutmine."
 
 #: types.py:253
 msgid "Skip system checks."

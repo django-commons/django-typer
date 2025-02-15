@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,11 +133,11 @@ msgstr "បោះពុម្ពអថេរមូលដ្ឋាននៅក្
 
 #: types.py:198
 msgid "Hide local variables in tracebacks."
-msgstr "លាក់អថេរក្នុងមូលដ្ឋានក្នុងការតាមដាន។"
+msgstr "លាក់អថេរមូលដ្ឋាននៅក្នុង tracebacks ។"
 
 #: types.py:214
 msgid "Don't colorize the command output."
-msgstr "កុំធ្វើឱ្យពណ៌លទ្ធផលពាក្យបញ្ជា។"
+msgstr "កុំដាក់ពណ៌លទ្ធផលពាក្យបញ្ជា។"
 
 #: types.py:233
 msgid "Force colorization of the command output."

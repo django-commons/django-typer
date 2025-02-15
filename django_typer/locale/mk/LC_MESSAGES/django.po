@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgid "Skip system checks."
 msgstr "Прескокнете ги системските проверки."
 
 #~ msgid "(dynamic)"
-#~ msgstr "(динамична)"
+#~ msgstr "(динамичен)"
 
 #~ msgid "Aborted!"
 #~ msgstr "Абортирано!"
@@ -166,7 +166,7 @@ msgstr "Прескокнете ги системските проверки."
 #~ msgstr "стандардно: {стандардно}"
 
 #~ msgid "required"
-#~ msgstr "се бара"
+#~ msgstr "потребно"
 
 #, python-brace-format
 #~ msgid "env var: {var}"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,7 +148,7 @@ msgstr "Примусове розфарбовування виводу кома�
 
 #: types.py:253
 msgid "Skip system checks."
-msgstr "Пропустити перевірку системи."
+msgstr "Пропустити системні перевірки."
 
 #~ msgid "(dynamic)"
 #~ msgstr "(динамічний)"
@@ -158,7 +158,7 @@ msgstr "Пропустити перевірку системи."
 
 #, python-brace-format
 #~ msgid "default: {default}"
-#~ msgstr "за замовчуванням: {за замовчуванням}"
+#~ msgstr "за умовчанням: {за замовчуванням}"
 
 #~ msgid "required"
 #~ msgstr "потрібно"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +29,11 @@ msgstr "Ar grogenn da implijout."
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"Sil heuliadoù kontroll furmaozañ an termenel diouzh an destenn echuiñ."
+"Silañ heuliadoù kontroll furmaozañ an termenell diouzh an destenn echuiñ."
 
 #: management/commands/shellcompletion.py:252
 msgid "Allow terminal formatting control sequences in completion text."
-msgstr "Aotren heuliadoù kontroll furmaozañ an termenel en destenn echuiñ."
+msgstr "Aotren heuliadoù kontroll furmaozañ an termenell en destenn echuiñ."
 
 #: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
@@ -44,8 +44,8 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Anv ar skript merañ django evit staliañ an emgefre ma vez disheñvel diouzh "
-"ar skript implijet evit galv ar gemennadenn-mañ."
+"Anv ar skript merañ django evit staliañ an echuiñ emgefre ma vez disheñvel "
+"diouzh ar skript implijet evit galv ar gemennadenn-mañ."
 
 #: management/commands/shellcompletion.py:291
 msgid ""
@@ -68,7 +68,7 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Anv ar skript merañ django evit lemel echuiñ ar c&#39;helc&#39;h ma vez "
+"Anv ar skript django manage evit lemel echuiñ ar c&#39;helc&#39;h ma vez "
 "disheñvel diouzh ar skript implijet evit galv ar gemennadenn-mañ."
 
 #: management/commands/shellcompletion.py:397

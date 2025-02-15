@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "အသုံးပြုရန်အခွံ။"
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
 msgstr ""
-"ပြီးဆုံးသည့်စာသားမှ terminal ဖော်မတ်ချခြင်း ထိန်းချုပ်မှု အတွဲများကို "
+"ပြီးဆုံးသည့်စာသားမှ terminal ဖော်မတ်ချခြင်း ထိန်းချုပ်မှု အစီအစဉ်များကို "
 "စစ်ထုတ်ပါ။"
 
 #: management/commands/shellcompletion.py:252
@@ -67,7 +67,7 @@ msgstr "shell completion script အတွက် အသုံးပြုရန�
 #: management/commands/shellcompletion.py:355
 msgid "Uninstall autocompletion for the current or given shell."
 msgstr ""
-"လက်ရှိ သို့မဟုတ် ပေးထားသည့် shell အတွက် အလိုအလျောက် ဖြည့်သွင်းခြင်းကို "
+"လက်ရှိ သို့မဟုတ် ပေးထားသော shell အတွက် အလိုအလျောက် ဖြည့်သွင်းခြင်းကို "
 "ဖြုတ်ပါ။"
 
 #: management/commands/shellcompletion.py:365
@@ -75,7 +75,7 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"ဤအမိန့်ကိုခေါ်ဆိုရန်အသုံးပြုသည့် script နှင့်ကွဲပြားပါက shell completion "
+"ဤအမိန့်ကိုခေါ်ဆိုရန်အသုံးပြုသည့် script နှင့်ကွာခြားပါက shell completion "
 "ကိုဖယ်ရှားရန် django စီမံခန့်ခွဲသည့် script ၏အမည်။"
 
 #: management/commands/shellcompletion.py:397
@@ -98,7 +98,7 @@ msgid ""
 msgstr ""
 "ပြီးဆုံးသည့်အမိန့်မှာ TyperCommand မဟုတ်သည့်အခါ အသုံးပြုရန်အတွက် ဖြည့်စွက်စာ"
 " ပြီးပြည့်စုံသောလုပ်ဆောင်ချက်သို့ python တင်သွင်းသည့်လမ်းကြောင်း။ "
-"ပုံမှန်အားဖြင့်၊ builtin django အလိုအလျောက်ဖြည့်စွမ်းဆောင်ချက်ကို "
+"မူရင်းအားဖြင့်၊ builtin django အလိုအလျောက်ဖြည့်စွမ်းဆောင်ချက်ကို "
 "အသုံးပြုသည်။"
 
 #: types.py:64
@@ -110,8 +110,8 @@ msgid ""
 "Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
 " verbose output"
 msgstr ""
-"စကားအပြောအဆိုအဆင့်; 0=အထွက်နှုန်းအနည်းဆုံး၊ 1=သာမန်အထွက်၊ 2=စကားအထွက်နှုန်း၊"
-" 3=အလွန်အကျွံထွက်ပေါက်"
+"စကားအပြောအဆိုအဆင့်; 0=အထွက်နှုန်းအနည်းဆုံး၊ 1=သာမန်အထွက်၊ 2=စကားအထွက်အတိုး၊ "
+"3=အလွန်အကျွံထွက်ပေါက်"
 
 #: types.py:114
 msgid ""

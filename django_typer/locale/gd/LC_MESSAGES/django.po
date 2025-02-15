@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,16 +38,16 @@ msgstr ""
 
 #: management/commands/shellcompletion.py:269
 msgid "Install autocompletion for the current or given shell."
-msgstr "Stàlaich fèin-choileanadh airson an t-slige làithreach no ainmichte."
+msgstr "Stàlaich fèin-choileanadh airson an t-slige gnàthach no ainmichte."
 
 #: management/commands/shellcompletion.py:279
 msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Ainm an sgriobt riaghlaidh django gus fèin-chrìochnachadh a chuir a-steach "
-"ma tha e eadar-dhealaichte bhon sgriobt a chaidh a chleachdadh gus an àithne"
-" seo a chuir a-steach."
+"Ainm an sgriobt riaghlaidh django gus fèin-choileanadh a chuir a-steach ma "
+"tha e eadar-dhealaichte bhon sgriobt a chaidh a chleachdadh gus an àithne "
+"seo a chuir a-steach."
 
 #: management/commands/shellcompletion.py:291
 msgid ""

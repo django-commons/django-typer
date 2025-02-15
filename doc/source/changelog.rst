@@ -9,14 +9,13 @@ v3.0.0 (202X-XX-XX)
 
 * Implemented `Completer for media files. <https://github.com/django-commons/django-typer/issues/175>`_
 * Implemented `Completer for static files. <https://github.com/django-commons/django-typer/issues/174>`_
-* Implemented `path completers should be configurable with a root directory other than cwd <https://github.com/django-commons/django-typer/issues/165>`_
 * Fixed `Completions before the end of the typed command string do not work. <https://github.com/django-commons/django-typer/issues/168>`_
 * BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
+* Implemented `path completers should be configurable with a root directory other than cwd <https://github.com/django-commons/django-typer/issues/165>`_
 * Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
 * BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`
 * Implemented `Model completer/parser should support returning the field value <https://github.com/django-commons/django-typer/issues/162>`_
 * Fixed `Model objects with null lookup fields should not be included in model field completion output <https://github.com/django-commons/django-typer/issues/160>`_
-* Implemented `Add security scans to CI. <https://github.com/django-commons/django-typer/issues/158>`_
 * Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
 * Implemented `Use in-house shell completer classes. <https://github.com/django-commons/django-typer/issues/156>`_
 * Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
@@ -34,11 +33,13 @@ v3.0.0 (202X-XX-XX)
 * Fixed `Installed shellcompletion scripts do not pass values of --settings or --pythonpath <https://github.com/django-commons/django-typer/issues/68>`_
 * Implemented `Add support for QuerySet parameter types. <https://github.com/django-commons/django-typer/issues/58>`_
 * Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
+* Implemented `Add translations for helps.. <https://github.com/django-commons/django-typer/issues/18>`_
 * Implemented `Add completer/parser for FileField and FilePathField <https://github.com/django-commons/django-typer/issues/17>`_
 * Implemented `Add completer/parser for DurationField <https://github.com/django-commons/django-typer/issues/16>`_
 * Implemented `Add completer/parser for DateTimeField <https://github.com/django-commons/django-typer/issues/15>`_
 * Implemented `Add completer/parser for DateField <https://github.com/django-commons/django-typer/issues/14>`_
 * Implemented `Add completer/parser for TimeField <https://github.com/django-commons/django-typer/issues/13>`_
+* Implemented `Improve shell completion continuous integration tests  <https://github.com/django-commons/django-typer/issues/11>`_
 
 
 Migrating from 2.x to 3.x

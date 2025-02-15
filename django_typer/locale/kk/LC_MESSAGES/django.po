@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -129,11 +129,11 @@ msgstr "CommandError ерекше жағдайларында көтеріңіз"
 
 #: types.py:181
 msgid "Print local variables in tracebacks."
-msgstr "Бақылау деректерінде жергілікті айнымалы мәндерді басып шығарыңыз."
+msgstr "Бақылауда жергілікті айнымалы мәндерді басып шығарыңыз."
 
 #: types.py:198
 msgid "Hide local variables in tracebacks."
-msgstr "Бақылау деректерінде жергілікті айнымалы мәндерді жасырыңыз."
+msgstr "Бақылауда жергілікті айнымалы мәндерді жасыру."
 
 #: types.py:214
 msgid "Don't colorize the command output."

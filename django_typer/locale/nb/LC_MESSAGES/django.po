@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 22:29-0600\n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr "Installer autofullføring for gjeldende skall."
 
 #: management/commands/shellcompletion.py:225
 msgid "The shell to use."
-msgstr "Skallet å bruke."
+msgstr "Skallet som skal brukes."
 
 #: management/commands/shellcompletion.py:238
 msgid "Filter terminal formatting control sequences out of completion text."
@@ -44,8 +44,8 @@ msgid ""
 "The name of the django manage script to install autocompletion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Navnet på django management-skriptet for å installere autofullføring for "
-"hvis det er forskjellig fra skriptet som ble brukt til å påkalle denne "
+"Navnet på django-administrasjonsskriptet for å installere autofullføring for"
+" hvis det er forskjellig fra skriptet som ble brukt til å påkalle denne "
 "kommandoen."
 
 #: management/commands/shellcompletion.py:291
@@ -69,8 +69,9 @@ msgid ""
 "The name of the django manage script to remove shell completion for if "
 "different than the script used to invoke this command."
 msgstr ""
-"Navnet på django management-skriptet for å fjerne skallfullføringen hvis det"
-" er forskjellig fra skriptet som ble brukt til å påkalle denne kommandoen."
+"Navnet på django-administrasjonsskriptet for å fjerne skallfullføringen hvis"
+" det er forskjellig fra skriptet som ble brukt til å påkalle denne "
+"kommandoen."
 
 #: management/commands/shellcompletion.py:397
 msgid "Generate autocompletion for command string."
@@ -104,7 +105,7 @@ msgid ""
 " verbose output"
 msgstr ""
 "Spredningsnivå; 0=minimal utgang, 1=normal utgang, 2=ordlig utgang, 3=svært "
-"ordrik utgang"
+"detaljert utgang"
 
 #: types.py:114
 msgid ""
@@ -146,7 +147,7 @@ msgstr "Tving fargelegging av kommandoutgangen."
 
 #: types.py:253
 msgid "Skip system checks."
-msgstr "Hopp over systemsjekker."
+msgstr "Hopp over systemkontroller."
 
 #~ msgid "(dynamic)"
 #~ msgstr "(dynamisk)"
