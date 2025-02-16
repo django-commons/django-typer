@@ -38,6 +38,9 @@ jobs:
           - python-version: '3.10'
             django-version: '5.1'
 
+    env:
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -48,7 +51,7 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Dependencies
         run: |
-          just init ${{ steps.setup-python.outputs.python-path }}python
+          just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
           just install django~=${{ matrix.django-version }}
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}

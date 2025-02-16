@@ -68,7 +68,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
         sudo apt remove powershell
@@ -121,7 +121,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -174,7 +174,7 @@ jobs:
         brew install just
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -244,7 +244,7 @@ jobs:
           uses: extractions/setup-just@v2
         - name: Install
           run: |
-            just init ${{ steps.setup-python.outputs.python-path }}python
+            just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
             just install --with psycopg3
             just pin-dependency Django~=${{ matrix.django-version }}
         - name: Run Unit Tests
@@ -294,7 +294,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Test Tab Completion
@@ -345,7 +345,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Install Fish shell
@@ -412,7 +412,7 @@ jobs:
       run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -466,7 +466,7 @@ jobs:
         brew install just
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -526,7 +526,7 @@ jobs:
       run: echo "SHELL=$(which fish)" >> $GITHUB_ENV
     - name: Install
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Tab Completion Tests
@@ -581,7 +581,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install Release Dependencies
       run: |
-        just init ${{ steps.setup-python.outputs.python-path }}python
+        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
       shell: powershell
@@ -633,7 +633,7 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Release Dependencies
         run: |
-          just init ${{ steps.setup-python.outputs.python-path }}python
+          just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
           just install
 
       - name: Get coverage files
