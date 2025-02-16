@@ -2499,26 +2499,6 @@ class OutputWrapper(BaseOutputWrapper):
             super().flush()
 
 
-class _CommandResult:
-    """
-    A container for result objects - we use this to make TyperCommand.print_result with
-    minimal impact to BaseCommand.
-    """
-
-    result: t.Any
-    print_result: bool
-
-    def __init__(self, result, print_result):
-        self.result = result
-        self.print_result = print_result
-
-    def __str__(self):
-        return str(self.result)
-
-    def __bool__(self):
-        return self.print_result and bool(self.result)
-
-
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     """
     An extension of BaseCommand_ that uses the Typer_ library to parse
