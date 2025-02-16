@@ -48,7 +48,7 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Dependencies
         run: |
-          just init
+          just init ${{ steps.setup-python.outputs.python-path }}python
           just install django~=${{ matrix.django-version }}
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
@@ -62,6 +62,7 @@ jobs:
         timeout-minutes: 60
       - name: Run Static Analysis
         run: |
+          just test ./tests/verify_environment.py
           just check-lint
           just check-format
           just check-types

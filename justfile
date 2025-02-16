@@ -4,11 +4,11 @@ set unstable := true
 default:
     @just --list
 
-init:
+init python="python":
     pip install pipx
     pipx ensurepath
     pipx install poetry
-    poetry env use python
+    poetry env use {{ python }}
     poetry run pip install --upgrade pip setuptools wheel
 
 install-precommit:
