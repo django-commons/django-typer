@@ -53,7 +53,7 @@ jobs:
       - name: Install Dependencies
         run: |
           just init ${{ steps.sp.outputs.python-path }}
-          just install django~=${{ matrix.django-version }}
+          just pin-dependency Django~=${{ matrix.django-version }}.0
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |

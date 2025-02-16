@@ -71,7 +71,7 @@ jobs:
       run: |
         just init ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
         sudo apt remove powershell
     - name: Run Unit Tests
       run: |
@@ -125,7 +125,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -179,7 +179,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -250,7 +250,7 @@ jobs:
           run: |
             just init  ${{ steps.sp.outputs.python-path }}
             just install --with psycopg3
-            just pin-dependency Django~=${{ matrix.django-version }}
+            just pin-dependency Django~=${{ matrix.django-version }}.0
         - name: Run Unit Tests
           run: |
             just test ./tests/verify_environment.py
@@ -301,7 +301,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Test Tab Completion
       run: |
         just test ./tests/verify_environment.py
@@ -353,7 +353,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -421,7 +421,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
@@ -476,7 +476,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -537,7 +537,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
@@ -593,7 +593,7 @@ jobs:
       run: |
         just init  ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}
+        just pin-dependency Django~=${{ matrix.django-version }}.0
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
