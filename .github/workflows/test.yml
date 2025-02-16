@@ -46,6 +46,8 @@ jobs:
             django-version: '5.0'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -72,8 +74,8 @@ jobs:
         sudo apt remove powershell
     - name: Run Unit Tests
       run: |
+        just test ./tests/verify_environment.py
         just test-all
-
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
@@ -99,6 +101,8 @@ jobs:
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -122,6 +126,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
       run: |
+        just test ./tests/verify_environment.py
         just test-all
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
@@ -146,6 +151,8 @@ jobs:
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -172,6 +179,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
       run: |
+        just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -189,6 +197,8 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         COVERAGE_FILE: postgres-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+        TEST_DJANGO_VERSION: ${{ matrix.django-version }}
       strategy:
         matrix:
           python-version: ['3.13']
@@ -239,6 +249,7 @@ jobs:
             just pin-dependency Django~=${{ matrix.django-version }}
         - name: Run Unit Tests
           run: |
+            just test ./tests/verify_environment.py
             just test-all
         - name: Store coverage files
           uses: actions/upload-artifact@v4
@@ -261,6 +272,8 @@ jobs:
             django-version: '3.2'
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -286,6 +299,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Test Tab Completion
       run: |
+        just test ./tests/verify_environment.py
         just test-bash || exit 1
 
     - name: Store coverage files
@@ -309,6 +323,8 @@ jobs:
             django-version: '3.2'
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -338,6 +354,7 @@ jobs:
         sudo apt-get install -y fish
     - name: Test Tab Completion
       run: |
+        just test ./tests/verify_environment.py
         just test-fish
       shell: fish {0}
 
@@ -363,6 +380,8 @@ jobs:
 
     env:
       COVERAGE_FILE: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -399,6 +418,7 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
+        just test ./tests/verify_environment.py
         just test-zsh || exit 1
 
     - name: Store coverage files
@@ -423,6 +443,8 @@ jobs:
 
     env:
       COVERAGE_FILE: macos-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -449,6 +471,7 @@ jobs:
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
       run: |
+        just test ./tests/verify_environment.py
         just test-bash || exit 1
 
     - name: Store coverage files
@@ -473,6 +496,8 @@ jobs:
 
     env:
       COVERAGE_FILE: macos-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -507,6 +532,7 @@ jobs:
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
+        just test ./tests/verify_environment.py
         just test-fish || exit 1
 
     - name: Store coverage files
@@ -531,6 +557,8 @@ jobs:
 
     env:
       COVERAGE_FILE: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v4
@@ -559,6 +587,7 @@ jobs:
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
+        just test ./tests/verify_environment.py
         just test-powershell
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-pwsh
