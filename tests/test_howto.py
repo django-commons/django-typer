@@ -3,6 +3,7 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from contextlib import redirect_stdout
 
 from django_typer.management import TyperCommand, get_command
 from tests.utils import rich_installed, run_command, similarity
@@ -498,3 +499,31 @@ class TestFinalizerGroupTyperHowto(TestFinalizerGroupHowto):
 
 class TestFinalizerGroupTyperExtHowto(TestFinalizerGroupHowto):
     command = "finalize_group_typer_ext"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestPrintResultHowTo(TestCase):
+    command = "print_result"
+
+    def test_howto_print_result_run(self):
+        self.assertEqual(
+            run_command(self.command, "--settings", "tests.settings.howto")[0].strip(),
+            "",
+        )
+
+    def test_howto_print_result_call(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(call_command(self.command), "This will not be printed")
+        self.assertEqual(output.getvalue().strip(), "")
+
+    def test_howto_print_result_obj(self):
+        command = get_command(self.command)
+        self.assertEqual(
+            command.handle(),
+            "This will not be printed",
+        )
+
+
+class TestPrintResultTyperHowTo(TestPrintResultHowTo):
+    command = "print_result_typer"

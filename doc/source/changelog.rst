@@ -10,6 +10,7 @@ v3.0.0 (202X-XX-XX)
 * Implemented `Completer for media files. <https://github.com/django-commons/django-typer/issues/175>`_
 * Implemented `Completer for static files. <https://github.com/django-commons/django-typer/issues/174>`_
 * Fixed `Completions before the end of the typed command string do not work. <https://github.com/django-commons/django-typer/issues/168>`_
+* Implemented `Add print_return class field to enable/disable result printing <https://github.com/django-commons/django-typer/issues/167>`_
 * BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
 * Implemented `path completers should be configurable with a root directory other than cwd <https://github.com/django-commons/django-typer/issues/165>`_
 * Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`

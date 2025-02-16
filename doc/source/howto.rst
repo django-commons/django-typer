@@ -849,3 +849,31 @@ streams:
         .. literalinclude:: ../../tests/apps/howto/management/commands/printing_typer.py
             :language: python
             :linenos:
+
+
+Toggle on/off result printing
+-----------------------------
+
+Django's BaseCommand_ will print any truthy values returned from the handle() method. This may not
+always be desired behavior. By default :class:`~django_typer.management.TyperCommand` will do the
+same, but you may toggle this behavior off by setting the class field ``print_result`` to False.
+
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/print_result.py
+            :language: python
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/print_result_typer.py
+            :language: python
+            :linenos:
+
+.. warning::
+
+    We may switch the default behavior to not print in the future, so if you want guaranteed forward
+    compatible behavior you should set this field.

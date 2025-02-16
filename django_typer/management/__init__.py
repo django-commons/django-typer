@@ -2480,11 +2480,15 @@ class OutputWrapper(BaseOutputWrapper):
     returned from command functions.
     """
 
+    disable: bool = False
+
     def write(self, msg="", style_func=None, ending=None):
         """
         If the message is not a string, first cast it before invoking the base
         class write method.
         """
+        if self.disable:
+            return
         if not isinstance(msg, str):
             msg = str(msg)
         return super().write(msg=msg, style_func=style_func, ending=ending)
@@ -2493,6 +2497,26 @@ class OutputWrapper(BaseOutputWrapper):
         # as of python 3.13, sometimes flush is called on a closed stream
         if not getattr(self._out, "closed", False):
             super().flush()
+
+
+class _CommandResult:
+    """
+    A container for result objects - we use this to make TyperCommand.print_result with
+    minimal impact to BaseCommand.
+    """
+
+    result: t.Any
+    print_result: bool
+
+    def __init__(self, result, print_result):
+        self.result = result
+        self.print_result = print_result
+
+    def __str__(self):
+        return str(self.result)
+
+    def __bool__(self):
+        return self.print_result and bool(self.result)
 
 
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
@@ -2636,6 +2660,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     no_color: bool = False
     force_color: bool = False
     skip_checks: bool = False
+
+    print_result: bool = True
+    """Turn on/off automatic write to stdout of results returned by command"""
+
     _handle: t.Callable[..., t.Any]
     _traceback: bool = False
     _help_kwarg: t.Optional[str] = Default(None)
@@ -3248,9 +3276,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             ):
                 # result callbacks are not called on singular commands by click/typer
                 #  we do that here to keep our interface consistent
-                return self.typer_app.info.result_callback(
+                result = self.typer_app.info.result_callback(
                     result, **options, _command=self
                 )
+            self.stdout.disable = not self.print_result
             return result
 
     def run_from_argv(self, argv):
