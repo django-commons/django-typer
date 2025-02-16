@@ -45,13 +45,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
+        id: sp
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Just
         uses: extractions/setup-just@v2
       - name: Install Dependencies
         run: |
-          just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+          just init ${{ steps.sp.outputs.python-path }}
           just install django~=${{ matrix.django-version }}
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}

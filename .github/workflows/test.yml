@@ -52,6 +52,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-linux
@@ -68,7 +69,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
         sudo apt remove powershell
@@ -107,6 +108,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: setup-ssh-debug
@@ -121,7 +123,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -158,6 +160,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-macos
@@ -174,7 +177,7 @@ jobs:
         brew install just
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -229,6 +232,7 @@ jobs:
         - uses: actions/checkout@v4
         - name: Set up Python ${{ matrix.python-version }}
           uses: actions/setup-python@v5
+          id: sp
           with:
             python-version: ${{ matrix.python-version }}
         - name: install-emacs-macos
@@ -244,7 +248,7 @@ jobs:
           uses: extractions/setup-just@v2
         - name: Install
           run: |
-            just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+            just init  ${{ steps.sp.outputs.python-path }}
             just install --with psycopg3
             just pin-dependency Django~=${{ matrix.django-version }}
         - name: Run Unit Tests
@@ -279,6 +283,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-linux
@@ -294,7 +299,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Test Tab Completion
@@ -330,6 +335,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-linux
@@ -345,7 +351,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Install Fish shell
@@ -387,6 +393,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-macos
@@ -412,7 +419,7 @@ jobs:
       run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -450,6 +457,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-macos
@@ -466,7 +474,7 @@ jobs:
         brew install just
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Unit Tests
@@ -503,6 +511,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-emacs-macos
@@ -526,7 +535,7 @@ jobs:
       run: echo "SHELL=$(which fish)" >> $GITHUB_ENV
     - name: Install
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
     - name: Run Tab Completion Tests
@@ -564,6 +573,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
     - name: install-vim-windows
@@ -581,7 +591,7 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install Release Dependencies
       run: |
-        just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+        just init  ${{ steps.sp.outputs.python-path }}
         just install
         just pin-dependency Django~=${{ matrix.django-version }}
       shell: powershell
@@ -629,11 +639,12 @@ jobs:
           detached: true
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        id: sp
       - name: Setup Just
         uses: extractions/setup-just@v2
       - name: Install Release Dependencies
         run: |
-          just init  ${{ steps.setup_python.outputs.python-location }}/bin/python
+          just init ${{ steps.sp.outputs.python-path }}
           just install
 
       - name: Get coverage files
