@@ -8,8 +8,6 @@ init:
     pip install pipx
     pipx ensurepath
     pipx install poetry
-    poetry config --local virtualenvs.create true
-    poetry config --local virtualenvs.in-project true
     poetry env use python
     poetry run pip install --upgrade pip setuptools wheel
 
