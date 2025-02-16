@@ -15,18 +15,15 @@ install-precommit:
     poetry run pre-commit install
 
 install *OPTS:
-    poetry env use python
     poetry lock
     poetry install -E rich {{ OPTS }}
     poetry run pre-commit install
 
 install-docs:
-    poetry env use python
     poetry lock
     poetry install --with docs
 
 install-translate:
-    poetry env use python
     poetry lock
     poetry install --with translate
 
