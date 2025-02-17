@@ -35,4 +35,4 @@ __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
 __author__ = "Brian Kohan"
 __license__ = "MIT"
-__copyright__ = "Copyright 2023-2024 Brian Kohan"
+__copyright__ = "Copyright 2023-2025 Brian Kohan"
