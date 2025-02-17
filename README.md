@@ -34,7 +34,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 
 ## 🚨 Upgrade Notice
 
-**There are breaking changes between 2.x and 3.x, mostly involving shell tab completion. [See the changelog for migration steps]()**.
+**There are breaking changes between 2.x and 3.x, mostly involving shell tab completion. [See the changelog for migration steps](https://django-typer.readthedocs.io/en/latest/changelog.html#migrating-from-2-x-to-3-x)**.
 
 ## Installation
 

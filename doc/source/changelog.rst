@@ -4,7 +4,7 @@
 Change Log
 ==========
 
-v3.0.0 (202X-XX-XX)
+v3.0.0 (2024-02-16)
 ===================
 
 * Implemented `Completer for media files. <https://github.com/django-commons/django-typer/issues/175>`_
@@ -13,8 +13,8 @@ v3.0.0 (202X-XX-XX)
 * Implemented `Add print_return class field to enable/disable result printing <https://github.com/django-commons/django-typer/issues/167>`_
 * BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
 * Implemented `path completers should be configurable with a root directory other than cwd <https://github.com/django-commons/django-typer/issues/165>`_
-* Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
-* BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`
+* Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>`_
+* BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>`_
 * Implemented `Model completer/parser should support returning the field value <https://github.com/django-commons/django-typer/issues/162>`_
 * Fixed `Model objects with null lookup fields should not be included in model field completion output <https://github.com/django-commons/django-typer/issues/160>`_
 * Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
@@ -46,8 +46,8 @@ v3.0.0 (202X-XX-XX)
 Migrating from 2.x to 3.x
 -------------------------
 
-* Imports from the django_typer namespace have been removed. You should now import from
-  django_typer.management.
+* Imports from the ``django_typer`` namespace have been removed. You should now import from
+  ``django_typer.management``.
 
 * The `name` parameter has been removed from
   :func:`django_typer.management.initialize()` and :func:`django_typer.management.Typer.callback()`.
@@ -98,9 +98,6 @@ Shell Completions
 * If you are using shell tab completions you will need to reinstall the completion scripts. Using
   the `shellcompletion install` command. To be extra safe you may want to uninstall the old
   scripts before updating, using the v2.x ``shellcompletion remove`` command.
-
-* If you are using shell tab completions you will need to reinstall the completion scripts. using
-  the `shellcompletion install` command.
 
 * The interface to shellcompletion has changed. ``--shell`` is now an initialization option and
   ``remove`` was renamed to ``uninstall``.:
