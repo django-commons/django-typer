@@ -1,5 +1,7 @@
 name: Update Code of Conduct
 
+permissions: read-all
+
 on:
   workflow_dispatch:
     inputs:

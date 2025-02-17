@@ -5,6 +5,8 @@
 
 name: Publish Release
 
+permissions: read-all
+
 on:
   push:
     tags:
@@ -36,6 +38,8 @@ jobs:
   build:
     name: Build Package
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
 
     steps:
     - uses: actions/checkout@v4

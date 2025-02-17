@@ -1,5 +1,7 @@
 name: Test
 
+permissions: read-all
+
 on:
   push:
   #  branches: main
@@ -21,6 +23,8 @@ jobs:
 
   test-linux:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
@@ -85,6 +89,8 @@ jobs:
 
   test-windows:
     runs-on: windows-latest
+    permissions:
+      actions: write
     defaults:
       run:
         shell: pwsh
@@ -139,6 +145,8 @@ jobs:
 
   test-macos:
     runs-on: macos-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -192,6 +200,8 @@ jobs:
 
   postgres:
       runs-on: ubuntu-latest
+      permissions:
+        actions: write
       # Service containers to run with `container-job`
       env:
         RDBMS: postgres
@@ -263,6 +273,8 @@ jobs:
 
   linux-bash-complete:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -315,6 +327,8 @@ jobs:
 
   linux-fish-complete:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -372,6 +386,8 @@ jobs:
 
   macos-zsh-complete:
     runs-on: macos-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -436,6 +452,8 @@ jobs:
 
   macos-bash-complete:
     runs-on: macos-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -490,6 +508,8 @@ jobs:
 
   macos-fish-complete:
     runs-on: macos-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -552,6 +572,8 @@ jobs:
 
   windows-powershell-complete:
     runs-on: windows-latest
+    permissions:
+      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
