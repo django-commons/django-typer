@@ -2,6 +2,7 @@ name: Test
 
 on:
   push:
+  #  branches: main
   pull_request:
   workflow_dispatch:
     inputs:
@@ -13,9 +14,12 @@ on:
   schedule:
     - cron: '0 13 * * SUN'  # Runs at 6 am pacific every sunday
 
+env:
+  ENABLE_CI_ONLY_TESTS: "1"
+
 jobs:
 
-  test:
+  test-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,53 +44,50 @@ jobs:
             django-version: '4.2'
           - python-version: '3.13'
             django-version: '5.0'
-
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Install Release Dependencies
-      run: |
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
-    - name: Install Emacs
+    - name: install-emacs-linux
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         sudo apt install emacs
-    - name: Setup tmate session
+    - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
       timeout-minutes: 60
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install
+      run: |
+        just init ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+        sudo apt remove powershell
     - name: Run Unit Tests
       run: |
-        poetry run pip install colorama
-        poetry run pytest
-        poetry run pip uninstall -y rich
-        poetry run pytest --cov-append
-        poetry run pip uninstall -y colorama
-        poetry run pytest -k test_ctor_params --cov-append
-        mv .coverage py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
-
+        just test ./tests/verify_environment.py
+        just test-all
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
-  linux-shell-completion:
-    runs-on: ubuntu-latest
+  test-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
     strategy:
       matrix:
         python-version: ['3.9', '3.13']
@@ -99,50 +100,44 @@ jobs:
           - python-version: '3.13'
             django-version: '3.2'
 
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-    - name: Install Release Dependencies
-      run: |
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
-    - name: Install Fish shell
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fish
-    - name: Install Emacs
-      if: ${{ github.event.inputs.debug == 'true' }}
-      run: |
-        sudo apt install emacs
-    - name: Setup tmate session
+    - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
-      timeout-minutes: 60
+    - name: install-vim-windows
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
-        poetry run pytest tests/shellcompletion/*
-        mv .coverage linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
-
+        just test ./tests/verify_environment.py
+        just test-all
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: linux-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
-  macos-shell-completion:
+  test-macos:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -156,162 +151,510 @@ jobs:
           - python-version: '3.13'
             django-version: '3.2'
 
+    env:
+      COVERAGE_FILE: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
+      id: sp
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install Homebrew and Zshell Completion
-      shell: zsh {0}
-      run: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-        touch ~/.zshrc
-        (echo; echo 'eval "$(brew shellenv)"') >> ~/.zshrc
-        eval "$(brew shellenv)"
-        brew install zsh-completions
-        echo "if type brew &>/dev/null; then" >> ~/.zshrc
-        echo "  FPATH=~/.zfunc:$(brew --prefix)/share/zsh-completions:$FPATH" >> ~/.zshrc
-        echo "  autoload -Uz compinit" >> ~/.zshrc
-        echo "  compinit" >> ~/.zshrc
-        echo "fi" >> ~/.zshrc
-        echo "fpath+=~/.zfunc" >> ~/.zshrc
-        chmod go-w /opt/homebrew/share
-        chmod -R go-w /opt/homebrew/share/zsh
-        source ~/.zshrc
-        sudo chsh -s /bin/zsh runner
-    # - name: Install Bash Completions
-    #   shell: bash
-    #   run: |
-    #     brew install bash-completion@2
-    #     touch ~/.bashrc
-    #     echo "\n[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh" || true" >> ~/.bash_profile
-    #     source ~/.bashrc
-    # - name: Install Fish shell
-    #   run: |
-    #     brew install sbt
-    #     brew install fish
-    - name: Install Emacs
+    - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
         brew install emacs
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-
-    - name: Install Release Dependencies
-      run: |
-        poetry config virtualenvs.in-project true
-        poetry run pip install --upgrade pip
-        poetry install
-        poetry run pip install -U "Django~=${{ matrix.django-version }}"
-    - name: Setup tmate session
+    - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3
       with:
         detached: true
-      timeout-minutes: 60
-    - name: Run Unit Tests
-      shell: zsh {0}
+    - name: Setup Just
       run: |
-        poetry run pytest tests/shellcompletion/test_zsh.py || exit 1
-        mv .coverage macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        brew install just
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Run Unit Tests
+      run: |
+        just test ./tests/verify_environment.py
+        just test-all
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  postgres:
+      runs-on: ubuntu-latest
+      # Service containers to run with `container-job`
+      env:
+        RDBMS: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+        COVERAGE_FILE: postgres-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+        TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+      strategy:
+        matrix:
+          python-version: ['3.13']
+          postgres-version: ['latest']
+          django-version:
+            - '5.1' # December 2025
+
+      # Service containers to run with `runner-job`
+      services:
+        # Label used to access the service container
+        postgres:
+          # Docker Hub image
+          image: postgres:${{ matrix.postgres-version }}
+          # Provide the password for postgres
+          env:
+            POSTGRES_PASSWORD: postgres
+          # Set health checks to wait until postgres has started
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+          ports:
+            # Maps tcp port 5432 on service container to the host
+            - 5432:5432
+
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v5
+          id: sp
+          with:
+            python-version: ${{ matrix.python-version }}
+        - name: install-emacs-macos
+          if: ${{ github.event.inputs.debug == 'true' }}
+          run: |
+            sudo apt install emacs
+        - name: setup-ssh-debug
+          if: ${{ github.event.inputs.debug == 'true' }}
+          uses: mxschmitt/action-tmate@v3
+          with:
+            detached: true
+        - name: Setup Just
+          uses: extractions/setup-just@v2
+        - name: Install
+          run: |
+            just init  ${{ steps.sp.outputs.python-path }}
+            just install --with psycopg3
+            just pin-dependency Django~=${{ matrix.django-version }}.0
+        - name: Run Unit Tests
+          run: |
+            just test ./tests/verify_environment.py
+            just test-all
+        - name: Store coverage files
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ env.COVERAGE_FILE }}
+            path: ${{ env.COVERAGE_FILE }}
+
+  linux-bash-complete:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+    env:
+      COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-emacs-linux
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        sudo apt install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Test Tab Completion
+      run: |
+        just test ./tests/verify_environment.py
+        just test-bash || exit 1
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-        path: macos-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
-  # windows-shell-completion:
-  #   runs-on: windows-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: ['3.9', '3.13']
-  #       django-version:
-  #         - '3.2' # LTS April 2024
-  #         - '5.0' # April 2025
-  #       exclude:
-  #         - python-version: '3.9'
-  #           django-version: '5.0'
-  #         - python-version: '3.13'
-  #           django-version: '3.2'
+  linux-fish-complete:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+    env:
+      COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Set up Python ${{ matrix.python-version }}
-  #     uses: actions/setup-python@v5
-  #     with:
-  #       python-version: ${{ matrix.python-version }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-emacs-linux
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        sudo apt install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Install Fish shell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fish
+    - name: Test Tab Completion
+      run: |
+        just test ./tests/verify_environment.py
+        just test-fish
+      shell: fish {0}
 
-  #   - name: Install Poetry
-  #     uses: snok/install-poetry@v1
-  #     with:
-  #       virtualenvs-create: true
-  #       virtualenvs-in-project: true
-  #   - name: Add to Poetry to PATH
-  #     run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
-  #     shell: powershell
-  #   - name: Install Release Dependencies
-  #     run: |
-  #       poetry config virtualenvs.in-project true
-  #       poetry run pip install --upgrade pip
-  #       poetry install
-  #       poetry run pip install -U "Django~=${{ matrix.django-version }}"
-  #     shell: powershell
-  #   - name: Run Unit Tests
-  #     run: |
-  #       poetry run pytest tests/completion_tests.py::PowerShellTests
-  #       mv .coverage windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
-  #     shell: powershell
-  #   - name: Store coverage files
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: coverage-windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}
-  #       path: windows-complete-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  macos-zsh-complete:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Setup Just
+      run: |
+        brew install just
+    - name: Install Homebrew and Zshell Completion
+      shell: zsh {0}
+      run: |
+        brew install zsh-completions
+        chmod go-w /opt/homebrew/share
+        chmod -R go-w /opt/homebrew/share/zsh
+        sudo chsh -s /bin/zsh runner
+    - name: Set SHELL variable
+      run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Run Unit Tests
+      shell: zsh {0}
+      run: |
+        just test ./tests/verify_environment.py
+        just test-zsh || exit 1
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  macos-bash-complete:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: macos-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Setup Just
+      run: |
+        brew install just
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Run Unit Tests
+      run: |
+        just test ./tests/verify_environment.py
+        just test-bash || exit 1
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  macos-fish-complete:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.1' # December 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.1'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: macos-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-emacs-macos
+      if: ${{ github.event.inputs.debug == 'true' }}
+      run: |
+        brew install emacs
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Setup Just
+      run: |
+        brew install just
+    - name: Install Fish
+      run: |
+        brew install fish
+        sudo bash -c 'echo $(which fish) >> /etc/shells'
+        sudo chsh -s $(which fish)
+    - name: Set SHELL variable
+      run: echo "SHELL=$(which fish)" >> $GITHUB_ENV
+    - name: Install
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+    - name: Run Tab Completion Tests
+      shell: fish {0}
+      run: |
+        just test ./tests/verify_environment.py
+        just test-fish || exit 1
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  windows-powershell-complete:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.0' # April 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.0'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-vim-windows
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        detached: true
+    - name: Add to Poetry to PATH
+      run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
+      shell: powershell
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install Release Dependencies
+      run: |
+        just init  ${{ steps.sp.outputs.python-path }}
+        just install
+        just pin-dependency Django~=${{ matrix.django-version }}.0
+      shell: powershell
+    - name: Run Powershell Tab Completion Tests
+      run: |
+        just test ./tests/verify_environment.py
+        just test-powershell
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test-pwsh
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      shell: powershell
+    - name: Test CMD shell failure
+      run: |
+        poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+      shell: cmd
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
 
   coverage-combine:
-    needs: [test, linux-shell-completion, macos-shell-completion] #, windows-shell-completion]
+    needs: [
+      test-linux,
+      test-windows,
+      test-macos,
+      linux-bash-complete,
+      linux-fish-complete,
+      macos-zsh-complete,
+      macos-bash-complete,
+      macos-fish-complete,
+      windows-powershell-complete
+    ]
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install Emacs
+      - name: install-emacs-linux
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           sudo apt install emacs
-      - name: Setup tmate session
+      - name: setup-ssh-debug
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@v3
         with:
           detached: true
-        timeout-minutes: 60
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-    
+        id: sp
+      - name: Setup Just
+        uses: extractions/setup-just@v2
       - name: Install Release Dependencies
         run: |
-          poetry config virtualenvs.in-project true
-          poetry run pip install --upgrade pip
-          poetry install
+          just init ${{ steps.sp.outputs.python-path }}
+          just install
 
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
-          pattern: coverage-*
+          pattern: "*.coverage"
           merge-multiple: true
 
       - run: ls -la *.coverage
-      - run: poetry run coverage combine --keep *.coverage
-      - run: poetry run coverage report
-      - run: poetry run coverage xml
+      - run: just coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

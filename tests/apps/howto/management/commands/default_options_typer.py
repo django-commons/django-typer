@@ -5,7 +5,8 @@ app = Typer()
 
 # after the first Typer() call this module will have a Command class
 # and we can modify it directly to remove the --settings option
-Command.suppressed_base_arguments = ["--settings"]
+assert app.django_command
+app.django_command.suppressed_base_arguments = ["--settings"]
 
 
 @app.command()

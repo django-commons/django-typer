@@ -29,7 +29,9 @@ try:
     def subsub_grp2():
         return "adapter2::adapted2()::grp2()::sub_grp2()::subsub_grp2()"
 
-    assert False, "Should not be able to do this, because we must always be very specific as to which command we are modifying"
+    assert False, (
+        "Should not be able to do this, because we must always be very specific as to which command we are modifying"
+    )
 except AssertionError:
     pass
 

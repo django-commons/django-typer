@@ -1,0 +1,199 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Cari qabıq üçün avtomatik tamamlama quraşdırın."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "İstifadə ediləcək qabıq."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Tamamlanmış mətndən terminal formatlaşdırma nəzarət ardıcıllığını süzün."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Tamamlama mətnində terminal formatlaşdırma nəzarət ardıcıllığına icazə "
+"verin."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Cari və ya verilmiş qabıq üçün avtomatik tamamlama quraşdırın."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django idarə skriptinin adı bu əmri çağırmaq üçün istifadə edilən skriptdən "
+"fərqli olduqda avtomatik tamamlamanı quraşdırmaq üçün."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Tamamlama əmri TyperCommand olmadığı zaman istifadə etmək üçün python tam "
+"funksiyaya tam idxal yolu."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Qabıq tamamlama skripti üçün istifadə ediləcək şablonun adı."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Cari və ya verilmiş qabıq üçün avtomatik tamamlamanı silin."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django idarə skriptinin adı bu əmri çağırmaq üçün istifadə edilən skriptdən "
+"fərqli olduqda, qabıq tamamlanmasını aradan qaldırır."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Komanda sətri üçün avtomatik tamamlama yaradın."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "üçün tamamlama təklifləri yaratmaq üçün əmr sətri."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Kursorun mövqeyi."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Tamamlama əmri TyperCommand olmadığı zaman istifadə etmək üçün python tam "
+"funksiyaya tam idxal yolu. Varsayılan olaraq, daxili django avtomatik "
+"tamamlama funksiyası istifadə olunur."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Proqramın versiya nömrəsini göstərin və çıxın."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Genişlik səviyyəsi; 0=minimal çıxış, 1=normal çıxış, 2=ətraflı çıxış, 3=çox "
+"ətraflı çıxış"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Parametrlər moduluna gedən Python yolu, məsələn, "
+"\"myproject.settings.main\". Bu təmin edilmədikdə, "
+"DJANGO_SETTINGS_MODULE mühit dəyişəni istifadə olunacaq."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Python yoluna əlavə ediləcək kataloq, məsələn, "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError istisnalarını artırın"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Tracebacklərdə yerli dəyişənləri çap edin."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "İzləmələrdə yerli dəyişənləri gizlədin."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Komanda çıxışını rəngləndirməyin."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Komanda çıxışının rənglənməsini məcbur edin."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Sistem yoxlamalarını keçin."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamik)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Abort edildi!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "defolt: {defolt}"
+
+#~ msgid "required"
+#~ msgstr "tələb olunur"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Arqumentlər"
+
+#~ msgid "Options"
+#~ msgstr "Seçimlər"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(köhnəlmişdir) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[defolt: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[lazımdır]"
+
+#~ msgid "Commands"
+#~ msgstr "Əmrlər"
+
+#~ msgid "Error"
+#~ msgstr "Xəta"
+
+#~ msgid "Aborted."
+#~ msgstr "Abort edildi."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "Yardım üçün [blue]&#39;{command_path} {help_option}&#39;[/] cəhd edin."

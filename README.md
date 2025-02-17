@@ -253,7 +253,7 @@ app = Typer(help=_("A more complex command that defines a hierarchy of subcomman
 
 math_grp = Typer(help=_("Do some math at the given precision."))
 
-app.add_typer(math_grp)
+app.add_typer(math_grp, name="math")
 
 @math_grp.callback()
 def math(

@@ -1,22 +1,23 @@
 import inspect
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 import re
 import math
+import time
 from collections import Counter
 import pexpect
 from django.core.management.color import no_style
+from django_typer import utils
 
-try:
-    import rich
+# from charset_normalizer import from_bytes
+import platform
 
-    rich_installed = True
-except ImportError:
-    rich_installed = False
+rich_installed = utils.rich_installed
 
 
 TESTS_DIR = Path(__file__).parent
@@ -57,6 +58,21 @@ def similarity(text1, text2):
     return get_cosine(vector1, vector2)
 
 
+def strip_control_sequences(text):
+    """
+    Removes control sequences, such as ANSI escape codes, from the given text.
+
+    Args:
+        text (str): The input text containing control sequences.
+
+    Returns:
+        str: The cleaned text without control sequences.
+    """
+    # Regular expression to match ANSI escape codes
+    ansi_escape_pattern = re.compile(r"\x1b(?:[@-_][0-?]*[ -/]*[@-~])")
+    return ansi_escape_pattern.sub("", text)
+
+
 def get_named_arguments(function):
     sig = inspect.signature(function)
     return [
@@ -75,17 +91,74 @@ def get_named_defaults(function):
     }
 
 
+if platform.system() == "Windows":
+    import winpty
+
+    class WinPtyWrapper:
+        strip_ansi = True
+        buffer = ""
+
+        def __init__(self, command, env=None, cwd=None, strip_ansi=strip_ansi):
+            self.strip_ansi = strip_ansi
+            self.buffer = ""
+            self.process = winpty.PtyProcess.spawn(command, cwd=cwd, env=env)
+
+        def sendline(self, line):
+            self.process.write(line + "\r\n")
+
+        def read(self):
+            return self.process.read().encode("utf-8")
+
+        def expect(self, pattern, timeout=None):
+            if not self.isalive():
+                raise EOFError("Process terminated before finding the pattern.")
+
+            start_time = time.time()
+
+            while True:
+                if timeout is not None and (time.time() - start_time) > timeout:
+                    raise TimeoutError(f"Pattern '{pattern}' not found within timeout.")
+
+                chunk = self.read().decode("utf-8")
+                if self.strip_ansi:
+                    chunk = strip_control_sequences(chunk)
+                self.buffer += chunk
+                if self.buffer:
+                    # Search for the pattern in the buffer
+                    match = re.search(pattern, self.buffer)
+                    if match:
+                        self.buffer = self.buffer[match.end() :]
+                        return True
+
+                # Check if the process has ended
+                if not self.isalive():
+                    raise EOFError("Process terminated before finding the pattern.")
+
+        def isalive(self):
+            return self.process.isalive()
+
+        def close(self):
+            self.process.close()
+
+
 def interact(command, *args, **kwargs):
-    cwd = os.getcwd()
-    try:
-        os.chdir(manage_py.parent)
-        return pexpect.spawn(
+    if platform.system() == "Windows":
+        return WinPtyWrapper(
             " ".join([sys.executable, f"./{manage_py.name}", command, *args]),
             env=os.environ,
-            **kwargs,
+            cwd=str(manage_py.parent),
         )
-    finally:
-        os.chdir(cwd)
+    else:
+        cwd = os.getcwd()
+        try:
+            os.chdir(manage_py.parent)
+            return pexpect.spawn(
+                " ".join([sys.executable, f"./{manage_py.name}", command, *args]),
+                env=os.environ,
+                **kwargs,
+            )
+        finally:
+            os.chdir(cwd)
 
 
 def run_command(
@@ -94,7 +167,9 @@ def run_command(
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
-        env = os.environ.copy()
+        env = kwargs.pop("env") if "env" in kwargs else os.environ.copy()
+        if platform.system() == "Windows":
+            env.setdefault("PYTHONIOENCODING", "utf-8")
         if chdir:
             os.chdir(manage_py.parent)
         result = subprocess.run(
@@ -105,24 +180,32 @@ def run_command(
                 *args,
             ],
             capture_output=True,
-            text=True,
+            text=False,
             env=env,
             **kwargs,
         )
+        stdout_encoding = (
+            "utf-8"  # getattr(from_bytes(result.stdout).best(), "encoding", "utf-8")
+        )
+        stdout = result.stdout.decode(stdout_encoding)
+        stderr_encoding = (
+            "utf-8"  # getattr(from_bytes(result.stderr).best(), "encoding", "utf-8")
+        )
+        stderr = result.stderr.decode(stderr_encoding)
 
         # Check the return code to ensure the script ran successfully
         if result.returncode != 0:
-            return result.stdout, result.stderr, result.returncode
+            return stdout, stderr, result.returncode
 
         # Parse the output
         if result.stdout:
             if parse_json:
                 try:
-                    return json.loads(result.stdout), result.stderr, result.returncode
+                    return json.loads(stdout), stderr, result.returncode
                 except json.JSONDecodeError:
-                    return result.stdout, result.stderr, result.returncode
-            return result.stdout, result.stderr, result.returncode
-        return result.stdout, result.stderr, result.returncode
+                    return stdout, stderr, result.returncode
+            return stdout, stderr, result.returncode
+        return stdout, stderr, result.returncode
     finally:
         os.chdir(cwd)
 
@@ -157,3 +240,7 @@ def read_django_parameters():
     finally:
         if DJANGO_PARAMETER_LOG_FILE.exists():
             DJANGO_PARAMETER_LOG_FILE.unlink()
+
+
+def to_platform_str(path: str) -> str:
+    return path.replace("/", os.path.sep)

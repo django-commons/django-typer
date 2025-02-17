@@ -8,7 +8,8 @@ from django.conf import settings
 from django.core.management import CommandError, call_command
 
 from django_typer.management import CommandNode, Typer
-from django_typer import completers
+from django_typer.completers.path import directories
+from django_typer.completers.db import databases as complete_db
 
 app = Typer()
 
@@ -35,7 +36,7 @@ def init_or_run_all(
         typer.Option(
             "-o",
             "--output",
-            shell_complete=completers.complete_directory,
+            shell_complete=directories,
             help="The directory to write backup artifacts to.",
         ),
     ] = Path(os.getcwd()),
@@ -102,7 +103,7 @@ def database(
                 "The name of the database(s) to backup. If not provided, "
                 "all databases will be backed up."
             ),
-            shell_complete=completers.databases,
+            shell_complete=complete_db(),
         ),
     ] = databases,
 ):

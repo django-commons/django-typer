@@ -1,0 +1,197 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Namestite samodokončanje za trenutno lupino."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Lupina za uporabo."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Filtrirajte kontrolna zaporedja oblikovanja terminala iz dokončanega "
+"besedila."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Dovoli zaporedja nadzora oblikovanja terminala v zaključnem besedilu."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Namestite samodokončanje za trenutno ali dano lupino."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Ime skripta za upravljanje django za namestitev samodokončanja, če se "
+"razlikuje od skripta, uporabljenega za priklic tega ukaza."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Uvozna pot python do nadomestne popolne funkcije za uporabo, ko ukaz za "
+"dokončanje ni TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Ime predloge, ki se uporablja za skript za dokončanje lupine."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Odstranite samodejno dokončanje za trenutno ali dano lupino."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Ime skripta za upravljanje django za odstranitev dokončanja lupine, če se "
+"razlikuje od skripta, uporabljenega za priklic tega ukaza."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Ustvari samodokončanje za ukazni niz."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Ukazni niz za ustvarjanje predlogov za dokončanje."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Položaj kazalca."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Uvozna pot python do nadomestne dokončane funkcije za uporabo, ko ukaz za "
+"dokončanje ni TyperCommand. Privzeto je uporabljena vgrajena funkcija "
+"samodokončanja django."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Pokaži številko različice programa in zapusti."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Raven besednosti; 0=minimalni izhod, 1=normalen izpis, 2=podroben izpis, "
+"3=zelo podroben izpis"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Pot Python do nastavitvenega modula, npr. "
+"\"myproject.settings.main\". Če to ni na voljo, bo uporabljena "
+"spremenljivka okolja DJANGO_SETTINGS_MODULE."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Imenik, ki ga želite dodati na pot Python, npr. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Sproži pri izjemah CommandError"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Natisnite lokalne spremenljivke v povratnih sledovih."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Skrij lokalne spremenljivke v povratnih sledovih."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Ne obarvajte izhoda ukaza."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Vsili barvanje izhoda ukaza."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Preskoči sistemske preglede."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamičen)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Prekinjeno!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "privzeto: {privzeto}"
+
+#~ msgid "required"
+#~ msgstr "potrebno"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumenti"
+
+#~ msgid "Options"
+#~ msgstr "Možnosti"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(zastarelo) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[privzeto: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[obvezno]"
+
+#~ msgid "Commands"
+#~ msgstr "Ukazi"
+
+#~ msgid "Error"
+#~ msgstr "Napaka"
+
+#~ msgid "Aborted."
+#~ msgstr "Prekinjeno."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Za pomoč poskusite [blue]&#39;{command_path} {help_option}&#39;[/]."

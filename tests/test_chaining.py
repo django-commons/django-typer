@@ -13,19 +13,26 @@ class TestChaining(TestCase):
         result = run_command(
             "chain", "command1", "--option=one", "command2", "--option=two"
         )[0]
-        self.assertEqual(result, "command1\ncommand2\n['one', 'two']\n")
+        self.assertEqual(
+            result.splitlines(), "command1\ncommand2\n['one', 'two']\n".splitlines()
+        )
 
         result = run_command(
             "chain", "command2", "--option=two", "command1", "--option=one"
         )[0]
-        self.assertEqual(result, "command2\ncommand1\n['two', 'one']\n")
+        self.assertEqual(
+            result.splitlines(), "command2\ncommand1\n['two', 'one']\n".splitlines()
+        )
 
         stdout = StringIO()
         with contextlib.redirect_stdout(stdout):
             result = call_command(
                 "chain", "command2", "--option=two", "command1", "--option=one"
             )
-        self.assertEqual(stdout.getvalue(), "command2\ncommand1\n['two', 'one']\n")
+        self.assertEqual(
+            stdout.getvalue().splitlines(),
+            "command2\ncommand1\n['two', 'one']\n".splitlines(),
+        )
         self.assertEqual(result, ["two", "one"])
 
         chain = get_command("chain")

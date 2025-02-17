@@ -1,0 +1,200 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Встановити автозаповнення для поточної оболонки."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Оболонка для використання."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Відфільтрувати послідовності керування форматуванням терміналу з тексту "
+"завершення."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Дозволити послідовності керування форматуванням терміналу в тексті "
+"завершення."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Встановити автозавершення для поточної або заданої оболонки."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Ім’я сценарію керування django для встановлення автозавершення, якщо воно "
+"відрізняється від сценарію, використаного для виклику цієї команди."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Шлях імпорту Python до резервної повної функції, яка використовується, коли "
+"команда завершення не є TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Назва шаблону для сценарію завершення оболонки."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Видалити автозавершення для поточної або заданої оболонки."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Ім’я сценарію керування django для видалення завершення оболонки, якщо воно "
+"відрізняється від сценарію, використаного для виклику цієї команди."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Створити автозавершення для командного рядка."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Командний рядок для створення пропозицій завершення."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Позиція курсору."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Шлях імпорту Python до резервної повної функції, яка використовується, коли "
+"команда завершення не є TyperCommand. За замовчуванням використовується "
+"вбудована функція автозаповнення django."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Показати номер версії програми та вийти."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Рівень багатослівності; 0=мінімальний вивід, 1=нормальний вивід, 2=докладний"
+" вивід, 3=дуже докладний вивід"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Шлях Python до модуля налаштувань, наприклад, "
+"\"myproject.settings.main\". Якщо цього не вказано, буде "
+"використовуватися змінна середовища DJANGO_SETTINGS_MODULE."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Каталог, який потрібно додати до шляху Python, наприклад, "
+"«/home/djangoprojects/myproject»."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Викликати винятки CommandError"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Вивести локальні змінні в трасування."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Приховати локальні змінні в трасуваннях."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Не розфарбовуйте вихід команди."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Примусове розфарбовування виводу команди."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Пропустити системні перевірки."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(динамічний)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Перервано!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "за умовчанням: {за замовчуванням}"
+
+#~ msgid "required"
+#~ msgstr "потрібно"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Аргументи"
+
+#~ msgid "Options"
+#~ msgstr "Опції"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(застаріле) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[за замовчуванням: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[обов&#39;язково]"
+
+#~ msgid "Commands"
+#~ msgstr "Команди"
+
+#~ msgid "Error"
+#~ msgstr "Помилка"
+
+#~ msgid "Aborted."
+#~ msgstr "Перервано."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "Спробуйте отримати допомогу [blue]&#39;{command_path} {help_option}&#39;[/]."

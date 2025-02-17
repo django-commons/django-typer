@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "موجودہ شیل کے لیے خودکار تکمیل کو انسٹال کریں۔"
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "استعمال کرنے کے لیے شیل۔"
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"مکمل ہونے والے متن سے باہر ٹرمینل فارمیٹنگ کنٹرول کے سلسلے کو فلٹر کریں۔"
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "تکمیلی متن میں ٹرمینل فارمیٹنگ کنٹرول کی ترتیب کی اجازت دیں۔"
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "موجودہ یا دیے گئے شیل کے لیے خودکار تکمیل کو انسٹال کریں۔"
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"اگر اس کمانڈ کو استعمال کرنے کے لیے استعمال ہونے والے اسکرپٹ سے مختلف ہو تو "
+"خودکار تکمیل کو انسٹال کرنے کے لیے جینگو مینیج اسکرپٹ کا نام۔"
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"جب تکمیل کمانڈ TyperCommand نہیں ہے تو استعمال کرنے کے لیے فال بیک مکمل "
+"فنکشن کے لیے python درآمد کا راستہ۔"
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "شیل تکمیل اسکرپٹ کے لیے استعمال کرنے کے لیے ٹیمپلیٹ کا نام۔"
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "موجودہ یا دیے گئے شیل کے لیے خودکار تکمیل کو اَن انسٹال کریں۔"
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"شیل کی تکمیل کو ہٹانے کے لیے جینگو مینیج اسکرپٹ کا نام اگر اس کمانڈ کو "
+"استعمال کرنے کے لیے استعمال ہونے والے اسکرپٹ سے مختلف ہو۔"
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "کمانڈ سٹرنگ کے لیے خودکار تکمیل پیدا کریں۔"
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "کمانڈ سٹرنگ جس کے لیے تکمیل کی تجاویز تیار کی جاتی ہیں۔"
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "کرسر کی پوزیشن۔"
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"جب تکمیل کمانڈ TyperCommand نہیں ہے تو استعمال کرنے کے لیے فال بیک مکمل "
+"فنکشن کے لیے python درآمد کا راستہ۔ پہلے سے طے شدہ طور پر، بلٹ ان جینگو "
+"آٹوکمپلیٹ فنکشن استعمال ہوتا ہے۔"
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "پروگرام کا ورژن نمبر دکھائیں اور باہر نکلیں۔"
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"لفظی سطح؛ 0=کم سے کم آؤٹ پٹ، 1=نارمل آؤٹ پٹ، 2=وربوز آؤٹ پٹ، 3=بہت وربوز آؤٹ"
+" پٹ"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"سیٹنگ ماڈیول کا ازگر کا راستہ، جیسے \"myproject.settings.main\"۔ اگر"
+" یہ فراہم نہیں کیا جاتا ہے تو، DJANGO_SETTINGS_MODULE ماحولیاتی متغیر "
+"استعمال کیا جائے گا۔"
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"ازگر کے راستے میں شامل کرنے کے لیے ایک ڈائریکٹری، جیسے "
+"\"/home/djangoprojects/myproject\"۔"
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "کمانڈ ایرر استثناء پر اضافہ کریں۔"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "ٹریس بیکس میں مقامی متغیرات پرنٹ کریں۔"
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "ٹریس بیکس میں مقامی متغیرات کو چھپائیں۔"
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "کمانڈ آؤٹ پٹ کو رنگین نہ کریں۔"
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "کمانڈ آؤٹ پٹ کو زبردستی رنگین کریں۔"
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "سسٹم چیکس کو چھوڑ دیں۔"
+
+#~ msgid "(dynamic)"
+#~ msgstr "(متحرک)"
+
+#~ msgid "Aborted!"
+#~ msgstr "اسقاط شدہ!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "ڈیفالٹ: {default}"
+
+#~ msgid "required"
+#~ msgstr "مطلوبہ"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "دلائل"
+
+#~ msgid "Options"
+#~ msgstr "اختیارات"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(فرسودہ) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[پہلے سے طے شدہ: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[ضروری]"
+
+#~ msgid "Commands"
+#~ msgstr "احکام"
+
+#~ msgid "Error"
+#~ msgstr "خرابی"
+
+#~ msgid "Aborted."
+#~ msgstr "اسقاط۔"
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "مدد کے لیے [blue]&#39;{command_path} {help_option}&#39;[/] آزمائیں۔"

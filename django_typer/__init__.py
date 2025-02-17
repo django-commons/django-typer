@@ -29,25 +29,7 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 keep a tight version lock on Typer.
 """
 
-# WARNING - these imports are going away in version 3!
-# import them from django_typer.management directly
-from .management import (
-    CommandNode,  # noqa: F401
-    Context,  # noqa: F401
-    DjangoTyperMixin,  # noqa: F401
-    DTCommand,  # noqa: F401
-    DTGroup,  # noqa: F401
-    Typer,  # noqa: F401
-    TyperCommand,  # noqa: F401
-    callback,  # noqa: F401
-    command,  # noqa: F401
-    get_command,  # noqa: F401
-    group,  # noqa: F401
-    initialize,  # noqa: F401
-    model_parser_completer,  # noqa: F401
-)
-
-VERSION = (2, 6, 0)
+VERSION = (3, 0, 0)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)

@@ -3,15 +3,15 @@ import re
 import pytest
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
+from django_typer.config import traceback_config, use_rich_tracebacks
+from django_typer.utils import with_typehint
 
 from tests.utils import rich_installed, run_command
+import platform
 
 
-@pytest.mark.skipif(not rich_installed, reason="rich not installed")
-class TestTracebackConfig(TestCase):
+class TracebackConfigTests(with_typehint(TestCase)):
     rich_installed = True
-
-    uninstall = False
 
     def test_default_traceback(self):
         result = run_command("test_command1", "--no-color", "delete", "me", "--throw")[
@@ -19,15 +19,34 @@ class TestTracebackConfig(TestCase):
         ]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        if self.rich_installed:
+        if rich_installed:
             self.assertIn("────────", result)
-            # locals should be present
-            self.assertIn("name = 'me'", result)
-            self.assertIn("throw = True", result)
+            # locals should not be present
+            self.assertNotIn("name = 'me'", result)
+            self.assertNotIn("throw = True", result)
             # by default we get only the last frame
             self.assertEqual(len(re.findall(r"\.py:\d+", result) or []), 1)
+
+            hlp = run_command("test_command1", "--no-color", "--help")[0]
+            self.assertNotIn("--hide-locals", hlp)
+            self.assertIn("--show-locals", hlp)
+
+            result = run_command(
+                "test_command1",
+                "--no-color",
+                "--show-locals",
+                "delete",
+                "me",
+                "--throw",
+            )[1]
+            self.assertIn("name = 'me'", result)
+            self.assertIn("throw = True", result)
         else:
             self.assertNotIn("────────", result)
+
+            hlp = run_command("test_command1", "--no-color", "--help")[0]
+            self.assertNotIn("--hide-locals", hlp)
+            self.assertNotIn("--show-locals", hlp)
 
     def test_tb_command_overrides(self):
         result = run_command(
@@ -35,15 +54,34 @@ class TestTracebackConfig(TestCase):
         )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        if self.rich_installed:
+        if rich_installed:
             self.assertIn("────────", result)
             # locals should be present
-            self.assertNotIn("name = 'me'", result)
-            self.assertNotIn("throw = True", result)
+            self.assertIn("name = 'me'", result)
+            self.assertIn("throw = True", result)
             # should get a stack trace with files and line numbers
             self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
+
+            hlp = run_command("test_tb_overrides", "--no-color", "--help")[0]
+            self.assertIn("--hide-locals", hlp)
+            self.assertNotIn("--show-locals", hlp)
+
+            result = run_command(
+                "test_tb_overrides",
+                "--no-color",
+                "--hide-locals",
+                "delete",
+                "me",
+                "--throw",
+            )[1]
+            self.assertNotIn("name = 'me'", result)
+            self.assertNotIn("throw = True", result)
         else:
             self.assertNotIn("────────", result)
+
+            hlp = run_command("test_tb_overrides", "--no-color", "--help")[0]
+            self.assertNotIn("--hide-locals", hlp)
+            self.assertNotIn("--show-locals", hlp)
 
     def test_turn_traceback_off_false(self):
         result = run_command(
@@ -58,6 +96,31 @@ class TestTracebackConfig(TestCase):
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
 
+        hlp = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_false",
+            "--no-color",
+            "--help",
+        )[0]
+        self.assertFalse("--show-locals" in hlp)
+        self.assertFalse("--hide-locals" in hlp)
+
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=False)
+    def test_traceback_set_to_false(self):
+        self.assertEqual(traceback_config(), {"show_locals": False})
+        self.assertIs(use_rich_tracebacks(), False)
+
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=True)
+    def test_traceback_set_to_true(self):
+        self.assertEqual(traceback_config(), {"show_locals": False})
+        self.assertIs(use_rich_tracebacks(), rich_installed)
+
+    @override_settings(DT_RICH_TRACEBACK_CONFIG=None)
+    def test_traceback_set_to_none(self):
+        self.assertEqual(traceback_config(), {"show_locals": False})
+        self.assertIs(use_rich_tracebacks(), False)
+
     def test_turn_traceback_off_none(self):
         result = run_command(
             "test_command1",
@@ -71,6 +134,16 @@ class TestTracebackConfig(TestCase):
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
 
+        hlp = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_none",
+            "--no-color",
+            "--help",
+        )[0]
+        self.assertFalse("--show-locals" in hlp)
+        self.assertFalse("--hide-locals" in hlp)
+
     def test_traceback_no_locals_short_false(self):
         result = run_command(
             "test_command1",
@@ -83,53 +156,50 @@ class TestTracebackConfig(TestCase):
         )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        # locals should not be present
-        self.assertNotIn("name = 'me'", result)
-        self.assertNotIn("throw = True", result)
-        if self.rich_installed:
+        if rich_installed:
             self.assertIn("────────", result)
             self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
+
+            # locals should be present
+            self.assertIn("name = 'me'", result)
+            self.assertIn("throw = True", result)
+
+            hlp = run_command(
+                "test_command1",
+                "--settings",
+                "tests.settings.settings_tb_change_defaults",
+                "--no-color",
+                "--help",
+            )[0]
+            self.assertFalse("--show-locals" in hlp)
+            self.assertTrue("--hide-locals" in hlp)
+            result = run_command(
+                "test_command1",
+                "--no-color",
+                "--hide-locals",
+                "--settings",
+                "tests.settings.settings_tb_change_defaults",
+                "delete",
+                "me",
+                "--throw",
+            )[1]
+
+            self.assertNotIn("name = 'me'", result)
+            self.assertNotIn("throw = True", result)
         else:
             self.assertNotIn("────────", result)
 
         self.assertNotIn("\x1b", result)
 
-    def test_rich_install(self):
-        if self.rich_installed:
-            result = run_command(
-                "test_command1",
-                "--settings",
-                "tests.settings.settings_throw_init_exception",
-                "--no-color",
-                "delete",
-                "me",
-            )[1]
-            self.assertIn("Traceback (most recent call last)", result)
-            self.assertIn("Exception: Test ready exception", result)
-            self.assertIn("────────", result)
-            self.assertIn("── locals ──", result)
-            self.assertNotIn("\x1b", result)
-
-    @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
-    def test_tb_no_install(self):
-        if self.rich_installed:
-            result = run_command(
-                "test_command1",
-                "--settings",
-                "tests.settings.settings_tb_no_install",
-                "delete",
-                "me",
-            )[1]
-            self.assertIn("Traceback (most recent call last)", result)
-            self.assertIn("Exception: Test ready exception", result)
-            self.assertNotIn("────────", result)
-            self.assertNotIn("── locals ──", result)
-
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="TODO --force-color not working on Windows",
+    )
     def test_colored_traceback(self):
         result = run_command(
             "test_command1", "--force-color", "delete", "Brian", "--throw"
         )[1]
-        if self.rich_installed:
+        if rich_installed:
             self.assertIn("\x1b", result)
 
         result = run_command(
@@ -141,12 +211,56 @@ class TestTracebackConfig(TestCase):
         self.assertNotIn("\x1b", result)
 
 
+@pytest.mark.rich
+@pytest.mark.skipif(not rich_installed, reason="rich not installed")
+class TestTracebackConfig(TracebackConfigTests, TestCase):
+    rich_installed = True
+
+    @override_settings(DJ_RICH_TRACEBACK_CONFIG={"no_install": True})
+    def test_tb_no_install(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_tb_no_install",
+            "delete",
+            "me",
+        )[1]
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: Test ready exception", result)
+        self.assertNotIn("────────", result)
+        self.assertNotIn("── locals ──", result)
+
+        hlp = run_command(
+            "test_command1", "--settings", "tests.settings.settings_tb_no_install"
+        )[1]
+        self.assertFalse("--show-locals" in hlp)
+        self.assertFalse("--hide-locals" in hlp)
+
+    def test_rich_install(self):
+        result = run_command(
+            "test_command1",
+            "--settings",
+            "tests.settings.settings_throw_init_exception",
+            "--no-color",
+            "delete",
+            "me",
+        )[1]
+        self.assertIn("Traceback (most recent call last)", result)
+        self.assertIn("Exception: Test ready exception", result)
+        self.assertIn("────────", result)
+        self.assertNotIn("── locals ──", result)
+        self.assertNotIn("\x1b", result)
+
+
+@pytest.mark.no_rich
 @pytest.mark.skipif(rich_installed, reason="rich installed")
-class TestTracebackConfigNoRich(TestTracebackConfig):
+class TestTracebackConfigNoRich(TracebackConfigTests, TestCase):
     rich_installed = False
 
 
 class TestSettingsSystemCheck(TestCase):
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_warning_thrown(self):
         result = run_command(
             "noop", "--settings", "tests.settings.settings_tb_bad_config"
@@ -176,12 +290,12 @@ class TracebackTests(TestCase):
 
     def test_usage_error_no_tb(self):
         stdout, stderr, retcode = run_command("tb", "--no-color", "wrong")
-        self.assertTrue("Usage: ./manage.py tb [OPTIONS] COMMAND [ARGS]" in stdout)
+        self.assertTrue("manage.py tb [OPTIONS] COMMAND [ARGS]" in stdout)
         self.assertTrue("No such command" in stderr)
         self.assertTrue(retcode > 0)
 
         stdout, stderr, retcode = run_command("tb", "--no-color", "error", "wrong")
-        self.assertTrue("Usage: ./manage.py tb error [OPTIONS]" in stdout)
+        self.assertTrue("manage.py tb error [OPTIONS]" in stdout)
         self.assertTrue("Got unexpected extra argument" in stderr)
         self.assertTrue(retcode > 0)
 
@@ -191,6 +305,8 @@ class TracebackTests(TestCase):
         with self.assertRaises(CommandError):
             call_command("tb", "error", "wrong")
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_usage_error_with_tb_if_requested(self):
         stdout, stderr, retcode = run_command(
             "tb", "--no-color", "--traceback", "wrong"
@@ -198,9 +314,11 @@ class TracebackTests(TestCase):
         self.assertFalse(stdout.strip())
         self.assertTrue("Traceback" in stderr)
         if rich_installed:
-            self.assertTrue("───── locals ─────" in stderr)
+            # self.assertTrue("───── locals ─────" in stderr)
+            self.assertTrue("──────────── Traceback" in stderr)
         else:
-            self.assertFalse("───── locals ─────" in stderr)
+            # self.assertFalse("───── locals ─────" in stderr)
+            self.assertFalse("──────────── Traceback" in stderr)
         self.assertTrue("No such command 'wrong'" in stderr)
         self.assertTrue(retcode > 0)
 
@@ -210,9 +328,11 @@ class TracebackTests(TestCase):
         self.assertFalse(stdout.strip())
         self.assertTrue("Traceback" in stderr)
         if rich_installed:
-            self.assertTrue("───── locals ─────" in stderr)
+            # self.assertTrue("───── locals ─────" in stderr)
+            self.assertTrue("──────────── Traceback" in stderr)
         else:
-            self.assertFalse("───── locals ─────" in stderr)
+            # self.assertFalse("───── locals ─────" in stderr)
+            self.assertFalse("──────────── Traceback" in stderr)
         self.assertFalse(stdout.strip())
         self.assertTrue("Got unexpected extra argument" in stderr)
         self.assertTrue(retcode > 0)

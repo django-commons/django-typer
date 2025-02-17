@@ -193,5 +193,6 @@ the self argument in your commands.**
    extensions
    shell_completion
    howto
+   showcase
    reference
    changelog

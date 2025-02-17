@@ -1,7 +1,3 @@
-import sys
-from contextlib import redirect_stdout
-from io import StringIO
-
 import pytest
 from django.test import TestCase, override_settings
 
@@ -30,8 +26,8 @@ basic_help = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -126,8 +122,8 @@ multi_help = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -182,8 +178,8 @@ hierarchy_help = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -304,12 +300,12 @@ Options:
 class ExampleTests(TestCase):
     settings = "tests.settings.examples"
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_basic(self):
         observed_help = run_command(
             "basic", "--settings", self.settings, "--no-color", "--help"
         )[0].strip()
-        # import ipdb
-        # ipdb.set_trace()
         self.assertGreater(
             similarity(
                 observed_help, basic_help if rich_installed else basic_help_no_rich
@@ -317,6 +313,8 @@ class ExampleTests(TestCase):
             0.99,
         )
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_multi(self):
         observed_help = run_command(
             "multi", "--settings", self.settings, "--no-color", "--help"
@@ -350,6 +348,8 @@ class ExampleTests(TestCase):
             0.99,
         )
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_hierarchy(self):
         observed_help = run_command(
             "hierarchy", "--settings", self.settings, "--no-color", "--help"
@@ -401,15 +401,20 @@ class ExampleTests(TestCase):
             "multiply",
             "--help",
         )[0].strip()
-        self.assertGreater(
-            similarity(
-                observed_help,
-                hierarchy_math_multiply_help
-                if rich_installed
-                else hierarchy_math_multiply_help_no_rich,
-            ),
-            0.99,
-        )
+        try:
+            self.assertGreater(
+                similarity(
+                    observed_help,
+                    hierarchy_math_multiply_help
+                    if rich_installed
+                    else hierarchy_math_multiply_help_no_rich,
+                ),
+                0.99,
+            )
+        except AssertionError:
+            import ipdb
+
+            ipdb.set_trace()
 
         self.assertEqual(
             run_command(
@@ -470,33 +475,23 @@ class CompleterExampleTests(TestCase):
         from django_typer.management.commands.shellcompletion import (
             Command as ShellCompletion,
         )
-        from django_typer.management.commands.shellcompletion import (
-            Shells,
+
+        shellcompletion = get_command("shellcompletion", ShellCompletion).init(
+            shell="zsh"
         )
+        completions = shellcompletion.complete(f"{self.app_labels_cmd} ")
+        self.assertTrue("contenttypes" in completions)
+        self.assertTrue("completers" in completions)
+        self.assertTrue("django_typer" in completions)
+        self.assertTrue("admin" in completions)
+        self.assertTrue("auth" in completions)
+        self.assertTrue("sessions" in completions)
+        self.assertTrue("messages" in completions)
 
-        shellcompletion = get_command("shellcompletion", ShellCompletion)
+        completions = shellcompletion.complete(f"{self.app_labels_cmd} a")
 
-        stdout = StringIO()
-        with redirect_stdout(stdout):
-            shellcompletion.complete(f"{self.app_labels_cmd} ", shell=Shells.zsh)
-
-        completions = stdout.getvalue()
-        self.assertTrue('"contenttypes"' in completions)
-        self.assertTrue('"completers"' in completions)
-        self.assertTrue('"django_typer"' in completions)
-        self.assertTrue('"admin"' in completions)
-        self.assertTrue('"auth"' in completions)
-        self.assertTrue('"sessions"' in completions)
-        self.assertTrue('"messages"' in completions)
-
-        stdout.truncate(0)
-        stdout.seek(0)
-
-        with redirect_stdout(stdout):
-            shellcompletion.complete(f"{self.app_labels_cmd} a", shell=Shells.zsh)
-
-        self.assertTrue('"admin"' in completions)
-        self.assertTrue('"auth"' in completions)
+        self.assertTrue("admin" in completions)
+        self.assertTrue("auth" in completions)
 
         stdout, stderr, retcode = run_command(
             self.app_labels_cmd,

@@ -11,7 +11,7 @@ class AlphabetizeCommands(DTGroup):
 app = Typer(cls=AlphabetizeCommands)
 
 d_app = Typer(cls=AlphabetizeCommands)
-app.add_typer(d_app)
+app.add_typer(d_app, name="d")
 
 
 @app.command()

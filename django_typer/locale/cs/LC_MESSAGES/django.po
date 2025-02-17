@@ -1,0 +1,195 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Nainstalujte automatické dokončování pro aktuální prostředí."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Skořápka k použití."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Filtrujte nedokončené řídicí sekvence formátování terminálu."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Povolit řídicí sekvence formátování terminálu v dokončovacím textu."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Nainstalujte automatické dokončování pro aktuální nebo daný shell."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Název řídícího skriptu django pro instalaci automatického dokončování, pokud"
+" se liší od skriptu použitého k vyvolání tohoto příkazu."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Cesta importu pythonu k záložní kompletní funkci, která se má použít, když "
+"příkaz dokončení není TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Název šablony, která se má použít pro skript dokončení shellu."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Odinstalujte automatické dokončování pro aktuální nebo daný shell."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Název řídicího skriptu django pro odstranění dokončení shellu, pokud se liší"
+" od skriptu použitého k vyvolání tohoto příkazu."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Generovat automatické dokončování pro řetězec příkazů."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Příkazový řetězec, pro který se mají vygenerovat návrhy dokončení."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Pozice kurzoru."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Cesta importu pythonu k záložní kompletní funkci, která se má použít, když "
+"příkaz dokončení není TyperCommand. Ve výchozím nastavení se používá "
+"vestavěná funkce automatického dokončování django."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Zobrazte číslo verze programu a ukončete."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"úroveň výřečnosti; 0 = minimální výstup, 1 = normální výstup, 2 = podrobný "
+"výstup, 3 = velmi podrobný výstup"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Cesta Pythonu k modulu nastavení, např. \"myproject.settings.main\"."
+" Pokud to není uvedeno, použije se proměnná prostředí "
+"DJANGO_SETTINGS_MODULE."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Adresář, který se má přidat do cesty Pythonu, např. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Upozorňovat na výjimky CommandError"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Tisk lokálních proměnných v tracebackech."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Skryjte místní proměnné v tracebackech."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Nebarvi výstup příkazu."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Vynutit zabarvení výstupu příkazu."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Přeskočit systémové kontroly."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dynamický)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Přerušeno!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "výchozí: {default}"
+
+#~ msgid "required"
+#~ msgstr "požadovaný"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumenty"
+
+#~ msgid "Options"
+#~ msgstr "Možnosti"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(zastaralé) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[výchozí: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[požadovaný]"
+
+#~ msgid "Commands"
+#~ msgstr "Příkazy"
+
+#~ msgid "Error"
+#~ msgstr "Chyba"
+
+#~ msgid "Aborted."
+#~ msgstr "Přerušeno."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Zkuste pomoc [modrá]&#39;{command_path} {help_option}&#39;[/]."

@@ -1,34 +1,28 @@
-import os
 import shutil
 import sys
 from pathlib import Path
 
 import pytest
 from django.test import TestCase
+from django.core.management import CommandError
 
 from tests.shellcompletion import (
-    _DefaultCompleteTestCase,
-    _InstalledScriptTestCase,
+    _ScriptCompleteTestCase,
+    _InstalledScriptCompleteTestCase,
 )
 
 
-@pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
-class FishShellTests(_DefaultCompleteTestCase):  # , TestCase):
-    """
-    TODO this test is currently disabled because fish completion installation does
-    not seem to work for scripts not on the path.
-    """
-
+class _FishMixin:
     shell = "fish"
+    profile: Path
+    tabs = "\t"
     directory = Path("~/.config/fish/completions").expanduser()
+    interactive_opt = "--interactive"
 
-    def set_environment(self, fd):
-        # super().set_environment(fd)
-        os.write(fd, f"export PATH={Path(sys.executable).parent}:$PATH\n".encode())
-        os.write(
-            fd,
-            f'export DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
-        )
+    environment = [
+        f"set -x DJANGO_SETTINGS_MODULE 'tests.settings.completion'",
+        f"source {Path(sys.executable).absolute().parent / 'activate.fish'}",
+    ]
 
     def verify_install(self, script=None):
         if not script:
@@ -40,16 +34,76 @@ class FishShellTests(_DefaultCompleteTestCase):  # , TestCase):
             script = self.manage_script
         self.assertFalse((self.directory / f"{script}.fish").exists())
 
+
+@pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
+class FishShellTests(_FishMixin, _ScriptCompleteTestCase, TestCase):
     def test_shell_complete(self):
-        # just verify that install/remove works. The actual completion is not tested
-        # because there's an issue running fish interactively in a pty:
-        #  warning: No TTY for interactive shell (tcgetpgrp failed)
-        #  setpgid: Inappropriate ioctl for device
-        # TODO - fix this
-        self.install()
-        self.remove()
+        with self.assertRaises(CommandError):
+            self.install()
+
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_rich_output(self): ...
+
+    @pytest.mark.rich
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_no_rich_output(self): ...
+
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_settings_pass_through(self): ...
+
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_pythonpath_pass_through(self): ...
+
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_fallback(self): ...
+
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_reentrant_install_uninstall(self): ...
+
+    @pytest.mark.skip(reason="fish does not support script installations")
+    def test_path_completion(self): ...
 
 
 @pytest.mark.skipif(shutil.which("fish") is None, reason="Fish not available")
-class FishExeShellTests(_InstalledScriptTestCase, FishShellTests, TestCase):
-    shell = "fish"
+class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    @pytest.mark.skip(reason="fish does not support ansi control sequences")
+    def test_rich_output(self): ...
+
+    # TODO - fix fish tests, having trouble running it in a subprocess!!
+    def test_shell_complete(self):
+        self.remove()
+        self.verify_remove()
+        self.remove()
+        self.verify_remove()
+        self.install()
+        self.verify_install()
+        self.install()
+        self.verify_install()
+        self.remove()
+        self.verify_remove()
+
+    @pytest.mark.rich
+    @pytest.mark.skip(reason="TODO")
+    def test_no_rich_output(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_settings_pass_through(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_pythonpath_pass_through(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_fallback(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_reentrant_install_uninstall(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_multi_install(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_path_completion(self): ...

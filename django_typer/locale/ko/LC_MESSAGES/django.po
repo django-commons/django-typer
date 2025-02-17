@@ -1,0 +1,183 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "현재 셸에 자동 완성 기능을 설치합니다."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "사용할 셸입니다."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "완성 텍스트에서 터미널 포맷팅 제어 시퀀스를 필터링합니다."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "완성 텍스트에서 터미널 포맷팅 제어 시퀀스를 허용합니다."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "현재 셸이나 지정된 셸에 대한 자동 완성 기능을 설치합니다."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr "이 명령을 호출하는 데 사용된 스크립트와 다른 경우 자동 완성 기능을 설치할 django manage 스크립트의 이름입니다."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr "완성 명령이 TyperCommand가 아닌 경우 사용할 대체 완료 함수에 대한 Python 가져오기 경로입니다."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "셸 완성 스크립트에 사용할 템플릿의 이름입니다."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "현재 셸이나 지정된 셸에 대한 자동 완성을 제거하세요."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr "이 명령을 호출하는 데 사용된 스크립트와 다른 경우 셸 완성을 제거하기 위한 django 관리 스크립트의 이름입니다."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "명령 문자열에 대한 자동 완성을 생성합니다."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "완성 제안을 생성하는 명령 문자열입니다."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "커서 위치."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"완료 명령이 TyperCommand가 아닐 때 사용할 폴백 완료 함수에 대한 파이썬 가져오기 경로입니다. 기본적으로 내장된 django "
+"자동완성 함수가 사용됩니다."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "프로그램의 버전 번호를 표시하고 종료합니다."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr "자세한 수준; 0=최소 출력, 1=정상 출력, 2=자세한 출력, 3=매우 자세한 출력"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"설정 모듈에 대한 Python 경로, 예: \"myproject.settings.main\". 이것이 제공되지 않으면 "
+"DJANGO_SETTINGS_MODULE 환경 변수가 사용됩니다."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr "Python 경로에 추가할 디렉토리, 예: \"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError 예외 발생 시 발생"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "추적에서 지역 변수를 출력합니다."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "추적에서 로컬 변수를 숨깁니다."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "명령 출력에 색상을 지정하지 마세요."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "명령 출력을 강제로 색칠합니다."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "시스템 검사를 건너뜁니다."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(동적)"
+
+#~ msgid "Aborted!"
+#~ msgstr "중단되었습니다!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "기본값: {기본값}"
+
+#~ msgid "required"
+#~ msgstr "필수의"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "환경 변수: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "인수"
+
+#~ msgid "Options"
+#~ msgstr "옵션"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(더 이상 사용되지 않음) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[기본: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[환경 변수: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[필수의]"
+
+#~ msgid "Commands"
+#~ msgstr "명령"
+
+#~ msgid "Error"
+#~ msgstr "오류"
+
+#~ msgid "Aborted."
+#~ msgstr "중단됨."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "도움이 필요하면 [blue]&#39;{command_path} {help_option}&#39;[/]을 입력해 보세요."

@@ -1,0 +1,195 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "ਮੌਜੂਦਾ ਸ਼ੈੱਲ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਇੰਸਟਾਲ ਕਰੋ।"
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "ਵਰਤਣ ਲਈ ਸ਼ੈੱਲ।"
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "ਟਰਮੀਨਲ ਫਾਰਮੈਟਿੰਗ ਕੰਟਰੋਲ ਕ੍ਰਮਾਂ ਨੂੰ ਸੰਪੂਰਨਤਾ ਟੈਕਸਟ ਤੋਂ ਬਾਹਰ ਫਿਲਟਰ ਕਰੋ।"
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "ਸੰਪੂਰਨਤਾ ਟੈਕਸਟ ਵਿੱਚ ਟਰਮੀਨਲ ਫਾਰਮੈਟਿੰਗ ਕੰਟਰੋਲ ਕ੍ਰਮਾਂ ਦੀ ਆਗਿਆ ਦਿਓ।"
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "ਮੌਜੂਦਾ ਜਾਂ ਦਿੱਤੇ ਗਏ ਸ਼ੈੱਲ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਇੰਸਟਾਲ ਕਰੋ।"
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ਜੇ ਇਸ ਕਮਾਂਡ ਨੂੰ ਇਨਵੋਕ ਕਰਨ ਲਈ ਵਰਤੀ ਗਈ ਸਕ੍ਰਿਪਟ ਤੋਂ ਵੱਖਰੀ ਹੋਵੇ ਤਾਂ ਆਟੋਕੰਪਲੀਸ਼ਨ "
+"ਇੰਸਟਾਲ ਕਰਨ ਲਈ django ਮੈਨੇਜ ਸਕ੍ਰਿਪਟ ਦਾ ਨਾਮ।"
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"ਫਾਲਬੈਕ ਕੰਪਲੀਟ ਫੰਕਸ਼ਨ ਲਈ ਪਾਈਥਨ ਇੰਪੋਰਟ ਪਾਥ, ਜਦੋਂ ਕੰਪਲੀਟੇਸ਼ਨ ਕਮਾਂਡ ਟਾਈਪਰਕਮਾਂਡ "
+"ਨਹੀਂ ਹੁੰਦੀ, ਤਾਂ ਵਰਤੀ ਜਾਂਦੀ ਹੈ।"
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "ਸ਼ੈੱਲ ਸੰਪੂਰਨਤਾ ਸਕ੍ਰਿਪਟ ਲਈ ਵਰਤਣ ਲਈ ਟੈਂਪਲੇਟ ਦਾ ਨਾਮ।"
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "ਮੌਜੂਦਾ ਜਾਂ ਦਿੱਤੇ ਗਏ ਸ਼ੈੱਲ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਨੂੰ ਅਣਇੰਸਟੌਲ ਕਰੋ।"
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ਜੇ ਇਸ ਕਮਾਂਡ ਨੂੰ ਇਨਵੋਕ ਕਰਨ ਲਈ ਵਰਤੀ ਗਈ ਸਕ੍ਰਿਪਟ ਤੋਂ ਵੱਖਰਾ ਹੋਵੇ ਤਾਂ ਸ਼ੈੱਲ "
+"ਕੰਪਲੀਸ਼ਨਸ ਨੂੰ ਹਟਾਉਣ ਲਈ django ਮੈਨੇਜ ਸਕ੍ਰਿਪਟ ਦਾ ਨਾਮ।"
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "ਕਮਾਂਡ ਸਟ੍ਰਿੰਗ ਲਈ ਆਟੋਕੰਪਲੀਸ਼ਨ ਤਿਆਰ ਕਰੋ।"
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "ਕਮਾਂਡ ਸਤਰ ਜਿਸ ਲਈ ਸੰਪੂਰਨਤਾ ਸੁਝਾਅ ਤਿਆਰ ਕੀਤੇ ਜਾਣਗੇ।"
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "ਕਰਸਰ ਦੀ ਸਥਿਤੀ।"
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"ਫਾਲਬੈਕ ਕੰਪਲੀਟ ਫੰਕਸ਼ਨ ਲਈ ਪਾਈਥਨ ਇੰਪੋਰਟ ਪਾਥ, ਜਦੋਂ ਕੰਪਲੀਟੇਸ਼ਨ ਕਮਾਂਡ ਟਾਈਪਰਕਮਾਂਡ "
+"ਨਹੀਂ ਹੁੰਦੀ, ਤਾਂ ਵਰਤੀ ਜਾਂਦੀ ਹੈ। ਡਿਫਾਲਟ ਰੂਪ ਵਿੱਚ, ਬਿਲਟਇਨ ਡੀਜੈਂਗੋ ਆਟੋਕੰਪਲੀਟ "
+"ਫੰਕਸ਼ਨ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ।"
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "ਪ੍ਰੋਗਰਾਮ ਦਾ ਵਰਜਨ ਨੰਬਰ ਦਿਖਾਓ ਅਤੇ ਬਾਹਰ ਜਾਓ।"
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"ਵਰਬੋਸਿਟੀ ਲੈਵਲ; 0=ਘੱਟੋ-ਘੱਟ ਆਉਟਪੁੱਟ, 1=ਆਮ ਆਉਟਪੁੱਟ, 2=ਵਰਬੋਸ ਆਉਟਪੁੱਟ, 3=ਬਹੁਤ "
+"ਵਰਬੋਸ ਆਉਟਪੁੱਟ"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"ਸੈਟਿੰਗ ਮੋਡੀਊਲ ਲਈ ਪਾਈਥਨ ਮਾਰਗ, ਜਿਵੇਂ ਕਿ \"myproject.settings.main\"। "
+"ਜੇਕਰ ਇਹ ਪ੍ਰਦਾਨ ਨਹੀਂ ਕੀਤਾ ਜਾਂਦਾ ਹੈ, ਤਾਂ DJANGO_SETTINGS_MODULE ਵਾਤਾਵਰਣ "
+"ਵੇਰੀਏਬਲ ਵਰਤਿਆ ਜਾਵੇਗਾ।"
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"ਪਾਈਥਨ ਮਾਰਗ ਵਿੱਚ ਜੋੜਨ ਲਈ ਇੱਕ ਡਾਇਰੈਕਟਰੀ, ਜਿਵੇਂ ਕਿ "
+"\"/home/djangoprojects/myproject\"।"
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError ਅਪਵਾਦਾਂ &#39;ਤੇ ਵਾਧਾ ਕਰੋ"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "ਟ੍ਰੇਸਬੈਕ ਵਿੱਚ ਸਥਾਨਕ ਵੇਰੀਏਬਲ ਪ੍ਰਿੰਟ ਕਰੋ।"
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "ਟ੍ਰੇਸਬੈਕ ਵਿੱਚ ਸਥਾਨਕ ਵੇਰੀਏਬਲ ਲੁਕਾਓ।"
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "ਕਮਾਂਡ ਆਉਟਪੁੱਟ ਨੂੰ ਰੰਗੀਨ ਨਾ ਕਰੋ।"
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "ਕਮਾਂਡ ਆਉਟਪੁੱਟ ਨੂੰ ਜ਼ਬਰਦਸਤੀ ਰੰਗੀਨ ਕਰੋ।"
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "ਸਿਸਟਮ ਜਾਂਚਾਂ ਛੱਡੋ।"
+
+#~ msgid "(dynamic)"
+#~ msgstr "(ਗਤੀਸ਼ੀਲ)"
+
+#~ msgid "Aborted!"
+#~ msgstr "ਰੱਦ ਕਰ ਦਿੱਤਾ ਗਿਆ!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "ਡਿਫਾਲਟ: {ਡਿਫਾਲਟ}"
+
+#~ msgid "required"
+#~ msgstr "ਲੋੜੀਂਦਾ"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "ਦਲੀਲਾਂ"
+
+#~ msgid "Options"
+#~ msgstr "ਵਿਕਲਪ"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(ਨਾਪਸੰਦ ਕੀਤਾ ਗਿਆ) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[ਡਿਫਾਲਟ: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[ਲੋੜੀਂਦਾ]"
+
+#~ msgid "Commands"
+#~ msgstr "ਹੁਕਮ"
+
+#~ msgid "Error"
+#~ msgstr "ਗਲਤੀ"
+
+#~ msgid "Aborted."
+#~ msgstr "ਅਧੂਰਾ ਛੱਡ ਦਿੱਤਾ ਗਿਆ।"
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "ਮਦਦ ਲਈ [blue]&#39;{command_path} {help_option}&#39;[/] ਅਜ਼ਮਾਓ।"

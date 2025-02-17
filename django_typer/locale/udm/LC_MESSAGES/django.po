@@ -1,0 +1,195 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Туала оболочка понна автозаполнение пуктыны."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Оболочкаез кутыны."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Фильтр терминал форматирование управление радлыкез быдэсмиз текст."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Терминал форматировать карон управление радлыкез быдэстон текст."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Туала яке сётэм оболочка понна автозаполнение пуктыны."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Автозаполнение пуктыны django manage скриптлэн нимыз, та командаез ӧтьыны "
+"кутӥськись скриптлэсь пӧртэм ке."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Python импорт сюрес fallback быдэс функцизэс кутыны, куке быдэстон команда "
+"ӧвӧл TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Шаблонлэн нимыз, кудзэ кутыны кулэ оболочкаез быдэстон скрипт понна."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Туала яке сётэм оболочка понна автозаполнениез поттыны."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"django manage скриптлэн нимыз, оболочкаез быдэстон понна, та командаез "
+"ӧтьыны кутӥськись скриптлэсь пӧртэм ке."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Команда строка понна автозаполнение генерировать карыны."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Команда строка, кудзэ лэсьтоно быдэстон понна ӵектонъёс."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Курсорлэн интыез."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Python импорт сюрес fallback быдэс функцизэс кутыны, куке быдэстон команда "
+"ӧвӧл TyperCommand. По умолчанию, кутӥське встроенный django автозаполнение "
+"функцизэс."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Возьматэ программалэсь версизэ но потыны."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Вербость уровень; 0=минимальный выход, 1=нормальный выход, 2=вербальный "
+"выход, 3=очень вербальный выход"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Python-лэн сюресэз настройкаос модуль, кылсярысь, "
+"\"myproject.settings.main\". Та уг ке сётӥськы, "
+"DJANGO_SETTINGS_MODULE инкуазь переменной кутӥськоз."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Каталог, кудзэ ватсано Python сюрес вылэ, кылсярысь, "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError исключениос вылын ӝутыны"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Интыысь переменнойёсты трассировкаосын печатланы."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Отслеживание пыр локальной переменнойёсты лушканы."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Командалэсь поттонзэ эн буялэ."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Командалэсь потэмзэ кужымен буёлэн пусйыны."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Системаез эскеронъёсты ортчыны."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(динамической)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Аборт!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "умолчание: {умолчание}"
+
+#~ msgid "required"
+#~ msgstr "кулэ"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Аргументъёс"
+
+#~ msgid "Options"
+#~ msgstr "Вариантъёс"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(куашкатэмын) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[ватон: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[кулэ]"
+
+#~ msgid "Commands"
+#~ msgstr "Командаос"
+
+#~ msgid "Error"
+#~ msgstr "Янгыш"
+
+#~ msgid "Aborted."
+#~ msgstr "Аборт лэсьтэмын."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "[blue]&#39;{command_path} {help_option}&#39;[/] юрттэт понна тырше."

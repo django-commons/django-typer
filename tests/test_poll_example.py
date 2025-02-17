@@ -1,25 +1,18 @@
 import contextlib
-import sys
 from io import StringIO
 
-import pytest
 from django.core.management import call_command
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.utils import timezone
+import contextlib
 
 from django_typer.management import get_command
 from tests.apps.examples.polls.models import Question
-from tests.utils import run_command
 
-SHELLS = [
-    (None, False),
-    ("zsh", True),
-    ("bash", False),
-    ("pwsh", True),
-]
+SHELLS = [("zsh", True), ("bash", False), ("pwsh", True), ("fish", True)]
 
 
-class TestPollExample(SimpleTestCase):
+class TestPollExample(TestCase):
     q1 = None
     q2 = None
     q3 = None
@@ -57,7 +50,7 @@ class TestPollExample(SimpleTestCase):
                     "shellcompletion",
                     "complete",
                     shell=shell,
-                    cmd_str=f"closepoll{self.typer} ",
+                    command=f"closepoll{self.typer} ",
                 )
             result2 = StringIO()
             with contextlib.redirect_stdout(result2):
@@ -65,7 +58,7 @@ class TestPollExample(SimpleTestCase):
                     "shellcompletion",
                     "complete",
                     shell=shell,
-                    cmd_str=f"./manage.py closepoll{self.typer} ",
+                    command=f"./manage.py closepoll{self.typer} ",
                 )
 
             result = result1.getvalue()
@@ -76,18 +69,22 @@ class TestPollExample(SimpleTestCase):
                     self.assertTrue(q.question_text in result)
 
     def test_tutorial1(self):
-        result = run_command(f"closepoll_t1{self.typer}", str(self.q2.id))
-        self.assertFalse(result[1])
-        self.assertTrue("Successfully closed poll" in result[0])
+        with contextlib.redirect_stdout(StringIO()) as output:
+            call_command(f"closepoll_t1{self.typer}", str(self.q2.id))
+            result = output.getvalue()
+        self.assertEqual(result.strip(), f'Successfully closed poll "{self.q2.id}"')
 
     def test_tutorial2(self):
-        result = run_command(f"closepoll_t2{self.typer}", str(self.q2.id))
-        self.assertFalse(result[1])
-        self.assertTrue("Successfully closed poll" in result[0])
+        with contextlib.redirect_stdout(StringIO()) as output:
+            call_command(f"closepoll_t2{self.typer}", str(self.q2.id))
+            result = output.getvalue()
+        self.assertEqual(result.strip(), f'Successfully closed poll "{self.q2.id}"')
 
     def test_tutorial_parser(self):
-        result = run_command(f"closepoll_t3{self.typer}", str(self.q1.id))
-        self.assertFalse(result[1])
+        with contextlib.redirect_stdout(StringIO()) as output:
+            call_command(f"closepoll_t3{self.typer}", str(self.q1.id))
+            result = output.getvalue()
+        self.assertEqual(result.strip(), f'Successfully closed poll "{self.q1.id}"')
 
     def test_tutorial_parser_cmd(self):
         log = StringIO()
@@ -109,10 +106,11 @@ class TestPollExample(SimpleTestCase):
         self.assertEqual(log.getvalue().count("Successfully"), 3)
 
     def test_poll_ex(self):
-        result = run_command(f"closepoll{self.typer}", str(self.q2.id))
-        self.assertFalse(result[1])
-        self.assertTrue("Successfully closed poll" in result[0])
+        with contextlib.redirect_stdout(StringIO()) as output:
+            call_command(f"closepoll{self.typer}", str(self.q2.id))
+            result = output.getvalue()
+        self.assertTrue("Successfully closed poll" in result)
 
 
-class TestPollExampleTyper(SimpleTestCase):
+class TestPollExampleTyper(TestPollExample):
     typer = "_typer"

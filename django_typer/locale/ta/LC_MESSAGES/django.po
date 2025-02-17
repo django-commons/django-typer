@@ -1,0 +1,203 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "தற்போதைய ஷெல்லுக்கு தானியங்குநிரப்புதலை நிறுவவும்."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "பயன்படுத்த வேண்டிய ஷெல்."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"வடிகட்டி முனைய வடிவமைப்பு கட்டுப்பாட்டு வரிசைகள் நிறைவு உரைக்கு வெளியே "
+"உள்ளன."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "நிறைவு உரையில் முனைய வடிவமைப்பு கட்டுப்பாட்டு வரிசைகளை அனுமதிக்கவும்."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr ""
+"தற்போதைய அல்லது கொடுக்கப்பட்ட ஷெல்லுக்கு தானியங்குநிரப்புதலை நிறுவவும்."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"இந்தக் கட்டளையை செயல்படுத்தப் பயன்படுத்தப்படும் ஸ்கிரிப்டை விட வேறுபட்டால், "
+"தானியங்குநிரப்புதலை நிறுவ django மேலாண்மை ஸ்கிரிப்ட்டின் பெயர்."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"நிறைவு கட்டளை TyperCommand ஆக இல்லாதபோது பயன்படுத்த வேண்டிய ஃபால்பேக் "
+"முழுமையான செயல்பாட்டிற்கான python இறக்குமதி பாதை."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr ""
+"ஷெல் நிறைவு ஸ்கிரிப்ட்டுக்குப் பயன்படுத்த வேண்டிய டெம்ப்ளேட்டின் பெயர்."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"தற்போதைய அல்லது கொடுக்கப்பட்ட ஷெல்லுக்கான தானியங்குநிரப்புதலை நிறுவல் "
+"நீக்கவும்."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"இந்தக் கட்டளையை செயல்படுத்தப் பயன்படுத்தப்படும் ஸ்கிரிப்டை விட django manage"
+" script பெயர் வேறுபட்டால், shell completion ஐ நீக்குவதற்கான பெயர்."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "கட்டளை சரத்திற்கு தானியங்குநிரப்புதலை உருவாக்கு."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "நிறைவு பரிந்துரைகளை உருவாக்குவதற்கான கட்டளை சரம்."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "கர்சர் நிலை."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"complete கட்டளை TyperCommand ஆக இல்லாதபோது, fallback complete "
+"செயல்பாட்டிற்கான python இறக்குமதி பாதையைப் பயன்படுத்த வேண்டும். "
+"முன்னிருப்பாக, உள்ளமைக்கப்பட்ட django autocomplete செயல்பாடு "
+"பயன்படுத்தப்படுகிறது."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "நிரலின் பதிப்பு எண்ணைக் காட்டி வெளியேறவும்."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"சொற்களஞ்சிய நிலை; 0 = குறைந்தபட்ச வெளியீடு, 1 = சாதாரண வெளியீடு, 2 = "
+"சொற்களஞ்சிய வெளியீடு, 3 = மிகவும் சொற்களஞ்சிய வெளியீடு"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"அமைப்புகள் தொகுதிக்கான பைதான் பாதை, எ.கா. "
+"\"myproject.settings.main\". இது வழங்கப்படவில்லை என்றால், "
+"DJANGO_SETTINGS_MODULE சூழல் மாறி பயன்படுத்தப்படும்."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"பைதான் பாதையில் சேர்க்க வேண்டிய ஒரு கோப்பகம், எ.கா. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "கட்டளை பிழை விதிவிலக்குகளை உயர்த்தவும்"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "டிரேஸ்பேக்குகளில் உள்ளூர் மாறிகளை அச்சிடுக."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "சுவடு குறிகளில் உள்ளூர் மாறிகளை மறைக்கவும்."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "கட்டளை வெளியீட்டை வண்ணமயமாக்க வேண்டாம்."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "கட்டளை வெளியீட்டின் வண்ணமயமாக்கலை கட்டாயப்படுத்தவும்."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "கணினி சரிபார்ப்புகளைத் தவிர்க்கவும்."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(டைனமிக்)"
+
+#~ msgid "Aborted!"
+#~ msgstr "கைவிடப்பட்டது!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "இயல்புநிலை: {இயல்புநிலை}"
+
+#~ msgid "required"
+#~ msgstr "தேவை"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "வாதங்கள்"
+
+#~ msgid "Options"
+#~ msgstr "விருப்பங்கள்"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(நிறுத்தப்பட்டது) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[இயல்புநிலை: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env வகை: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[தேவை]"
+
+#~ msgid "Commands"
+#~ msgstr "கட்டளைகள்"
+
+#~ msgid "Error"
+#~ msgstr "பிழை"
+
+#~ msgid "Aborted."
+#~ msgstr "கைவிடப்பட்டது."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "உதவிக்கு [நீல]&#39;{command_path} {help_option}&#39;[/] ஐ முயற்சிக்கவும்."

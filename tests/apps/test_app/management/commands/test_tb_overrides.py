@@ -6,7 +6,7 @@ from django_typer.management import TyperCommand, command, initialize
 class Command(
     TyperCommand,
     pretty_exceptions_enable=True,
-    pretty_exceptions_show_locals=False,
+    pretty_exceptions_show_locals=True,
     pretty_exceptions_short=False,
 ):
     help = "This is a test help message"

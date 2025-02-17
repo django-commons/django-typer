@@ -1,6 +1,131 @@
+.. include:: ./refs.rst
+
 ==========
 Change Log
 ==========
+
+v3.0.0 (202X-XX-XX)
+===================
+
+* Implemented `Completer for media files. <https://github.com/django-commons/django-typer/issues/175>`_
+* Implemented `Completer for static files. <https://github.com/django-commons/django-typer/issues/174>`_
+* Fixed `Completions before the end of the typed command string do not work. <https://github.com/django-commons/django-typer/issues/168>`_
+* Implemented `Add print_return class field to enable/disable result printing <https://github.com/django-commons/django-typer/issues/167>`_
+* BREAKING `Default rich traceback should not show locals - its too much information. <https://github.com/django-commons/django-typer/issues/166>`_
+* Implemented `path completers should be configurable with a root directory other than cwd <https://github.com/django-commons/django-typer/issues/165>`_
+* Implemented `Migrate pyproject.toml to poetry 2 and portable project specifiers. <https://github.com/django-commons/django-typer/issues/164>_`
+* BREAKING `Split parsers.py and completers.py into submodules. <https://github.com/django-commons/django-typer/issues/163>_`
+* Implemented `Model completer/parser should support returning the field value <https://github.com/django-commons/django-typer/issues/162>`_
+* Fixed `Model objects with null lookup fields should not be included in model field completion output <https://github.com/django-commons/django-typer/issues/160>`_
+* Implemented `Add a performance regression. <https://github.com/django-commons/django-typer/issues/157>`_
+* Implemented `Use in-house shell completer classes. <https://github.com/django-commons/django-typer/issues/156>`_
+* Implemented `Add precommit hook to fix safe lint and format issues <https://github.com/django-commons/django-typer/issues/153>`_
+* Fixed `Fish shell complete is broken when rich is installed. <https://github.com/django-commons/django-typer/issues/152>`_
+* BREAKING `Remove name parameter from initialize()/callback(). <https://github.com/django-commons/django-typer/issues/150>`_
+* Implemented `Run full test suite on mac osx <https://github.com/django-commons/django-typer/issues/148>`_
+* Implemented `Convert check.sh to justfile <https://github.com/django-commons/django-typer/issues/147>`_
+* Implemented `Run full test suite on windows in CI <https://github.com/django-commons/django-typer/issues/146>`_
+* Implemented `ANSI color control sequences should optionally be scrubbed from shell completions <https://github.com/django-commons/django-typer/issues/144>`_
+* Fixed `supressed_base_arguments are still present in the Context <https://github.com/django-commons/django-typer/issues/143>`_
+* Implemented `Add showcase of commands using django-typer to docs <https://github.com/django-commons/django-typer/issues/142>`_
+* Implemented `Add a @finalize decorator for functions to collect/operate on subroutine results. <https://github.com/django-commons/django-typer/issues/140>`_
+* Fixed `Remove management imports in django_typer/__init__.py <https://github.com/django-commons/django-typer/issues/95>`_
+* Fixed `ParamSpec includes self for group methods <https://github.com/django-commons/django-typer/issues/73>`_
+* Fixed `Installed shellcompletion scripts do not pass values of --settings or --pythonpath <https://github.com/django-commons/django-typer/issues/68>`_
+* Implemented `Add support for QuerySet parameter types. <https://github.com/django-commons/django-typer/issues/58>`_
+* Fixed `shellcompletion complete should print to the command's stdout. <https://github.com/django-commons/django-typer/issues/19>`_
+* Implemented `Add translations for helps.. <https://github.com/django-commons/django-typer/issues/18>`_
+* Implemented `Add completer/parser for FileField and FilePathField <https://github.com/django-commons/django-typer/issues/17>`_
+* Implemented `Add completer/parser for DurationField <https://github.com/django-commons/django-typer/issues/16>`_
+* Implemented `Add completer/parser for DateTimeField <https://github.com/django-commons/django-typer/issues/15>`_
+* Implemented `Add completer/parser for DateField <https://github.com/django-commons/django-typer/issues/14>`_
+* Implemented `Add completer/parser for TimeField <https://github.com/django-commons/django-typer/issues/13>`_
+* Implemented `Improve shell completion continuous integration tests  <https://github.com/django-commons/django-typer/issues/11>`_
+
+
+Migrating from 2.x to 3.x
+-------------------------
+
+* Imports from the django_typer namespace have been removed. You should now import from
+  django_typer.management.
+
+* The `name` parameter has been removed from
+  :func:`django_typer.management.initialize()` and :func:`django_typer.management.Typer.callback()`.
+  This change was forced by `upstream changes <https://github.com/fastapi/typer/pull/1052>`_ in
+  Typer_ that will allow :func:`django_typer.management.Typer.add_typer` to define commands across
+  multiple files.
+
+* Rich tracebacks will not include local variables by default. To replicate the old behavior
+  you will need to add this to your settings:
+
+  .. code-block:: python
+
+      RICH_TRACEBACK_CONFIG={"show_locals": True}
+
+  --show-locals and --hide-locals common parameters are added to toggle local variables on
+  and off in the stack trace output.
+
+Shell Completions
+~~~~~~~~~~~~~~~~~
+
+.. list-table:: **Some imports have changed in the django_typer namespace!**
+  :widths: 50 50
+  :header-rows: 1
+
+  * - old
+    - new
+  * - ``management.model_parser_completer``
+    - ``utils.model_parser_completer``
+  * - ``parsers.ModelObjectParser``
+    - ``parsers.model.ModelObjectParser``
+  * - ``parsers.parse_app_label``
+    - ``parsers.apps.app_config``
+  * - ``completers.complete_app_label``
+    - ``completers.apps.app_labels``
+  * - ``completers.commands``
+    - ``completers.cmd.commands``
+  * - ``completers.databases``
+    - ``completers.db.databases``
+  * - ``completers.ModelObjectCompleter``
+    - ``completers.model.ModelObjectCompleter``
+  * - ``completers.complete_path``
+    - ``completers.path.paths``
+  * - ``completers.complete_directory``
+    - ``completers.path.directories``
+  * - ``completers.complete_import_path``
+    - ``completers.path.import_paths``
+
+* If you are using shell tab completions you will need to reinstall the completion scripts. Using
+  the `shellcompletion install` command. To be extra safe you may want to uninstall the old
+  scripts before updating, using the v2.x ``shellcompletion remove`` command.
+
+* If you are using shell tab completions you will need to reinstall the completion scripts. using
+  the `shellcompletion install` command.
+
+* The interface to shellcompletion has changed. ``--shell`` is now an initialization option and
+  ``remove`` was renamed to ``uninstall``.:
+
+    .. code-block::
+
+        # old interface
+        manage shellcompletion complete --shell zsh "command string"
+        manage shellcompletion remove
+
+        # new interface
+        manage shellcompletion --shell zsh complete "command string"
+        manage shellcompletion uninstall
+
+* The function signature for :ref:`shellcompletion fallbacks <completion_fallbacks>` has changed.
+  The fallback signature is now:
+
+    .. code-block::
+
+        import typing as t
+        from click.shell_complete import CompletionItem
+
+        def fallback(args: t.List[str], incomplete: str) -> t.List[CompletionItem]:
+            ...
+
 
 v2.6.0 (2024-12-03)
 ===================

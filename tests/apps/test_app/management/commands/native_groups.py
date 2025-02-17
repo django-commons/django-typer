@@ -24,7 +24,7 @@ def main(name: str):
 grp2 = Typer()
 
 
-@grp2.callback(name="grp1")
+@grp2.callback()
 def init_grp1(flag: bool = False):
     global _flag
     _flag = flag
@@ -36,7 +36,7 @@ def cmd2(fraction: float):
 
 
 #  this works
-app.add_typer(grp2)
+app.add_typer(grp2, name="grp1")
 
 
 @grp2.command()

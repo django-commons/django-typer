@@ -1,0 +1,195 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Installeer outovoltooiing vir die huidige dop."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Die dop om te gebruik."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Filtreer terminaalformateringbeheerreekse buite voltooide teks."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Laat terminale formateringbeheerreekse in voltooiingsteks toe."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Installeer outovoltooiing vir die huidige of gegewe dop."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Die naam van die django-bestuurskrip om outovoltooiing te installeer, indien"
+" anders as die skrip wat gebruik is om hierdie opdrag op te roep."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Die luislang-invoerpad na &#39;n terugval volledige funksie om te gebruik "
+"wanneer die voltooiingsopdrag nie &#39;n TyperCommand is nie."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Die naam van die sjabloon om te gebruik vir die dopvoltooiingskrip."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Verwyder outovoltooiing vir die huidige of gegewe dop."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Die naam van die django-bestuurskrip om dopvoltooiing te verwyder vir indien"
+" anders as die skrip wat gebruik is om hierdie opdrag op te roep."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Genereer outovoltooiing vir opdragstring."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Die opdragstring om voltooiingsvoorstelle te genereer."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Die wyserposisie."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Die luislang-invoerpad na &#39;n terugval volledige funksie om te gebruik "
+"wanneer die voltooiingsopdrag nie &#39;n TyperCommand is nie. By verstek "
+"word die ingeboude django-outovoltooi-funksie gebruik."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Wys program se weergawenommer en gaan uit."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Verbosity vlak; 0 = minimale uitset, 1 = normale uitvoer, 2 = verbose "
+"uitvoer, 3 = baie verbose uitvoer"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Die Python-pad na &#39;n instellingsmodule, bv "
+"\"myproject.settings.main\". As dit nie verskaf word nie, sal die "
+"DJANGO_SETTINGS_MODULE omgewingsveranderlike gebruik word."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"&#39;n Gids om by die Python-pad te voeg, bv. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Verhoog op CommandError-uitsonderings"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Druk plaaslike veranderlikes in terugspoor."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Versteek plaaslike veranderlikes in terugsporings."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Moenie die opdraguitvoer inkleur nie."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Dwing inkleuring van die opdraguitset."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Slaan stelselkontroles oor."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamies)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Geaborteer!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "verstek: {verstek}"
+
+#~ msgid "required"
+#~ msgstr "vereis word"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumente"
+
+#~ msgid "Options"
+#~ msgstr "Opsies"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(verwerp) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[verstek: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[vereis]"
+
+#~ msgid "Commands"
+#~ msgstr "Opdragte"
+
+#~ msgid "Error"
+#~ msgstr "Fout"
+
+#~ msgid "Aborted."
+#~ msgstr "Geaborteer."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Probeer [blue]&#39;{command_path} {help_option}&#39;[/] vir hulp."

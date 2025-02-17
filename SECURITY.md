@@ -1,8 +1,11 @@
 # Security Policy
 
+[![CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge)](https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer)
+
 ## Supported Versions
 
-Only the latest version of django-typer [![PyPI version](https://badge.fury.io/py/django-typer.svg)](https://pypi.python.org/pypi/django-typer) is supported.
+Only the latest version [![PyPI version](https://badge.fury.io/py/django-typer.svg)](https://pypi.python.org/pypi/django-typer) is supported.
 
 ## Reporting a Vulnerability
 

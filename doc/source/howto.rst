@@ -262,6 +262,81 @@ decorator. This is like defining a group at the command root and is an extension
     command.init(False)
     assert not command.subcommand2()
 
+
+.. _howto_finalizers:
+
+Collect Results with @finalize
+------------------------------
+
+Typer_ and Click_ have a ``results_callback`` mechanism on ``MultiCommands`` that allow a function
+hook to be registered to operate on the results of subroutines before the command exits. You may
+use this same ``results_callback`` mechanism directly through the Typer_ interface, but
+django-typer_ offers a more convenient class-aware way to do this with the
+:func:`~django_typer.management.finalize` decorator.
+
+For example lets say we have two subcommands that return strings, we could turn them into a csv
+string by registering a callback with :func:`~django_typer.management.finalize`:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_typer.py
+
+
+    .. tab:: Typer-style w/finalize
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_typer_ext.py
+
+
+.. code-block:: console
+
+        $> ./manage.py finalizer cmd1 cmd1 cmd2
+        result1, result2, result3
+
+.. tip::
+
+    @finalize() wrapped callbacks will be passed the CLI parameters on the current context
+    if the function signature accepts them. While convenient, we recommend using command state to
+    track these parameters instead. This will be more amenable to direct invocations of command
+    object functions.
+
+Use @finalize on groups
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finalizers are hierarchical. The :func:`~django_typer.management.finalize` decorator is available
+for use on subgroups. When used on a group, the callback will be invoked after the group's
+subcommands have been executed and the return value of the finalizer will be passed up to any
+finalizers at higher levels in the command hierarchy.
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group.py
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group_typer.py
+
+    .. tab:: Typer-style w/finalize
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/finalize_group_typer_ext.py
+
+.. code-block:: console
+
+        $> ./manage.py finalizer cmd1 cmd1 cmd2 grp cmd4 cmd3
+        result1, result2, result3, RESULT4, RESULT3
+
+.. tip::
+
+    Finalizers can be overridden just like groups and initializers using the :ref:`plugin pattern. <plugins>`
+
+
 Call Commands from Code
 -----------------------
 
@@ -589,7 +664,7 @@ This provides a common hook for configuring rich_ that you can control on a per-
         "extra_lines": 3,                  # default is 3
         "theme": None,                     # predefined themes
         "word_wrap": False,                # default is False
-        "show_locals": True,               # rich default is False, but we turn this on
+        "show_locals": True,               # default is False
         "locals_max_length": 10            # default is 10
         "locals_max_string": 80            # default is 80
         "locals_hide_dunder": True,        # default is True
@@ -774,3 +849,31 @@ streams:
         .. literalinclude:: ../../tests/apps/howto/management/commands/printing_typer.py
             :language: python
             :linenos:
+
+
+Toggle on/off result printing
+-----------------------------
+
+Django's BaseCommand_ will print any truthy values returned from the handle() method. This may not
+always be desired behavior. By default :class:`~django_typer.management.TyperCommand` will do the
+same, but you may toggle this behavior off by setting the class field ``print_result`` to False.
+
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/print_result.py
+            :language: python
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/print_result_typer.py
+            :language: python
+            :linenos:
+
+.. warning::
+
+    We may switch the default behavior to not print in the future, so if you want guaranteed forward
+    compatible behavior you should set this field.

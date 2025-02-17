@@ -1,0 +1,200 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "ప్రస్తుత షెల్ కోసం ఆటోకంప్లీషన్‌ను ఇన్‌స్టాల్ చేయండి."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "ఉపయోగించాల్సిన షెల్."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"ఫిల్టర్ టెర్మినల్ ఫార్మాటింగ్ కంట్రోల్ సీక్వెన్స్‌లు పూర్తి టెక్స్ట్ నుండి "
+"బయటపడ్డాయి."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"కంప్లీషన్ టెక్స్ట్‌లో టెర్మినల్ ఫార్మాటింగ్ కంట్రోల్ సీక్వెన్స్‌లను "
+"అనుమతించండి."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "ప్రస్తుత లేదా ఇచ్చిన షెల్ కోసం ఆటోకంప్లీషన్‌ను ఇన్‌స్టాల్ చేయండి."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ఈ కమాండ్‌ను అమలు చేయడానికి ఉపయోగించిన స్క్రిప్ట్ కంటే భిన్నంగా ఉంటే, "
+"ఆటోకంప్లీషన్‌ను ఇన్‌స్టాల్ చేయడానికి django మేనేజ్ స్క్రిప్ట్ పేరు."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"కంప్లీషన్ కమాండ్ TyperCommand కానప్పుడు ఉపయోగించాల్సిన ఫాల్‌బ్యాక్ కంప్లీట్ "
+"ఫంక్షన్‌కు పైథాన్ దిగుమతి మార్గం."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "షెల్ కంప్లీషన్ స్క్రిప్ట్ కోసం ఉపయోగించాల్సిన టెంప్లేట్ పేరు."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "ప్రస్తుత లేదా ఇచ్చిన షెల్ కోసం ఆటోకంప్లీషన్‌ను అన్‌ఇన్‌స్టాల్ చేయండి."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ఈ కమాండ్‌ను అమలు చేయడానికి ఉపయోగించిన స్క్రిప్ట్ కంటే భిన్నంగా ఉంటే, django "
+"manage script to remove shell completion పేరు."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "కమాండ్ స్ట్రింగ్ కోసం ఆటోకంప్లీషన్‌ను రూపొందించండి."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "పూర్తి సూచనలను రూపొందించడానికి కమాండ్ స్ట్రింగ్."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "కర్సర్ స్థానం."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"కంప్లీషన్ కమాండ్ TyperCommand కానప్పుడు ఉపయోగించాల్సిన ఫాల్‌బ్యాక్ కంప్లీట్ "
+"ఫంక్షన్‌కు పైథాన్ దిగుమతి మార్గం. డిఫాల్ట్‌గా, అంతర్నిర్మిత django "
+"ఆటోకంప్లీట్ ఫంక్షన్ ఉపయోగించబడుతుంది."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "ప్రోగ్రామ్ యొక్క వెర్షన్ నంబర్ చూపించి నిష్క్రమించండి."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"వెర్బోసిటీ స్థాయి; 0 = కనిష్ట అవుట్‌పుట్, 1 = సాధారణ అవుట్‌పుట్, 2 = "
+"వెర్బోస్ అవుట్‌పుట్, 3 = చాలా వెర్బోస్ అవుట్‌పుట్"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"సెట్టింగుల మాడ్యూల్‌కు పైథాన్ మార్గం, ఉదా. "
+"\"myproject.settings.main\". ఇది అందించకపోతే, DJANGO_SETTINGS_MODULE"
+" ఎన్విరాన్మెంట్ వేరియబుల్ ఉపయోగించబడుతుంది."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"పైథాన్ పాత్ కు జోడించడానికి ఒక డైరెక్టరీ, ఉదా. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError మినహాయింపులపై రైజ్ చేయండి"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "ట్రేస్‌బ్యాక్‌లలో స్థానిక వేరియబుల్స్‌ను ప్రింట్ చేయండి."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "ట్రేస్‌బ్యాక్‌లలో స్థానిక వేరియబుల్స్‌ను దాచండి."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "కమాండ్ అవుట్‌పుట్‌ను రంగు వేయవద్దు."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "కమాండ్ అవుట్‌పుట్ యొక్క బలవంతపు రంగుీకరణ."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "సిస్టమ్ తనిఖీలను దాటవేయండి."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(డైనమిక్)"
+
+#~ msgid "Aborted!"
+#~ msgstr "రద్దు చేయబడింది!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "డిఫాల్ట్: {డిఫాల్ట్}"
+
+#~ msgid "required"
+#~ msgstr "అవసరం"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "వాదనలు"
+
+#~ msgid "Options"
+#~ msgstr "ఎంపికలు"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(నిలిపివేయబడింది) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[డిఫాల్ట్: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[అవసరం]"
+
+#~ msgid "Commands"
+#~ msgstr "ఆదేశాలు"
+
+#~ msgid "Error"
+#~ msgstr "లోపం"
+
+#~ msgid "Aborted."
+#~ msgstr "రద్దు చేయబడింది."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "సహాయం కోసం [నీలం]&#39;{command_path} {help_option}&#39;[/] ప్రయత్నించండి."

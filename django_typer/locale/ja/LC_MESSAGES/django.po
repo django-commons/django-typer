@@ -1,0 +1,184 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "現在のシェルに自動補完をインストールします。"
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "使用するシェル。"
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "補完テキストから端末フォーマット制御シーケンスをフィルタリングします。"
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "補完テキストで端末フォーマット制御シーケンスを許可します。"
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "現在のシェルまたは指定されたシェルの自動補完をインストールします。"
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr "このコマンドを呼び出すために使用されたスクリプトと異なる場合に、自動補完をインストールする Django 管理スクリプトの名前。"
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr "補完コマンドが TyperCommand でない場合に、使用するフォールバック補完関数への Python インポート パス。"
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "シェル補完スクリプトに使用するテンプレートの名前。"
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "現在のシェルまたは指定されたシェルの自動補完をアンインストールします。"
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr "このコマンドを呼び出すために使用されたスクリプトと異なる場合に、シェル補完を削除する Django 管理スクリプトの名前。"
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "コマンド文字列の自動補完を生成します。"
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "補完候補を生成するコマンド文字列。"
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "カーソルの位置。"
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"補完コマンドが TyperCommand でない場合に、使用するフォールバック補完関数への Python インポート パス。デフォルトでは、組み込みの "
+"django オートコンプリート関数が使用されます。"
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "プログラムのバージョン番号を表示して終了します。"
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr "詳細レベル。0 = 最小限の出力、1 = 通常の出力、2 = 詳細出力、3 = 非常に詳細な出力"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"設定モジュールへの Python パス (例: "
+"\"myproject.settings.main\")。これが指定されていない場合は、DJANGO_SETTINGS_MODULE "
+"環境変数が使用されます。"
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr "Python パスに追加するディレクトリ (例: \"/home/djangoprojects/myproject\")。"
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError例外が発生する"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "トレースバックにローカル変数を出力します。"
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "トレースバック内のローカル変数を非表示にします。"
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "コマンド出力を色付けしません。"
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "コマンド出力の色付けを強制します。"
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "システムチェックをスキップします。"
+
+#~ msgid "(dynamic)"
+#~ msgstr "（動的）"
+
+#~ msgid "Aborted!"
+#~ msgstr "中止しました!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "デフォルト: {default}"
+
+#~ msgid "required"
+#~ msgstr "必須"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "環境変数: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "引数"
+
+#~ msgid "Options"
+#~ msgstr "オプション"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(非推奨) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[デフォルト： {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[環境変数: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[必須]"
+
+#~ msgid "Commands"
+#~ msgstr "コマンド"
+
+#~ msgid "Error"
+#~ msgstr "エラー"
+
+#~ msgid "Aborted."
+#~ msgstr "中止されました。"
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "ヘルプについては、[blue]&#39;{command_path} {help_option}&#39;[/] を試してください。"

@@ -1,20 +1,24 @@
-import fcntl
 import os
-import pty
 import re
 import select
 import struct
 import subprocess
 import sys
-import termios
 import time
 import typing as t
 from pathlib import Path
+import pytest
+from functools import cached_property
+import re
+import subprocess
+import platform
 
-from shellingham import detect_shell
+from django_typer.utils import detect_shell
 
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
+from django_typer.shells import DjangoTyperShellCompleter
+from ..utils import rich_installed
 
 default_shell = None
 
@@ -24,7 +28,7 @@ except Exception:
     pass
 
 
-def read_all_from_fd_with_timeout(fd, timeout):
+def read_all_from_fd_with_timeout(fd, timeout=3):
     all_data = bytearray()
     start_time = time.time()
 
@@ -50,25 +54,34 @@ def read_all_from_fd_with_timeout(fd, timeout):
 
 def scrub(output: str) -> str:
     """Scrub control code characters and ansi escape sequences for terminal colors from output"""
-    return re.sub(r"[\x00-\x1F\x7F]|\x1B\[[0-?]*[ -/]*[@-~]", "", output).replace(
-        "\t", ""
+    return (
+        re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output, flags=re.IGNORECASE)
+        .replace("\t", "")
+        .replace("\x08", "")
     )
 
 
-class _DefaultCompleteTestCase:
-    shell = None
-    manage_script = "manage.py"
-    launch_script = "./manage.py"
+class _CompleteTestCase:
+    shell: str
+    manage_script: str
+    launch_script: str
 
-    @property
-    def interactive_opt(self):
-        # currently all supported shells support -i for interactive mode
-        # this includes zsh, bash, fish and powershell
-        return "-i"
+    interactive_opt: t.Optional[str] = None
 
-    @property
+    environment: t.List[str] = []
+
+    tabs: str
+
+    @cached_property
     def command(self) -> ShellCompletion:
-        return get_command("shellcompletion")
+        cmd = get_command("shellcompletion", ShellCompletion)
+        cmd.init(shell=self.shell)
+        return cmd
+
+    def get_completer(self, **kwargs) -> DjangoTyperShellCompleter:
+        return self.command.shell_class(
+            **{"prog_name": self.manage_script, "command": self.command, **kwargs}
+        )
 
     def setUp(self):
         self.remove()
@@ -84,14 +97,25 @@ class _DefaultCompleteTestCase:
     def verify_remove(self, script=None):
         pass
 
-    def install(self, script=None):
+    def install(
+        self,
+        script=None,
+        force_color=False,
+        no_color=None,
+        fallback=None,
+        no_shell=False,
+    ):
         if not script:
             script = self.manage_script
+        init_kwargs = {"force_color": force_color, "no_color": no_color}
         kwargs = {}
-        if self.shell:
-            kwargs["shell"] = self.shell
         if script:
             kwargs["manage_script"] = script
+        if self.shell and not no_shell:
+            init_kwargs["shell"] = self.shell
+        if fallback:
+            kwargs["fallback"] = fallback
+        self.command.init(**init_kwargs)
         self.command.install(**kwargs)
         self.verify_install(script=script)
 
@@ -99,78 +123,124 @@ class _DefaultCompleteTestCase:
         if not script:
             script = self.manage_script
         kwargs = {}
-        if self.shell:
-            kwargs["shell"] = self.shell
         if script:
             kwargs["manage_script"] = script
-        self.command.remove(**kwargs)
+        if self.shell:
+            self.command.init(shell=self.shell)
+        self.command.uninstall(**kwargs)
+        self.get_completions("ping")  # just to reinit shell
         self.verify_remove(script=script)
 
-    def set_environment(self, fd):
-        os.write(fd, f"PATH={Path(sys.executable).parent}:$PATH\n".encode())
-        os.write(
-            fd,
-            f'DJANGO_SETTINGS_MODULE={os.environ["DJANGO_SETTINGS_MODULE"]}\n'.encode(),
-        )
+    if platform.system() == "Windows":
 
-    def get_completions(self, *cmds: str) -> t.List[str]:
-        def read(fd):
-            """Function to read from a file descriptor."""
-            return os.read(fd, 1024 * 1024).decode()
+        def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
+            import winpty
 
-        # Create a pseudo-terminal
-        master_fd, slave_fd = pty.openpty()
+            assert self.shell
 
-        # Define window size - width and height
-        os.set_blocking(slave_fd, False)
-        win_size = struct.pack("HHHH", 24, 80, 0, 0)  # 24 rows, 80 columns
-        fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
+            pty = winpty.PTY(128, 256)
 
-        # env = os.environ.copy()
-        # env["TERM"] = "xterm-256color"
+            def read_all() -> str:
+                output = ""
+                while data := pty.read():
+                    output += data
+                    time.sleep(0.1)
+                return output
 
-        # Spawn a new shell process
-        shell = self.shell or detect_shell()[0]
-        process = subprocess.Popen(
-            [shell, *([self.interactive_opt] if self.interactive_opt else [])],
-            stdin=slave_fd,
-            stdout=slave_fd,
-            stderr=slave_fd,
-            text=True,
-            # env=env,
-            # preexec_fn=os.setsid,
-        )
-        # Wait for the shell to start and get to the prompt
-        print(read(master_fd))
+            # Start the subprocess
+            pty.spawn(
+                self.shell, *([self.interactive_opt] if self.interactive_opt else [])
+            )
 
-        self.set_environment(master_fd)
+            # Wait for the shell to start and get to the prompt
+            time.sleep(3)
+            read_all()
 
-        print(read(master_fd))
-        # Send a command with a tab character for completion
+            for line in self.environment:
+                pty.write(f"{line}{os.linesep}")
 
-        os.write(master_fd, (" ".join(cmds)).encode())
-        time.sleep(0.5)
+            time.sleep(2)
+            output = read_all() + read_all()
 
-        print(f'"{(" ".join(cmds))}"')
-        os.write(master_fd, b"\t\t")
+            pty.write(" ".join(cmds))
+            pty.write(position * ("\x1b[C" if position > 0 else "\x1b[D"))
+            time.sleep(0.1)
+            pty.write(self.tabs)
 
-        time.sleep(0.5)
+            time.sleep(2)
+            completion = read_all() + read_all()
 
-        # Read the output
-        output = read_all_from_fd_with_timeout(master_fd, 3)
+            return scrub(completion) if scrub_output else completion
 
-        if "do you wish" in output or "Display all" in output:
-            os.write(master_fd, b"y\n")
+    else:
+
+        def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
+            import fcntl
+            import termios
+            import pty
+
+            def read(fd):
+                """Function to read from a file descriptor."""
+                return os.read(fd, 1024 * 1024).decode()
+
+            # Create a pseudo-terminal
+            master_fd, slave_fd = pty.openpty()
+
+            # Define window size - width and height
+            os.set_blocking(slave_fd, False)
+            win_size = struct.pack("HHHH", 24, 80, 0, 0)  # 24 rows, 80 columns
+            fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
+
+            # env = os.environ.copy()
+            # env["TERM"] = "xterm-256color"
+
+            # Spawn a new shell process
+            shell = self.shell or detect_shell()[0]
+            process = subprocess.Popen(
+                [shell, *([self.interactive_opt] if self.interactive_opt else [])],
+                stdin=slave_fd,
+                stdout=slave_fd,
+                stderr=slave_fd,
+                text=True,
+                # env=env,
+                # preexec_fn=os.setsid,
+            )
+            # Wait for the shell to start and get to the prompt
+            print(read(master_fd))
+
+            for line in self.environment:
+                os.write(master_fd, f"{line}{os.linesep}".encode())
+
+            print(read(master_fd))
+            # Send a command with a tab character for completion
+
+            cmd = " ".join(cmds)
+            os.write(master_fd, cmd.encode())
+
+            # positioning does not seem to work :(
+            if position < 0:
+                os.write(master_fd, f"\033[{abs(position)}D".encode())
+            elif position > 0:
+                os.write(master_fd, f"\033[{abs(position)}C".encode())
             time.sleep(0.5)
-            output = read_all_from_fd_with_timeout(master_fd, 3)
 
-        # Clean up
-        os.close(slave_fd)
-        os.close(master_fd)
-        process.terminate()
-        process.wait()
-        # remove bell character which can show up in some terminals where we hit tab
-        return scrub(output)
+            print(f'"{cmd}"')
+            os.write(master_fd, self.tabs.encode())
+
+            time.sleep(0.5)
+
+            # Read the output
+            output = read_all_from_fd_with_timeout(master_fd)
+
+            # Clean up
+            os.close(slave_fd)
+            os.close(master_fd)
+            process.terminate()
+            process.wait()
+            # remove bell character which can show up in some terminals where we hit tab
+            if scrub_output:
+                return scrub(output)
+            return output
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")
@@ -191,14 +261,43 @@ class _DefaultCompleteTestCase:
 
     def run_command_completion(self):
         completions = self.get_completions(self.launch_script, "complet")
-        # annoingly in CI there are some spaces inserted between the incomplete phrase
-        # and the completion on linux in bash specifically
-        self.assertTrue(re.match(r".*complet\s*ion.*", completions))
+        self.assertIn("completion", completions)
         completions = self.get_completions(self.launch_script, " ")
-        self.assertIn("makemigrations", completions)
-        self.assertIn("migrate", completions)
-        self.assertIn("closepoll", completions)
-        self.assertIn("basic", completions)
+        self.assertIn("changepassword", completions)
+        self.assertIn("check", completions)
+        self.assertIn("dumpdata", completions)
+        self.assertIn("completion", completions)
+        self.assertIn("collectstatic", completions)
+
+    def run_rich_option_completion(self, rich_output_expected: bool):
+        completions = self.get_completions(
+            self.launch_script, "completion", "--cmd", scrub_output=False
+        )
+        self.assertIn("--cmd", completions)
+        self.assertIn("--cmd-first", completions)
+        self.assertIn("--cmd-dup", completions)
+        if not rich_installed:
+            self.assertIn("[bold]", completions)
+            self.assertIn("[/bold]", completions)
+            self.assertIn("[reverse]", completions)
+            self.assertIn("[/reverse]", completions)
+            self.assertIn("[underline]", completions)
+            self.assertIn("[/underline]", completions)
+            self.assertIn("[yellow]", completions)
+            self.assertIn("[/yellow]", completions)
+        elif rich_output_expected:
+            # \x1b[0m and \x1b[m are the same
+            self.assertIn("\x1b[1mimport path\x1b[", completions)
+            if self.shell not in ["powershell", "pwsh"]:
+                # on powershell the helps cycle through when you tab - so only the first one is listed
+                self.assertIn("\x1b[7mcommands\x1b[", completions)
+                self.assertIn("\x1b[4;33mcommands\x1b[", completions)
+                self.assertIn("\x1b[1mname\x1b[", completions)
+        else:
+            self.assertNotIn("\x1b[7mcommands\x1b[", completions)
+            self.assertNotIn("\x1b[4;33mcommands\x1b[", completions)
+            self.assertNotIn("\x1b[1mimport path\x1b[", completions)
+            self.assertNotIn("\x1b[1mname\x1b[", completions)
 
     def test_shell_complete(self):
         with self.assertRaises(AssertionError):
@@ -212,8 +311,117 @@ class _DefaultCompleteTestCase:
             self.run_app_completion()
         self.install()
 
+    def test_fallback(self):
+        self.remove()
+        self.install(fallback="tests.fallback.custom_fallback")
+        completions = self.get_completions(self.launch_script, " ")
+        self.assertIn("custom_fallback", completions)
 
-class _InstalledScriptTestCase(_DefaultCompleteTestCase):
+    @pytest.mark.rich
+    @pytest.mark.no_rich
+    def test_rich_output(self):
+        self.install(force_color=True)
+        self.run_rich_option_completion(rich_output_expected=True)
+
+    @pytest.mark.rich
+    @pytest.mark.skipif(not rich_installed, reason="Rich not installed")
+    def test_no_rich_output(self):
+        self.install(no_color=True)
+        self.run_rich_option_completion(rich_output_expected=False)
+
+    def test_settings_pass_through(self):
+        # https://github.com/django-commons/django-typer/issues/68
+        self.install()
+        completions = self.get_completions(self.launch_script, "app_labels", " ")
+        self.assertNotIn("django_typer", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "app_labels",
+            "--settings",
+            "tests.settings.examples",
+            " ",
+        )
+        self.assertIn("django_typer", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "app_labels",
+            "--settings=tests.settings.examples",
+            " ",
+        )
+        self.assertIn("django_typer", completions)
+
+    def test_pythonpath_pass_through(self):
+        # https://github.com/django-commons/django-typer/issues/68
+        self.install()
+        completions = self.get_completions(
+            self.launch_script, "python_path", "--options", " "
+        )
+        self.assertNotIn("working", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "python_path",
+            "--pythonpath",
+            "tests/off_path",
+            "--option",
+            " ",
+        )
+        self.assertIn("working", completions)
+        completions = self.get_completions(
+            self.launch_script,
+            "python_path",
+            "--pythonpath=tests/off_path",
+            "--option",
+            " ",
+        )
+        self.assertIn("working", completions)
+
+    def test_reentrant_install_uninstall(self):
+        self.install()
+        self.install()
+        self.verify_install()
+
+        completions = self.get_completions(self.launch_script, "complet")
+        self.assertIn("completion", completions)
+
+        self.remove()
+        self.remove()
+        self.verify_remove()
+
+    def test_path_completion(self):
+        self.install()
+        self.verify_install()
+        completions = self.get_completions(
+            self.launch_script, "completion", "--path", "./django_typer/co"
+        )
+        self.assertIn("completers", completions)
+        self.assertIn("config.py", completions)
+        completions = self.get_completions(
+            self.launch_script, "completion", "--dir", "./django_typer/"
+        )
+        self.assertNotIn("utils.py", completions)
+        self.assertNotIn("config.py", completions)
+        self.assertIn("templates", completions)
+        self.assertIn("management", completions)
+        self.remove()
+        self.verify_remove()
+
+    # todo - cursor positioning not working
+    # def test_cursor_position(self):
+    #     self.install()
+    #     self.verify_install()
+    #     cmd = [self.launch_script, "shellcompletion", "--set ", "install"]
+    #     completions = self.get_completions(*cmd, position=-9)
+    #     self.assertIn("--settings", completions)
+    #     self.remove()
+    #     self.verify_remove()
+
+
+class _ScriptCompleteTestCase(_CompleteTestCase):
+    manage_script: str = "manage.py"
+    launch_script: str = "./manage.py"
+
+
+class _InstalledScriptCompleteTestCase(_CompleteTestCase):
     """
     These shell completes use an installed script available on the path
     instead of a script directly invoked by path. The difference may
@@ -225,18 +433,66 @@ class _InstalledScriptTestCase(_DefaultCompleteTestCase):
     manage_script = "django_manage"
     launch_script = "django_manage"
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        cls.install_script()
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.remove_script()
+        super().tearDownClass()
+
+    @classmethod
+    def install_script(cls, script=None):
+        if not script:
+            script = cls.manage_script
         lines = []
-        with open(self.MANAGE_SCRIPT_TMPL, "r") as f:
+        with open(cls.MANAGE_SCRIPT_TMPL, "r") as f:
             for line in f.readlines():
                 if line.startswith("#!{{shebang}}"):
                     line = f"#!{sys.executable}\n"
                 lines.append(line)
-        exe = Path(sys.executable).parent / self.manage_script
+        exe = Path(sys.executable).parent / script
         with open(exe, "w") as f:
             for line in lines:
                 f.write(line)
 
         # make the script executable
         os.chmod(exe, os.stat(exe).st_mode | 0o111)
-        super().setUp()
+
+        if platform.system() == "Windows":
+            with open(exe.with_suffix(".cmd"), "w") as f:
+                f.write(f'@echo off{os.linesep}"{sys.executable}" "%~dp0{exe.name}" %*')
+            os.chmod(exe, os.stat(exe.with_suffix(".cmd")).st_mode | 0o111)
+
+    @classmethod
+    def remove_script(cls, script=None):
+        if not script:
+            script = cls.manage_script
+        exe = Path(sys.executable).parent / script
+        exe.unlink(missing_ok=True)
+        exe.with_suffix(".cmd").unlink(missing_ok=True)
+
+    def test_multi_install(self):
+        parts = self.manage_script.split(".")
+        manage2 = ".".join([parts[0] + "2", *parts[1:]])
+        try:
+            self.install_script(script=manage2)
+            self.install()
+            self.verify_install()
+            self.install(script=manage2)
+            self.verify_install(script=manage2)
+
+            completions = self.get_completions(self.manage_script, "complet")
+            self.assertIn("completion", completions)
+
+            completions = self.get_completions(manage2, "complet")
+            self.assertIn("completion", completions)
+
+            self.remove()
+            self.verify_remove()
+            self.remove(script=manage2)
+            self.verify_remove(script=manage2)
+        finally:
+            self.remove_script(script=manage2)

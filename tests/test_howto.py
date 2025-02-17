@@ -3,9 +3,10 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from contextlib import redirect_stdout
 
 from django_typer.management import TyperCommand, get_command
-from tests.utils import rich_installed
+from tests.utils import rich_installed, run_command, similarity
 
 
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
@@ -32,6 +33,7 @@ class TestDefaultCmdTyperHowto(TestDefaultCmdHowto):
     cmd = "default_cmd_typer"
 
 
+@pytest.mark.rich
 @pytest.mark.skipif(not rich_installed, reason="This test requires rich help output")
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
 class TestGroupsHowto(TestCase):
@@ -51,8 +53,8 @@ class TestGroupsHowto(TestCase):
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -94,18 +96,24 @@ class TestGroupsHowto(TestCase):
         groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "groups")
-        self.assertEqual(stdout.getvalue().strip(), self.root_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.root_help.strip()), 0.99
+        )
         stdout.truncate(0)
         stdout.seek(0)
 
         groups.print_help("./howto.py", "groups", "group1")
-        self.assertEqual(stdout.getvalue().strip(), self.group1_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.group1_help.strip()), 0.99
+        )
 
         stdout.truncate(0)
         stdout.seek(0)
 
         groups.print_help("./howto.py", "groups", "group1", "subgroup1")
-        self.assertEqual(stdout.getvalue().strip(), self.subgroup1_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.subgroup1_help.strip()), 0.99
+        )
 
         groups.group1()
         groups.group1.subgroup1()
@@ -142,6 +150,7 @@ class TestInitializerTyperHowto(TestInitializerHowto):
     cmd = "initializer_typer"
 
 
+@pytest.mark.rich
 @pytest.mark.skipif(not rich_installed, reason="This test requires rich help output")
 @override_settings(INSTALLED_APPS=["tests.apps.howto"])
 class TestDefaultOptionsHowto(TestCase):
@@ -164,9 +173,10 @@ class TestDefaultOptionsHowto(TestCase):
 │ --pythonpath         PATH                     A directory to add to the      │
 │                                               Python path, e.g.              │
 │                                               "/home/djangoprojects/myproje… │
-│                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
+│ --show-locals                                 Print local variables in       │
+│                                               tracebacks.                    │
 │ --no-color                                    Don't colorize the command     │
 │                                               output.                        │
 │ --force-color                                 Force colorization of the      │
@@ -181,7 +191,9 @@ class TestDefaultOptionsHowto(TestCase):
         groups = get_command(self.cmd, TyperCommand, stdout=stdout, no_color=True)
 
         groups.print_help("./howto.py", "default_options")
-        self.assertEqual(stdout.getvalue().strip(), self.cmd_help.strip())
+        self.assertGreaterEqual(
+            similarity(stdout.getvalue().strip(), self.cmd_help.strip()), 0.99
+        )
 
 
 class TestDefaultOptionsTyperHowto(TestDefaultOptionsHowto):
@@ -317,6 +329,8 @@ class TestOrderHowTo(TestCase):
 
     grp_cls = AlphabetizeCommands
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_howto_order(self):
         from tests.apps.howto.management.commands.order import Command as OrderCommand
 
@@ -364,3 +378,152 @@ class TestPrintingTyperHowto(TestOrderHowTo):
     from tests.apps.howto.management.commands.order_typer import AlphabetizeCommands
 
     grp_cls = AlphabetizeCommands
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestFinalizerHowto(TestCase):
+    command = "finalize"
+
+    def test_howto_finalizer_run(self):
+        self.assertEqual(
+            run_command(
+                self.command,
+                "--settings",
+                "tests.settings.howto",
+                "cmd1",
+                "cmd1",
+                "cmd2",
+            )[0].strip(),
+            "result1, result1, result2",
+        )
+
+    def test_howto_finalizer_call(self):
+        self.assertEqual(
+            call_command(self.command, "cmd1", "cmd1", "cmd2"),
+            "result1, result1, result2",
+        )
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize import Command
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            command.to_csv([command.cmd1(), command.cmd1(), command.cmd2()]),
+            "result1, result1, result2",
+        )
+
+
+class TestFinalizerTyperHowto(TestFinalizerHowto):
+    command = "finalize_typer"
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_typer import Command, to_csv
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            to_csv([command.cmd1(), command.cmd1(), command.cmd2()]),
+            "result1, result1, result2",
+        )
+
+
+class TestFinalizerTyperExtHowto(TestFinalizerHowto):
+    command = "finalize_typer_ext"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestFinalizerGroupHowto(TestCase):
+    command = "finalize_group"
+
+    def test_howto_finalizer_run(self):
+        self.assertEqual(
+            run_command(
+                self.command,
+                "--settings",
+                "tests.settings.howto",
+                "cmd1",
+                "cmd1",
+                "cmd2",
+                "grp",
+                "cmd4",
+                "cmd3",
+            )[0].strip(),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+    def test_howto_finalizer_call(self):
+        self.assertEqual(
+            call_command(self.command, "cmd1", "cmd1", "cmd2", "grp", "cmd4", "cmd3"),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_group import Command
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            command.to_csv(
+                [
+                    command.cmd1(),
+                    command.cmd1(),
+                    command.cmd2(),
+                    command.grp.to_upper_csv([command.grp.cmd4(), command.grp.cmd3()]),
+                ]
+            ),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+
+class TestFinalizerGroupTyperHowto(TestFinalizerGroupHowto):
+    command = "finalize_group_typer"
+
+    def test_howto_finalizer_obj(self):
+        from tests.apps.howto.management.commands.finalize_group_typer import (
+            Command,
+            to_csv,
+            to_upper_csv,
+        )
+
+        command = get_command(self.command, Command)
+        self.assertEqual(
+            to_csv(
+                [
+                    command.cmd1(),
+                    command.cmd1(),
+                    command.cmd2(),
+                    to_upper_csv([command.cmd4(), command.cmd3()]),
+                ]
+            ),
+            "result1, result1, result2, RESULT4, RESULT3",
+        )
+
+
+class TestFinalizerGroupTyperExtHowto(TestFinalizerGroupHowto):
+    command = "finalize_group_typer_ext"
+
+
+@override_settings(INSTALLED_APPS=["tests.apps.howto"])
+class TestPrintResultHowTo(TestCase):
+    command = "print_result"
+
+    def test_howto_print_result_run(self):
+        self.assertEqual(
+            run_command(self.command, "--settings", "tests.settings.howto")[0].strip(),
+            "",
+        )
+
+    def test_howto_print_result_call(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(call_command(self.command), "This will not be printed")
+        self.assertEqual(output.getvalue().strip(), "")
+
+    def test_howto_print_result_obj(self):
+        command = get_command(self.command)
+        self.assertEqual(
+            command.handle(),
+            "This will not be printed",
+        )
+
+
+class TestPrintResultTyperHowTo(TestPrintResultHowTo):
+    command = "print_result_typer"

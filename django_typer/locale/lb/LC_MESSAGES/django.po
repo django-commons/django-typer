@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Installéiert Autocompletion fir déi aktuell Shell."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "D&#39;Schuel ze benotzen."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Filter Terminal Formatéierungskontrollsequenzen aus dem Fäerdegtext."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Erlaabt Terminalformatéierungskontrollsequenzen am Fäerdegtext."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Installéiert Autocompletion fir déi aktuell oder gegebene Shell."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Den Numm vum django verwalten Skript fir d&#39;Autocompletion "
+"z&#39;installéieren fir wann et anescht ass wéi de Skript deen benotzt gouf "
+"fir dëse Kommando opzeruffen."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"De Python-Importwee fir eng Réckfall komplett Funktioun fir ze benotzen wann"
+" de Fäerdegstellungskommando keen TyperCommand ass."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr ""
+"Den Numm vun der Schabloun fir de Shell-Fäerdegstellungsskript ze benotzen."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Uninstall Autocompletion fir déi aktuell oder gegebene Shell."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Den Numm vum django verwalten Skript fir d&#39;Shell-Fäerdegstellung ze "
+"läschen fir wann et anescht ass wéi de Skript deen benotzt gouf fir dëse "
+"Kommando opzeruffen."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Generéiere autocompletion fir Kommando String."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "De Kommando String fir Ofschlossvirschléi ze generéieren."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Cursorpositioun."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"De Python-Importwee fir eng Réckfall komplett Funktioun fir ze benotzen wann"
+" de Fäerdegstellungskommando keen TyperCommand ass. Par défaut gëtt déi "
+"agebaute django Autocomplete Funktioun benotzt."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Show Programm Versioun Zuel an Sortie."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Verbositéit Niveau; 0 = minimale Ausgab, 1 = normal Ausgab, 2 = verbose "
+"Ausgab, 3 = ganz verbose Ausgab"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"De Python Wee zu engem Astellungsmodul, zB "
+"\"myproject.settings.main\". Wann dëst net geliwwert gëtt, gëtt "
+"d&#39;DJANGO_SETTINGS_MODULE Ëmfeldvariabel benotzt."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"E Verzeichnis fir op de Python Wee ze addéieren, zB "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Erhéijung op CommandError Ausnahmen"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Dréckt lokal Verännerlechen an Tracebacks."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Verstoppen lokal Variabelen an Tracebacks."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Faarft de Kommandoausgang net."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Force Colorization vum Kommando Output."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Sprangen System Kontrollen."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dynamesch)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Ofgebrach!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "default: {default}"
+
+#~ msgid "required"
+#~ msgstr "néideg"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumenter"
+
+#~ msgid "Options"
+#~ msgstr "Optiounen"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(ofgeschaaft) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[Standard: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[obligatoresch]"
+
+#~ msgid "Commands"
+#~ msgstr "Kommandoen"
+
+#~ msgid "Error"
+#~ msgstr "Feeler"
+
+#~ msgid "Aborted."
+#~ msgstr "Ofgebrach."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Probéiert [blue]&#39;{command_path} {help_option}&#39;[/] fir Hëllef."

@@ -54,8 +54,8 @@ adapted_rich_help = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -122,8 +122,8 @@ adapted_help_no_adapters = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -163,7 +163,7 @@ class ResetAppsMixin:
                     for path in [
                         "tests.apps.adapter1",
                         "tests.apps.adapter2",
-                        "tests.apps.test_app.management.commands" "tests.apps.adapter0",
+                        "tests.apps.test_app.management.commandstests.apps.adapter0",
                     ]
                 ]
             ):
@@ -173,6 +173,7 @@ class ResetAppsMixin:
 
 
 class UnadaptedTests(TestCase):
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_no_adapter_apps(self):
         hlp = run_command("adapted", "--help", "--no-color")[0]
@@ -182,6 +183,7 @@ class UnadaptedTests(TestCase):
         )
         print(f"adapted --help similiarity: {sim}")
 
+    @pytest.mark.no_rich
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_no_adapter_apps_no_rich(self):
         stdout = StringIO()
@@ -262,6 +264,7 @@ class AdapterTests(ResetAppsMixin, TestCase):
     def test_adapted_is_compound(self):
         self.assertTrue(get_command("adapted").is_compound_command)
 
+    @pytest.mark.no_rich
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_adapted_helps_no_rich(self):
         hlp = run_command("adapted", "--settings", "tests.settings.adapted", "--help")[
@@ -339,6 +342,7 @@ class AdapterTests(ResetAppsMixin, TestCase):
         adapted.new_echo("hello", "world")
         self.assertEqual(stdout.getvalue().strip(), "test_app2: hello world")
 
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_adapted_helps(self):
         stdout = StringIO()

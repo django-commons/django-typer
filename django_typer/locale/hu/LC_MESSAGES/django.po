@@ -1,0 +1,204 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Telepítse az automatikus kiegészítést az aktuális rendszerhéjhoz."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "A használható héj."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Szűrje ki a terminál formázási vezérlőszekvenciáját a befejezett szövegből."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Terminál formázási vezérlőszekvenciák engedélyezése a befejező szövegben."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr ""
+"Telepítse az automatikus kiegészítést az aktuális vagy adott "
+"parancsértelmezőhöz."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Az automatikus kiegészítést telepítő django manager szkript neve, ha eltér a"
+" parancs meghívásához használt szkripttől."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"A python importálási elérési útja egy tartalék teljes függvényhez, amelyet "
+"akkor kell használni, ha a befejezési parancs nem TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "A shell befejezési parancsfájlhoz használandó sablon neve."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"Távolítsa el az automatikus kiegészítést az aktuális vagy adott "
+"parancsértelmezőről."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"A django manager szkript neve, amely eltávolítja a shell befejezését, ha "
+"eltér a parancs meghívásához használt szkripttől."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Automatikus kiegészítést generál a parancssorhoz."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "A parancssor a befejezési javaslatok generálásához."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "A kurzor pozíciója."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"A python importálási elérési útja egy tartalék teljes függvényhez, amelyet "
+"akkor kell használni, ha a befejezési parancs nem TyperCommand. "
+"Alapértelmezés szerint a beépített django automatikus kiegészítés funkciót "
+"használja."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Mutassa meg a program verziószámát és lépjen ki."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Bőbeszédűségi szint; 0=minimális kimenet, 1=normál kimenet, 2=bőbeszédű "
+"kimenet, 3=nagyon bőbeszédű kimenet"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Egy beállítási modul Python elérési útja, pl. "
+"\"myproject.settings.main\". Ha ez nincs megadva, akkor a "
+"DJANGO_SETTINGS_MODULE környezeti változó kerül felhasználásra."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"A Python elérési úthoz hozzáadandó könyvtár, pl. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Emelje a CommandError kivételek esetén"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Nyomtassa ki a helyi változókat a visszakövetésben."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Helyi változók elrejtése a visszakövetésekben."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Ne színezze ki a parancs kimenetét."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "A parancs kimenetének színezésének kényszerítése."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Rendszerellenőrzések kihagyása."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamikus)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Megszakítva!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "alapértelmezett: {alapértelmezett}"
+
+#~ msgid "required"
+#~ msgstr "kívánt"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Érvek"
+
+#~ msgid "Options"
+#~ msgstr "Opciók"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(elavult) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[alapértelmezett: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[kívánt]"
+
+#~ msgid "Commands"
+#~ msgstr "Parancsok"
+
+#~ msgid "Error"
+#~ msgstr "Hiba"
+
+#~ msgid "Aborted."
+#~ msgstr "Megszakítva."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "Segítségért próbálja ki a [kék]&#39;{command_path} {help_option}&#39;[/] "
+#~ "parancsot."

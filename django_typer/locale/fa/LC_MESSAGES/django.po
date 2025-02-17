@@ -1,0 +1,197 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "تکمیل خودکار را برای پوسته فعلی نصب کنید."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "پوسته برای استفاده"
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "فیلتر کردن دنباله‌های کنترل قالب‌بندی ترمینال بدون متن کامل."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "اجازه دادن به دنباله‌های کنترل قالب‌بندی ترمینال در متن کامل."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "تکمیل خودکار را برای پوسته فعلی یا داده شده نصب کنید."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"نام اسکریپت مدیریت جنگو برای نصب تکمیل خودکار در صورتی که با اسکریپت استفاده"
+" شده برای فراخوانی این دستور متفاوت باشد."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"مسیر وارد کردن پایتون به یک تابع کامل بازگشتی برای استفاده زمانی که دستور "
+"تکمیل یک TyperCommand نیست."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "نام الگوی مورد استفاده برای اسکریپت تکمیل پوسته."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "تکمیل خودکار را برای پوسته فعلی یا داده شده حذف نصب کنید."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"نام اسکریپت مدیریت جنگو برای حذف تکمیل پوسته برای اگر متفاوت از اسکریپت مورد"
+" استفاده برای فراخوانی این دستور باشد."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "تکمیل خودکار برای رشته فرمان ایجاد کنید."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "رشته فرمان برای ایجاد پیشنهادات تکمیل برای."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "موقعیت مکان نما."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"مسیر وارد کردن پایتون به یک تابع کامل بازگشتی برای استفاده زمانی که دستور "
+"تکمیل یک TyperCommand نیست. به طور پیش‌فرض، از عملکرد تکمیل خودکار جنگو "
+"داخلی استفاده می‌شود."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "نمایش شماره نسخه برنامه و خروج."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"سطح پرحرفی؛ 0=خروجی حداقل، 1=خروجی عادی، 2=خروجی پرمخاطب، 3=خروجی بسیار "
+"پرمخاطب"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"مسیر پایتون به یک ماژول تنظیمات، به عنوان مثال "
+"\"myproject.settings.main\". اگر این ارائه نشده باشد، از متغیر محیطی"
+" DJANGO_SETTINGS_MODULE استفاده خواهد شد."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"دایرکتوری برای اضافه کردن به مسیر پایتون، به عنوان مثال "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "استثناهای CommandError را افزایش دهید"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "چاپ متغیرهای محلی در ردیابی."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "مخفی کردن متغیرهای محلی در ردیابی"
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "خروجی فرمان را رنگی نکنید."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "رنگ آمیزی اجباری خروجی فرمان."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "رد شدن از بررسی های سیستم"
+
+#~ msgid "(dynamic)"
+#~ msgstr "(پویا)"
+
+#~ msgid "Aborted!"
+#~ msgstr "سقط شد!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "پیش‌فرض: {default}"
+
+#~ msgid "required"
+#~ msgstr "مورد نیاز است"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "استدلال ها"
+
+#~ msgid "Options"
+#~ msgstr "گزینه ها"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(منسوخ شده) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[پیش‌فرض: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[الزامی]"
+
+#~ msgid "Commands"
+#~ msgstr "دستورات"
+
+#~ msgid "Error"
+#~ msgstr "خطا"
+
+#~ msgid "Aborted."
+#~ msgstr "سقط شد."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "برای راهنمایی [blue]&#39;{command_path} {help_option}&#39;[/] را امتحان "
+#~ "کنید."

@@ -1,0 +1,203 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "നിലവിലുള്ള ഷെല്ലിനായി ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "ഉപയോഗിക്കാനുള്ള ഷെൽ."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"ഫിൽട്ടർ ടെർമിനൽ ഫോർമാറ്റിംഗ് നിയന്ത്രണ സീക്വൻസുകൾ പൂർത്തീകരണ വാചകത്തിന് "
+"പുറത്താണ്."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"പൂർത്തീകരണ വാചകത്തിൽ ടെർമിനൽ ഫോർമാറ്റിംഗ് നിയന്ത്രണ ശ്രേണികൾ അനുവദിക്കുക."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr ""
+"നിലവിലുള്ളതോ നൽകിയിരിക്കുന്നതോ ആയ ഷെല്ലിന് ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ഈ കമാൻഡ് പ്രവർത്തിപ്പിക്കാൻ ഉപയോഗിച്ച സ്ക്രിപ്റ്റിൽ നിന്ന് "
+"വ്യത്യസ്തമാണെങ്കിൽ, ഓട്ടോകംപ്ലീഷൻ ഇൻസ്റ്റാൾ ചെയ്യുന്നതിനുള്ള django മാനേജ് "
+"സ്ക്രിപ്റ്റിന്റെ പേര്."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"കംപ്ലീഷൻ കമാൻഡ് ഒരു TyperCommand അല്ലാത്തപ്പോൾ ഉപയോഗിക്കേണ്ട ഒരു ഫാൾബാക്ക് "
+"കംപ്ലീറ്റ് ഫംഗ്ഷനിലേക്കുള്ള പൈത്തൺ ഇംപോർട്ട് പാത്ത്."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "ഷെൽ പൂർത്തീകരണ സ്ക്രിപ്റ്റിന് ഉപയോഗിക്കേണ്ട ടെംപ്ലേറ്റിന്റെ പേര്."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr ""
+"നിലവിലുള്ളതോ നൽകിയിരിക്കുന്നതോ ആയ ഷെല്ലിൽ ഓട്ടോകംപ്ലീഷൻ അൺഇൻസ്റ്റാൾ ചെയ്യുക."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ഈ കമാൻഡ് പ്രവർത്തിപ്പിക്കാൻ ഉപയോഗിച്ച സ്ക്രിപ്റ്റിൽ നിന്ന് "
+"വ്യത്യസ്തമാണെങ്കിൽ, ഷെൽ കംപ്ലീഷൻ നീക്കം ചെയ്യുന്നതിനുള്ള django മാനേജ്മെന്റ്"
+" സ്ക്രിപ്റ്റിന്റെ പേര്."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "കമാൻഡ് സ്ട്രിംഗിനായി ഓട്ടോകംപ്ലീഷൻ സൃഷ്ടിക്കുക."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "പൂർത്തീകരണ നിർദ്ദേശങ്ങൾ സൃഷ്ടിക്കുന്നതിനുള്ള കമാൻഡ് സ്ട്രിംഗ്."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "കഴ്‌സറിന്റെ സ്ഥാനം."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"കംപ്ലീഷൻ കമാൻഡ് ഒരു TyperCommand അല്ലാത്തപ്പോൾ ഉപയോഗിക്കേണ്ട ഫാൾബാക്ക് "
+"കംപ്ലീറ്റ് ഫംഗ്ഷനിലേക്കുള്ള പൈത്തൺ ഇംപോർട്ട് പാത്ത്. ഡിഫോൾട്ടായി, ബിൽറ്റ്-ഇൻ"
+" django ഓട്ടോകംപ്ലീറ്റ് ഫംഗ്ഷൻ ഉപയോഗിക്കുന്നു."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "പ്രോഗ്രാമിന്റെ പതിപ്പ് നമ്പർ കാണിച്ച് പുറത്തുകടക്കുക."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"വെർബോസിറ്റി ലെവൽ; 0=മിനിമൽ ഔട്ട്‌പുട്ട്, 1=നോർമൽ ഔട്ട്‌പുട്ട്, 2=വെർബോസ് "
+"ഔട്ട്‌പുട്ട്, 3=വളരെ വെർബോസ് ഔട്ട്‌പുട്ട്"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"ഒരു ക്രമീകരണ മൊഡ്യൂളിലേക്കുള്ള പൈത്തൺ പാത, ഉദാ: "
+"\"myproject.settings.main\". ഇത് നൽകിയിട്ടില്ലെങ്കിൽ, "
+"DJANGO_SETTINGS_MODULE എൻവയോൺമെന്റ് വേരിയബിൾ ഉപയോഗിക്കും."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"പൈത്തൺ പാതയിലേക്ക് ചേർക്കുന്നതിനുള്ള ഒരു ഡയറക്ടറി, ഉദാ: "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "കമാൻഡ് എറർ എക്സെപ്ഷനുകളിൽ ഉയർത്തുക"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "ട്രെയ്‌സ്ബാക്കുകളിൽ ലോക്കൽ വേരിയബിളുകൾ പ്രിന്റ് ചെയ്യുക."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "ട്രെയ്‌സ്ബാക്കുകളിൽ ലോക്കൽ വേരിയബിളുകൾ മറയ്ക്കുക."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "കമാൻഡ് ഔട്ട്‌പുട്ട് വർണ്ണമാക്കരുത്."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "കമാൻഡ് ഔട്ട്‌പുട്ടിന്റെ നിർബന്ധിത വർണ്ണീകരണം."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "സിസ്റ്റം പരിശോധനകൾ ഒഴിവാക്കുക."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(ചലനാത്മകം)"
+
+#~ msgid "Aborted!"
+#~ msgstr "നിർത്തലാക്കി!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "സ്ഥിരസ്ഥിതി: {സ്ഥിരസ്ഥിതി}"
+
+#~ msgid "required"
+#~ msgstr "ആവശ്യമാണ്"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "വാദങ്ങൾ"
+
+#~ msgid "Options"
+#~ msgstr "ഓപ്ഷനുകൾ"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(ഒഴിവാക്കി) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[സ്ഥിരസ്ഥിതി: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[ആവശ്യമാണ്]"
+
+#~ msgid "Commands"
+#~ msgstr "കമാൻഡുകൾ"
+
+#~ msgid "Error"
+#~ msgstr "പിശക്"
+
+#~ msgid "Aborted."
+#~ msgstr "നിർത്തലാക്കി."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "സഹായത്തിനായി [നീല]&#39;{കമാൻഡ്_പാത്ത്} {ഹെൽപ്പ്_ഓപ്ഷൻ}&#39;[/] പരീക്ഷിക്കുക."

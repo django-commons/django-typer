@@ -10,6 +10,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+import django_stubs_ext
+
+django_stubs_ext.monkeypatch()
 
 # Set default terminal width for help outputs - necessary for
 # testing help output in CI environments.
@@ -34,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "tests.apps.completion",
     "tests.apps.test_app",
     "tests.apps.util",
     "django_typer",
@@ -77,13 +81,27 @@ TEMPLATES = [
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        "TEST": {"NAME": BASE_DIR / "db.sqlite3"},
+rdbms = os.environ.get("RDBMS", "sqlite")
+
+if rdbms == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            "TEST": {"NAME": BASE_DIR / "db.sqlite3"},
+        }
     }
-}
+elif rdbms == "postgres":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "postgres"),
+            "USER": os.environ.get("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", ""),
+            "PORT": os.environ.get("POSTGRES_PORT", ""),
+        }
+    }
 
 
 # Password validation

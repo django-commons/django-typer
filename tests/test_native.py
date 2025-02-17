@@ -30,8 +30,8 @@ native_help_rich = """
 │                            variable will be used.                            │
 │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
 │                            "/home/djangoprojects/myproject".                 │
-│                            [default: None]                                   │
 │ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
 │ --no-color                 Don't colorize the command output.                │
 │ --force-color              Force colorization of the command output.         │
 │ --skip-checks              Skip system checks.                               │
@@ -82,9 +82,10 @@ native_groups_help_rich = """
 │ --pythonpath         PATH                     A directory to add to the      │
 │                                               Python path, e.g.              │
 │                                               "/home/djangoprojects/myproje… │
-│                                               [default: None]                │
 │ --traceback                                   Raise on CommandError          │
 │                                               exceptions                     │
+│ --show-locals                                 Print local variables in       │
+│                                               tracebacks.                    │
 │ --no-color                                    Don't colorize the command     │
 │                                               output.                        │
 │ --force-color                                 Force colorization of the      │
@@ -172,15 +173,15 @@ class TestNative(TestCase):
         self.assertEqual(native.main("Brian"), {"name": "Brian"})
 
     def test_native_cli(self):
-        self.assertEqual(
-            run_command(self.command, *self.settings, "Brian")[0].strip(),
-            str({"name": "Brian"}),
-        )
+        stdout, stderr, retcode = run_command(self.command, *self.settings, "Brian")
+        self.assertEqual(retcode, 0, stderr)
+        self.assertEqual(stdout.strip(), str({"name": "Brian"}))
         self.assertEqual(
             str(run_command(self.command, *self.settings, "--version")[0]).strip(),
             DJANGO_VERSION,
         )
 
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_help_rich(self):
         stdout = StringIO()
@@ -193,6 +194,7 @@ class TestNative(TestCase):
         print(f"{self.command} --help similiarity: {sim}")
         self.assertGreater(sim, 0.99)
 
+    @pytest.mark.no_rich
     @pytest.mark.skipif(rich_installed, reason="rich is installed")
     def test_native_help_no_rich(self):
         stdout = StringIO()
@@ -227,6 +229,7 @@ class TestNativeGroups(TestCase):
         ("{command} grp1 cmd2", native_groups_grp1_cmd2_help_rich),
     ]
 
+    @pytest.mark.rich
     @pytest.mark.skipif(not rich_installed, reason="rich is not installed")
     def test_native_groups_helps(self):
         for cmd_pth, expected_help in self.commands:
@@ -279,6 +282,10 @@ class TestNativeGroups(TestCase):
         native_groups.init_grp1(flag=flag)
         self.assertEqual(
             native_groups.run_subgrp("hello!"),
+            {"verbosity": 3, "flag": flag, "msg": "hello!"},
+        )
+        self.assertEqual(
+            native_groups.subgrp("hello!"),
             {"verbosity": 3, "flag": flag, "msg": "hello!"},
         )
 
@@ -373,7 +380,6 @@ native_tweaks_help_rich = """
 │ --pythonpath        PATH                     A directory to add to the       │
 │                                              Python path, e.g.               │
 │                                              "/home/djangoprojects/myprojec… │
-│                                              [default: None]                 │
 │ --no-color                                   Don't colorize the command      │
 │                                              output.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
@@ -406,3 +412,8 @@ class TestNativeTweaks(TestNative):
 
     native_help_rich = native_tweaks_help_rich
     native_help_no_rich = native_tweaks_help_no_rich
+
+
+class TestBug145(TestCase):
+    def test_bug_145(self):
+        self.assertEqual(call_command("bug_145", "grp", "cmd"), "grp:cmd")

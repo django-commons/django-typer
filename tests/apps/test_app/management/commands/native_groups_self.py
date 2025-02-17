@@ -19,7 +19,7 @@ def main(self, name: str):
 grp2 = Typer()
 
 
-@grp2.callback(name="grp1")
+@grp2.callback()
 def init_grp1(self, flag: bool = False):
     assert isinstance(self, TyperCommand)
     self.flag = flag
@@ -31,7 +31,7 @@ def cmd2(self, fraction: float):
     return {"verbosity": self.verbosity, "flag": self.flag, "fraction": fraction}
 
 
-app.add_typer(grp2)
+app.add_typer(grp2, name="grp1")
 
 
 @grp2.command()

@@ -11,7 +11,7 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 
 from django_typer.management import get_command
-from tests.utils import TESTS_DIR, manage_py, run_command, similarity
+from tests.utils import TESTS_DIR, manage_py, run_command, similarity, rich_installed
 
 
 class TestGroups(TestCase):
@@ -19,16 +19,6 @@ class TestGroups(TestCase):
     A collection of tests that test complex grouping commands and also that
     command inheritance behaves as expected.
     """
-
-    rich_installed: bool
-
-    def setUp(self):
-        try:
-            import rich  # noqa
-
-            self.rich_installed = True
-        except ImportError:
-            self.rich_installed = False
 
     def test_group_call(self):
         with self.assertRaises(NotImplementedError):
@@ -71,7 +61,7 @@ class TestGroups(TestCase):
                             result.stdout,
                             (
                                 TESTS_DIR / "apps" / "test_app" / "helps" / "groups.txt"
-                            ).read_text(),
+                            ).read_text(encoding="utf-8"),
                         ),
                         0.99,  # width inconsistences drive this number < 1
                     )
@@ -79,6 +69,8 @@ class TestGroups(TestCase):
         finally:
             os.chdir(cwd)
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     @override_settings(
         INSTALLED_APPS=[
             "tests.apps.test_app",
@@ -91,7 +83,6 @@ class TestGroups(TestCase):
         ],
     )
     def test_helps(self, app="test_app"):
-        print("test_helps")
         for cmds in [
             ("groups",),
             ("groups", "echo"),
@@ -118,27 +109,26 @@ class TestGroups(TestCase):
             cmd = get_command(cmds[0], stdout=buffer, no_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
-            helps_dir = "helps" if self.rich_installed else "helps_no_rich"
-            try:
-                self.assertGreater(
-                    sim := similarity(
-                        hlp,
-                        (
-                            TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
-                        ).read_text(),
-                    ),
-                    0.99,  # width inconsistences drive this number < 1
-                )
-            except AssertionError:
-                raise
-            print(f'{app}: {" ".join(cmds)} = {sim:.2f}')
+            helps_dir = "helps" if rich_installed else "helps_no_rich"
+            self.assertGreater(
+                sim := similarity(
+                    hlp,
+                    (
+                        TESTS_DIR / "apps" / app / helps_dir / f"{cmds[-1]}.txt"
+                    ).read_text(encoding="utf-8"),
+                ),
+                0.99,  # width inconsistences drive this number < 1
+            )
+            print(f"{app}: {' '.join(cmds)} = {sim:.2f}")
 
             cmd = get_command(cmds[0], stdout=buffer, force_color=True)
             cmd.print_help("./manage.py", *cmds)
             hlp = buffer.getvalue()
-            if self.rich_installed:
+            if rich_installed:
                 self.assertTrue("\x1b" in hlp)
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     @override_settings(
         INSTALLED_APPS=[
             "tests.apps.test_app2",
@@ -217,7 +207,7 @@ class TestGroups(TestCase):
                 ("hey! " * 5).strip(),
             )
         else:
-            self.assertIn("Usage: ./manage.py groups echo [OPTIONS] MESSAGE", result[0])
+            self.assertIn("manage.py groups echo [OPTIONS] MESSAGE", result[0])
             self.assertIn("Got unexpected extra argument (5)", result[1])
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
@@ -373,7 +363,7 @@ class TestGroups(TestCase):
         )
         if override:
             self.assertIn(
-                "Usage: ./manage.py groups string STRING case upper [OPTIONS]",
+                "manage.py groups string STRING case upper [OPTIONS]",
                 result[0],
             )
             self.assertIn("Got unexpected extra arguments (4 9)", result[1].strip())
@@ -410,7 +400,7 @@ class TestGroups(TestCase):
             parse_json=False,
         )
         if override:
-            self.assertEqual(result[0], "emmatc\n")
+            self.assertEqual(result[0].strip(), "emmatc")
             self.assertEqual(
                 call_command("groups", "string", " emmatc  ", "strip"), "emmatc"
             )
@@ -418,7 +408,7 @@ class TestGroups(TestCase):
             self.assertEqual(grp_cmd.strip(), "emmatc")
         else:
             self.assertIn(
-                "Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]",
+                "manage.py groups string [OPTIONS] STRING COMMAND [ARGS]",
                 result[0],
             )
             self.assertIn("No such command 'strip'.", result[1])
@@ -474,6 +464,7 @@ class TestGroups(TestCase):
 class TestCallCommandArgs(TestCase):
     @override_settings(
         INSTALLED_APPS=[
+            "tests.apps.completion",
             "tests.apps.test_app2",
             "tests.apps.test_app",
             "django.contrib.admin",

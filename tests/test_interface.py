@@ -66,9 +66,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_typer_callback_interface_matches(self):
-        dt_params = set(get_named_arguments(Typer.callback)) - {
-            "name"
-        }  # todo fix in 3.0
+        dt_params = set(get_named_arguments(Typer.callback))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(dt_params.symmetric_difference(typer_params))
@@ -78,9 +76,7 @@ class InterfaceTests(TestCase):
         )
 
     def test_typer_initialize_interface_matches(self):
-        dt_params = set(get_named_arguments(Typer.initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        dt_params = set(get_named_arguments(Typer.initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(dt_params.symmetric_difference(typer_params))
@@ -107,6 +103,7 @@ class InterfaceTests(TestCase):
         dt_params.remove("django_command")
         dt_params.remove("parent")
         self.assertFalse(dt_params.symmetric_difference(typer_params))
+        dt_params.remove("pretty_exceptions_show_locals")
         self.assertEqual(
             self.compare_defaults(dt_params, Typer.__init__, typer.Typer.__init__),
             len(dt_params),
@@ -136,9 +133,7 @@ class InterfaceTests(TestCase):
     def test_initialize_interface_matches(self):
         from django_typer.management import callback
 
-        initialize_params = set(get_named_arguments(initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        initialize_params = set(get_named_arguments(initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(initialize_params.symmetric_difference(typer_params))
@@ -170,14 +165,14 @@ class InterfaceTests(TestCase):
             self.compare_defaults(
                 [
                     "pretty_exceptions_enable",
-                    "pretty_exceptions_show_locals",
+                    # "pretty_exceptions_show_locals",
                     "pretty_exceptions_short",
                 ],
                 TyperCommandMeta.__new__,
                 typer.Typer.__init__,
                 require_placeholder_match=False,
             ),
-            3,
+            2,
         )
 
     def test_typer_group_interface_matches(self):
@@ -211,9 +206,7 @@ class InterfaceTests(TestCase):
     def test_base_class_initialize_interface_matches(self):
         from django_typer.management import TyperCommand
 
-        command_params = set(get_named_arguments(TyperCommand.initialize)) - {
-            "name"
-        }  # todo fix in 3.0
+        command_params = set(get_named_arguments(TyperCommand.initialize))
         typer_params = set(get_named_arguments(typer.Typer.callback))
 
         self.assertFalse(command_params.symmetric_difference(typer_params))
@@ -243,6 +236,8 @@ class InterfaceTests(TestCase):
     def test_action_nargs(self):
         # unclear if nargs is even necessary - no other test seems to exercise it, leaving in for
         # base class compat reasons
+        from tests.utils import rich_installed
+
         self.assertEqual(
             get_command("basic")
             .create_parser("./manage.py", "basic")
@@ -258,10 +253,14 @@ class InterfaceTests(TestCase):
             -1,
         )
         multi_parser = get_command("multi").create_parser("./manage.py", "multi")
-        self.assertEqual(multi_parser._actions[7].param.name, "files")
-        self.assertEqual(multi_parser._actions[7].nargs, -1)
-        self.assertEqual(multi_parser._actions[8].param.name, "flag1")
-        self.assertEqual(multi_parser._actions[8].nargs, 0)
+        self.assertEqual(
+            multi_parser._actions[8 if rich_installed else 7].param.name, "files"
+        )
+        self.assertEqual(multi_parser._actions[8 if rich_installed else 7].nargs, -1)
+        self.assertEqual(
+            multi_parser._actions[9 if rich_installed else 8].param.name, "flag1"
+        )
+        self.assertEqual(multi_parser._actions[9 if rich_installed else 8].nargs, 0)
 
     def test_cmd_getattr(self):
         from django_typer.management import TyperCommand

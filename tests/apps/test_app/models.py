@@ -17,3 +17,17 @@ class ShellCompleteTester(models.Model):
     email_field = models.EmailField(null=True, default=None, db_index=True)
 
     url_field = models.URLField(null=True, default=None, db_index=True)
+
+    file_field = models.FileField(
+        null=True, default=None, upload_to="documents/", db_index=True
+    )
+
+    file_path_field = models.FilePathField(null=True, default=None, db_index=True)
+
+    date_field = models.DateField(null=True, default=None, db_index=True)
+
+    datetime_field = models.DateTimeField(null=True, default=None, db_index=True)
+
+    time_field = models.TimeField(null=True, default=None, db_index=True)
+
+    duration_field = models.DurationField(null=True, default=None, db_index=True)

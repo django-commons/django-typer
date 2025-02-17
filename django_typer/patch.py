@@ -52,7 +52,7 @@ def apply() -> None:
         # are not attached to ttys. Upstream Django should change the init
         # call to a just_fix_windows_console - we undo this and redo the right
         # thing here.
-        import colorama
+        import colorama  # pyright: ignore[reportMissingModuleSource]
 
         colorama.deinit()
         colorama.just_fix_windows_console()
@@ -60,7 +60,7 @@ def apply() -> None:
         pass
 
     try:
-        from rich.console import Console
+        from rich.console import Console  # pyright: ignore[reportMissingImports]
 
         # this has to go here before rich Consoles are instantiated by Typer
         color_system: t.Optional[

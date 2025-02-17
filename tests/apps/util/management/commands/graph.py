@@ -100,9 +100,9 @@ class Command(TyperCommand):
             ),
         ] = [],
     ):
-        assert len(load_order) <= len(
-            commands
-        ), "Cannot provide more load options than commands"
+        assert len(load_order) <= len(commands), (
+            "Cannot provide more load options than commands"
+        )
 
         plugin_loads = []
 
@@ -193,7 +193,7 @@ class Command(TyperCommand):
             parent_node = self.get_node_name(app)
         else:
             plugin = f": {self.plugin}" if self.plugin else ""
-            parent_node = f'[{self.app_name.split(".")[-1]}{plugin}] {self.cmd_name}'
+            parent_node = f"[{self.app_name.split('.')[-1]}{plugin}] {self.cmd_name}"
 
         style = {}
         if self.level:

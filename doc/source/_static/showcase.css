@@ -1,0 +1,3 @@
+table th:first-child, table td:first-child {
+    white-space: nowrap;
+}

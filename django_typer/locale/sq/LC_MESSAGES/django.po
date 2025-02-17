@@ -1,0 +1,202 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Instaloni plotësimin automatik për guaskën aktuale."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Predha për t&#39;u përdorur."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"Filtro sekuencat e kontrollit të formatimit të terminalit jashtë tekstit të "
+"përfunduar."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"Lejo sekuencat e kontrollit të formatimit të terminalit në tekstin e "
+"përfunduar."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Instaloni plotësimin automatik për guaskën aktuale ose të dhënë."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Emri i skriptit të menaxhimit të django për të instaluar plotësimin "
+"automatik nëse është i ndryshëm nga skripti i përdorur për të thirrur këtë "
+"komandë."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Rruga e importimit të python në një funksion të plotë kthimi për t&#39;u "
+"përdorur kur komanda e përfundimit nuk është një TyperCommand."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr ""
+"Emri i shabllonit që do të përdoret për skriptin e plotësimit të guaskës."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Çinstaloni plotësimin automatik për predhën aktuale ose të dhënë."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Emri i skriptit të menaxhimit të django për të hequr kompletimin e guaskës "
+"nëse është i ndryshëm nga skripti i përdorur për të thirrur këtë komandë."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Gjeneroni plotësimin automatik për vargun e komandës."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Vargu i komandës për të gjeneruar sugjerime për përfundimin."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Pozicioni i kursorit."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Rruga e importimit të python në një funksion të plotë kthimi për t&#39;u "
+"përdorur kur komanda e përfundimit nuk është një TyperCommand. Si "
+"parazgjedhje, përdoret funksioni i integruar i plotësimit automatik të "
+"django."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Trego numrin e versionit të programit dhe dil."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Niveli i foljes; 0=dalja minimale, 1=dalja normale, 2=dalja me fjalë, "
+"3=dalja shumë e folur"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Rruga e Python drejt një moduli të cilësimeve, p.sh. "
+"\"myproject.settings.main\". Nëse kjo nuk ofrohet, do të përdoret "
+"ndryshorja e mjedisit DJANGO_SETTINGS_MODULE."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Një direktori për të shtuar në shtegun e Python, p.sh. "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Raise on CommandError përjashtime"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Printoni variabla lokale në gjurmë."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Fshih variablat lokale në gjurmët."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Mos e ngjyrosni daljen e komandës."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Forco ngjyrosjen e daljes së komandës."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Kapërceni kontrollet e sistemit."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinamik)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Abortuar!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "e paracaktuar: {default}"
+
+#~ msgid "required"
+#~ msgstr "kërkohet"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumentet"
+
+#~ msgid "Options"
+#~ msgstr "Opsionet"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(i zhvlerësuar) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[e parazgjedhur: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[kërkohet]"
+
+#~ msgid "Commands"
+#~ msgstr "Komandat"
+
+#~ msgid "Error"
+#~ msgstr "Gabim"
+
+#~ msgid "Aborted."
+#~ msgstr "E ndërprerë."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "Provo [blu]&#39;{command_path} {help_option}&#39;[/] për ndihmë."

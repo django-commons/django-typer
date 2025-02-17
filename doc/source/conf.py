@@ -52,7 +52,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinxcontrib.typer',
-    'sphinx_tabs.tabs'
+    'sphinx_tabs.tabs',
+    "sphinx.ext.viewcode"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -92,6 +93,9 @@ suppress_warnings = ['app.add_directive']
 linkcheck_ignore = [
     r'https://github.com/django/django/blob/main/django/core/management/__init__.py#L278',  # Ignore exact match
 ]
+
+autodoc_typehints = "description"  # or signature
+autodoc_typehints_format = "short"
 
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything

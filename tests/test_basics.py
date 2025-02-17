@@ -1,5 +1,6 @@
 import json
 from io import StringIO
+import pytest
 
 import django
 from django.core.management import call_command
@@ -126,6 +127,8 @@ class BasicTests(TestCase):
             get_command("base")(*args, **kwargs), f"base({args}, {kwargs})"
         )
 
+    @pytest.mark.rich
+    @pytest.mark.no_rich
     def test_cmd_help_order(self):
         buffer = StringIO()
         cmd = get_command("order", TyperCommand, stdout=buffer, no_color=True)

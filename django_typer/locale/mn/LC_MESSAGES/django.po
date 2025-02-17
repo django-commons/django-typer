@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Одоогийн бүрхүүлд автоматаар гүйцээхийг суулгана уу."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Хэрэглэх бүрхүүл."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Дууссан текстээс терминалын форматын хяналтын дарааллыг шүүнэ."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Дуусгах текст дэх терминалын форматын хяналтын дарааллыг зөвшөөрөх."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Одоогийн эсвэл өгөгдсөн бүрхүүлд автоматаар гүйцээхийг суулгана уу."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Хэрэв энэ командыг дуудахад ашигласан скриптээс өөр бол автоматаар "
+"гүйцээхийг суулгах django удирдлагын скриптийн нэр."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Дуусгах команд нь TyperCommand биш үед ашиглах бүрэн гүйцэд функц руу питон "
+"импортын зам."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Бүрхүүлийг дуусгах скриптэд ашиглах загварын нэр."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Одоогийн эсвэл өгөгдсөн бүрхүүлд автоматаар дуусгахыг устгана уу."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Хэрэв энэ командыг дуудахад ашигласан скриптээс өөр бол бүрхүүлийн "
+"гүйцээлтийг арилгахын тулд django удирдах скриптийн нэр."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Командын мөрөнд автоматаар гүйцээх үйлдлийг үүсгэх."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Дуусгах зөвлөмжийг үүсгэх командын мөр."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Курсорын байрлал."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Дуусгах команд нь TyperCommand биш үед ашиглах бүрэн гүйцэд функц руу питон "
+"импортын зам. Анхдагч байдлаар, суурилуулсан django автомат гүйцээх функцийг"
+" ашигладаг."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Програмын хувилбарын дугаарыг үзүүлж, гарна уу."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Товч тайлбарын түвшин; 0 = хамгийн бага гаралт, 1 = хэвийн гаралт, 2 = "
+"дэлгэрэнгүй гаралт, 3 = маш дэлгэрэнгүй гаралт"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"\"myproject.settings.main\" гэх мэт тохиргооны модулийн Python зам. "
+"Хэрэв үүнийг өгөөгүй бол DJANGO_SETTINGS_MODULE орчны хувьсагчийг ашиглана."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Python замд нэмэх лавлах, жишээ нь "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "CommandError-ийн онцгой тохиолдлуудыг нэмэгдүүлэх"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Traceback-д локал хувьсагчдыг хэвлэх."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Traceback-д орон нутгийн хувьсагчдыг нуух."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Тушаалын гаралтыг өнгөөр бүү хар."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Командын гаралтыг хүчээр өнгөөр ялгах."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Системийн шалгалтыг алгасах."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(динамик)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Цуцлагдсан!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "өгөгдмөл: {өгөгдмөл}"
+
+#~ msgid "required"
+#~ msgstr "шаардлагатай"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Аргументууд"
+
+#~ msgid "Options"
+#~ msgstr "Сонголтууд"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(хуучирсан) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[өгөгдмөл: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[шаардлагатай]"
+
+#~ msgid "Commands"
+#~ msgstr "Тушаалууд"
+
+#~ msgid "Error"
+#~ msgstr "Алдаа"
+
+#~ msgid "Aborted."
+#~ msgstr "Цуцлагдсан."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "Тусламж авахын тулд [blue]&#39;{command_path} {help_option}&#39;[/] гэж үзнэ"
+#~ " үү."

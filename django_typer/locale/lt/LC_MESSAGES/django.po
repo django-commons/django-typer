@@ -1,0 +1,197 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:36-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "Įdiekite esamo apvalkalo automatinį užbaigimą."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "Naudojamas apvalkalas."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr "Filtruoti terminalo formatavimo valdymo sekas iš užbaigto teksto."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr "Leisti terminalo formatavimo valdymo sekas baigiamame tekste."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "Įdiekite esamo arba nurodyto apvalkalo automatinį užbaigimą."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django valdymo scenarijaus, skirto automatiniam užbaigimui įdiegti, "
+"pavadinimas, jei jis skiriasi nuo scenarijaus, naudojamo šiai komandai "
+"iškviesti."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"Python importavimo kelias į atsarginę užbaigimo funkciją, kurią reikia "
+"naudoti, kai užbaigimo komanda nėra „TyperCommand“."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "Šablono, naudojamo apvalkalo užbaigimo scenarijui, pavadinimas."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "Pašalinkite esamo arba nurodyto apvalkalo automatinį užbaigimą."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"Django valdymo scenarijaus pavadinimas, skirtas pašalinti apvalkalo "
+"užbaigimą, jei skiriasi nuo scenarijaus, naudojamo šiai komandai iškviesti."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "Sugeneruokite automatinį komandų eilutės užbaigimą."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "Komandos eilutė, skirta užbaigimo pasiūlymams generuoti."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "Žymeklio padėtis."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"Python importavimo kelias į atsarginę užbaigimo funkciją, kurią reikia "
+"naudoti, kai užbaigimo komanda nėra „TyperCommand“. Pagal numatytuosius "
+"nustatymus naudojama integruota django automatinio užbaigimo funkcija."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "Rodyti programos versijos numerį ir išeiti."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"Daugiažodiškumo lygis; 0 = minimali išvestis, 1 = įprasta išvestis, 2 = "
+"išsami išvestis, 3 = labai išsami išvestis"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"Python kelias į nustatymų modulį, pvz., „myproject.settings.main“. Jei tai "
+"nepateikta, bus naudojamas aplinkos kintamasis DJANGO_SETTINGS_MODULE."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"Katalogas, kurį reikia pridėti prie Python kelio, pvz., "
+"„/home/djangoprojects/myproject“."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "Padidinkite CommandError išimtis"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "Spausdinkite vietinius kintamuosius tracebacke."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "Slėpti vietinius kintamuosius pėdsakuose."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "Nespalvinkite komandos išvesties."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "Priverstinis komandos išvesties spalvinimas."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "Praleiskite sistemos patikrinimus."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(dinaminis)"
+
+#~ msgid "Aborted!"
+#~ msgstr "Nutraukta!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "numatytasis: {default}"
+
+#~ msgid "required"
+#~ msgstr "reikalaujama"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "Argumentai"
+
+#~ msgid "Options"
+#~ msgstr "Parinktys"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(nebenaudojama) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[numatytasis: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[būtina]"
+
+#~ msgid "Commands"
+#~ msgstr "Komandos"
+
+#~ msgid "Error"
+#~ msgstr "Klaida"
+
+#~ msgid "Aborted."
+#~ msgstr "Nutraukta."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr ""
+#~ "Jei reikia pagalbos, išbandykite [mėlyną]&#39;{command_path} "
+#~ "{help_option}&#39;[/]."

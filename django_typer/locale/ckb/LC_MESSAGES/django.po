@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-15 15:35-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: management/commands/shellcompletion.py:103
+msgid "Install autocompletion for the current shell."
+msgstr "تەواوکردنی ئۆتۆماتیکی بۆ توێکڵی ئێستا دابنێ."
+
+#: management/commands/shellcompletion.py:225
+msgid "The shell to use."
+msgstr "ئەو توێکڵە بۆ بەکارهێنان."
+
+#: management/commands/shellcompletion.py:238
+msgid "Filter terminal formatting control sequences out of completion text."
+msgstr ""
+"فلتەرکردنی زنجیرەکانی کۆنترۆڵی فۆرماتکردنی تێرمیناڵ لە دەقی تەواوکردن."
+
+#: management/commands/shellcompletion.py:252
+msgid "Allow terminal formatting control sequences in completion text."
+msgstr ""
+"ڕێگە بە زنجیرەکانی کۆنترۆڵکردنی فۆرماتکردنی تێرمیناڵ بدە لە دەقی "
+"تەواوکردندا."
+
+#: management/commands/shellcompletion.py:269
+msgid "Install autocompletion for the current or given shell."
+msgstr "تەواوکردنی ئۆتۆماتیکی بۆ توێکڵی ئێستا یان پێدراو دابنێ."
+
+#: management/commands/shellcompletion.py:279
+msgid ""
+"The name of the django manage script to install autocompletion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ناوی سکریپتی بەڕێوەبردنی django بۆ دامەزراندنی تەواوکردنی ئۆتۆماتیکی بۆ "
+"ئەگەر جیاواز بێت لەو سکریپتە کە بۆ بانگهێشتکردنی ئەم فرمانە بەکارهاتووە."
+
+#: management/commands/shellcompletion.py:291
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand."
+msgstr ""
+"ڕێڕەوی هاوردەکردنی پایتۆن بۆ فەنکشنێکی تەواوکردنی fallback بۆ بەکارهێنان "
+"کاتێک فەرمانی تەواوکردن TyperCommand نییە."
+
+#: management/commands/shellcompletion.py:304
+msgid "The name of the template to use for the shell completion script."
+msgstr "ناوی ئەو قاڵبەی کە بۆ سکریپتی تەواوکردنی توێکڵەکە بەکاردێت."
+
+#: management/commands/shellcompletion.py:355
+msgid "Uninstall autocompletion for the current or given shell."
+msgstr "تەواوکردنی ئۆتۆماتیکی بۆ توێکڵی ئێستا یان پێدراو لاببە."
+
+#: management/commands/shellcompletion.py:365
+msgid ""
+"The name of the django manage script to remove shell completion for if "
+"different than the script used to invoke this command."
+msgstr ""
+"ناوی سکریپتی بەڕێوەبردنی django بۆ لابردنی تەواوبوونی توێکڵ بۆ ئەگەر جیاواز "
+"بێت لەو سکریپتە کە بۆ بانگهێشتکردنی ئەم فرمانە بەکارهاتووە."
+
+#: management/commands/shellcompletion.py:397
+msgid "Generate autocompletion for command string."
+msgstr "دروستکردنی تەواوکردنی خۆکارانە بۆ ڕستەی فەرمانەکان."
+
+#: management/commands/shellcompletion.py:405
+msgid "The command string to generate completion suggestions for."
+msgstr "ڕیزبەندی فەرمانەکان بۆ دروستکردنی پێشنیاری تەواوکردن بۆ..."
+
+#: management/commands/shellcompletion.py:410
+msgid "The cursor position."
+msgstr "شوێنی ئاماژەدەرەکە."
+
+#: management/commands/shellcompletion.py:418
+msgid ""
+"The python import path to a fallback complete function to use when the "
+"completion command is not a TyperCommand. By default, the builtin django "
+"autocomplete function is used."
+msgstr ""
+"ڕێڕەوی هاوردەکردنی پایتۆن بۆ فەنکشنێکی تەواوکردنی fallback بۆ بەکارهێنان "
+"کاتێک فەرمانی تەواوکردن TyperCommand نییە. بە شێوەیەکی بنەڕەتی، فەنکشنی "
+"builtin django autocomplete بەکاردەهێنرێت."
+
+#: types.py:64
+msgid "Show program's version number and exit."
+msgstr "ژمارەی وەشانی بەرنامەکە پیشان بدە و دەربکە."
+
+#: types.py:84
+msgid ""
+"Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very"
+" verbose output"
+msgstr ""
+"ئاستی قسەکردن؛ 0=کەمترین دەرچوون، 1=دەرئەنجامی ئاسایی، 2=دەرئەنجامی قسەخۆش، "
+"3=دەرئەنجامی زۆر قسەخۆش"
+
+#: types.py:114
+msgid ""
+"The Python path to a settings module, e.g. \"myproject.settings.main\". If "
+"this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be"
+" used."
+msgstr ""
+"ڕێڕەوی پایتۆن بۆ مۆدیۆلی ڕێکخستنەکان، بۆ نموونە "
+"\"myproject.settings.main\". ئەگەر ئەمە دابین نەکرا، گۆڕاوەی ژینگەی "
+"DJANGO_SETTINGS_MODULE بەکاردەهێنرێت."
+
+#: types.py:139
+msgid ""
+"A directory to add to the Python path, e.g. "
+"\"/home/djangoprojects/myproject\"."
+msgstr ""
+"دایرێکتۆرێک بۆ زیادکردن بۆ ڕێڕەوی پایتۆن، بۆ نموونە "
+"\"/home/djangoprojects/myproject\"."
+
+#: types.py:161
+msgid "Raise on CommandError exceptions"
+msgstr "بەرزکردنەوە لەسەر ئیستسنای CommandError"
+
+#: types.py:181
+msgid "Print local variables in tracebacks."
+msgstr "گۆڕاوە ناوخۆییەکان لە شوێنپێهەڵگرتنەکاندا چاپ بکە."
+
+#: types.py:198
+msgid "Hide local variables in tracebacks."
+msgstr "گۆڕاوە ناوخۆییەکان لە شوێنپێهەڵگرتنەکاندا بشارەوە."
+
+#: types.py:214
+msgid "Don't colorize the command output."
+msgstr "دەرچوونی فەرمانەکە ڕەنگ مەکە."
+
+#: types.py:233
+msgid "Force colorization of the command output."
+msgstr "ڕەنگکردنی هێزی دەرچوونی فەرمانەکە."
+
+#: types.py:253
+msgid "Skip system checks."
+msgstr "پشکنینەکانی سیستەم بەجێبهێڵە."
+
+#~ msgid "(dynamic)"
+#~ msgstr "(داینامیک)"
+
+#~ msgid "Aborted!"
+#~ msgstr "لەبارچوو!"
+
+#, python-brace-format
+#~ msgid "default: {default}"
+#~ msgstr "پێشوەختە: {بەپێی پێشوەختە}"
+
+#~ msgid "required"
+#~ msgstr "داواکراو"
+
+#, python-brace-format
+#~ msgid "env var: {var}"
+#~ msgstr "env var: {var}"
+
+#~ msgid "Arguments"
+#~ msgstr "ئارگومێنتەکان"
+
+#~ msgid "Options"
+#~ msgstr "بژاردەکان"
+
+#~ msgid "(deprecated) "
+#~ msgstr "(بەکارنەهاتووە) "
+
+#~ msgid "[default: {}]"
+#~ msgstr "[بنەڕەتی: {}]"
+
+#~ msgid "[env var: {}]"
+#~ msgstr "[env var: {}]"
+
+#~ msgid "[required]"
+#~ msgstr "[داواکراو]"
+
+#~ msgid "Commands"
+#~ msgstr "فەرمانەکان"
+
+#~ msgid "Error"
+#~ msgstr "هەڵە"
+
+#~ msgid "Aborted."
+#~ msgstr "لەبارچوو."
+
+#, python-brace-format
+#~ msgid "Try [blue]'{command_path} {help_option}'[/] for help."
+#~ msgstr "بۆ یارمەتی [blue]&#39;{command_path} {help_option}&#39;[/] هەوڵبدە."
