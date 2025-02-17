@@ -4,12 +4,6 @@ permissions: read-all
 
 on:
   workflow_dispatch:
-    inputs:
-      debug:
-        description: 'Open ssh debug session.'
-        required: true
-        default: false
-        type: boolean
   # Run every Sunday at midnight UTC (00:00) - triggered by webhook?
   schedule:
     - cron: '0 0 * * SUN'
@@ -25,16 +19,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install Emacs
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          sudo apt install emacs
-      - name: Setup tmate session
-        if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
-        timeout-minutes: 60
       - name: Checkout repository
         uses: actions/checkout@v4
 
