@@ -54,8 +54,9 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Dependencies
         run: |
-          just init ${{ steps.sp.outputs.python-path }} install-docs
-          just pin-dependency Django~=${{ matrix.django-version }}.0
+          just setup ${{ steps.sp.outputs.python-path }}
+          just test-lock Django~=${{ matrix.django-version }}.0
+          just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |

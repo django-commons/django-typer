@@ -71,11 +71,10 @@ jobs:
       timeout-minutes: 60
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
         sudo apt remove powershell
     - name: Run Unit Tests
       run: |
@@ -127,11 +126,10 @@ jobs:
       uses: rhysd/action-setup-vim@v1
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -183,11 +181,10 @@ jobs:
     - name: Setup Just
       run: |
         brew install just
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -256,11 +253,11 @@ jobs:
             detached: true
         - name: Setup Just
           uses: extractions/setup-just@v2
-        - name: Install
+        - name: Install Dependencies
           run: |
-            just init  ${{ steps.sp.outputs.python-path }}
-            just install --with psycopg3
-            just pin-dependency Django~=${{ matrix.django-version }}.0
+            just setup ${{ steps.sp.outputs.python-path }}
+            just test-lock Django~=${{ matrix.django-version }}.0
+            just install-psycopg3
         - name: Run Unit Tests
           run: |
             just test ./tests/verify_environment.py
@@ -309,11 +306,10 @@ jobs:
         detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Test Tab Completion
       run: |
         just test ./tests/verify_environment.py
@@ -363,11 +359,10 @@ jobs:
         detached: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -433,11 +428,10 @@ jobs:
         sudo chsh -s /bin/zsh runner
     - name: Set SHELL variable
       run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
@@ -490,11 +484,10 @@ jobs:
     - name: Setup Just
       run: |
         brew install just
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -553,11 +546,10 @@ jobs:
         sudo chsh -s $(which fish)
     - name: Set SHELL variable
       run: echo "SHELL=$(which fish)" >> $GITHUB_ENV
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
@@ -611,11 +603,10 @@ jobs:
       shell: powershell
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install Release Dependencies
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
@@ -682,5 +673,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files:
+            ./coverage.xml
           verbose: true

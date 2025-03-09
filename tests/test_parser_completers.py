@@ -151,8 +151,8 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             time(23, 59, 59, 999999),
         ],
         "duration_field": [
-            # TODO - the negative durations are not being completed because typer/click interprets
-            # the incomplete string as an option, not a value.
+            # TODO - the negative durations are not being completed because typer/click
+            # interprets the incomplete string as an option, not a value.
             # https://github.com/django-commons/django-typer/issues/161
             timedelta(days=5),
             timedelta(days=52),
@@ -1802,52 +1802,54 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             for pth in local_files:
                 self.assertNotIn(f".{sep}{pth}", result)
 
-        result = self.shellcompletion.complete("multi --pythonpath ./d")
-        self.assertIn("./doc", result)
-        self.assertIn("./django_typer", result)
+        local_dirs = [
+            (Path("./src/django_typer") / d).as_posix()
+            for d in os.listdir("./src/django_typer")
+            if (Path("./src/django_typer") / d).is_dir()
+        ]
+        result = self.shellcompletion.complete("multi --pythonpath ./src/d")
+        self.assertNotIn("./doc", result)
+        self.assertIn("./src/django_typer", result)
         for pth in [
             *local_files,
-            *[pth for pth in local_dirs if not pth.startswith("d")],
+            *[pth for pth in local_dirs if not pth.startswith("./src/d")],
         ]:
-            self.assertNotIn(f"./{pth}", result)
+            self.assertNotIn(f"./src/{pth}", result)
 
-        local_dirs = [
-            (Path("django_typer") / d).as_posix()
-            for d in os.listdir("django_typer")
-            if (Path("django_typer") / d).is_dir()
-        ]
         local_files = [
-            (Path("django_typer") / f).as_posix()
-            for f in os.listdir("django_typer")
-            if not (Path("django_typer") / f).is_dir()
+            (Path("./src/django_typer") / f).as_posix()
+            for f in os.listdir("./src/django_typer")
+            if not (Path("./src/django_typer") / f).is_dir()
         ]
-        result = self.shellcompletion.complete("multi --pythonpath dj")
+        result = self.shellcompletion.complete("multi --pythonpath src/dj")
         for pth in local_dirs:
             self.assertIn(pth.replace("/", os.path.sep), result)
         for pth in local_files:
             self.assertNotIn(pth.replace("/", os.path.sep), result)
 
-        result = self.shellcompletion.complete("multi --pythonpath ./dj")
+        result = self.shellcompletion.complete("multi --pythonpath ./src/dj")
         for pth in local_dirs:
             self.assertIn(f"./{pth}", result)
         for pth in local_files:
             self.assertNotIn(f"./{pth}", result)
 
-        result = self.shellcompletion.complete("multi --pythonpath ./django_typer")
-        self.assertIn("./django_typer/management", result)
-        self.assertIn("./django_typer/locale", result)
-        self.assertNotIn("./django_typer/__init__.py", result)
+        result = self.shellcompletion.complete("multi --pythonpath ./src/django_typer")
+        self.assertIn("./src/django_typer/management", result)
+        self.assertIn("./src/django_typer/locale", result)
+        self.assertNotIn("./src/django_typer/__init__.py", result)
 
-        result = self.shellcompletion.complete("multi --pythonpath django_typer/")
-        self.assertIn("django_typer/management", result)
-        self.assertIn("django_typer/locale", result)
-        self.assertNotIn("django_typer/__init__.py", result)
+        result = self.shellcompletion.complete("multi --pythonpath src/django_typer/")
+        self.assertIn("src/django_typer/management", result)
+        self.assertIn("src/django_typer/locale", result)
+        self.assertNotIn("src/django_typer/__init__.py", result)
 
-        result = self.shellcompletion.complete("multi --pythonpath django_typer/man")
-        self.assertIn("django_typer/management/commands", result)
-        self.assertNotIn("django_typer/examples", result)
-        self.assertNotIn("django_typer/locale", result)
-        self.assertNotIn("django_typer/management/__init__.py", result)
+        result = self.shellcompletion.complete(
+            "multi --pythonpath src/django_typer/man"
+        )
+        self.assertIn("src/django_typer/management/commands", result)
+        self.assertNotIn("src/django_typer/examples", result)
+        self.assertNotIn("src/django_typer/locale", result)
+        self.assertNotIn("src/django_typer/management/__init__.py", result)
 
         result = self.shellcompletion.complete("multi --pythonpath /")
         for pth in os.listdir("/"):
@@ -1858,18 +1860,20 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             else:
                 self.assertNotIn(f"/{pth}", result)
 
-        result = self.shellcompletion.complete("multi --pythonpath django_typer/utils")
-        self.assertNotIn("django_typer/utils.py", result)
+        result = self.shellcompletion.complete(
+            "multi --pythonpath src/django_typer/utils"
+        )
+        self.assertNotIn("src/django_typer/utils.py", result)
 
         result = self.shellcompletion.complete(
-            "multi --pythonpath django_typer/does_not_exist"
+            "multi --pythonpath src/django_typer/does_not_exist"
         )
-        self.assertNotIn("django_typer", result)
+        self.assertNotIn("src/django_typer", result)
 
         result = self.shellcompletion.complete(
             "multi --pythonpath does_not_exist/does_not_exist"
         )
-        self.assertNotIn("django_typer", result)
+        self.assertNotIn("src", result)
 
     def test_path_completer(self):
         local_paths = [Path(pth).as_posix() for pth in os.listdir()]
@@ -1882,11 +1886,11 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             for pth in local_paths:
                 self.assertIn(f".{sep}{pth}", result)
 
-        result = self.shellcompletion.complete("completion --path ./d")
-        self.assertIn("./doc", result)
-        self.assertIn("./django_typer", result)
+        result = self.shellcompletion.complete("completion --path ./C")
+        self.assertIn("./CONTRIBUTING.md", result)
+        self.assertIn("./CODE_OF_CONDUCT.md", result)
         for pth in [
-            *[pth for pth in local_paths if not pth.startswith("d")],
+            *[pth for pth in local_paths if not pth.startswith("C")],
         ]:
             self.assertNotIn(f"./{pth}", result)
 
@@ -1897,33 +1901,33 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             self.assertNotIn(f"./{pth}", result)
 
         local_paths = [
-            (Path("django_typer") / d).as_posix()
-            for d in os.listdir("django_typer")
-            if (Path("django_typer") / d).is_dir()
+            (Path("src/django_typer") / d).as_posix()
+            for d in os.listdir("src/django_typer")
+            if (Path("src/django_typer") / d).is_dir()
         ]
-        result = self.shellcompletion.complete("completion --path dj")
+        result = self.shellcompletion.complete("completion --path src/dj")
         for pth in local_paths:
             self.assertIn(str(pth).replace("/", os.path.sep), result)
 
-        result = self.shellcompletion.complete("completion --path ./dj")
+        result = self.shellcompletion.complete("completion --path ./src/dj")
         for pth in local_paths:
             self.assertIn(f"./{pth}", result)
 
-        result = self.shellcompletion.complete("completion --path ./django_typer")
-        self.assertIn("./django_typer/management", result)
-        self.assertIn("./django_typer/locale", result)
-        self.assertIn("./django_typer/__init__.py", result)
+        result = self.shellcompletion.complete("completion --path ./src/django_typer")
+        self.assertIn("./src/django_typer/management", result)
+        self.assertIn("./src/django_typer/locale", result)
+        self.assertIn("./src/django_typer/__init__.py", result)
 
-        result = self.shellcompletion.complete("completion --path django_typer/")
-        self.assertIn("django_typer/management", result)
-        self.assertIn("django_typer/locale", result)
-        self.assertIn("django_typer/__init__.py", result)
+        result = self.shellcompletion.complete("completion --path src/django_typer/")
+        self.assertIn("src/django_typer/management", result)
+        self.assertIn("src/django_typer/locale", result)
+        self.assertIn("src/django_typer/__init__.py", result)
 
-        result = self.shellcompletion.complete("completion --path django_typer/man")
-        self.assertIn("django_typer/management/__init__.py", result)
-        self.assertIn("django_typer/management/commands", result)
-        self.assertNotIn("django_typer/examples", result)
-        self.assertNotIn("django_typer/locale", result)
+        result = self.shellcompletion.complete("completion --path src/django_typer/man")
+        self.assertIn("src/django_typer/management/__init__.py", result)
+        self.assertIn("src/django_typer/management/commands", result)
+        self.assertNotIn("src/django_typer/examples", result)
+        self.assertNotIn("src/django_typer/locale", result)
 
         result = self.shellcompletion.complete("completion --path /")
         for pth in os.listdir("/"):
@@ -1932,31 +1936,33 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             self.assertIn(f"/{pth}", result)
 
         result = self.shellcompletion.complete(
-            "completion --path django_typer/completers"
+            "completion --path src/django_typer/completers"
         )
-        self.assertIn("django_typer/completers", result)
-
-        result = self.shellcompletion.complete("completion --path django_typer/apps.py")
-        self.assertIn("django_typer/apps.py", result)
+        self.assertIn("src/django_typer/completers", result)
 
         result = self.shellcompletion.complete(
-            "completion --path django_typer/does_not_exist"
+            "completion --path src/django_typer/apps.py"
         )
-        self.assertNotIn("django_typer", result)
+        self.assertIn("src/django_typer/apps.py", result)
+
+        result = self.shellcompletion.complete(
+            "completion --path src/django_typer/does_not_exist"
+        )
+        self.assertNotIn("src/django_typer", result)
 
         result = self.shellcompletion.complete(
             "completion --path does_not_exist/does_not_exist"
         )
-        self.assertNotIn("django_typer", result)
+        self.assertNotIn("src/django_typer", result)
 
     def test_mixed_divider_path_completer(self):
         shellcompletion = get_command("shellcompletion", ShellCompletion)
         shellcompletion.init(shell=SHELL)
         completions = shellcompletion.complete(
-            "completion --path ./django_typer\\compl"
+            "completion --path ./src/django_typer\\compl"
         )
         if platform.system() == "Windows":
-            self.assertIn("./django_typer\\completers", completions)
+            self.assertIn("./src/django_typer\\completers", completions)
         else:
             self.assertFalse(completions.strip())
 

@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import Error, register
-
 from django_typer.utils import register_command_plugins
 
 

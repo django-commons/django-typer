@@ -4,6 +4,12 @@
 Change Log
 ==========
 
+v3.1.0 (2024-03-xx)
+===================
+
+* Implemented `Switch poetry -> uv <https://github.com/django-commons/django-typer/issues/185>`_
+
+
 v3.0.0 (2024-02-16)
 ===================
 
