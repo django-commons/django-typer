@@ -69,6 +69,10 @@ jobs:
       with:
         detached: true
       timeout-minutes: 60
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Dependencies
@@ -124,6 +128,10 @@ jobs:
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Dependencies
@@ -178,6 +186,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -251,6 +263,10 @@ jobs:
           uses: mxschmitt/action-tmate@v3.19
           with:
             detached: true
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+          with:
+            enable-cache: true
         - name: Setup Just
           uses: extractions/setup-just@v2
         - name: Install Dependencies
@@ -304,6 +320,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Dependencies
@@ -357,6 +377,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Dependencies
@@ -416,6 +440,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -481,6 +509,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -536,6 +568,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -598,9 +634,13 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
-    - name: Add to Poetry to PATH
+    - name: Add to Just to PATH
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
     - name: Install Dependencies
@@ -618,7 +658,7 @@ jobs:
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        just test ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -653,6 +693,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         id: sp
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Setup Just
         uses: extractions/setup-just@v2
       - name: Install Release Dependencies
