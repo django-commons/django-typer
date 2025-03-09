@@ -182,52 +182,73 @@ check: check-lint check-format check-types check-package check-docs check-docs-l
 
 # run the tests that require rich not to be installed
 test-no-rich:
-    @just run pip uninstall -y rich
-    @just run pytest --cov-append -m no_rich
+    uv pip uninstall rich
+    uv run pytest --cov-append -m no_rich
 
 # run the tests that require rich to be installed
 test-rich:
-    @just run pytest --cov-append -m rich
-
-# run all tests and log them
-log-tests:
-    @just run python -m pytest --collect-only --disable-warnings -q --no-cov | @just run python -c "from pathlib import Path; import sys; Path('./tests/tests.log').unlink(missing_ok=True); open('./tests/tests.log', 'a').close(); open('./tests/all_tests.log', 'w').writelines(sys.stdin)"
+    uv run pytest --cov-append -m rich
 
 # run all tests
 test-all: test-rich test-no-rich
-    @just run pip install colorama
-    @just run pytest --cov-append -m "not rich and not no_rich"
-    @just run pip uninstall -y colorama
-    @just run pytest --cov-append -k test_ctor_params
+    uv pip install colorama
+    uv run pytest --cov-append -m "not rich and not no_rich"
+    uv pip uninstall colorama
+    uv run pytest --cov-append -k test_ctor_params
+
+_log-tests:
+    uv run pytest --collect-only --disable-warnings -q --no-cov
+
+# run all tests and log them
+[script]
+log-tests:
+    from pathlib import Path
+    import sys
+    Path('./tests/tests.log').unlink(missing_ok=True)
+    open('./tests/tests.log', 'a').close()
+    open('./tests/all_tests.log', 'w').writelines(sys.stdin)
 
 # run the tests and report if any were not run - sanity check
+[script]
 list-missed-tests: install log-tests test-all
-    @just run python ./tests/missed_tests.py
+    import sys
+    from pathlib import Path
+    test_log = Path(__file__).parent / "tests.log"
+    all_tests = Path(__file__).parent / "all_tests.log"
+    assert test_log.is_file() and all_tests.is_file()
+
+    tests_run = set(test_log.read_text().splitlines())
+    all_tests = set(all_tests.read_text().splitlines()[0:-2])
+    if tests_run != all_tests:
+        print("Not all tests were run:", file=sys.stderr)
+        for test in all_tests - tests_run:
+            print(test, file=sys.stderr)
+        sys.exit(1)
 
 # test bash shell completions
 [script("bash")]
 test-bash:
-    @just run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
+    uv run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
 
 # test zsh shell completions
 [script("zsh")]
 test-zsh:
-    @just run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
+    uv run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
 
 # test powershell shell completions
 [script("powershell")]
 test-powershell:
-    @just run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
+    uv run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
 
 # test pwsh shell completions
 [script("pwsh")]
 test-pwsh:
-    @just run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
+    uv run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
 
 # test fish shell completions
 [script("fish")]
 test-fish:
-    @just run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
+    uv run pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
 
 # run tests
 test *TESTS:
