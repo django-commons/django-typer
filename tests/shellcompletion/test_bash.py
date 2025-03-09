@@ -69,7 +69,7 @@ class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
         self.assertEqual(
             (
                 Path(__file__).parent.parent.parent
-                / "django_typer/templates/shell_complete/bash.sh"
+                / "src/django_typer/templates/shell_complete/bash.sh"
             ).read_text(),
             self.get_completer().source_template,
         )
@@ -77,7 +77,7 @@ class BashExeTests(_InstalledScriptCompleteTestCase, BashTests):
         self.assertEqual(
             (
                 Path(__file__).parent.parent.parent
-                / "django_typer/templates/shell_complete/zsh.sh"
+                / "src/django_typer/templates/shell_complete/zsh.sh"
             ).read_text(),
             self.get_completer(template="shell_complete/zsh.sh").source_template,
         )
