@@ -82,9 +82,11 @@ jobs:
       uses: extractions/setup-just@v2
     - name: Install Dependencies
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
-        sudo apt remove powershell
+        if [ "${{ matrix.django-version }}" = "5.2b1" ]; then
+          just test-lock "Django==${{ matrix.django-version }}"
+        else
+          just test-lock "Django~=${{ matrix.django-version }}.0"
+        fi
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
