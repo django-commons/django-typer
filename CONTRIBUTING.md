@@ -10,11 +10,10 @@ We are actively seeking additional maintainers. If you're interested, please ope
 
 We provide a platform independent justfile with recipes for all the development tasks. You should [install just](https://just.systems/man/en/installation.html) if it is not on your system already.
 
-`django-typer` uses [Poetry](https://python-poetry.org/) for environment, package, and dependency management. ``just init`` will install the necessary build tooling if you do not already have it:
+`django-typer` uses [uv](https://docs.astral.sh/uv) for environment, package, and dependency management. ``just setup`` will install the necessary build tooling if you do not already have it:
 
 ```shell
-just init
-just install
+just setup
 ```
 
 ### Windows
@@ -70,14 +69,14 @@ just test-all
 To run a single test, or group of tests in a class:
 
 ```shell
-poetry run pytest <path_to_tests_file>::ClassName::FunctionName
+just test <path_to_tests_file>::ClassName::FunctionName
 ```
 
 For instance, to run all tests in BasicTests, and then just the test_call_command test you would do:
 
 ```shell
-poetry run pytest tests/test_basics.py::BasicTests
-poetry run pytest tests/test_basics.py::BasicTests::test_call_command
+just test tests/test_basics.py::BasicTests
+just test tests/test_basics.py::BasicTests::test_call_command
 ```
 
 ## Versioning
