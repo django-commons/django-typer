@@ -1821,7 +1821,7 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             for f in os.listdir("./src/django_typer")
             if not (Path("./src/django_typer") / f).is_dir()
         ]
-        result = self.shellcompletion.complete("multi --pythonpath src/dj")
+        result = self.shellcompletion.complete(f"multi --pythonpath src{os.path.sep}dj")
         for pth in local_dirs:
             self.assertIn(pth.replace("/", os.path.sep), result)
         for pth in local_files:
@@ -1905,7 +1905,7 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             for d in os.listdir("src/django_typer")
             if (Path("src/django_typer") / d).is_dir()
         ]
-        result = self.shellcompletion.complete("completion --path src/dj")
+        result = self.shellcompletion.complete(f"completion --path src{os.path.sep}dj")
         for pth in local_paths:
             self.assertIn(str(pth).replace("/", os.path.sep), result)
 

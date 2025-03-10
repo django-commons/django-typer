@@ -13,10 +13,11 @@ default:
 manage *COMMAND:
     import os
     import sys
+    import shlex
     from pathlib import Path
     from django.core import management
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings.base")
-    management.execute_from_command_line(sys.argv + "{{ COMMAND }}".split(" "))
+    management.execute_from_command_line(sys.argv + shlex.split('{{ COMMAND }}'))
 
 # install the uv package manager
 [linux]
@@ -94,7 +95,7 @@ clean-git-ignored:
     git clean -fdX
 
 # remove all non repository artifacts
-clean: clean-docs clean-env clean-git-ignored
+clean: clean-docs clean-git-ignored clean-env
 
 # build html documentation
 build-docs-html: install-docs
