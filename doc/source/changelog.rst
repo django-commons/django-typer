@@ -7,6 +7,7 @@ Change Log
 v3.1.0 (2024-03-xx)
 ===================
 
+* Implemented `Support Django 5.2 <https://github.com/django-commons/django-typer/issues/188>`_
 * Implemented `Switch poetry -> uv <https://github.com/django-commons/django-typer/issues/185>`_
 * Implemented `Require tests to pass before release action runs. <<https://github.com/django-commons/django-typer/issues/173>`_
 

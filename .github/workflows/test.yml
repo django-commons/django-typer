@@ -35,6 +35,7 @@ jobs:
           - '4.2' # LTS April 2026
           - '5.0' # April 2025
           - '5.1' # December 2025
+          - '5.2b1'
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
@@ -50,6 +51,8 @@ jobs:
             django-version: '4.2'
           - python-version: '3.13'
             django-version: '5.0'
+          - python-version: '3.9'
+            django-version: '5.2b1'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
