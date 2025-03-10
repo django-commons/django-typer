@@ -8,6 +8,7 @@ v3.1.0 (2024-03-xx)
 ===================
 
 * Implemented `Switch poetry -> uv <https://github.com/django-commons/django-typer/issues/185>`_
+* Implemented `Require tests to pass before release action runs. <<https://github.com/django-commons/django-typer/issues/173>`_
 
 
 v3.0.0 (2024-02-16)
