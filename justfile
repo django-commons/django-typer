@@ -48,6 +48,7 @@ install *OPTS:
 install-docs:
     uv sync --group docs --all-extras
 
+# install with postgresql dependencies
 install-psycopg3:
     uv sync --group psycopg3
 
@@ -108,6 +109,7 @@ build-docs-pdf: install-docs
 # build the docs
 build-docs: build-docs-html
 
+# build src package and wheel
 build:
     uv build
 
