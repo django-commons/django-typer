@@ -18,6 +18,7 @@ on:
 
 env:
   ENABLE_CI_ONLY_TESTS: "1"
+  PYTHONPATH: ${{ github.workspace }}
 
 jobs:
 
@@ -659,7 +660,7 @@ jobs:
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        uv run pytest ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        just test-win-shell-failure
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4
