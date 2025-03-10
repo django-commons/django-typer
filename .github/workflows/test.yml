@@ -707,7 +707,7 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Install Release Dependencies
         run: |
-          just init ${{ steps.sp.outputs.python-path }}
+          just setup ${{ steps.sp.outputs.python-path }}
           just install
 
       - name: Get coverage files
