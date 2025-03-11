@@ -1,7 +1,6 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set unstable := true
 set script-interpreter := ['uv', 'run', '--script']
-set positional-arguments := true
 
 export PYTHONPATH := source_directory()
 
@@ -10,7 +9,7 @@ default:
     @just --list --list-submodules
 
 [script]
-_manage *COMMAND:
+manage *COMMAND:
     import os
     import sys
     import shlex
@@ -18,38 +17,6 @@ _manage *COMMAND:
     from django.core import management
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings.base")
     management.execute_from_command_line(["just manage", *shlex.split("{{ COMMAND }}")])
-
-# run the django admin
-manage *COMMAND:
-    #! /bin/sh
-    ARGS_LIST=""
-    for arg in "$@"; do
-    case "$arg" in
-        *[[:space:]]*)
-            # Argument contains a space; wrap it in quotes.
-            ARGS_LIST="${ARGS_LIST} \"\'${arg}\'\""
-            ;;
-        *)
-            # No spaces, print as-is.
-            ARGS_LIST="${ARGS_LIST} ${arg}"
-            ;;
-        esac
-    done
-    eval "just _manage $ARGS_LIST"
-
-# run the django admin
-[windows]
-manage *COMMAND:
-    $ARGS_LIST = ""
-    foreach ($arg in $args) {
-        if ($arg -match "\s") {
-            $ARGS_LIST += " " + '"' + "'" + $arg + "'" + '"'
-        }
-        else {
-            $ARGS_LIST += " " + $arg
-        }
-    }
-    Invoke-Expression "just _manage $ARGS_LIST"
 
 # install the uv package manager
 [linux]
