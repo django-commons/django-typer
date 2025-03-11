@@ -661,6 +661,67 @@ jobs:
         just test ./tests/verify_environment.py
         just test-powershell
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      shell: powershell
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  windows-pwsh-complete:
+    runs-on: windows-latest
+    permissions:
+      actions: write
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.0' # April 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.0'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: windows-pwsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-vim-windows
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3.19
+      with:
+        detached: true
+    - name: Add to Just to PATH
+      run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
+      shell: pwsh
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install Dependencies
+      run: |
+        just setup ${{ steps.sp.outputs.python-path }}
+        just install --extra rich
+        just test-lock Django~=${{ matrix.django-version }}.0
+      shell: pwsh
+    - name: Run Powershell Tab Completion Tests
+      run: |
+        just test ./tests/verify_environment.py
         just test-pwsh
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
@@ -684,7 +745,8 @@ jobs:
       macos-zsh-complete,
       macos-bash-complete,
       macos-fish-complete,
-      windows-powershell-complete
+      windows-powershell-complete,
+      windows-pwsh-complete
     ]
     runs-on: ubuntu-latest
 
