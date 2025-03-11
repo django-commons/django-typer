@@ -43,6 +43,10 @@ install *OPTS:
     uv sync {{ OPTS }}
     @just run pre-commit install
 
+# install with rich dependencies
+install-rich:
+    uv sync --extra rich
+
 # install documentation dependencies
 install-docs:
     uv sync --group docs --all-extras
@@ -189,6 +193,7 @@ test-no-rich:
 
 # run the tests that require rich to be installed
 test-rich:
+    @just install-rich
     uv run pytest --cov-append -m rich
 
 # run all tests
