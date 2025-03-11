@@ -731,7 +731,7 @@ jobs:
         .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"
         just test-pwsh
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      shell: powershell
+      shell: pwsh
     - name: Test CMD shell failure
       run: |
         call .venv\Scripts\activate
