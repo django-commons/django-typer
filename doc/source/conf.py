@@ -6,8 +6,7 @@ from sphinx.ext.autodoc import between
 import shutil
 import django
 
-sys.path.append(str(Path(__file__).parent.parent.parent / 'tests'))
-sys.path.append(str(Path(__file__).parent.parent.parent / 'examples'))
+sys.path.append(str(Path(__file__).parent.parent.parent))
 sys.path.append(str(Path(__file__).parent / 'ext'))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings.base')
