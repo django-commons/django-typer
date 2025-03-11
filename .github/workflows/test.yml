@@ -727,8 +727,7 @@ jobs:
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        set PYTHONPATH=%CD%
-        .venv\Scripts\activate
+        call .venv\Scripts\activate
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
