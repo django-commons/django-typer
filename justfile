@@ -187,20 +187,19 @@ fix: lint format
 check: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
 # run the tests that require rich not to be installed
-test-no-rich:
-    uv pip uninstall rich
-    uv run pytest --cov-append -m no_rich
+test-no-rich *ENV:
+    uv run {{ ENV }} --no-extra rich --exact pytest --cov-append -m no_rich
 
 # run the tests that require rich to be installed
-test-rich:
-    uv run pytest --cov-append -m rich
+test-rich *ENV:
+    uv run {{ ENV }} --extra rich --exact pytest --cov-append -m rich
 
 # run all tests
-test-all: test-rich test-no-rich
-    uv pip install colorama
-    uv run pytest --cov-append -m "not rich and not no_rich"
-    uv pip uninstall colorama
-    uv run pytest --cov-append -k test_ctor_params
+test-all *ENV: coverage-erase
+    @just test-rich {{ ENV }}
+    @just test-no-rich {{ ENV }}
+    uv run {{ ENV }} --all-extras --group colorama --exact pytest --cov-append -m "not rich and not no_rich"
+    uv run --all-extras --no-group colorama --exact colorama pytest --cov-append -k test_ctor_params
 
 _log-tests:
     uv run pytest --collect-only --disable-warnings -q --no-cov
@@ -266,6 +265,10 @@ test *TESTS:
 # run the pre-commit checks
 precommit:
     @just run pre-commit
+
+# erase any coverage data
+coverage-erase:
+    @just run coverage erase
 
 # generate the test coverage report
 coverage:

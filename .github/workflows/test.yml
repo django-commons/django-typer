@@ -280,11 +280,11 @@ jobs:
           run: |
             just setup ${{ steps.sp.outputs.python-path }}
             just test-lock Django~=${{ matrix.django-version }}.0
-            just install-psycopg3
+            just install
         - name: Run Unit Tests
           run: |
             just test ./tests/verify_environment.py
-            just test-all
+            just test-all --group psycopg3
         - name: Store coverage files
           uses: actions/upload-artifact@v4
           with:
@@ -727,7 +727,8 @@ jobs:
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        .venv\Scripts\activate.bat
+        set PYTHONPATH=%CD%
+        .venv\Scripts\activate
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files

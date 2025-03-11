@@ -502,6 +502,9 @@ rich = [
 ]
 
 [package.dev-dependencies]
+colorama = [
+    { name = "colorama" },
+]
 dev = [
     { name = "coverage" },
     { name = "django-stubs" },
@@ -549,6 +552,7 @@ requires-dist = [
 provides-extras = ["rich"]
 
 [package.metadata.requires-dev]
+colorama = [{ name = "colorama", specifier = ">=0.4.6" }]
 dev = [
     { name = "coverage", specifier = ">=7.6.12" },
     { name = "django-stubs", specifier = ">=5.1.3" },

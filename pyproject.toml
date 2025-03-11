@@ -166,6 +166,9 @@ exclude = [
 ]
 
 [dependency-groups]
+colorama = [
+    "colorama>=0.4.6",
+]
 dev = [
     "coverage>=7.6.12",
     "django-stubs>=5.1.3",
