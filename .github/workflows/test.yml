@@ -659,7 +659,7 @@ jobs:
     - name: Run Powershell Tab Completion Tests
       run: |
         just test ./tests/verify_environment.py
-        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell" || exit 1
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-powershell
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
@@ -728,7 +728,7 @@ jobs:
     - name: Run Powershell Tab Completion Tests
       run: |
         just test ./tests/verify_environment.py
-        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh" || exit 1
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         just test-pwsh
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
