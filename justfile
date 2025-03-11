@@ -199,7 +199,7 @@ test-all *ENV: coverage-erase
     @just test-rich {{ ENV }}
     @just test-no-rich {{ ENV }}
     uv run {{ ENV }} --all-extras --group colorama --exact pytest --cov-append -m "not rich and not no_rich"
-    uv run --all-extras --no-group colorama --exact colorama pytest --cov-append -k test_ctor_params
+    uv run {{ ENV }} --all-extras --no-group colorama --exact pytest --cov-append -k test_ctor_params
 
 _log-tests:
     uv run pytest --collect-only --disable-warnings -q --no-cov
