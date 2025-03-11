@@ -666,7 +666,7 @@ jobs:
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        uv run pytest ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        uv run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4

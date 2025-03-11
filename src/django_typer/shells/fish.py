@@ -1,3 +1,4 @@
+import os
 from functools import cached_property
 from pathlib import Path
 
@@ -36,9 +37,19 @@ class FishComplete(DjangoTyperShellCompleter):
     Fish does not support ansi control codes.
     """
 
+    def get_user_profile(self) -> Path:
+        """
+        Get the user's fish config file. It is located in the user's home directory by
+        default unless the ``XDG_CONFIG_HOME`` environment variable is set.
+        """
+        return (
+            Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+            / "fish/config.fish"
+        )
+
     @cached_property
     def install_dir(self) -> Path:
-        install_dir = Path.home() / ".config/fish/completions"
+        install_dir = self.get_user_profile().parent / "completions"
         install_dir.mkdir(parents=True, exist_ok=True)
         return install_dir
 

@@ -237,6 +237,14 @@ class DjangoTyperShellCompleter(ShellComplete):
         Deriving classes must implement this method to uninstall the completion script.
         """
 
+    @abstractmethod
+    def get_user_profile(self) -> Path:
+        """
+        Most shells have a profile script that is sourced when the interactive shell
+        starts. Deriving classes should implement this method to return the location
+        of that script.
+        """
+
     def process_rich_text(self, text: str) -> str:
         """
         Removes rich text markup from a string if color is disabled, otherwise it

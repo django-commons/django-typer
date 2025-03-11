@@ -44,12 +44,19 @@ class ZshComplete(DjangoTyperShellCompleter):
     by default.
     """
 
+    def get_user_profile(self) -> Path:
+        """
+        Get the user's .zshrc file. It is located in the user's home directory by
+        default unless the ``ZDOTDIR`` environment variable is set.
+        """
+        return Path(os.environ.get("ZDOTDIR", Path.home())) / ".zshrc"
+
     @cached_property
     def install_dir(self) -> Path:
         """
         The directory where completer scripts will be installed.
         """
-        install_dir = Path.home() / ".zfunc"
+        install_dir = self.get_user_profile().parent / ".zfunc"
         install_dir.mkdir(parents=True, exist_ok=True)
         return install_dir
 
@@ -60,7 +67,7 @@ class ZshComplete(DjangoTyperShellCompleter):
     def install(self) -> Path:
         assert self.prog_name
         Path.home().mkdir(parents=True, exist_ok=True)
-        zshrc = Path.home() / ".zshrc"
+        zshrc = self.get_user_profile()
         zshrc_source = ""
         if zshrc.is_file():
             zshrc_source = zshrc.read_text()
@@ -94,7 +101,7 @@ class ZshComplete(DjangoTyperShellCompleter):
         if script.is_file():
             script.unlink()
 
-        zshrc = Path.home() / ".zshrc"
+        zshrc = self.get_user_profile()
         if zshrc.is_file():
             zshrc_source = zshrc.read_text()
             zshrc.write_text(
