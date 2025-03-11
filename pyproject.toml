@@ -143,13 +143,14 @@ command_line = "-m pytest --cov=django_typer"
 
 [tool.coverage.paths]
 source = [
-    "django_typer"
+    "src/django_typer"
 ]
 
 [tool.pyright]
 exclude = ["tests/**/*"]
 include = [
-    "src/django_typer"
+    "src/django_typer",
+    "*/site-packages/django_typer"
 ]
 
 [tool.ruff]
