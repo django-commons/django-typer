@@ -280,7 +280,7 @@ jobs:
           run: |
             just setup ${{ steps.sp.outputs.python-path }}
             just test-lock Django~=${{ matrix.django-version }}.0
-            just install
+            just install-psycopg3
         - name: Run Unit Tests
           run: |
             just test ./tests/verify_environment.py
