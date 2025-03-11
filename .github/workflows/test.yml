@@ -653,7 +653,7 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just install --extra rich
+        just install
         just test-lock Django~=${{ matrix.django-version }}.0
       shell: powershell
     - name: Run Powershell Tab Completion Tests
@@ -716,7 +716,7 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just install --extra rich
+        just install
         just test-lock Django~=${{ matrix.django-version }}.0
       shell: pwsh
     - name: Run Powershell Tab Completion Tests

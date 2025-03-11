@@ -40,12 +40,12 @@ install-precommit:
 
 # update and install development dependencies
 install *OPTS:
-    uv sync {{ OPTS }}
+    uv sync --all-extras {{ OPTS }}
     @just run pre-commit install
 
-# install with rich dependencies
-install-rich:
-    uv sync --extra rich
+# install without extra dependencies
+install-basic:
+    uv sync
 
 # install documentation dependencies
 install-docs:
@@ -53,7 +53,7 @@ install-docs:
 
 # install with postgresql dependencies
 install-psycopg3:
-    uv sync --group psycopg3
+    uv sync --all-extras --group psycopg3
 
 # install translation dependencies
 install-translate:
@@ -193,7 +193,6 @@ test-no-rich:
 
 # run the tests that require rich to be installed
 test-rich:
-    @just install-rich
     uv run pytest --cov-append -m rich
 
 # run all tests
