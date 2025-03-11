@@ -341,6 +341,9 @@ jobs:
       run: |
         just test ./tests/verify_environment.py
         just test-bash || exit 1
+        sudo apt-get remove --purge -y powershell
+        source .venv/bin/activate
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -665,9 +668,6 @@ jobs:
     - name: Test CMD shell failure
       run: |
         call .venv\Scripts\activate
-        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
-        Rename-Item -Path "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NewName "powershell_disabled.exe" -Force
-        Rename-Item -Path "C:\Program Files\PowerShell\7\pwsh.exe" -NewName "pwsh_disabled.exe" -Force
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd
     - name: Store coverage files
