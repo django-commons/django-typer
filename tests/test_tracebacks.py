@@ -19,7 +19,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         ]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        if rich_installed:
+        if self.rich_installed:
             self.assertIn("────────", result)
             # locals should not be present
             self.assertNotIn("name = 'me'", result)
@@ -54,7 +54,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        if rich_installed:
+        if self.rich_installed:
             self.assertIn("────────", result)
             # locals should be present
             self.assertIn("name = 'me'", result)
@@ -114,7 +114,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
     @override_settings(DT_RICH_TRACEBACK_CONFIG=True)
     def test_traceback_set_to_true(self):
         self.assertEqual(traceback_config(), {"show_locals": False})
-        self.assertIs(use_rich_tracebacks(), rich_installed)
+        self.assertIs(use_rich_tracebacks(), self.rich_installed)
 
     @override_settings(DT_RICH_TRACEBACK_CONFIG=None)
     def test_traceback_set_to_none(self):
@@ -156,7 +156,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         )[1]
         self.assertIn("Traceback (most recent call last)", result)
         self.assertIn("Exception: This is a test exception", result)
-        if rich_installed:
+        if self.rich_installed:
             self.assertIn("────────", result)
             self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
 
@@ -199,7 +199,7 @@ class TracebackConfigTests(with_typehint(TestCase)):
         result = run_command(
             "test_command1", "--force-color", "delete", "Brian", "--throw"
         )[1]
-        if rich_installed:
+        if self.rich_installed:
             self.assertIn("\x1b", result)
 
         result = run_command(

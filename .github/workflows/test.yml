@@ -341,6 +341,9 @@ jobs:
       run: |
         just test ./tests/verify_environment.py
         just test-bash || exit 1
+        sudo apt-get remove --purge -y powershell
+        source .venv/bin/activate
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -658,14 +661,14 @@ jobs:
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
-        just test ./tests/verify_environment.py
-        just test-powershell
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test ./tests/verify_environment.py; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test-powershell; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
     - name: Test CMD shell failure
       run: |
         call .venv\Scripts\activate
-        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -727,9 +730,9 @@ jobs:
     - name: Run Powershell Tab Completion Tests
       run: |
         just test ./tests/verify_environment.py
-        just test-pwsh
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      shell: powershell
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test-pwsh; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      shell: pwsh
     - name: Test CMD shell failure
       run: |
         call .venv\Scripts\activate
