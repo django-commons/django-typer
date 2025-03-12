@@ -105,9 +105,16 @@ clean: clean-docs clean-git-ignored clean-env
 build-docs-html: install-docs
     @just run sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
 
+[script]
+_open-pdf-docs:
+    import webbrowser
+    webbrowser.open(f"file://{Path('./doc/build/pdf/django-typer.pdf').absolute()}")
+
 # build pdf documentation
 build-docs-pdf: install-docs
-    @just run sphinx-build --fresh-env --builder latexpdf --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
+    @just run sphinx-build --fresh-env --builder latex --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
+    make -C ./doc/build/pdf
+    @just _open_pdf-docs
 
 # build the docs
 build-docs: build-docs-html
