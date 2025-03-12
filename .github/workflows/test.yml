@@ -6,6 +6,7 @@ on:
   push:
   #  branches: main
   pull_request:
+  workflow_call:
   workflow_dispatch:
     inputs:
       debug:
@@ -18,6 +19,7 @@ on:
 
 env:
   ENABLE_CI_ONLY_TESTS: "1"
+  PYTHONPATH: ${{ github.workspace }}
 
 jobs:
 
@@ -33,6 +35,7 @@ jobs:
           - '4.2' # LTS April 2026
           - '5.0' # April 2025
           - '5.1' # December 2025
+          - '5.2b1'
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
@@ -48,6 +51,8 @@ jobs:
             django-version: '4.2'
           - python-version: '3.13'
             django-version: '5.0'
+          - python-version: '3.9'
+            django-version: '5.2b1'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -69,14 +74,19 @@ jobs:
       with:
         detached: true
       timeout-minutes: 60
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
-        sudo apt remove powershell
+        if [ "${{ matrix.django-version }}" = "5.2b1" ]; then
+          just test-lock "Django==${{ matrix.django-version }}"
+        else
+          just test-lock "Django~=${{ matrix.django-version }}.0"
+        fi
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -125,13 +135,16 @@ jobs:
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -180,14 +193,17 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -254,17 +270,21 @@ jobs:
           uses: mxschmitt/action-tmate@v3.19
           with:
             detached: true
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+          with:
+            enable-cache: true
         - name: Setup Just
           uses: extractions/setup-just@v2
-        - name: Install
+        - name: Install Dependencies
           run: |
-            just init  ${{ steps.sp.outputs.python-path }}
-            just install --with psycopg3
-            just pin-dependency Django~=${{ matrix.django-version }}.0
+            just setup ${{ steps.sp.outputs.python-path }}
+            just test-lock Django~=${{ matrix.django-version }}.0
+            just install-psycopg3
         - name: Run Unit Tests
           run: |
             just test ./tests/verify_environment.py
-            just test-all
+            just test-all --group psycopg3
         - name: Store coverage files
           uses: actions/upload-artifact@v4
           with:
@@ -307,17 +327,23 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Test Tab Completion
       run: |
         just test ./tests/verify_environment.py
         just test-bash || exit 1
+        sudo apt-get remove --purge -y powershell
+        source .venv/bin/activate
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -361,13 +387,16 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -421,6 +450,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -433,11 +466,10 @@ jobs:
         sudo chsh -s /bin/zsh runner
     - name: Set SHELL variable
       run: echo "SHELL=$(which zsh)" >> $GITHUB_ENV
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
@@ -487,14 +519,17 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -543,6 +578,10 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       run: |
         brew install just
@@ -553,11 +592,10 @@ jobs:
         sudo chsh -s $(which fish)
     - name: Set SHELL variable
       run: echo "SHELL=$(which fish)" >> $GITHUB_ENV
-    - name: Install
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
-        just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just setup ${{ steps.sp.outputs.python-path }}
+        just test-lock Django~=${{ matrix.django-version }}.0
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
@@ -606,28 +644,99 @@ jobs:
       uses: mxschmitt/action-tmate@v3.19
       with:
         detached: true
-    - name: Add to Poetry to PATH
+    - name: Add to Just to PATH
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Setup Just
       uses: extractions/setup-just@v2
-    - name: Install Release Dependencies
+    - name: Install Dependencies
       run: |
-        just init  ${{ steps.sp.outputs.python-path }}
+        just setup ${{ steps.sp.outputs.python-path }}
         just install
-        just pin-dependency Django~=${{ matrix.django-version }}.0
+        just test-lock Django~=${{ matrix.django-version }}.0
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
-        just test ./tests/verify_environment.py
-        just test-powershell
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        just test-pwsh
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test ./tests/verify_environment.py; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test-powershell; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       shell: powershell
     - name: Test CMD shell failure
       run: |
-        poetry run pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
+        call .venv\Scripts\activate
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
+      shell: cmd
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.COVERAGE_FILE }}
+        path: ${{ env.COVERAGE_FILE }}
+
+  windows-pwsh-complete:
+    runs-on: windows-latest
+    permissions:
+      actions: write
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.13']
+        django-version:
+          - '3.2' # LTS April 2024
+          - '5.0' # April 2025
+        exclude:
+          - python-version: '3.9'
+            django-version: '5.0'
+          - python-version: '3.13'
+            django-version: '3.2'
+
+    env:
+      COVERAGE_FILE: windows-pwsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
+      TEST_PYTHON_VERSION: ${{ matrix.python-version }}
+      TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      id: sp
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: install-vim-windows
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: rhysd/action-setup-vim@v1
+    - name: setup-ssh-debug
+      if: ${{ github.event.inputs.debug == 'true' }}
+      uses: mxschmitt/action-tmate@v3.19
+      with:
+        detached: true
+    - name: Add to Just to PATH
+      run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
+      shell: pwsh
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Install Dependencies
+      run: |
+        just setup ${{ steps.sp.outputs.python-path }}
+        just install
+        just test-lock Django~=${{ matrix.django-version }}.0
+      shell: pwsh
+    - name: Run Powershell Tab Completion Tests
+      run: |
+        just test ./tests/verify_environment.py
+        .venv\Scripts\activate.ps1; cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        just test-pwsh; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      shell: pwsh
+    - name: Test CMD shell failure
+      run: |
+        call .venv\Scripts\activate
+        pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
       uses: actions/upload-artifact@v4
@@ -645,7 +754,8 @@ jobs:
       macos-zsh-complete,
       macos-bash-complete,
       macos-fish-complete,
-      windows-powershell-complete
+      windows-powershell-complete,
+      windows-pwsh-complete
     ]
     runs-on: ubuntu-latest
 
@@ -662,11 +772,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         id: sp
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Setup Just
         uses: extractions/setup-just@v2
       - name: Install Release Dependencies
         run: |
-          just init ${{ steps.sp.outputs.python-path }}
+          just setup ${{ steps.sp.outputs.python-path }}
           just install
 
       - name: Get coverage files
@@ -682,5 +796,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files:
+            ./coverage.xml
           verbose: true

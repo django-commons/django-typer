@@ -29,7 +29,7 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 keep a tight version lock on Typer.
 """
 
-VERSION = (3, 0, 0)
+VERSION = (3, 1, 0)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)

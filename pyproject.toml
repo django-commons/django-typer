@@ -1,10 +1,10 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.0.0"
+version = "3.1.0"
 requires-python = ">=3.9,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -16,9 +16,6 @@ readme = "README.md"
 repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
-packages = [
-    { include = "django_typer" }
-]
 dependencies = [
     "Django>=3.2,<6.0",
     "click>=8.1.8,<8.2",
@@ -42,6 +39,7 @@ classifiers = [
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
@@ -57,6 +55,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/django_typer"]
+
 [project.optional-dependencies]
 # this should track typer's rich dependency, so long as our console
 # patches still work - so be sure to test on the low end of the range
@@ -70,60 +74,6 @@ rich = ["rich>=10.11.0,<14.0.0"]
 "Changelog" = "https://django-typer.readthedocs.io/en/latest/changelog.html"
 "Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
-# for testing
-[project.scripts]
-manage = "tests.manage:main"
-
-[tool.poetry.group.dev.dependencies]
-ipdb = "^0.13.13"
-ipython = [
-    { version = "^8.20.0", markers = "python_version >= '3.10'" },
-    { version = "^8.18.1", markers = "python_version >= '3.9'" }
-]
-pytest-django = "^4.8.0"
-pytest-cov = "^6.0.0"
-mypy = "^1.14"
-aiohttp = "^3.9.1"
-pytest-env = "^1.0.0"
-django-stubs = ">=4.2.7"
-pexpect = "^4.9.0"
-pyright = {extras = ["nodejs"], version = "^1.1.357"}
-ruff = "^0.9"
-graphviz = "^0.20.3"
-pluggy = "^1.5.0"
-pywinpty = { version = "^2.0.14", markers = "sys_platform == 'win32'" }
-pytest-timeout = "^2.3.1"
-pre-commit = "^4.0.1"
-django-stubs-ext = ">=4.2.7"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-furo = "2024.8.6"
-sphinx-tabs = "^3.4.5"
-readme-renderer = { extras = ["md"], version = "44"}
-sphinxcontrib-typer = {extras = ["html", "pdf", "png"], version = "^0.5.1", markers="python_version >= '3.9'"}
-doc8 = "^1.1.1"
-Sphinx = [
-    { version = "^8.0", markers = "python_version >= '3.10'" },
-    { version = "^7.4", markers = "python_version < '3.10'" }
-]
-docutils = "^0.21"
-sphinx-autobuild = "2024.10.3"
-
-[tool.poetry.group.translate]
-optional = true
-
-[tool.poetry.group.translate.dependencies]
-django-autotranslate = "^1.3.0"
-google-api-python-client = "^2.160.0"
-
-[tool.poetry.group.psycopg3]
-optional = true
-
-[tool.poetry.group.psycopg3.dependencies]
-psycopg = "^3.1.8"
 
 [tool.mypy]
 # The mypy configurations: http://bit.ly/2zEl9WI
@@ -145,7 +95,8 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-
+mypy_path = "src"
+modules = "django_typer"
 
 # todo doc8 configuration here is not being picked up and doesnt seem to be working
 # as expected - for now pass these parameters manually
@@ -192,13 +143,14 @@ command_line = "-m pytest --cov=django_typer"
 
 [tool.coverage.paths]
 source = [
-    "django_typer"
+    "src/django_typer"
 ]
 
 [tool.pyright]
 exclude = ["tests/**/*"]
 include = [
-    "django_typer"
+    "src/django_typer",
+    "*/site-packages/django_typer"
 ]
 
 [tool.ruff]
@@ -212,4 +164,41 @@ exclude = [
 [tool.ruff.lint]
 exclude = [
     "tests/**/*"
+]
+
+[dependency-groups]
+colorama = [
+    "colorama>=0.4.6",
+]
+dev = [
+    "coverage>=7.6.12",
+    "django-stubs>=5.1.3",
+    "django-stubs-ext>=5.1.3",
+    "graphviz>=0.20.3",
+    "ipdb>=0.13.13",
+    "mypy>=1.15.0",
+    "pexpect>=4.9.0",
+    "pluggy>=1.5.0",
+    "pre-commit>=4.1.0",
+    "pyright>=1.1.396",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "pytest-django>=4.10.0",
+    "pytest-env>=1.1.5",
+    "pytest-timeout>=2.3.1",
+    "ruff>=0.9.10",
+    "pywinpty>=2.0.14; sys_platform == 'win32'",
+    "tomlkit>=0.13.2",
+]
+docs = [
+    "doc8>=1.1.2",
+    "furo>=2024.8.6",
+    "readme-renderer[md]>=44.0",
+    "sphinx>=7.4.7",
+    "sphinx-autobuild>=2024.10.3",
+    "sphinx-tabs>=3.4.7",
+    "sphinxcontrib-typer>=0.5.1",
+]
+psycopg3 = [
+    "psycopg>=3.1.8",
 ]

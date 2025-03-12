@@ -41,9 +41,15 @@ class BashComplete(DjangoTyperShellCompleter):
     by default.
     """
 
+    def get_user_profile(self) -> Path:
+        """
+        Get .bashrc it is always located in the user's home directory.
+        """
+        return Path.home() / ".bashrc"
+
     @cached_property
     def install_dir(self) -> Path:
-        install_dir = Path.home() / ".bash_completions"
+        install_dir = self.get_user_profile().parent / ".bash_completions"
         install_dir.mkdir(parents=True, exist_ok=True)
         return install_dir
 
@@ -84,7 +90,7 @@ class BashComplete(DjangoTyperShellCompleter):
         assert self.prog_name
         Path.home().mkdir(parents=True, exist_ok=True)
         script = self.install_dir / f"{self.prog_name}.sh"
-        bashrc = Path.home() / ".bashrc"
+        bashrc = self.get_user_profile()
         bashrc_source = bashrc.read_text() if bashrc.is_file() else ""
         source_line = f"source {script}"
         if source_line not in bashrc_source:
@@ -100,7 +106,7 @@ class BashComplete(DjangoTyperShellCompleter):
         if script.is_file():
             script.unlink()
 
-        bashrc = Path.home() / ".bashrc"
+        bashrc = self.get_user_profile()
         if bashrc.is_file():
             bashrc_source = bashrc.read_text()
             bashrc.write_text(bashrc_source.replace(f"source {script}\n", ""))

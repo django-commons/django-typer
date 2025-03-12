@@ -1,72 +1,96 @@
-##
-# Derived from:
-#  https://github.com/django-commons/django-commons-playground/blob/main/.github/workflows/release.yml
-#
 
 name: Publish Release
 
 permissions: read-all
 
+concurrency:
+  # stop previous release runs if tag is recreated
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     tags:
       - 'v*'  # only publish on version tags (e.g. v1.0.0)
-  workflow_dispatch:
-    inputs:
-      pypi:
-        description: 'Publish to PyPi'
-        required: true
-        default: false
-        type: boolean
-      github:
-        description: 'Publish a GitHub Release'
-        required: true
-        default: false
-        type: boolean
-      testpypi:
-        description: 'Publish to TestPyPi'
-        required: true
-        default: true
-        type: boolean
-  
-env:
-  PYPI_URL: https://pypi.org/p/django-typer
-  PYPI_TEST_URL: https://test.pypi.org/project/django-typer
 
 jobs:
+
+  lint:
+    permissions:
+      contents: read
+      actions: write
+    uses: ./.github/workflows/lint.yml
+    secrets: inherit
+
+  test:
+    permissions:
+      contents: read
+      actions: write
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
 
   build:
     name: Build Package
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       actions: write
-
+    outputs:
+      PACKAGE_NAME: ${{ steps.set-package.outputs.package_name }}
+      RELEASE_VERSION: ${{ steps.set-package.outputs.release_version }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.x"
-    - name: Install pypa/build
-      run:
-        python3 -m pip install build --user
-    - name: Build a binary wheel and a source tarball
-      run: python3 -m build
+        python-version: ">=3.11"  # for tomlib
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+    - name: Setup Just
+      uses: extractions/setup-just@v2
+    - name: Verify Tag
+      run: |
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        echo "Verifying tag $TAG_NAME..."
+        # if a tag was deleted and recreated we may have the old one cached
+        # be sure that we're publishing the current tag!
+        git fetch --force origin refs/tags/$TAG_NAME:refs/tags/$TAG_NAME
+
+        # verify signature
+        curl -sL https://github.com/${{ github.actor }}.gpg | gpg --import 
+        git tag -v "$TAG_NAME"
+
+        # verify version
+        RELEASE_VERSION=$(just validate_version $TAG_NAME)
+
+        # export the release version
+        echo "RELEASE_VERSION=${RELEASE_VERSION}" >> $GITHUB_ENV 
+    - name: Build the binary wheel and a source tarball
+      run: just build
     - name: Store the distribution packages
       uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
+    - name: Set Package Name
+      id: set-package
+      run:
+        PACKAGE_NAME=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['name'])")
+        echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
 
   publish-to-pypi:
     name: Publish to PyPI
-    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.pypi == 'true') || github.event_name != 'workflow_dispatch' }}
     needs:
-    - build
+      - lint
+      - test
+      - build
+      - publish-to-testpypi
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: ${{ env.PYPI_URL }}
+      url: https://pypi.org/p/${{ needs.build.outputs.PACKAGE_NAME }}
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
@@ -80,10 +104,11 @@ jobs:
 
   github-release:
     name: Publish GitHub Release
-    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.github == 'true') || github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     needs:
-    - build
+      - lint
+      - test
+      - build
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
       id-token: write  # IMPORTANT: mandatory for sigstore
@@ -121,14 +146,13 @@ jobs:
 
   publish-to-testpypi:
     name: Publish to TestPyPI
-    if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.testpypi == 'true') || github.event_name != 'workflow_dispatch' }}
     needs:
     - build
     runs-on: ubuntu-latest
 
     environment:
       name: testpypi
-      url: ${{ env.PYPI_TEST_URL }}
+      url: https://test.pypi.org/project/${{ needs.build.outputs.PACKAGE_NAME }}
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -144,14 +168,3 @@ jobs:
       with:
         repository-url: https://test.pypi.org/legacy/
         skip-existing: true
-
-  # TODO fetch-data requires login
-  # notify-django-packages:
-  #   name: Notify Django Packages
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - publish-to-pypi
-  #   steps:
-  #     - name: Notify Django Packages
-  #       run:
-  #         curl -X GET "https://djangopackages.org/packages/django-typer/fetch-data/"

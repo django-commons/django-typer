@@ -391,12 +391,12 @@ class _CompleteTestCase:
         self.install()
         self.verify_install()
         completions = self.get_completions(
-            self.launch_script, "completion", "--path", "./django_typer/co"
+            self.launch_script, "completion", "--path", "./src/django_typer/co"
         )
         self.assertIn("completers", completions)
         self.assertIn("config.py", completions)
         completions = self.get_completions(
-            self.launch_script, "completion", "--dir", "./django_typer/"
+            self.launch_script, "completion", "--dir", "./src/django_typer/"
         )
         self.assertNotIn("utils.py", completions)
         self.assertNotIn("config.py", completions)
