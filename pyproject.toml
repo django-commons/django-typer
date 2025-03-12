@@ -150,7 +150,6 @@ source = [
 exclude = ["tests/**/*"]
 include = [
     "src/django_typer",
-    "*/site-packages/django_typer"
 ]
 
 [tool.ruff]
