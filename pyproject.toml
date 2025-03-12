@@ -71,7 +71,7 @@ rich = ["rich>=10.11.0,<14.0.0"]
 "Documentation" = "https://django-typer.readthedocs.io"
 "Repository" = "https://github.com/django-commons/django-typer"
 "Issues" = "https://github.com/django-commons/django-typer/issues"
-"Changelog" = "https://django-typer.readthedocs.io/en/latest/changelog.html"
+"Changelog" = "https://django-typer.readthedocs.io/en/stable/changelog.html"
 "Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
 

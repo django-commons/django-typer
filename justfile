@@ -108,13 +108,14 @@ build-docs-html: install-docs
 [script]
 _open-pdf-docs:
     import webbrowser
+    from pathlib import Path
     webbrowser.open(f"file://{Path('./doc/build/pdf/django-typer.pdf').absolute()}")
 
 # build pdf documentation
 build-docs-pdf: install-docs
     @just run sphinx-build --fresh-env --builder latex --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
     make -C ./doc/build/pdf
-    @just _open_pdf-docs
+    @just _open-pdf-docs
 
 # build the docs
 build-docs: build-docs-html
