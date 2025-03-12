@@ -71,7 +71,7 @@ rich = ["rich>=10.11.0,<14.0.0"]
 "Documentation" = "https://django-typer.readthedocs.io"
 "Repository" = "https://github.com/django-commons/django-typer"
 "Issues" = "https://github.com/django-commons/django-typer/issues"
-"Changelog" = "https://django-typer.readthedocs.io/en/latest/changelog.html"
+"Changelog" = "https://django-typer.readthedocs.io/en/stable/changelog.html"
 "Code_of_Conduct" = "https://github.com/django-commons/membership/blob/main/CODE_OF_CONDUCT.md"
 
 
@@ -197,7 +197,7 @@ docs = [
     "sphinx>=7.4.7",
     "sphinx-autobuild>=2024.10.3",
     "sphinx-tabs>=3.4.7",
-    "sphinxcontrib-typer>=0.5.1",
+    "sphinxcontrib-typer[png]>=0.5.1",
 ]
 psycopg3 = [
     "psycopg>=3.1.8",
