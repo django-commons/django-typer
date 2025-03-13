@@ -196,5 +196,5 @@ the self argument in your commands.**
    shell_completion
    howto
    showcase
-   reference
+   reference/index
    changelog
