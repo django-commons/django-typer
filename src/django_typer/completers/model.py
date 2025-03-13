@@ -17,30 +17,30 @@ class ModelObjectCompleter:
 
     This completer currently supports the following field types and their subclasses:
 
-        - `IntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#integerfield>`_
-            - `AutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#autofield>`_
-            - `BigAutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#bigautofield>`_
-            - `BigIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#bigintegerfield>`_
-            - `SmallIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#smallintegerfield>`_
-            - `PositiveIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#positiveintegerfield>`_
-            - `PositiveSmallIntegerField <https://docs.djangoproject.com/en/stable/ref/models/fields/#positivesmallintegerfield>`_
-            - `SmallAutoField <https://docs.djangoproject.com/en/stable/ref/models/fields/#smallautofield>`_
-        - `CharField <https://docs.djangoproject.com/en/stable/ref/models/fields/#charfield>`_
-            - `SlugField <https://docs.djangoproject.com/en/stable/ref/models/fields/#slugfield>`_
-            - `URLField <https://docs.djangoproject.com/en/stable/ref/models/fields/#urlfield>`_
-            - `EmailField <https://docs.djangoproject.com/en/stable/ref/models/fields/#emailfield>`_
-        - `FileField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filefield>`_
-            - `ImageField <https://docs.djangoproject.com/en/stable/ref/models/fields/#imagefield>`_
-        - `FilePathField <https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield>`_
-        - `TextField <https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield>`_
-        - `DateField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield>`_ **(Must use ISO 8601: YYYY-MM-DD)**
-        - `TimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#timefield>`_ **(Must use ISO 8601: HH:MM:SS.ssssss)**
-        - `DateTimeField <https://docs.djangoproject.com/en/stable/ref/models/fields/#datetimefield>`_ **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
-        - `DurationField <https://docs.djangoproject.com/en/stable/ref/models/fields/#durationfield>`_ **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
-        - `UUIDField <https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield>`_
-        - `FloatField <https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield>`_
-        - `DecimalField <https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield>`_
-        - `GenericIPAddressField <https://docs.djangoproject.com/en/stable/ref/models/fields/#genericipaddressfield>`_
+        - :class:`~django.db.models.IntegerField`
+            - :class:`~django.db.models.AutoField`
+            - :class:`~django.db.models.BigAutoField`
+            - :class:`~django.db.models.BigIntegerField`
+            - :class:`~django.db.models.SmallIntegerField`
+            - :class:`~django.db.models.PositiveIntegerField`
+            - :class:`~django.db.models.PositiveSmallIntegerField`
+            - :class:`~django.db.models.SmallAutoField`
+        - :class:`~django.db.models.CharField`
+            - :class:`~django.db.models.SlugField`
+            - :class:`~django.db.models.URLField`
+            - :class:`~django.db.models.EmailField`
+        - :class:`~django.db.models.FileField`
+            - :class:`~django.db.models.ImageField`
+        - :class:`~django.db.models.FilePathField`
+        - :class:`~django.db.models.TextField`
+        - :class:`~django.db.models.DateField` **(Must use ISO 8601: YYYY-MM-DD)**
+        - :class:`~django.db.models.TimeField` **(Must use ISO 8601: HH:MM:SS.ssssss)**
+        - :class:`~django.db.models.DateTimeField` **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
+        - :class:`~django.db.models.DurationField` **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
+        - :class:`~django.db.models.UUIDField`
+        - :class:`~django.db.models.FloatField`
+        - :class:`~django.db.models.DecimalField`
+        - :class:`~django.db.models.GenericIPAddressField`
 
     .. note::
 

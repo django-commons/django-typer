@@ -7,8 +7,9 @@ Django Typer
 
 Use static typing to define the CLI for your Django_ management commands with Typer_. Optionally
 use the provided :class:`~django_typer.management.TyperCommand` class that inherits from
-BaseCommand_. This class maps the Typer_ interface onto a class based interface that Django
-developers will be familiar with. All of the BaseCommand_ functionality is inherited, so that
+:class:`~django.core.management.BaseCommand`. This class maps the Typer_ interface onto a class
+based interface that Django developers will be familiar with. All of the
+:class:`~django.core.management.BaseCommand` functionality is inherited, so that
 :class:`~django_typer.management.TyperCommand` can be a drop in replacement.
 
 **django-typer makes it easy to:**
@@ -17,13 +18,13 @@ developers will be familiar with. All of the BaseCommand_ functionality is inher
     * Create subcommands and hierarchical groups of commands.
     * Use the full power of Typer_'s parameter types to validate and parse command line inputs.
     * Create beautiful and information dense help outputs.
-    * Configure the rendering of exception stack traces using rich_.
+    * Configure the rendering of exception stack traces using :doc:`rich <rich:index>`.
     * :ref:`Install shell tab-completion support <shellcompletions>` for bash_, zsh_, fish_ and
       powershell_.
     * :ref:`Create custom and portable shell tab-completions for your CLI parameters.
       <define-shellcompletions>`
     * Port existing commands (:class:`~django_typer.management.TyperCommand` is interface compatible
-      with BaseCommand_).
+      with :class:`~django.core.management.BaseCommand`).
     * Use either a Django-style class-based interface or the Typer-style interface to define
       commands.
     * Add plugins to upstream commands.
@@ -49,7 +50,7 @@ developers will be familiar with. All of the BaseCommand_ functionality is inher
 
         pip install django-typer
 
-    rich_ is a powerful library for rich text and beautiful formatting in the terminal.
+    :doc:`rich <rich:index>` is a powerful library for rich text and beautiful formatting in the terminal.
     It is not required, but highly recommended for the best experience:
 
     .. code:: bash
@@ -57,7 +58,7 @@ developers will be familiar with. All of the BaseCommand_ functionality is inher
         pip install "django-typer[rich]"
 
 
-2. Optionally add ``django_typer`` to your ``INSTALLED_APPS`` setting:
+2. Optionally add ``django_typer`` to your :setting:`INSTALLED_APPS` setting:
 
     .. code:: python
 
@@ -82,9 +83,10 @@ developers will be familiar with. All of the BaseCommand_ functionality is inher
 
 :big:`Basic Example`
 
-:class:`~django_typer.management.TyperCommand` is a drop in extension to BaseCommand_. All of the
-documented features of BaseCommand_ work the same way! Or, you may also use an interface identical
-to Typer_'s. Simply import Typer_ from django_typer instead of typer.
+:class:`~django_typer.management.TyperCommand` is a drop in extension to
+:class:`~django.core.management.BaseCommand`. All of the documented features of
+:class:`~django.core.management.BaseCommand` work the same way! Or, you may also use an interface
+identical to Typer_'s. Simply import Typer_ from django_typer instead of typer.
 
 .. tabs::
 

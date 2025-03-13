@@ -6,9 +6,10 @@ from django.core.management import CommandError
 
 def app_config(label: t.Union[str, AppConfig]):
     """
-    A parser for app labels. If the label is already an AppConfig instance,
-    the instance is returned. The label will be tried first, if that fails
-    the label will be treated as the app name.
+    A parser for app :attr:`~django.apps.AppConfig.label`. If the label is already
+    an :class:`~django.apps.AppConfig` instance, the instance is returned. The label
+    will be tried first, if that fails the label will be treated as the app
+    :attr:`~django.apps.AppConfig.name`.
 
     .. code-block:: python
 

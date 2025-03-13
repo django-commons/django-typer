@@ -2,12 +2,12 @@
 Typer_ supports custom parsers for options and arguments. If you would
 like to type a parameter with a type that isn't supported by Typer_ you can
 `implement your own parser
-<https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_, or `ParamType
-<https://click.palletsprojects.com/en/8.1.x/api/#click.ParamType>`_ in click_ parlance.
+<https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_, or
+:class:`click.ParamType` in :doc:`click <click:index>` parlance.
 
 This package contains a collection of parsers that turn strings into useful
-Django types. Pass these parsers to the `parser` argument of typer.Option and
-typer.Argument. Parsers are provided for:
+Django types. Pass these parsers to the `parser` argument of ``typer.Option`` and
+``typer.Argument``. Parsers are provided for:
 
 - **models, querysets or field values**: Turn a string into a model object instance
     using :class:`~django_typer.parsers.model.ModelObjectParser`.
@@ -21,6 +21,6 @@ typer.Argument. Parsers are provided for:
         - Handles the case where the value is already the expected type.
         - Returns None if the value is None (already implemented if subclassing
           ParamType).
-        - Raises a CommandError if the value is invalid.
+        - Raises a :exc:`~django.core.management.CommandError` if the value is invalid.
         - Handles the case where the param and context are None.
 """
