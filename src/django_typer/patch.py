@@ -1,12 +1,13 @@
 """
-Stuffing the typer interface into the Django BaseCommand_ interface is an exercise
-in fitting a square peg into a round hole. A small amount of upstream patching is
-required to make this work. All monkey patching is defined in this module to more
-easily keep track of it.
+Stuffing the typer interface into the Django
+:class:`~django.core.management.BaseCommand` interface is an exercise in fitting a
+square peg into a round hole. A small amount of upstream patching is required to make
+this work. All monkey patching is defined in this module to more easily keep track of
+it.
 
 Mostly because typer does not allow direct access to the rich console objects it
 creates we need to do some monkey patching to get the desired behavior when
---no-color options or --force-color options are specified
+:option:`--no-color` options or :option:`--force-color` options are specified
 
 apply() needs to be called before any imports from Typer
 
@@ -14,8 +15,8 @@ apply() needs to be called before any imports from Typer
 
     Revisit this if Typer exposes control of the console objects.
 
-To achieve expected --force-color and --no-color behavior there are 3 different
-console objects installed when rich is used:
+To achieve expected :option:`--force-color` and :option:`--no-color` behavior there are
+3 different console objects installed when rich is used:
 
 - The first is the global exception handler installed by rich - see apps.py
 - The second is the command exception handler console installed by typer - see below

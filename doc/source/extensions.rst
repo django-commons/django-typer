@@ -8,7 +8,7 @@ Tutorial: Inheritance & Plugins
 
 Adding to, or altering the behavior of, commands from upstream Django_ apps is a common use case.
 Doing so allows you to keep your CLI_ stable while adding additional behaviors by installing new
-apps in ``INSTALLED_APPS``. There are three main extension patterns you may wish to employ:
+apps in :setting:`INSTALLED_APPS`. There are three main extension patterns you may wish to employ:
 
     1. Override the behavior of a command in an upstream app.
     2. Add additional subcommands or groups to a command in an upstream app.
@@ -16,9 +16,9 @@ apps in ``INSTALLED_APPS``. There are three main extension patterns you may wish
        (`Inversion of Control <https://en.wikipedia.org/wiki/Inversion_of_control>`_)
 
 The django-typer_ plugin mechanism supports all three of these use cases in a way that respects
-the precedence order of apps in the ``INSTALLED_APPS`` setting. In this tutorial we walk through
-an example of each using a :ref:`generic backup command <generic_backup>`. First we'll see how we
-might  :ref:`use inheritance (1) <inheritance>` to override and change the behavior of a
+the precedence order of apps in the :setting:`INSTALLED_APPS` setting. In this tutorial we walk
+through an example of each using a :ref:`generic backup command <generic_backup>`. First we'll see
+how we might  :ref:`use inheritance (1) <inheritance>` to override and change the behavior of a
 subcommand. Then we'll see how we can :ref:`add subcommands (2) <plugin>` to an upstream command
 using plugins. Finally we'll use pluggy_ to implement a hook system that allows us to
 :ref:`add custom logic (3) <hooks>` to an upstream command.
@@ -259,7 +259,7 @@ directory in the ``apps.py`` file of the media and my_app apps like this:
     Because we explicitly register our plugins we can call the package whatever we want.
     django-typer does not require it to be named ``plugins``. It is also important to
     do this inside ready() because conflicts are resolved in the order in which the extension
-    modules are registered and ready() methods are called in ``INSTALLED_APPS`` order.
+    modules are registered and ready() methods are called in :setting:`INSTALLED_APPS` order.
 
 For plugins to work, we'll need to re-implement media from above as a composed extension
 like this:

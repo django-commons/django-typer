@@ -1,10 +1,10 @@
 """
-Typer_ and click_ provide tab-completion hooks for individual parameters. As with
-:mod:`~django_typer.parsers` custom completion logic can be implemented for custom
-parameter types and added to the annotation of the parameter. Previous versions of
-Typer_ supporting click_ 7 used the autocompletion argument to provide completion
-logic, Typer_ still supports this, but passing ``shell_complete`` to the annotation is
-the preferred way to do this.
+Typer_ and :doc:`click <click:index>` provide tab-completion hooks for individual
+parameters. As with :mod:`~django_typer.parsers` custom completion logic can be
+implemented for custom parameter types and added to the annotation of the parameter.
+Previous versions of Typer_ supporting :doc:`click <click:index>` 7 used the
+autocompletion argument to provide completion logic, Typer_ still supports this, but
+passing ``shell_complete`` to the annotation is the preferred way to do this.
 
 This package provides some completer functions and classes that work with common Django_
 types:

@@ -268,10 +268,10 @@ decorator. This is like defining a group at the command root and is an extension
 Collect Results with @finalize
 ------------------------------
 
-Typer_ and Click_ have a ``results_callback`` mechanism on ``MultiCommands`` that allow a function
-hook to be registered to operate on the results of subroutines before the command exits. You may
-use this same ``results_callback`` mechanism directly through the Typer_ interface, but
-django-typer_ offers a more convenient class-aware way to do this with the
+Typer_ and :doc:`Click <click:index>` have a ``results_callback`` mechanism on ``MultiCommands``
+that allow a function hook to be registered to operate on the results of subroutines before the
+command exits. You may use this same ``results_callback`` mechanism directly through the Typer_
+interface, but django-typer_ offers a more convenient class-aware way to do this with the
 :func:`~django_typer.management.finalize` decorator.
 
 For example lets say we have two subcommands that return strings, we could turn them into a csv
@@ -334,17 +334,19 @@ finalizers at higher levels in the command hierarchy.
 
 .. tip::
 
-    Finalizers can be overridden just like groups and initializers using the :ref:`plugin pattern. <plugins>`
+    Finalizers can be overridden just like groups and initializers using the
+    :ref:`plugin pattern. <plugins>`
 
 
 Call Commands from Code
 -----------------------
 
 There are two options for invoking a :class:`~django_typer.management.TyperCommand` from code
-without spawning off a subprocess. The first is to use Django_'s builtin call_command_ function.
-This function will work exactly as it does for normal BaseCommand_ derived commands. django-typer_
-however adds another mechanism that can be more efficient, especially if your options and
-arguments are already of the correct type and require no parsing:
+without spawning off a subprocess. The first is to use Django_'s builtin
+:func:`~django.core.management.call_command` function. This function will work exactly as it does
+for normal :class:`~django.core.management.BaseCommand` derived commands. django-typer_ however adds
+another mechanism that can be more efficient, especially if your options and arguments are already
+of the correct type and require no parsing:
 
 Say we have this command, called ``mycommand``:
 
@@ -378,7 +380,7 @@ Say we have this command, called ``mycommand``:
 
 The rule of thumb is this:
 
-    - Use call_command_ if your options and arguments need parsing.
+    - Use :func:`~django.core.management.call_command` if your options and arguments need parsing.
     - Use :func:`~django_typer.management.get_command` and invoke the command functions directly if
       your options and arguments are already of the correct type.
 
@@ -411,15 +413,16 @@ You may also fetch a subcommand function directly by passing its path:
 Change Default Django Options
 -----------------------------
 
-:class:`~django_typer.management.TyperCommand` classes preserve all of the functionality of BaseCommand_ derivatives.
-This means that you can still use class members like `suppressed_base_arguments
-<https://docs.djangoproject.com/en/5.0/howto/custom-management-commands/#django.core.management.BaseCommand.suppressed_base_arguments>`_
-to suppress default options.
+:class:`~django_typer.management.TyperCommand` classes preserve all of the functionality of
+:class:`~django.core.management.BaseCommand` derivatives. This means that you can still use class
+members like :attr:`~django.core.management.BaseCommand.suppressed_base_arguments` to suppress
+default options.
 
-By default :class:`~django_typer.management.TyperCommand` suppresses ``--verbosity``. You can add
-it back by setting ``suppressed_base_arguments`` to an empty list. If you want to use verbosity you
-can simply redefine it or use one of django-typer_'s :ref:`provided type hints <types>` for the
-default BaseCommand_ options:
+By default :class:`~django_typer.management.TyperCommand` suppresses :option:`--verbosity`. You can
+add it back by setting :attr:`~django.core.management.BaseCommand.suppressed_base_arguments` to an
+empty list. If you want to use verbosity you can simply redefine it or use one of django-typer_'s
+:ref:`provided type hints <types>` for the default :class:`~django.core.management.BaseCommand`
+options:
 
 .. tabs::
 
@@ -631,28 +634,30 @@ and if it is not provided the function will be treated as a
 
 .. note::
 
-    **Conflicting extensions are resolved in INSTALLED_APPS order.** For a detailed discussion
-    about the utility of this pattern, see the tutorial on :ref:`Extending Commands <plugins>`.
+    **Conflicting extensions are resolved in** :setting:`INSTALLED_APPS` **order.** For a detailed
+    discussion about the utility of this pattern, see the tutorial on
+    :ref:`Extending Commands <plugins>`.
 
 .. warning::
 
     Take care not to import any extension code during or before Django's bootstrap procedure. This
-    may result in conflict override behavior that does not honor INSTALLED_APPS order.
+    may result in conflict override behavior that does not honor :setting:`INSTALLED_APPS` order.
 
 .. _configure-rich-exception-tracebacks:
 
-Configure rich_ Stack Traces
-----------------------------
+Configure :doc:`rich <rich:index>` Stack Traces
+-----------------------------------------------
 
-When rich_ is installed it may be `configured to display rendered stack traces
-<https://rich.readthedocs.io/en/stable/traceback.html>`_ for unhandled exceptions.
+When :doc:`rich <rich:index>` is installed it may be
+:doc:`configured to display rendered stack traces <rich:traceback>` for unhandled exceptions.
 These stack traces are information dense and can be very helpful for debugging. By default, if
-rich_ is installed django-typer_ will configure it to render stack traces. You can disable
-this behavior by setting the ``DT_RICH_TRACEBACK_CONFIG`` config to ``False``. You may also
-set ``DT_RICH_TRACEBACK_CONFIG`` to a dictionary holding the parameters to pass to
-`rich.traceback.install`.
+:doc:`rich <rich:index>` is installed django-typer_ will configure it to render stack traces. You
+can disable this behavior by setting the ``DT_RICH_TRACEBACK_CONFIG`` config to ``False``. You may
+also set ``DT_RICH_TRACEBACK_CONFIG`` to a dictionary holding the parameters to pass to
+:func:`rich.traceback.install`.
 
-This provides a common hook for configuring rich_ that you can control on a per-deployment basis:
+This provides a common hook for configuring :doc:`rich <rich:index>` that you can control on a
+per-deployment basis:
 
 .. code-block::
     :caption: settings.py
@@ -819,22 +824,21 @@ print, self.stdout and typer.echo
 ---------------------------------
 
 There are no unbreakable rules about how you should print output from your commands.
-You could use loggers, normal print statements or the BaseCommand_ stdout and
-stderr output wrappers. Django advises the use of ``self.stdout.write`` because the
-stdout and stderr streams can be configured by calls to call_command_ or
-:func:`~django_typer.management.get_command` which allows you to easily grab output from your
-commands for testing. Using the command's configured stdout and stderr
-output wrappers also means output will respect the ``--force-color`` and ``--no-color``
-parameters.
+You could use loggers, normal print statements or the :class:`~django.core.management.BaseCommand`
+stdout and stderr output wrappers. Django advises the use of ``self.stdout.write`` because the
+stdout and stderr streams can be configured by calls to :func:`~django.core.management.call_command`
+or :func:`~django_typer.management.get_command` which allows you to easily grab output from your
+commands for testing. Using the command's configured stdout and stderr output wrappers also means
+output will respect the :option:`--force-color` and :option:`--no-color` parameters.
 
-Typer_ and click_ provide `echo and secho <https://typer.tiangolo.com/tutorial/printing/>`_
-functions that automatically handle byte to string conversions and offer simple styling
-support. :class:`~django_typer.management.TyperCommand` provides
-:meth:`~django_typer.management.TyperCommand.echo` and
+Typer_ and :doc:`click <click:index>` provide `echo and secho
+<https://typer.tiangolo.com/tutorial/printing/>`_ functions that automatically handle byte to string
+conversions and offer simple styling support. :class:`~django_typer.management.TyperCommand`
+provides :meth:`~django_typer.management.TyperCommand.echo` and
 :meth:`~django_typer.management.TyperCommand.secho` wrapper functions for the Typer_ echo/secho
 functions. If you wish to use Typer_'s echo you should use these wrapper functions because they
-honor the command's ``--force-color`` and ``--no-color`` flags and the configured stdout/stderr
-streams:
+honor the command's :option:`--force-color` and :option:`--no-color` flags and the configured
+stdout/stderr streams:
 
 .. tabs::
 
@@ -854,9 +858,10 @@ streams:
 Toggle on/off result printing
 -----------------------------
 
-Django's BaseCommand_ will print any truthy values returned from the handle() method. This may not
-always be desired behavior. By default :class:`~django_typer.management.TyperCommand` will do the
-same, but you may toggle this behavior off by setting the class field ``print_result`` to False.
+Django's :class:`~django.core.management.BaseCommand` will print any truthy values returned from the
+:meth:`~django.core.management.BaseCommand.handle` method. This may not always be desired behavior.
+By default :class:`~django_typer.management.TyperCommand` will do the same, but you may toggle this
+behavior off by setting the class field ``print_result`` to False.
 
 
 .. tabs::

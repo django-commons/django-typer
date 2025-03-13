@@ -26,9 +26,9 @@ or the potential values of either.
 Django has some support for bash completions, but it is not enabled by default and
 left to the user to install.
 
-django-typer_ augments the upstream functionality of Typer_ and Click_ to provide
-both an easy way to define shell completions for your custom CLI options and arguments
-as well as a way to install them in your shell.
+django-typer_ augments the upstream functionality of Typer_ and :doc:`Click <click:index>` to
+provide both an easy way to define shell completions for your custom CLI options and arguments as
+well as a way to install them in your shell.
 
 .. tip::
 
@@ -555,12 +555,12 @@ shells. There are two main extension points:
 
    You may also override the classes for the supported shells by registering your own class.
    We recommend using the :ref:`plugins <plugins>` pattern to do this so that your custom
-   completers will respect ``INSTALLED_APPS`` order.
+   completers will respect :setting:`INSTALLED_APPS` order.
 
 2. Override the completion script templates for your shell. The completion script templates are
    stored in the ``django_typer/templates``. You may override these templates in your project to
-   customize the completion script output `the same way you would an html template
-   <https://docs.djangoproject.com/en/stable/howto/overriding-templates>`_:
+   customize the completion script output
+   :doc:`the same way you would an html template <django:howto/overriding-templates>`:
 
 .. list-table::
    :header-rows: 1

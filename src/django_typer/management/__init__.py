@@ -161,19 +161,21 @@ def get_command(
 ):
     """
     Get a Django_ command by its name and instantiate it with the provided options. This
-    will work for subclasses of BaseCommand_ as well as for
-    :class:`~django_typer.TyperCommand` subclasses. If subcommands are listed for a
-    :class:`~django_typer.TyperCommand`, the method that corresponds to the command name
-    will be returned. This method may then be invoked directly. If no subcommands are
-    listed the command instance will be returned.
+    will work for subclasses of :class:`~django.core.management.BaseCommand` as well as
+    for :class:`~django_typer.management.TyperCommand` subclasses. If subcommands are
+    listed for a :class:`~django_typer.management.TyperCommand`, the method that
+    corresponds to the command name will be returned. This method may then be invoked
+    directly. If no subcommands are listed the command instance will be returned.
 
     Using ``get_command`` to fetch a command instance and then invoking the instance as
-    a callable is the preferred way to execute :class:`~django_typer.TyperCommand`
-    commands from code. The arguments and options passed to the __call__ method of the
-    command should be fully resolved to their expected parameter types before being
-    passed to the command. The call_command_ interface also works, but arguments must be
-    unparsed strings and options may be either strings or resolved parameter types. The
-    following is more efficient than call_command_.
+    a callable is the preferred way to execute
+    :class:`~django_typer.management.TyperCommand` commands from code. The arguments and
+    options passed to the __call__ method of the command should be fully resolved to
+    their expected parameter types before being passed to the command. The
+    :func:`~django.core.management.call_command` interface also works, but arguments
+    must be unparsed strings and options may be either strings or resolved parameter
+    types. The following is more efficient than
+    :func:`~django.core.management.call_command`.
 
     .. code-block:: python
 
@@ -193,9 +195,10 @@ def get_command(
         divide = get_command('hierarchy', 'math', 'divide')
         result = divide(10, 2)
 
-    When fetching an entire TyperCommand (i.e. no group or subcommand path), you may
-    supply the type of the expected TyperCommand as the second argument. This will allow
-    the type system to infer the correct return type:
+    When fetching an entire :class:`~django_typer.management.TyperCommand` (i.e. no
+    group or subcommand path), you may supply the type of the expected TyperCommand as
+    the second argument. This will allow the type system to infer the correct return
+    type:
 
     .. code-block:: python
 
@@ -204,10 +207,12 @@ def get_command(
 
     .. note::
 
-        If get_command fetches a BaseCommand that does not implement __call__
-        get_command will make the command callable by adding a __call__ method that
-        calls the handle method of the BaseCommand. This allows you to call the command
-        like get_command("command")() with confidence.
+        If get_command fetches a :class:`~django.core.management.BaseCommand` that does
+        not implement __call__ get_command will make the command callable by adding a
+        __call__ method that calls the
+        :meth:`~django.core.management.BaseCommand.handle` method of the
+        :class:`~django.core.management.BaseCommand`. This allows you to call the
+        command like ``get_command("command")()`` with confidence.
 
     :param command_name: the name of the command to get
     :param path: the path walking down the group/command tree
@@ -336,10 +341,11 @@ class _ParsedArgs(SimpleNamespace):
 class Context(TyperContext):
     """
     An extension of the
-    `click.Context <https://click.palletsprojects.com/api/#context>`_ class that adds a
-    reference to the :class:`~django_typer.TyperCommand` instance so that the Django_
-    command can be accessed from within click_ and Typer_ callbacks that take a context.
-    This context also keeps track of parameters that were supplied to call_command_.
+    :class:`click.Context` class that adds a reference to the
+    :class:`~django_typer.management.TyperCommand` instance so that the Django_ command
+    can be accessed from within :doc:`click <click:index>` and Typer_ callbacks that take a context. This
+    context also keeps track of parameters that were supplied to
+    :func:`~django.core.management.call_command`.
     """
 
     django_command: "TyperCommand"
@@ -351,8 +357,9 @@ class Context(TyperContext):
     class ParamDict(dict):
         """
         An extension of dict we use to block updates to parameters that were supplied
-        when the command was invoked via call_command_. This complexity is introduced
-        by the hybrid parsing and option passing inherent to call_command_.
+        when the command was invoked via :func:`~django.core.management.call_command`.
+        This complexity is introduced by the hybrid parsing and option passing inherent
+        to :func:`~django.core.management.call_command`.
         """
 
         supplied: t.Sequence[str]
@@ -369,7 +376,7 @@ class Context(TyperContext):
     def supplied_params(self) -> t.Dict[str, t.Any]:
         """
         Get the parameters that were supplied when the command was invoked via
-        call_command_, only the root context has these.
+        :func:`~django.core.management.call_command`, only the root context has these.
         """
         if self.parent:
             return self.parent.supplied_params
@@ -559,10 +566,10 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
 
 class DTCommand(DjangoTyperMixin, CoreTyperCommand):
     """
-    This class extends the TyperCommand class to work with the django-typer interfaces.
-    If you need to add functionality to the command class - you should inherit from
-    this class. You can then pass your custom class to the command() decorators
-    using the cls parameter.
+    This class extends the ``TyperCommand`` class to work with the django-typer
+    interfaces. If you need to add functionality to the command class - you should
+    inherit from this class. You can then pass your custom class to the
+    :func:`~django_typer.management.command` decorators using the cls parameter.
 
     .. code-block:: python
 
@@ -578,8 +585,7 @@ class DTCommand(DjangoTyperMixin, CoreTyperCommand):
                 ...
 
 
-    See `click commands api
-    <https://click.palletsprojects.com/en/latest/api/#commands>`_ for more information.
+    See :doc:`click:commands` for more information.
     """
 
 
@@ -587,8 +593,8 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     """
     This class extends the TyperGroup class to work with the django-typer interfaces.
     If you need to add functionality to the group class you should inherit from this
-    class. You can then pass your custom class to the command() decorators using the
-    cls parameter.
+    class. You can then pass your custom class to the
+    :func:`~django_typer.management.command` decorators using the cls parameter.
 
     .. code-block:: python
 
@@ -605,8 +611,7 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
 
     See `click docs on custom groups
     <https://click.palletsprojects.com/en/latest/commands/#custom-groups>`_
-    and `advanced patterns <https://click.palletsprojects.com/en/latest/advanced/>`_
-    for more information.
+    and :doc:`click:advanced` for more information.
     """
 
     def list_commands(self, ctx: click.Context) -> t.List[str]:
@@ -836,7 +841,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         line.
     :param result_callback: a callback to invoke with the result of the command
     :param context_settings: the click context settings to use - see
-        `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :class:`click.Context`.
     :param help: the help string to use, defaults to the function docstring, if you need
         to translate the help you should use the help kwarg instead because docstrings
         will not be translated.
@@ -1082,8 +1087,8 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
         """
         A function decorator that creates a new command and attaches it to this group.
-        This is a passthrough to Typer.command() and the options are the same, except
-        we swap the default command class for our wrapper.
+        This is a passthrough to ``Typer.command()`` and the options are the same,
+        except we swap the default command class for our wrapper.
 
         The decorated function is the command function. It may also be invoked directly
         as a method from an instance of the django command class.
@@ -1111,7 +1116,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             function)
         :param cls: the command class to use
         :param context_settings: the context settings to use - see
-            `click docs <https://click.palletsprojects.com/api/#context>`_.
+            :class:`click.Context`
         :param help: the help string to use, defaults to the function docstring, if
             you need the help to be translated you should use the help kwarg instead
             because docstrings will not be translated.
@@ -1244,7 +1249,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         """
         Create a new subgroup and attach it to this group. This is like creating a new
         Typer app and adding it to a parent Typer app. The kwargs are passed through
-        to the Typer() constructor.
+        to the ``Typer()`` constructor.
 
         .. code-block:: python
 
@@ -1274,7 +1279,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             command line.
         :param result_callback: a callback to invoke with the result of the command
         :param context_settings: the click context settings to use - see
-            `click docs <https://click.palletsprojects.com/api/#context>`_.
+            :class:`click.Context`.
         :param help: the help string to use, defaults to the function docstring, if you
             need to translate the help you should use the help kwarg instead because
             docstrings will not be translated.
@@ -1410,10 +1415,11 @@ def initialize(
     to general and not intuitive. Callbacks in Typer_ are functions that are invoked
     before a command is invoked and that can accept their own arguments. When an
     ``initialize()`` function is supplied to a django
-    :class:`~django_typer.TyperCommand` the default Django_ options will be added as
-    parameters. You can specify these parameters (see :mod:`django_typer.types`) as
-    arguments on the wrapped function if you wish to receive them - otherwise they will
-    be intercepted by the base class infrastructure and used to their purpose.
+    :class:`~django_typer.management.TyperCommand` the default Django_ options will be
+    added as parameters. You can specify these parameters
+    (see :mod:`django_typer.types`) as arguments on the wrapped function if you wish to
+    receive them - otherwise they will be intercepted by the base class infrastructure
+    and used to their purpose.
 
     The parameters are passed through to
     `Typer.callback() <https://typer.tiangolo.com/tutorial/commands/callback/>`_
@@ -1470,8 +1476,9 @@ def initialize(
 
     :param name: the name of the callback (defaults to the name of the decorated
         function)
-    :param cls: the command class to use - (the initialize() function is technically
-        the root command group)
+    :param cls: the command class to use - (the
+        :func:`~django_typer.management.initialize` function is technically the root
+        command group)
     :param invoke_without_command: whether to invoke the callback if no command was
         specified.
     :param no_args_is_help: whether to show the help if no arguments are provided
@@ -1481,7 +1488,7 @@ def initialize(
         line.
     :param result_callback: a callback to invoke with the result of the command
     :param context_settings: the click context settings to use - see
-        `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :class:`click.Context`.
     :param help: the help string to use, defaults to the function docstring, if you need
         to translate the help you should use the help kwarg instead because docstrings
         will not be translated.
@@ -1590,8 +1597,9 @@ def command(
     `Typer.command() <https://typer.tiangolo.com/tutorial/commands/>`_ and the
     options are the same, except we swap the default command class for our wrapper.
 
-    We do not need to decorate handle() functions with this decorator, but if we
-    want to pass options upstream to typer we can:
+    We do not need to decorate :meth:`~django.core.management.BaseCommand.handle`
+    functions with this decorator, but if we want to pass options upstream to typer we
+    can:
 
     .. code-block:: python
 
@@ -1618,14 +1626,13 @@ def command(
                 # name of the command to 'command2' from 'other_command'
 
     The decorated function is the command function. It may also be invoked directly
-    as a method from an instance of the :class:`~django_typer.TyperCommand` class,
-    see :func:`~django_typer.get_command`.
+    as a method from an instance of the :class:`~django_typer.management.TyperCommand`
+    class, see :func:`~django_typer.management.get_command`.
 
     :param name: the name of the command (defaults to the name of the decorated
         function)
     :param cls: the command class to use
-    :param context_settings: the context settings to use - see
-        `click docs <https://click.palletsprojects.com/api/#context>`_.
+    :param context_settings: the context settings to use - see :class:`click.Context`
     :param help: the help string to use, defaults to the function docstring, if
         you need the help to be translated you should use the help kwarg instead
         because docstrings will not be translated.
@@ -1691,9 +1698,9 @@ def group(
     """
     A function decorator that creates a new subgroup and attaches it to the root
     command group. This is like creating a new Typer_ app and adding it to a parent
-    Typer app. The kwargs are passed through to the Typer() constructor. The group()
-    functions work like :func:`~django_typer.initialize` functions for their command
-    groups.
+    Typer app. The kwargs are passed through to the ``Typer()`` constructor. The
+    :func:`~django_typer.management.group` functions work like
+    :func:`~django_typer.management.initialize` functions for their command groups.
 
     .. code-block:: python
         :caption: management/commands/example.py
@@ -1739,7 +1746,7 @@ def group(
         line.
     :param result_callback: a callback to invoke with the result of the command
     :param context_settings: the click context settings to use - see
-        `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :class:`click.Context`
     :param help: the help string to use, defaults to the function docstring, if you need
         to translate the help you should use the help kwarg instead because docstrings
         will not be translated.
@@ -1932,7 +1939,8 @@ class TyperCommandMeta(type):
     """
     The metaclass used to build the TyperCommand class. This metaclass is responsible
     for building Typer app using the arguments supplied to the TyperCommand constructor.
-    It also discovers if handle() was supplied as the single command implementation.
+    It also discovers if :meth:`~django.core.management.BaseCommand.handle` was supplied
+    as the single command implementation.
 
     .. warning::
 
@@ -1953,7 +1961,7 @@ class TyperCommandMeta(type):
         line.
     :param result_callback: a callback to invoke with the result of the command
     :param context_settings: the click context settings to use - see
-        `click docs <https://click.palletsprojects.com/api/#context>`_.
+        :class:`click.Context`
     :param help: the help string to use, defaults to the function docstring, if you need
         to translate the help you should use the help kwarg instead because docstrings
         will not be translated.
@@ -2350,9 +2358,10 @@ class CommandNode:
 class TyperParser:
     """
     A class that conforms to the argparse.ArgumentParser interface that the django
-    base class works with that is returned by BaseCommand.create_parser(). This class
-    does not strictly conform to the argparse interface but does just enough to
-    satisfy the django base class.
+    base class works with that is returned by
+    :meth:`~django.core.management.BaseCommand.create_parser`. This class does not
+    strictly conform to the argparse interface but does just enough to satisfy the
+    django base class.
 
     :param django_command: the django command instance
     :param prog_name: the name of the manage script that invoked the command
@@ -2501,29 +2510,36 @@ class OutputWrapper(BaseOutputWrapper):
 
 class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     """
-    An extension of BaseCommand_ that uses the Typer_ library to parse
-    arguments_ and options_. This class adapts BaseCommand_ using a light touch
-    that relies on most of the original BaseCommand_ implementation to handle
-    default arguments and behaviors.
+    An extension of :class:`~django.core.management.BaseCommand` that uses the Typer_
+    library to parse arguments_ and options_. This class adapts
+    :class:`~django.core.management.BaseCommand` using a light touch that relies on most
+    of the original :class:`~django.core.management.BaseCommand` implementation to
+    handle default arguments and behaviors.
 
-    All of the documented BaseCommand_ functionality works as expected. call_command_
-    also works as expected. TyperCommands however add a few extra features:
+    All of the documented :class:`~django.core.management.BaseCommand` functionality
+    works as expected. :func:`~django.core.management.call_command` also works as
+    expected. TyperCommands however add a few extra features:
 
         - We define arguments_ and options_ using concise and optionally annotated type
           hints.
-        - Simple TyperCommands implemented only using handle() can be called directly
-          by invoking the command as a callable.
+        - Simple TyperCommands implemented only using
+          :meth:`~django.core.management.BaseCommand.handle` can be called directly by
+          invoking the command as a callable.
         - We can define arbitrarily complex subcommand group hierarchies using the
-          :func:`~django_typer.group` and :func:`~django_typer.command` decorators.
+          :func:`~django_typer.management.group` and
+          :func:`~django_typer.management.command` decorators.
         - Commands and subcommands can be fetched and invoked directly as functions
-          using :func:`~django_typer.get_command`
+          using :func:`~django_typer.management.get_command`
         - We can define common initialization logic for groups of commands using
-          :func:`~django_typer.initialize`
-        - TyperCommands may safely return non-string values from handle()
+          :func:`~django_typer.management.initialize`
+        - TyperCommands may safely return non-string values from
+          :meth:`~django.core.management.BaseCommand.handle`
 
-    Defining a typer command is a lot like defining a BaseCommand_ except that we do not
-    have an add_arguments() method. Instead we define the parameters using type hints
-    directly on handle():
+    Defining a typer command is a lot like defining a
+    :class:`~django.core.management.BaseCommand` except that we do not have an
+    :meth:`~django.core.management.BaseCommand.add_arguments` method. Instead we define
+    the parameters using type hints directly on
+    :meth:`~django.core.management.BaseCommand.handle`:
 
     .. code-block:: python
 
@@ -2541,7 +2557,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     TyperCommands can be extremely simple like above, or we can create really complex
     command group hierarchies with subcommands and subgroups (see
-    :func:`~django_typer.group` and :func:`~django_typer.command`).
+    :func:`~django_typer.management.group` and
+    :func:`~django_typer.management.command`).
 
     Typer_ apps can be configured with a number of parameters to control behavior such
     as exception behavior, help output, help markup interpretation, result processing
@@ -2578,16 +2595,14 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     We're doing a number of things here:
 
-        - Using the :func:`~django_typer.command` decorator to define multiple
-          subcommands.
-        - Using the `suppressed_base_arguments attribute
-          <https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand.suppressed_base_arguments>`_
+        - Using the :func:`~django_typer.management.command` decorator to define
+          multiple subcommands.
+        - Using :attr:`~django.core.management.BaseCommand.suppressed_base_arguments`
           to suppress the default options Django adds to the command interface.
-        - Using the `rich_markup_mode parameter
+        - Using `rich_markup_mode
           <https://typer.tiangolo.com/tutorial/commands/help/#rich-markdown-and-markup>`_
           to enable markdown rendering in help output.
-        - Using the chain parameter to enable `command chaining
-          <https://click.palletsprojects.com/commands/#multi-command-chaining>`_.
+        - Using the chain parameter to enable :ref:`click:multi-command-chaining`.
 
 
     We can see that our help renders like so:
@@ -2607,10 +2622,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         command2
         ['one', 'two']
 
-    See :class:`~django_typer.TyperCommandMeta` for the list of accepted parameters.
-    Also refer to the Typer_ docs for more information on the behaviors expected for
-    those parameters - they are passed through to the Typer class constructor. Not all
-    parameters may make sense in the context of a django command.
+    See :class:`~django_typer.management.TyperCommandMeta` for the list of accepted
+    parameters. Also refer to the Typer_ docs for more information on the behaviors
+    expected for those parameters - they are passed through to the Typer class
+    constructor. Not all parameters may make sense in the context of a django command.
 
     :param stdout: the stdout stream to use
     :param stderr: the stderr stream to use
@@ -2709,8 +2724,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
         :param name: the name of the callback (defaults to the name of the decorated
             function)
-        :param cls: the command class to use - (the initialize() function is technically
-            the root command group)
+        :param cls: the command class to use - (the
+            :func:`~django_typer.management.initialize` function is technically the root
+            command group)
         :param invoke_without_command: whether to invoke the callback if no command was
             specified.
         :param no_args_is_help: whether to show the help if no arguments are provided
@@ -2720,7 +2736,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             command line.
         :param result_callback: a callback to invoke with the result of the command
         :param context_settings: the click context settings to use - see
-            `click docs <https://click.palletsprojects.com/api/#context>`_.
+            :class:`click.Context`.
         :param help: the help string to use, defaults to the function docstring, if you
             need to translate the help you should use the help kwarg instead because
             docstrings will not be translated.
@@ -2848,7 +2864,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             function)
         :param cls: the command class to use
         :param context_settings: the context settings to use - see
-            `click docs <https://click.palletsprojects.com/api/#context>`_.
+            :class:`click.Context`
         :param help: the help string to use, defaults to the function docstring, if
             you need the help to be translated you should use the help kwarg instead
             because docstrings will not be translated.
@@ -2965,7 +2981,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             command line.
         :param result_callback: a callback to invoke with the result of the command
         :param context_settings: the click context settings to use - see
-            `click docs <https://click.palletsprojects.com/api/#context>`_.
+            :class:`click.Context`.
         :param help: the help string to use, defaults to the function docstring, if you
             need to translate the help you should use the help kwarg instead because
             docstrings will not be translated.
@@ -3116,7 +3132,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def get_subcommand(self, *command_path: str) -> CommandNode:
         """
-        Retrieve a :class:`~django_typer.CommandNode` at the given command path.
+        Retrieve a :class:`~django_typer.management.CommandNode` at the given command
+        path.
 
         :param command_path: the path to the command to retrieve, where each argument
             is the string name in order of a group or command in the hierarchy.
@@ -3135,7 +3152,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         Create a parser for this command. This also sets the command
         context, so any functions below this call on the stack may
-        use get_current_command() to retrieve the django command instance.
+        use :func:`django_typer.utils.get_current_command` to retrieve the django
+        command instance.
 
         :param prog_name: the name of the manage script that invoked the command
         :param subcommand: the name of the django command
@@ -3158,7 +3176,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param prog_name: the name of the manage script that invoked the command
         :param subcommand: the name of the django command
         :param cmd_path: the path to the command to print the help for. This is
-            an extension to the pase class print_help() interface, required because
+            an extension to the base class ``print_help()`` interface, required because
             typer/click have different helps for each subgroup or subcommand.
         """
         with self:
@@ -3188,12 +3206,15 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __call__(self, *args, **kwargs):
         """
-        Call this command's derived class handle() implementation directly. Note this
-        does not call the handle() function below - but the handle() function that
-        was implemented on the deriving class if one exists.
+        Call this command's derived class
+        :meth:`~django.core.management.BaseCommand.handle` implementation directly. Note
+        this does not call the :meth:`~django.core.management.BaseCommand.handle`
+        function below - but the :meth:`~django.core.management.BaseCommand.handle`
+        function that was implemented on the deriving class if one exists.
 
-        When simple commands are implemented using only the handle() function we may
-        invoke that handle function directly using this call operator:
+        When simple commands are implemented using only the
+        :meth:`~django.core.management.BaseCommand.handle` function we may invoke that
+        handle function directly using this call operator:
 
         .. code-block:: python
 
@@ -3209,12 +3230,16 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
         .. note::
 
-            This only works for commands that implement handle(). Commands that have
-            multiple commands and groups are not required to implement handle() and
-            for those commands the functions should be invoked directly.
+            This only works for commands that implement
+            :meth:`~django.core.management.BaseCommand.handle`. Commands that have
+            multiple commands and groups are not required to implement
+            :meth:`~django.core.management.BaseCommand.handle` and for those commands
+            the functions should be invoked directly.
 
-        :param args: the arguments to directly pass to handle()
-        :param kwargs: the options to directly pass to handle()
+        :param args: the arguments to directly pass to
+            :meth:`~django.core.management.BaseCommand.handle`
+        :param kwargs: the options to directly pass to
+            :meth:`~django.core.management.BaseCommand.handle`
         """
         with self:
             handle = getattr(self, "_handle", None) or getattr(
@@ -3264,9 +3289,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def run_from_argv(self, argv):
         """
-        Wrap the BaseCommand.run_from_argv() method to push the command
-        onto the stack so any code in frames below this can get a reference
-        to the command instance using get_current_command().
+        Wrap the :meth:`~django.core.management.BaseCommand.run_from_argv` method to
+        push the command onto the stack so any code in frames below this can get a
+        reference to the command instance using
+        :func:`~django_typer.utils.get_current_command`.
 
         :param argv: the arguments to pass to the command
         """
@@ -3275,18 +3301,19 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def execute(self, *args, **options):
         """
-        Wrap the BaseCommand.execute() method to set and unset
-        no_color and force_color options.
+        Wrap the :meth:`~django.core.management.BaseCommand.execute` method to set and
+        unset no_color and force_color options.
 
         This function pushes the command onto the stack so any frame
         below this call may use get_current_command() to get a reference
         to the command instance.
 
-        args and options are passed to handle().
+        args and options are passed to
+        :meth:`~django.core.management.BaseCommand.handle`.
 
         :param args: the arguments to pass to the command
         :param options: the options to pass to the command
-        :return: t.Any object returned by the command
+        :return: Any object returned by the command
         """
         no_color = self.no_color
         force_color = self.force_color

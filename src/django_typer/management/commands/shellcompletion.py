@@ -14,9 +14,9 @@ typer's shell completion installation logic, but does have to patch the installe
 scripts. This is because there is only one installation for all Django_ management
 commands, not each individual command. The completion logic here will failover to
 Django_'s builtin autocomplete if the command in question is not a
-:class:`~django_typer.TyperCommand`. To promote compatibility with other management
-command libraries or custom completion logic, a fallback completion function can also
-be specified.
+:class:`~django_typer.management.TyperCommand`. To promote compatibility with other
+management command libraries or custom completion logic, a fallback completion function
+can also be specified.
 """
 
 import contextlib
@@ -82,8 +82,9 @@ class Command(TyperCommand):
     typer/click autocompletion scripts to generate the autocompletion items, but monkey
     patches the scripts to invoke our bundled shell complete script which fails over to
     the django autocomplete function when the command being completed is not a
-    :class:`~django_typer.TyperCommand`. When the django autocomplete function is used
-    we also wrap it so that it works for any supported click/typer shell, not just bash.
+    :class:`~django_typer.management.TyperCommand`. When the django autocomplete
+    function is used we also wrap it so that it works for any supported click/typer
+    shell, not just bash.
 
     We also provide a remove command to easily remove the installed script.
 

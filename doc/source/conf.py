@@ -48,11 +48,13 @@ release = django_typer.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinxcontrib_django',
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinxcontrib.typer',
     'sphinx_tabs.tabs',
-    "sphinx.ext.viewcode"
+    "sphinx.ext.viewcode",
+    'sphinx.ext.intersphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -95,6 +97,17 @@ linkcheck_ignore = [
 
 autodoc_typehints = "description"  # or signature
 autodoc_typehints_format = "short"
+
+intersphinx_mapping = {
+    "django": (
+        "https://docs.djangoproject.com/en/stable",
+        "https://docs.djangoproject.com/en/stable/_objects/",
+    ),
+    "click": ("https://click.palletsprojects.com/en/stable", None),
+    "rich": ("https://rich.readthedocs.io/en/stable", None),
+    "python": ('https://docs.python.org/3', None)
+}
+
 
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
