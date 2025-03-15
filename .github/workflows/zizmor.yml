@@ -1,16 +1,13 @@
 name: Zizmor GitHub Actions Security Analysis
 
 on:
-  # Run on push to main branch
   push:
     branches: [ main ]
-  # Run on pull requests
   pull_request:
     branches: [ main ]
-  # Run on schedule (weekly)
   schedule:
-    - cron: '0 0 * * 0'  # Run at midnight every Sunday
-  # Allow manual triggering
+    # Run weekly
+    - cron: '0 0 * * 0'
   workflow_dispatch:
 
 permissions:
