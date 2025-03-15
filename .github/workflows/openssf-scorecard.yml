@@ -1,0 +1,57 @@
+name: OpenSSF Scorecard Analysis
+
+on:
+  # For Branch-Protection check. Only the default branch is supported.
+  branch_protection_rule:
+  # To guarantee Maintained check is occasionally updated.
+  push:
+    branches: [ main ]
+  # For manual triggering
+  workflow_dispatch:
+  # Run weekly to track progress
+  schedule:
+    - cron: '0 0 * * 1'  # Run every Monday at midnight
+
+permissions: read-all
+
+jobs:
+  scorecard-analysis:
+    name: OpenSSF Scorecard Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload the results to code-scanning dashboard.
+      security-events: write
+      # Needed to publish results and get a badge (see publish_results below).
+      id-token: write
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: "Run Scorecard analysis"
+        uses: ossf/scorecard-action@v2.3.1
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          # A read-only PAT token, which is needed for the Branch-Protection check.
+          repo_token: ${{ secrets.SCORECARD_TOKEN }}
+          # Publish results to enable scorecard badges. For more details, see
+          # https://github.com/ossf/scorecard-action#publishing-results
+          publish_results: true
+
+      # Upload the results as artifacts.
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: SARIF file
+          path: results.sarif
+          retention-days: 5
+
+      # Upload the results to GitHub's code scanning dashboard.
+      - name: "Upload to code-scanning"
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: ossf-scorecard

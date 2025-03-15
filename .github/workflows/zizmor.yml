@@ -1,0 +1,58 @@
+name: Zizmor GitHub Actions Security Analysis
+
+on:
+  # Run on push to main branch
+  push:
+    branches: [ main ]
+  # Run on pull requests
+  pull_request:
+    branches: [ main ]
+  # Run on schedule (weekly)
+  schedule:
+    - cron: '0 0 * * 0'  # Run at midnight every Sunday
+  # Allow manual triggering
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor-analysis:
+    name: Zizmor Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install Zizmor
+        run: |
+          cargo install zizmor
+
+      - name: Run Zizmor analysis
+        run: |
+          zizmor --sarif results.sarif .github/workflows/
+
+      - name: Upload analysis results
+        uses: actions/upload-artifact@v4
+        with:
+          name: zizmor-results
+          path: results.sarif
+          retention-days: 7
+
+      - name: Upload to code-scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
