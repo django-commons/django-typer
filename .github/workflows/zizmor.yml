@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Zizmor analysis
         run: |
-          zizmor --sarif results.sarif .github/workflows/
+          zizmor --format sarif .github/workflows/ > results.sarif
 
       - name: Upload analysis results
         uses: actions/upload-artifact@v4
