@@ -40,6 +40,8 @@ jobs:
       RELEASE_VERSION: ${{ steps.set-package.outputs.release_version }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
