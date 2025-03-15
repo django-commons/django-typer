@@ -79,7 +79,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         **kwargs,
     ):
         # we don't always need the initialization parameters during completion
-        self.prog_name = prog_name
+        self.prog_name = prog_name.replace(" ", "_")
         if command:
             self.command = command
         if command_str is not None:
