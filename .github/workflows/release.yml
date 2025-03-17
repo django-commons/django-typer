@@ -51,7 +51,7 @@ jobs:
       with:
         enable-cache: true
     - name: Setup Just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@v3
     - name: Verify Tag
       run: |
         TAG_NAME=${GITHUB_REF#refs/tags/}
