@@ -29,6 +29,8 @@ import typing as t
 from pathlib import Path
 from types import ModuleType
 
+from click import get_current_context
+from click.core import ParameterSource
 from click.parser import split_arg_string
 from click.shell_completion import CompletionItem
 from django.core.management import CommandError, ManagementUtility
@@ -121,6 +123,8 @@ class Command(TyperCommand):
 
     _fallback: t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]] = None
     _manage_script: t.Optional[t.Union[str, Path]] = None
+
+    color_default: bool = True
 
     @property
     def fallback(
@@ -264,6 +268,15 @@ class Command(TyperCommand):
         self.no_color = (not self.shell_class.color) if no_color is None else no_color
         if self.force_color:
             self.no_color = False
+        ctx = get_current_context(silent=True)
+        self.color_default = (
+            (
+                ctx.get_parameter_source("no_color") is ParameterSource.DEFAULT
+                and ctx.get_parameter_source("force_color") is ParameterSource.DEFAULT
+            )
+            if ctx
+            else False
+        )
         return self
 
     @command(
@@ -309,7 +322,17 @@ class Command(TyperCommand):
                 # todo - add template name completer - see django-render-static
             ),
         ] = None,
-    ):
+        prompt: t.Annotated[
+            bool,
+            Option(
+                "--no-prompt",
+                help=t.cast(
+                    str,
+                    _("Do not ask for conformation before editing dotfiles."),
+                ),
+            ),
+        ] = True,
+    ) -> t.Optional[t.List[Path]]:
         """
         Install autocompletion for the given shell. If the shell is not specified, it
         will try to detect the shell. If the shell is not detected, it will fail.
@@ -319,6 +342,8 @@ class Command(TyperCommand):
         .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:install
             :width: 85
             :convert-png: latex
+
+        Returns the list of edited and/or created paths or None if no edits were made.
         """
         self.fallback = fallback  # type: ignore[assignment]
         self.manage_script = manage_script  # type: ignore[assignment]
@@ -340,17 +365,26 @@ class Command(TyperCommand):
                     )
                 )
 
-        install_path = self.shell_class(
+        install_paths = self.shell_class(
             prog_name=str(manage_script or self.manage_script_name),
             command=self,
             template=template,
             color=not self.no_color or self.force_color,
-        ).install()
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Installed autocompletion for {self.shell} @ {install_path}"
+            color_default=self.color_default,
+        ).install(prompt=prompt)
+        if install_paths:
+            self.stdout.write(
+                self.style.SUCCESS(
+                    _("Installed autocompletion for {shell}").format(shell=self.shell)
+                )
             )
-        )
+        else:
+            self.stdout.write(
+                self.style.ERROR(
+                    t.cast(str, _("Aborted shell completion installation."))
+                )
+            )
+        return install_paths or None
 
     @command(
         help=t.cast(str, _("Uninstall autocompletion for the current or given shell."))
@@ -389,6 +423,7 @@ class Command(TyperCommand):
             prog_name=str(manage_script or self.manage_script_name),
             command=self,
             color=not self.no_color or self.force_color,
+            color_default=self.color_default,
         ).uninstall()
         self.stdout.write(
             self.style.WARNING(f"Uninstalled autocompletion for {self.shell}.")
@@ -490,6 +525,7 @@ class Command(TyperCommand):
                         command_str=command,
                         command_args=args,
                         color=not self.no_color or self.force_color,
+                        color_default=self.color_default,
                     ).complete()
 
             # only try to set the fallback if we have to use it
@@ -499,6 +535,7 @@ class Command(TyperCommand):
                 command_str=command,
                 command_args=args,
                 color=not self.no_color or self.force_color,
+                color_default=self.color_default,
             ).complete()
 
         def strip_color(text: str) -> str:

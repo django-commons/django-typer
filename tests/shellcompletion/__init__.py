@@ -12,13 +12,15 @@ from functools import cached_property
 import re
 import subprocess
 import platform
+from django.test import TestCase
 
 from django_typer.utils import detect_shell
 
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
 from django_typer.shells import DjangoTyperShellCompleter
-from ..utils import rich_installed
+from django_typer.utils import with_typehint
+from ..utils import rich_installed, manage_py
 
 default_shell = None
 
@@ -61,7 +63,7 @@ def scrub(output: str) -> str:
     )
 
 
-class _CompleteTestCase:
+class _CompleteTestCase(with_typehint(TestCase)):
     shell: str
     manage_script: str
     launch_script: str
@@ -104,11 +106,12 @@ class _CompleteTestCase:
         no_color=None,
         fallback=None,
         no_shell=False,
+        prompt=False,
     ):
         if not script:
             script = self.manage_script
         init_kwargs = {"force_color": force_color, "no_color": no_color}
-        kwargs = {}
+        kwargs = {"prompt": prompt}
         if script:
             kwargs["manage_script"] = script
         if self.shell and not no_shell:
@@ -496,3 +499,62 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove(script=manage2)
         finally:
             self.remove_script(script=manage2)
+
+    if platform.system() != "Windows":
+
+        def test_prompt_install(self):
+            import pexpect
+
+            rex = re.compile
+            expected = [
+                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
+                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
+                rex(r"Aborted shell completion installation."),  # 2
+                rex(rf"Installed autocompletion for {self.shell}"),  # 3
+            ]
+
+            install_command = [
+                "shellcompletion",
+                "--no-color",
+                "--shell",
+                self.shell,
+                "install",
+            ]
+            self.remove()
+            self.verify_remove()
+
+            install = pexpect.spawn(self.manage_script, install_command)
+
+            def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
+                index = child.expect(expected)
+                if index in [0, 1]:
+                    return index, child.match.group("file").decode()
+                return index, None
+
+            # test an abort
+            idx, _ = wait_for_output(install)
+            self.assertLess(idx, 2)
+            install.sendline("N")
+
+            while True:
+                idx, _ = wait_for_output(install)
+                if idx < 2:
+                    install.sendline("N")
+                else:
+                    self.assertEqual(idx, 2)
+                    break
+
+            self.verify_remove()
+
+            # test an install
+            install = pexpect.spawn(self.manage_script, install_command)
+
+            while True:
+                idx, _ = wait_for_output(install)
+                if idx < 2:
+                    install.sendline("Y")
+                else:
+                    self.assertEqual(idx, 3)
+                    break
+
+            self.verify_install()

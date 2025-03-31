@@ -86,19 +86,32 @@ class BashComplete(DjangoTyperShellCompleter):
     def format_completion(self, item: CompletionItem) -> str:
         return f"{item.type},{item.value}"
 
-    def install(self) -> Path:
+    def install(self, prompt: bool = True) -> t.List[Path]:
         assert self.prog_name
-        Path.home().mkdir(parents=True, exist_ok=True)
+        edited = []
         script = self.install_dir / f"{self.prog_name}.sh"
         bashrc = self.get_user_profile()
         bashrc_source = bashrc.read_text() if bashrc.is_file() else ""
         source_line = f"source {script}"
         if source_line not in bashrc_source:
             bashrc_source += f"\n{source_line}\n"
-        bashrc.write_text(bashrc_source)
-        script.parent.mkdir(parents=True, exist_ok=True)
-        script.write_text(self.source())
-        return script
+            if self.prompt(
+                prompt=prompt,
+                source=source_line,
+                file=bashrc,
+                start_line=bashrc_source.count("\n") + 1,
+            ):
+                Path.home().mkdir(parents=True, exist_ok=True)
+                with open(bashrc, "a") as f:
+                    f.write(f"\n{source_line}\n")
+                edited.append(bashrc)
+
+        source = self.source()
+        if self.prompt(prompt=prompt, source=source, file=script):
+            script.parent.mkdir(parents=True, exist_ok=True)
+            script.write_text(self.source())
+            edited.append(script)
+        return edited
 
     def uninstall(self):
         assert self.prog_name

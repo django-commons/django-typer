@@ -134,6 +134,9 @@ project simply run the install command:
 
     ./manage.py shellcompletion install
 
+**The install command will list the precise edits to dotfiles and shell configuration files that it
+will make and ask for permission before proceeding. To skip the prompt use** ``--no-prompt``.
+
 .. note::
 
     The manage script may be named differently in your project - this is fine. The only requirement

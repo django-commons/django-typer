@@ -5,11 +5,13 @@ from pathlib import Path
 from sphinx.ext.autodoc import between
 import shutil
 import django
+from django.conf import settings
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 sys.path.append(str(Path(__file__).parent / 'ext'))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings.base')
+settings.configure()
 django.setup()
 
 import django_typer

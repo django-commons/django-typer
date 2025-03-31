@@ -7,6 +7,7 @@ Change Log
 v3.1.0 (2024-03-xx)
 ===================
 
+* Implemented `Prompt before writing to dotfiles when installing completions <https://github.com/django-commons/django-typer/issues/189>`_
 * Fixed `Shell completion tests let failures through in CI <https://github.com/django-commons/django-typer/issues/194>`_
 * Fixed `fish completion installs should respect XDG_CONFIG_HOME <https://github.com/django-commons/django-typer/issues/193>`_
 * Fixed `zsh completion installs should respect ZDOTDIR <https://github.com/django-commons/django-typer/issues/192>`_

@@ -13,6 +13,7 @@ from django.template import Context, Engine
 from django.template.backends.django import Template as DjangoTemplate
 from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
+from django.utils.translation import gettext as _
 
 if t.TYPE_CHECKING:  # pragma: no cover
     from django_typer.management.commands.shellcompletion import (
@@ -63,7 +64,11 @@ class DjangoTyperShellCompleter(ShellComplete):
     command_args: t.List[str]
 
     console = None  # type: ignore[var-annotated]
+
+    rich_console = None  # type: ignore[var-annotated]
     console_buffer: io.StringIO
+
+    color_default: bool = True
 
     def __init__(
         self,
@@ -76,6 +81,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         command_args: t.Optional[t.List[str]] = None,
         template: t.Optional[str] = None,
         color: t.Optional[bool] = None,
+        color_default: bool = color_default,
         **kwargs,
     ):
         # we don't always need the initialization parameters during completion
@@ -90,12 +96,20 @@ class DjangoTyperShellCompleter(ShellComplete):
             self.template = template
         if color is not None:
             self.color = color
+        self.color_default = color_default
 
         self.console_buffer = io.StringIO()
         try:
             from rich.console import Console
 
             self.console = Console(
+                # do not disable color output if not explicitly disabled
+                color_system="auto" if self.color_default or self.color else None,
+                force_terminal=True,
+                file=command.stdout if command else None,  # type: ignore[arg-type]
+                stderr=command.stderr if command else None,  # type: ignore[arg-type]
+            )
+            self.rich_console = Console(
                 color_system="auto" if self.color else None,
                 force_terminal=True,
                 file=self.console_buffer,
@@ -224,11 +238,16 @@ class DjangoTyperShellCompleter(ShellComplete):
             return self.load_template().render(Context(self.source_vars()))  # type: ignore
 
     @abstractmethod
-    def install(self) -> Path:
+    def install(self, prompt: bool = True) -> t.List[Path]:
         """
         Deriving classes must implement this method to install the completion script.
 
         This method should return the path to the installed script.
+
+        :param prompt: If True, prompt the user for confirmation before installing
+            the completion script.
+        :return: The paths that were created or edited or None if the user declined
+            installation or no changes were made.
         """
 
     @abstractmethod
@@ -245,21 +264,63 @@ class DjangoTyperShellCompleter(ShellComplete):
         of that script.
         """
 
+    def prompt(
+        self,
+        source: str,
+        file: Path,
+        prompt: bool = True,
+        start_line: int = 0,
+    ) -> bool:
+        """
+        Prompt the user for confirmation before editing the file with the given
+        source edits.
+
+        :param source: The source string that will be written to the file.
+        :param file: The path of the file that will be created or edited.
+        :param prompt: Prompt toggle, if False, will not prompt the user and return True
+        :param start_line: The line number the edit will start at.
+        :return: True if the user confirmed the edit, False otherwise.
+        """
+        if not prompt:
+            return True
+
+        prompt_text = (
+            _("Append the above contents to {file}?").format(file=file)
+            if start_line
+            else _("Create {file} with the above contents?").format(file=file)
+        )
+        if self.console:
+            from rich.prompt import Confirm
+            from rich.syntax import Syntax
+
+            syntax = Syntax(
+                source,
+                self.name,
+                theme="monokai",
+                start_line=start_line,
+                line_numbers=False,
+            )
+            self.console.print(syntax)
+            return Confirm.ask(prompt_text)
+        else:
+            print(source)
+            return input(prompt_text + " [y/N] ").lower() in {"y", "yes"}
+
     def process_rich_text(self, text: str) -> str:
         """
         Removes rich text markup from a string if color is disabled, otherwise it
         will render the rich markup to ansi control codes. If rich is not installed,
         none of this happens and the markup will be passed through as is.
         """
-        if self.console:
+        if self.rich_console:
             if self.color:
                 self.console_buffer.truncate(0)
                 self.console_buffer.seek(0)
-                self.console.print(text, end="")
+                self.rich_console.print(text, end="")
                 return self.console_buffer.getvalue()
             else:
                 return "".join(
-                    segment.text for segment in self.console.render(text)
+                    segment.text for segment in self.rich_console.render(text)
                 ).rstrip("\n")
         return text
 

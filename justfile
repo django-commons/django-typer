@@ -160,6 +160,28 @@ check-docs-links: _link_check
 check-docs:
     @just run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
 
+# fetch the intersphinx references for the given package
+[script]
+fetch-refs LIB: install-docs
+    import os
+    from pathlib import Path
+    import logging as _logging
+    import sys
+    import runpy
+    from sphinx.ext.intersphinx import inspect_main
+    _logging.basicConfig()
+
+    libs = runpy.run_path(Path(os.getcwd()) / "doc/source/conf.py").get("intersphinx_mapping")
+    url = libs.get("{{ LIB }}", None)
+    if not url:
+        sys.exit(f"Unrecognized {{ LIB }}, must be one of: {', '.join(libs.keys())}")
+    if url[1] is None:
+        url = f"{url[0].rstrip('/')}/objects.inv"
+    else:
+        url = url[1]
+
+    raise SystemExit(inspect_main([url]))
+
 # lint the code
 check-lint:
     @just run ruff check --select I
@@ -242,26 +264,38 @@ list-missed-tests: install log-tests test-all
 [script("bash")]
 test-bash:
     source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
+    uv pip uninstall rich
+    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_bash.py::BashExeTests::test_prompt_install
 
 # test zsh shell completions
 [script("zsh")]
 test-zsh:
     source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
+    uv pip uninstall rich
+    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_zsh.py::ZshExeTests::test_prompt_install
 
 # test powershell shell completions
 [script("powershell")]
 test-powershell:
     .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
+    # TODO - not implemented on windows
+    # uv pip uninstall rich
+    # source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install
 
 # test pwsh shell completions
 [script("pwsh")]
 test-pwsh:
     .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
+    # TODO - not implemented on windows
+    # uv pip uninstall rich
+    # source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install
 
 # test fish shell completions
 [script("fish")]
 test-fish:
     source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
+    uv pip uninstall rich
+    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_fish.py::FishExeTests::test_prompt_install
 
 # run tests
 test *TESTS:

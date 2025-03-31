@@ -1,4 +1,5 @@
 import os
+import typing as t
 from functools import cached_property
 from pathlib import Path
 
@@ -61,11 +62,14 @@ class FishComplete(DjangoTyperShellCompleter):
             )
         return f"{item.type},{self.process_rich_text(item.value)}"
 
-    def install(self) -> Path:
+    def install(self, prompt: bool = True) -> t.List[Path]:
         assert self.prog_name
         script = self.install_dir / f"{self.prog_name}.fish"
-        script.write_text(self.source())
-        return script
+        source = self.source()
+        if self.prompt(prompt=prompt, source=source, file=script):
+            script.write_text(source)
+            return [script]
+        return []
 
     def uninstall(self):
         assert self.prog_name
