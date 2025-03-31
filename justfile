@@ -263,17 +263,17 @@ list-missed-tests: install log-tests test-all
 # test bash shell completions
 [script("bash")]
 test-bash:
-    uv sync --no-extra rich
-    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
     uv sync --all-extras
+    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
+    uv sync --no-extra rich
     source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_bash.py::BashExeTests::test_prompt_install
 
 # test zsh shell completions
 [script("zsh")]
 test-zsh:
-    uv sync --no-extra rich
-    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
     uv sync --all-extras
+    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
+    uv sync --no-extra rich
     source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_zsh.py::ZshExeTests::test_prompt_install
 
 # test powershell shell completions
@@ -282,24 +282,24 @@ test-powershell:
     uv sync --no-extra rich
     .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
     # TODO - not implemented on windows
-    # uv pip uninstall rich
+    # uv sync --no-extra rich
     # .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install
 
 # test pwsh shell completions
 [script("pwsh")]
 test-pwsh:
-    uv sync --no-extra rich
+    uv sync --all-extras
     .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
     # TODO - not implemented on windows
-    # uv pip uninstall rich
+    # uv sync --no-extra rich
     # .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install
 
 # test fish shell completions
 [script("fish")]
 test-fish:
-    uv sync --no-extra rich
-    source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
     uv sync --all-extras
+    source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
+    uv sync --no-extra rich
     source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_fish.py::FishExeShellTests::test_prompt_install
 
 # run tests
