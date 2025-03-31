@@ -36,7 +36,7 @@ jobs:
           - '4.2' # LTS April 2026
           - '5.0' # April 2025
           - '5.1' # December 2025
-          - '5.2b1'
+          - '5.2rc1'
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
@@ -53,7 +53,7 @@ jobs:
           - python-version: '3.13'
             django-version: '5.0'
           - python-version: '3.9'
-            django-version: '5.2b1'
+            django-version: '5.2rc1'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -85,7 +85,7 @@ jobs:
       uses: extractions/setup-just@v3
     - name: Install Dependencies
       run: |
-        if [ "${{ matrix.django-version }}" = "5.2b1" ]; then
+        if [ "${{ matrix.django-version }}" = "5.2rc1" ]; then
           just test-lock "Django==${{ matrix.django-version }}"
         else
           just test-lock "Django~=${{ matrix.django-version }}.0"
