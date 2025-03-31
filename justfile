@@ -300,7 +300,7 @@ test-fish:
     uv sync --no-extra rich
     source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
     uv sync --all-extras
-    source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_fish.py::FishExeTests::test_prompt_install
+    source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_fish.py::FishExeShellTests::test_prompt_install
 
 # run tests
 test *TESTS:
