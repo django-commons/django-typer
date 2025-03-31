@@ -107,3 +107,6 @@ class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
 
     @pytest.mark.skip(reason="TODO")
     def test_path_completion(self): ...
+
+    @pytest.mark.skip(reason="TODO")
+    def test_prompt_install(self): ...
