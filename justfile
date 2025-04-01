@@ -280,19 +280,17 @@ test-zsh:
 [script("powershell")]
 test-powershell:
     uv sync --no-extra rich
-    .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
-    # TODO - not implemented on windows
-    # uv sync --no-extra rich
-    # .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install
+    . .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    uv sync --no-extra rich
+    . .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # test pwsh shell completions
 [script("pwsh")]
 test-pwsh:
     uv sync --all-extras
-    .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
-    # TODO - not implemented on windows
-    # uv sync --no-extra rich
-    # .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install
+    . .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    uv sync --no-extra rich
+    . .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # test fish shell completions
 [script("fish")]
