@@ -437,16 +437,6 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
     launch_script = "django-admin"
 
     @classmethod
-    def setUpClass(cls):
-        cls.install_script()
-        super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.remove_script()
-        super().tearDownClass()
-
-    @classmethod
     def install_script(cls, script=None):
         if not script:
             script = cls.manage_script
