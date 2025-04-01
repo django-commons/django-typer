@@ -18,6 +18,7 @@ from django_typer.completers.path import (
     static_paths,
     media_paths,
 )
+from django_typer.completers.settings import setting, languages
 from django_typer.completers.db import databases
 from django_typer.completers.cmd import commands
 from django_typer.completers import these_strings, chain
@@ -158,6 +159,22 @@ class Command(TyperCommand, rich_markup_mode="rich"):
                 show_default=False,
             ),
         ] = "",
+        languages: Annotated[
+            t.List[str],
+            typer.Option(
+                "--lang",
+                help=t.cast(str, _("One or more languages.")),
+                shell_complete=languages,
+            ),
+        ] = [],
+        setting: Annotated[
+            t.List[str],
+            typer.Option(
+                "--setting",
+                help=t.cast(str, _("One or more Django setting variables.")),
+                shell_complete=setting,
+            ),
+        ] = [],
     ):
         assert self.__class__ is Command
         for app in django_apps:

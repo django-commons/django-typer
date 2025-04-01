@@ -4,16 +4,19 @@
 Change Log
 ==========
 
-v3.1.0 (2024-03-xx)
+v3.1.0 (2024-03-31)
 ===================
 
-* Implemented `Prompt before writing to dotfiles when installing completions <https://github.com/django-commons/django-typer/issues/189>`_
+* Implemented `Add completer for settings names. <https://github.com/django-commons/django-typer/issues/203>`_
 * Fixed `Shell completion tests let failures through in CI <https://github.com/django-commons/django-typer/issues/194>`_
 * Fixed `fish completion installs should respect XDG_CONFIG_HOME <https://github.com/django-commons/django-typer/issues/193>`_
 * Fixed `zsh completion installs should respect ZDOTDIR <https://github.com/django-commons/django-typer/issues/192>`_
+* Implemented `Prompt before writing to dotfiles when installing completions <https://github.com/django-commons/django-typer/issues/189>`_
 * Implemented `Support Django 5.2 <https://github.com/django-commons/django-typer/issues/188>`_
 * Implemented `Use intersphinx for external document references. <https://github.com/django-commons/django-typer/issues/187>`_
+* Implemented `Add completer for language codes. <https://github.com/django-commons/django-typer/issues/186>`_
 * Implemented `Switch poetry -> uv <https://github.com/django-commons/django-typer/issues/185>`_
+* Implemented `Model object completers should handle fields with choices appropriately <https://github.com/django-commons/django-typer/issues/182>`_
 * Implemented `Require tests to pass before release action runs. <https://github.com/django-commons/django-typer/issues/173>`_
 
 

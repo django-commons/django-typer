@@ -512,6 +512,38 @@ parameter and the :class:`~django_typer.parsers.model.ReturnType` enumeration:
             ...
 
 
+Fields with Choices
+~~~~~~~~~~~~~~~~~~~
+
+The above examples using :func:`~django_typer.utils.model_parser_completer` will work for fields
+with choices. You may however want to avoid the database lookup given that the choice list is
+readily available. To do this you could use :func:`~django_typer.completers.these_strings` in
+combination with the :class:`~django_typer.parsers.model.ModelObjectParser`:
+
+.. code-block:: python
+
+    from django_typer.parsers.model import ModelObjectParser, ReturnType
+
+    class Command(TyperCommand):
+        def handle(
+            self,
+            query: Annotated[
+                QuerySet[ModelClass],
+                typer.Option(
+                    parser=ModelObjectParser(
+                        ModelClass,
+                        "choice_field,
+                        return_type=ReturnType.QUERY_SET,
+                    ),
+                    shell_complete=these_strings(
+                        ModelClass.FIELD_CHOICES,
+                        allow_duplicates=False,
+                    ),
+                    help="Fetch objects by their choices for field choice_field.",
+                ),
+            ] = ModelClass.objects.none(),
+        ):
+            ...
 
 Completer Chains
 ----------------
@@ -541,6 +573,14 @@ be returned, or only the first completer that generates matches.
             )
         ]
     )
+
+Settings
+--------
+
+A number of completers are provided that complete values involving settings. These include:
+
+* setting: :func:`~django_typer.completers.settings.setting`
+* languages: :func:`~django_typer.completers.settings.languages`
 
 
 Customizing/Adding Shells

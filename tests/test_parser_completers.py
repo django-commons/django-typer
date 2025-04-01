@@ -6,7 +6,9 @@ from io import StringIO
 from pathlib import Path
 from datetime import date, datetime, time, timedelta
 import random
+import typing as t
 
+import django
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
@@ -18,8 +20,11 @@ from django_typer.management.commands.shellcompletion import (
 )
 from django_typer.management import get_command
 from django_typer.utils import with_typehint
-from tests.apps.examples.polls.models import Question
-from tests.apps.test_app.models import ShellCompleteTester
+from django.db.models import Model
+from django.db.models import F
+from django.db.models.functions import Cast
+from django.db.models import CharField
+from tests.apps.test_app.models import ShellCompleteTester, ChoicesShellCompleteTester
 from tests.utils import run_command
 import platform
 from django.utils.timezone import get_default_timezone, get_default_timezone_name
@@ -35,7 +40,29 @@ SHELL = {
 }.get(DETECTED_SHELL, "bash")
 
 
-def get_values(completion):
+def get_values_and_helps(completion) -> t.List[t.Tuple[str, str]]:
+    if SHELL == "zsh":
+        return list(zip(completion.split("\n")[1::3], completion.split("\n")[2::3]))
+    elif SHELL == "bash":
+        return [(line.split(",")[1], "") for line in completion.split("\n") if line]
+    elif SHELL in ["pwsh", "powershell"]:
+        return [
+            (line.split(":::")[1], line.split(":::")[2])
+            for line in completion.splitlines()
+            if line
+        ]
+    elif SHELL == "fish":
+        values = []
+        for line in completion.splitlines():
+            if not line:
+                continue
+            parts = line.split(",")[1].split("\t", 1)
+            values.append((parts[0], parts[1] if len(parts) > 1 else ""))
+        return values
+    raise NotImplementedError(f"get_values for shell {SHELL} not implemented")
+
+
+def get_values(completion) -> t.List[str]:
     if SHELL == "zsh":
         return completion.split("\n")[1::3]
     elif SHELL == "bash":
@@ -53,19 +80,16 @@ def get_values(completion):
 
 class ParserCompleterMixin(with_typehint(TestCase)):
     field_values = {}
+    MODEL_CLASS: t.Type[Model]
 
     def setUp(self):
         super().setUp()
-        self.q1 = Question.objects.create(
-            question_text="Is Putin a war criminal?",
-            pub_date=tz_utils.now(),
-        )
         for field, values in self.field_values.items():
             for value in values:
-                ShellCompleteTester.objects.create(**{field: value})
+                self.MODEL_CLASS.objects.create(**{field: value})
 
     def tearDown(self) -> None:
-        ShellCompleteTester.objects.all().delete()
+        self.MODEL_CLASS.objects.all().delete()
         return super().tearDown()
 
     @property
@@ -76,6 +100,8 @@ class ParserCompleterMixin(with_typehint(TestCase)):
 
 
 class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
+    MODEL_CLASS = ShellCompleteTester
+
     field_values = {
         "char_field": ["jon", "john", "jack", "jason"],
         "text_field": [
@@ -235,8 +261,13 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         from django_typer.parsers.model import ModelObjectParser
         from tests.apps.examples.polls.models import Question
 
+        q1 = Question.objects.create(
+            question_text="Is Putin a war criminal?",
+            pub_date=tz_utils.now(),
+        )
+
         parser = ModelObjectParser(Question)
-        self.assertEqual(parser.convert(self.q1, None, None), self.q1)
+        self.assertEqual(parser.convert(q1, None, None), q1)
 
     def test_app_label_parser_idempotency(self):
         from django_typer.parsers.apps import app_config
@@ -2092,12 +2123,50 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         )
         self.assertTrue("tests" in completions)
 
+    def test_language_completer(self):
+        from django.conf import settings
+
+        languages = {code: language for code, language in settings.LANGUAGES}
+        all_e = {lang for lang, _ in settings.LANGUAGES if lang.startswith("e")}
+        result = get_values_and_helps(
+            self.shellcompletion.complete("completion --lang e").strip()
+        )
+        completed_set = {result[0] for result in result}
+        self.assertEqual(completed_set, all_e)
+        if self.shellcompletion.shell != "bash":
+            for code, language in result:
+                self.assertEqual(language, languages[code])
+
+        # sanity check
+        self.assertTrue("es" in completed_set)
+        self.assertTrue("en" in completed_set)
+
+    def test_setting_completer(self):
+        from django.conf import settings
+
+        settings_expected = {
+            setting
+            for setting in dir(settings)
+            if setting.isupper() and setting.startswith("S")
+        }
+
+        result = get_values_and_helps(
+            self.shellcompletion.complete("completion --setting S").strip()
+        )
+        completed_set = {result[0] for result in result}
+        self.assertEqual(completed_set, settings_expected)
+        # sanity check
+        self.assertTrue("STATIC_URL" in completed_set)
+        self.assertTrue("SECRET_KEY" in completed_set)
+
 
 @override_settings(
     MEDIA_ROOT=Path(__file__).parent / "media",
     STATIC_ROOT=str(Path(__file__).parent / "static"),
 )
 class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
+    MODEL_CLASS = ShellCompleteTester
+
     def test_relative_import_path(self):
         completions = get_values(
             self.shellcompletion.complete("completion --settings-module ")
@@ -2143,6 +2212,7 @@ class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
 
 class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
     tz_info = None
+    MODEL_CLASS = ShellCompleteTester
 
     def populate_db(self):
         from django.conf import settings
@@ -2407,3 +2477,69 @@ class TestDateTimeParserCompleter(ParserCompleterMixin, TestCase):
         self.assertEqual(get_default_timezone_name(), "America/Los_Angeles")
         self.populate_db()
         self.run_tests(tz1="-08:00", tz2="-07:00")
+
+
+class TestChoicesCompletion(ParserCompleterMixin, TestCase):
+    if django.VERSION[0] < 5:
+        MODEL_CLASS = ChoicesShellCompleteTester
+    else:
+        from tests.apps.dj5plus.models import ChoicesShellCompleteTesterDJ5Plus
+
+        MODEL_CLASS = ChoicesShellCompleteTesterDJ5Plus
+
+    # creates models with increasing numbers of instances for each additional choice
+    field_values = {
+        field: [
+            choice[0]
+            for idx, choice in enumerate(
+                getattr(
+                    ChoicesShellCompleteTester._meta.get_field(field), "choices", []
+                )
+                or []
+            )
+            for _ in range(0, idx + 1)
+        ]
+        for field in ["char_choice", "int_choice", "ip_choice"]
+    }
+
+    def test_choices_completer(self):
+        n_tests = 0
+        for field, values in self.field_values.items():
+            field_choices = {
+                k: v for k, v in self.MODEL_CLASS._meta.get_field(field).choices
+            }
+            for value in values:
+                value_str = str(value)
+                for idx in range(0, len(value_str)):
+                    test_str = value_str[0:idx]
+                    completions = get_values_and_helps(
+                        self.shellcompletion.complete(
+                            f"choices --{field.replace('_', '-')}s {test_str}"
+                        )
+                    )
+                    str_qry = self.MODEL_CLASS.objects.annotate(
+                        field_as_str=Cast(field, output_field=CharField())
+                    )
+                    if test_str:
+                        str_qry = str_qry.filter(field_as_str__startswith=test_str)
+                    else:
+                        str_qry = str_qry.filter(**{f"{field}__isnull": False})
+                    expected = str_qry.values_list("field_as_str", flat=True).distinct()
+
+                    if not expected:
+                        self.assertFalse(completions)
+                        continue
+
+                    n_tests += 1
+
+                    self.assertEqual(
+                        set(expected),
+                        set([comp[0] for comp in completions]),
+                    )
+                    # verify helps
+                    if not self.shellcompletion.shell != "bash":
+                        for val, help_txt in completions:
+                            self.assertEqual(help_txt, field_choices[value])
+
+        # sanity check!
+        self.assertEqual(n_tests, 872)

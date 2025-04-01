@@ -23,3 +23,6 @@ Completers
 
 .. automodule:: django_typer.completers.path
     :members:
+
+.. automodule:: django_typer.completers.settings
+    :members:

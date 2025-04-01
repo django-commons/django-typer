@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 import django_stubs_ext
+import django
 
 django_stubs_ext.monkeypatch()
 
@@ -49,6 +50,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+if django.VERSION[0] >= 5:
+    INSTALLED_APPS = ["tests.apps.dj5plus", *INSTALLED_APPS]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

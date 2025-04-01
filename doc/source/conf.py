@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 sys.path.append(str(Path(__file__).parent / 'ext'))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings.base')
-settings.configure()
+#settings.configure()
 django.setup()
 
 import django_typer

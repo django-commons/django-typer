@@ -15,6 +15,8 @@ from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.utils.translation import gettext as _
 
+__all__ = ["DjangoTyperShellCompleter", "register_completion_class"]
+
 if t.TYPE_CHECKING:  # pragma: no cover
     from django_typer.management.commands.shellcompletion import (
         Command as ShellCompletion,
