@@ -27,6 +27,7 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
     ]
 
     def verify_install(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
         self.assertTrue((directory / f"_{script}").exists())
@@ -35,12 +36,7 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
         directory = directory or self.directory
         if not script:
             script = self.manage_script
-        try:
-            self.assertFalse((directory / f"_{script}").exists())
-        except AssertionError:
-            import ipdb
-
-            ipdb.set_trace()
+        self.assertFalse((directory / f"_{script}").exists())
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")

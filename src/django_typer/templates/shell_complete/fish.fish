@@ -44,4 +44,4 @@ function __fish_{{prog_name}}_complete
     end;
 end
 
-complete -c {{ manage_script_name }} --no-files --arguments '(__fish_manage_complete)'
+complete -c {{ manage_script_name }} --no-files --arguments '(__fish_{{prog_name}}_complete)'

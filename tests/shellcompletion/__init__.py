@@ -433,8 +433,8 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
     """
 
     MANAGE_SCRIPT_TMPL = Path(__file__).parent / "django_manage.py"
-    manage_script = "django_manage"
-    launch_script = "django_manage"
+    manage_script = "django-admin"
+    launch_script = "django-admin"
 
     @classmethod
     def setUpClass(cls):
@@ -505,7 +505,11 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
         def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
             import pexpect
 
-            env = {**dict(os.environ), **env}
+            env = {
+                **dict(os.environ),
+                "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+                **env,
+            }
 
             rex = re.compile
             expected = [
@@ -559,4 +563,77 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                     self.assertEqual(idx, 3)
                     break
 
+            self.verify_install(directory=directory)
+
+    else:
+
+        def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
+            env = {
+                **dict(os.environ),
+                "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+                **env,
+            }
+
+            rex = re.compile
+            expected_patterns = [
+                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
+                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
+                rex(r"Aborted shell completion installation."),  # 2
+                rex(rf"Installed autocompletion for {self.shell}"),  # 3
+            ]
+
+            install_command = [
+                self.manage_script,
+                "shellcompletion",
+                "--no-color",
+                "--shell",
+                self.shell,
+                "install",
+            ]
+            self.remove()
+            self.verify_remove(directory=directory)
+
+            def run_with_response(responses: t.List[str]):
+                process = subprocess.Popen(
+                    install_command,
+                    env=env,
+                    cwd=directory,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+
+                output = ""
+                for response in responses:
+                    while True:
+                        line = process.stdout.readline()
+                        if not line:
+                            break
+                        output += line
+
+                        matched_index, matched_file = match_output(line)
+                        if matched_index is not None:
+                            process.stdin.write(response + "\n")
+                            process.stdin.flush()
+                            break
+
+                process.wait()
+                return output
+
+            def match_output(line: str) -> t.Tuple[t.Optional[int], t.Optional[str]]:
+                for i, pattern in enumerate(expected_patterns):
+                    match = pattern.search(line)
+                    if match:
+                        return i, match.groupdict().get("file")
+                return None, None
+
+            # Test abort sequence
+            abort_output = run_with_response(["N", "N"])
+            self.assertIn("Aborted shell completion installation.", abort_output)
+            self.verify_remove(directory=directory)
+
+            # Test install sequence
+            install_output = run_with_response(["Y", "Y"])
+            self.assertIn(f"Installed autocompletion for {self.shell}", install_output)
             self.verify_install(directory=directory)

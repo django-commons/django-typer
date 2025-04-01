@@ -74,7 +74,7 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     if (
         on_path
         and on_path.is_absolute()
-        and (on_path != cmd_pth.absolute() or not cmd_pth.is_file())
+        and (on_path == cmd_pth.absolute() or not cmd_pth.is_file())
     ):
         return cmd_pth.name
     try:

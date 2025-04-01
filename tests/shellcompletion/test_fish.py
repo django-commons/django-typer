@@ -1,6 +1,7 @@
 import shutil
 import sys
 from pathlib import Path
+import typing as t
 
 import pytest
 from django.test import TestCase
@@ -24,12 +25,14 @@ class _FishMixin:
         f"source {Path(sys.executable).absolute().parent / 'activate.fish'}",
     ]
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
         self.assertTrue((self.directory / f"{script}.fish").exists())
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
         self.assertFalse((self.directory / f"{script}.fish").exists())
@@ -107,6 +110,3 @@ class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
 
     @pytest.mark.skip(reason="TODO")
     def test_path_completion(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_prompt_install(self): ...

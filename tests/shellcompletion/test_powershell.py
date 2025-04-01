@@ -2,6 +2,7 @@ import shutil
 import sys
 from pathlib import Path
 import platform
+import typing as t
 
 import pytest
 from django.core.management import CommandError
@@ -34,7 +35,7 @@ class _PowerShellMixin:
         cls.profile = cls.completer_class().get_user_profile()
         return super().setUpClass()
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
         if not script:
             script = self.manage_script
         self.assertTrue(self.profile.exists())
@@ -43,7 +44,7 @@ class _PowerShellMixin:
             in self.profile.read_text()
         )
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
         if not script:
             script = self.manage_script
         if self.profile.exists():
