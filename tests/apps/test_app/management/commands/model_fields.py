@@ -17,7 +17,7 @@ from django_typer.management import (
 )
 from django_typer.utils import model_parser_completer
 from django_typer import types
-from django_typer.completers.model import ModelObjectCompleter
+from django_typer.completers.model import text_query
 from tests.apps.test_app.models import ShellCompleteTester
 
 
@@ -61,7 +61,7 @@ class Command(TyperCommand):
                 **model_parser_completer(
                     ShellCompleteTester,
                     "text_field",
-                    query=ModelObjectCompleter.text_query,
+                    query=text_query,
                 ),
                 help=t.cast(str, _("Fetch objects by their text fields.")),
             ),
