@@ -2517,14 +2517,6 @@ class TestChoicesCompletion(ParserCompleterMixin, TestCase):
                             f"choices --{field.replace('_', '-')}s {test_str}"
                         )
                     )
-                    # postgres normalizes the IPs - revert that
-                    if field == "ip_choice":
-                        for idx in range(0, len(completions)):
-                            completions[idx] = (
-                                completions[idx][0].split("/")[0],
-                                completions[idx][1],
-                            )
-
                     str_qry = self.MODEL_CLASS.objects.annotate(
                         field_as_str=Cast(field, output_field=CharField())
                     )
@@ -2532,13 +2524,20 @@ class TestChoicesCompletion(ParserCompleterMixin, TestCase):
                         str_qry = str_qry.filter(field_as_str__startswith=test_str)
                     else:
                         str_qry = str_qry.filter(**{f"{field}__isnull": False})
-                    expected = str_qry.values_list("field_as_str", flat=True).distinct()
+                    expected = list(
+                        str_qry.values_list("field_as_str", flat=True).distinct()
+                    )
 
                     if not expected:
                         self.assertFalse(completions)
                         continue
 
                     n_tests += 1
+
+                    # postgres normalizes the IPs - revert that
+                    if field == "ip_choice":
+                        for idx in range(0, len(expected)):
+                            expected[idx] = expected[idx].split("/")[0]
 
                     self.assertEqual(
                         set(expected),
