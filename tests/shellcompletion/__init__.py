@@ -502,7 +502,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
     if platform.system() != "Windows":
 
-        def test_prompt_install(self):
+        def test_prompt_install(self, env={}):
             import pexpect
 
             rex = re.compile
@@ -523,7 +523,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.remove()
             self.verify_remove()
 
-            install = pexpect.spawn(self.manage_script, install_command)
+            install = pexpect.spawn(self.manage_script, install_command, env=env)
 
             def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
                 index = child.expect(expected)
@@ -547,7 +547,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove()
 
             # test an install
-            install = pexpect.spawn(self.manage_script, install_command)
+            install = pexpect.spawn(self.manage_script, install_command, env=env)
 
             while True:
                 idx, _ = wait_for_output(install)

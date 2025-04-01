@@ -2537,9 +2537,9 @@ class TestChoicesCompletion(ParserCompleterMixin, TestCase):
                         set([comp[0] for comp in completions]),
                     )
                     # verify helps
-                    if not self.shellcompletion.shell != "bash":
+                    if self.shellcompletion.shell != "bash":
                         for val, help_txt in completions:
-                            self.assertEqual(help_txt, field_choices[value])
+                            self.assertEqual(help_txt, field_choices[type(value)(val)])
 
         # sanity check!
         self.assertEqual(n_tests, 872)

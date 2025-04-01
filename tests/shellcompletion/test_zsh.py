@@ -5,6 +5,7 @@ import pytest
 from django.test import TestCase, override_settings
 import sys
 import os
+import platform
 
 from tests.shellcompletion import (
     _ScriptCompleteTestCase,
@@ -61,3 +62,11 @@ class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
     @override_settings(TEMPLATES=[])
     def test_no_template_config(self):
         self.test_shell_complete()
+
+    if platform.system() != "Windows":
+
+        def test_prompt_install(self, env={}):
+            zdot_dir = Path(__file__).parent / "zdotdir"
+            zdot_dir.mkdir(exist_ok=True)
+            super().test_prompt_install(env={"ZDOTDIR": str(zdot_dir.absolute())})
+            shutil.rmtree(zdot_dir)
