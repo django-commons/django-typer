@@ -93,10 +93,10 @@ class _CompleteTestCase(with_typehint(TestCase)):
         self.remove()
         super().tearDown()
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
         pass
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
         pass
 
     def install(
@@ -502,8 +502,10 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
     if platform.system() != "Windows":
 
-        def test_prompt_install(self, env={}):
+        def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
             import pexpect
+
+            env = {**dict(os.environ), **env}
 
             rex = re.compile
             expected = [
@@ -521,7 +523,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                 "install",
             ]
             self.remove()
-            self.verify_remove()
+            self.verify_remove(directory=directory)
 
             install = pexpect.spawn(self.manage_script, install_command, env=env)
 
@@ -544,7 +546,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                     self.assertEqual(idx, 2)
                     break
 
-            self.verify_remove()
+            self.verify_remove(directory=directory)
 
             # test an install
             install = pexpect.spawn(self.manage_script, install_command, env=env)
@@ -557,4 +559,4 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                     self.assertEqual(idx, 3)
                     break
 
-            self.verify_install()
+            self.verify_install(directory=directory)
