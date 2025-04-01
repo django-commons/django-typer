@@ -9,8 +9,6 @@ from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 
-P = t.ParamSpec("P")
-
 
 def int_ranges(incomplete: str, max_val: int) -> t.List[t.Tuple[int, int]]:
     lower = int(incomplete)
