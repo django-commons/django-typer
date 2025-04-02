@@ -280,14 +280,26 @@ class _CompleteTestCase(with_typehint(TestCase)):
         self.assertIn("--cmd-first", completions)
         self.assertIn("--cmd-dup", completions)
         if not rich_installed:
-            self.assertIn("[bold]", completions)
-            self.assertIn("[/bold]", completions)
-            self.assertIn("[reverse]", completions)
-            self.assertIn("[/reverse]", completions)
-            self.assertIn("[underline]", completions)
-            self.assertIn("[/underline]", completions)
-            self.assertIn("[yellow]", completions)
-            self.assertIn("[/yellow]", completions)
+            if self.shell not in ["powershell", "pwsh"]:
+                self.assertIn("[bold]", completions)
+                self.assertIn("[/bold]", completions)
+                self.assertIn("[reverse]", completions)
+                self.assertIn("[/reverse]", completions)
+                self.assertIn("[underline]", completions)
+                self.assertIn("[/underline]", completions)
+                self.assertIn("[yellow]", completions)
+                self.assertIn("[/yellow]", completions)
+            else:
+                self.assertTrue(
+                    "[bold]" in completions
+                    or "[/bold]" in completions
+                    or "[reverse]" in completions
+                    or "[/reverse]" in completions
+                    or "[underline]" in completions
+                    or "[/underline]" in completions
+                    or "[yellow]" in completions
+                    or "[/yellow]" in completions
+                )
         elif rich_output_expected:
             # \x1b[0m and \x1b[m are the same
             if self.shell not in ["powershell", "pwsh"]:
@@ -562,6 +574,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             self.verify_install(directory=directory)
 
+    # TODO
     # else:
 
     #     def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):

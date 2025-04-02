@@ -36,7 +36,7 @@ jobs:
           - '4.2' # LTS April 2026
           - '5.0' # April 2025
           - '5.1' # December 2025
-          - '5.2rc1'
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
@@ -53,7 +53,7 @@ jobs:
           - python-version: '3.13'
             django-version: '5.0'
           - python-version: '3.9'
-            django-version: '5.2rc1'
+            django-version: '5.2'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -85,11 +85,7 @@ jobs:
       uses: extractions/setup-just@v3
     - name: Install Dependencies
       run: |
-        if [ "${{ matrix.django-version }}" = "5.2rc1" ]; then
-          just test-lock "Django==${{ matrix.django-version }}"
-        else
-          just test-lock "Django~=${{ matrix.django-version }}.0"
-        fi
+        just test-lock "Django~=${{ matrix.django-version }}.0"
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -112,10 +108,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
 
@@ -170,10 +166,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # LTS April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
 
@@ -240,7 +236,7 @@ jobs:
           python-version: ['3.13']
           postgres-version: ['latest']
           django-version:
-            - '5.1' # December 2025
+            - '5.2' # April 2028
 
       # Service containers to run with `runner-job`
       services:
@@ -309,10 +305,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
     env:
@@ -371,10 +367,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
     env:
@@ -435,10 +431,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
 
@@ -506,10 +502,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
 
@@ -567,10 +563,10 @@ jobs:
         python-version: ['3.9', '3.13']
         django-version:
           - '3.2' # LTS April 2024
-          - '5.1' # December 2025
+          - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
-            django-version: '5.1'
+            django-version: '5.2'
           - python-version: '3.13'
             django-version: '3.2'
 
