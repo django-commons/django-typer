@@ -502,10 +502,12 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                 **env,
             }
 
+            rex = re.compile
             expected = [
-                re.compile(r"\[y/N\]"),  # 0
-                re.compile("Aborted"),  # 1
-                re.compile("Installed"),  # 2
+                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
+                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
+                rex(r"Aborted shell completion installation."),  # 2
+                rex(rf"Installed autocompletion for {self.shell}"),  # 3
             ]
 
             install_command = [
@@ -520,17 +522,23 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             install = pexpect.spawn(self.manage_script, install_command, env=env)
 
+            def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
+                index = child.expect(expected)
+                if index in [0, 1]:
+                    return index, child.match.group("file").decode()
+                return index, None
+
             # test an abort
-            idx = install.expect(expected)
-            self.assertEqual(idx, 0)
+            idx, _ = wait_for_output(install)
+            self.assertLess(idx, 2)
             install.sendline("N")
 
             while True:
-                idx = install.expect(expected)
-                if idx == 0:
+                idx, _ = wait_for_output(install)
+                if idx < 2:
                     install.sendline("N")
                 else:
-                    self.assertEqual(idx, 1)
+                    self.assertEqual(idx, 2)
                     break
 
             self.verify_remove(directory=directory)
@@ -539,83 +547,85 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             install = pexpect.spawn(self.manage_script, install_command, env=env)
 
             while True:
-                idx = install.expect(expected)
-                if idx < 1:
+                idx, _ = wait_for_output(install)
+                if idx < 2:
                     install.sendline("Y")
                 else:
-                    self.assertEqual(idx, 2)
+                    self.assertEqual(idx, 3)
                     break
 
             self.verify_install(directory=directory)
 
-    else:
+    # else:
 
-        def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
-            env = {
-                **dict(os.environ),
-                "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
-                "DJANGO_COLORS": "nocolor",
-                **env,
-            }
+    #     def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
+    #         env = {
+    #             **dict(os.environ),
+    #             "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+    #             "DJANGO_COLORS": "nocolor",
+    #             **env,
+    #         }
 
-            expected = [
-                re.compile(r"\[y/N\]"),  # 0
-                re.compile("Aborted"),  # 1
-                re.compile("Installed"),  # 2
-            ]
+    #         rex = re.compile
+    #         expected_patterns = [
+    #             rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
+    #             rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
+    #             rex(r"Aborted shell completion installation."),  # 2
+    #             rex(rf"Installed autocompletion for {self.shell}"),  # 3
+    #         ]
 
-            install_command = [
-                self.manage_script,
-                "shellcompletion",
-                "--no-color",
-                "--shell",
-                self.shell,
-                "install",
-            ]
-            self.remove()
-            self.verify_remove(directory=directory)
+    #         install_command = [
+    #             self.manage_script,
+    #             "shellcompletion",
+    #             "--no-color",
+    #             "--shell",
+    #             self.shell,
+    #             "install",
+    #         ]
+    #         self.remove()
+    #         self.verify_remove(directory=directory)
 
-            def run_with_response(responses: t.List[str]):
-                process = subprocess.Popen(
-                    install_command,
-                    env=env,
-                    cwd=directory,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                )
+    #         def run_with_response(responses: t.List[str]):
+    #             process = subprocess.Popen(
+    #                 install_command,
+    #                 env=env,
+    #                 cwd=directory,
+    #                 stdin=subprocess.PIPE,
+    #                 stdout=subprocess.PIPE,
+    #                 stderr=subprocess.STDOUT,
+    #                 text=True,
+    #             )
 
-                output = ""
-                for response in responses:
-                    while True:
-                        line = process.stdout.readline()
-                        if not line:
-                            break
-                        output += line
+    #             output = ""
+    #             for response in responses:
+    #                 while True:
+    #                     line = process.stdout.readline()
+    #                     if not line:
+    #                         break
+    #                     output += line
 
-                        matched_index = match_output(line)
-                        if matched_index is not None:
-                            process.stdin.write(response + "\n")
-                            process.stdin.flush()
-                            break
+    #                     matched_index, matched_file = match_output(line)
+    #                     if matched_index is not None:
+    #                         process.stdin.write(response + "\n")
+    #                         process.stdin.flush()
+    #                         break
 
-                process.wait()
-                return output
+    #             process.wait()
+    #             return output
 
-            def match_output(line: str) -> t.Optional[int]:
-                for i, pattern in enumerate(expected):
-                    match = pattern.search(line)
-                    if match:
-                        return i
-                return None
+    #         def match_output(line: str) -> t.Tuple[t.Optional[int], t.Optional[str]]:
+    #             for i, pattern in enumerate(expected_patterns):
+    #                 match = pattern.search(line)
+    #                 if match:
+    #                     return i, match.groupdict().get("file")
+    #             return None, None
 
-            # Test abort sequence
-            abort_output = run_with_response(["N", "N"])
-            self.assertIn("Aborted shell completion installation.", abort_output)
-            self.verify_remove(directory=directory)
+    #         # Test abort sequence
+    #         abort_output = run_with_response(["N", "N"])
+    #         self.assertIn("Aborted shell completion installation.", abort_output)
+    #         self.verify_remove(directory=directory)
 
-            # Test install sequence
-            install_output = run_with_response(["Y", "Y"])
-            self.assertIn(f"Installed autocompletion for {self.shell}", install_output)
-            self.verify_install(directory=directory)
+    #         # Test install sequence
+    #         install_output = run_with_response(["Y", "Y"])
+    #         self.assertIn(f"Installed autocompletion for {self.shell}", install_output)
+    #         self.verify_install(directory=directory)

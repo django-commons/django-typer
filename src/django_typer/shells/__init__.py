@@ -303,7 +303,7 @@ class DjangoTyperShellCompleter(ShellComplete):
                 line_numbers=False,
             )
             self.console.print(syntax)
-            return Confirm.ask(prompt_text)
+            return Confirm.ask(prompt_text, console=self.console)
         else:
             print(source)
             return input(prompt_text + " [y/N] ").lower() in {"y", "yes"}
