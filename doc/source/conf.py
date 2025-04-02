@@ -35,12 +35,9 @@ from literalinclude import ExtendedLiteralInclude
 
 
 # -- Project information -----------------------------------------------------
-
-project = 'django-typer'
-copyright = f'2023-{datetime.now().year}, Brian Kohan'
-author = 'Brian Kohan'
-
-# The full version, including alpha/beta/rc tags
+project = django_typer.__title__
+copyright = django_typer.__copyright__
+author = django_typer.__author__
 release = django_typer.__version__
 
 

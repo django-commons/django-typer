@@ -10,6 +10,7 @@ v3.1.0 (2024-04-02)
 * Fixed `Fish shell completion fails for any script named something other than "manage" <https://github.com/django-commons/django-typer/issues/207>`_
 * Fixed `shellcompletion install fails on fish when the command resolves to a script path <https://github.com/django-commons/django-typer/issues/206>`_
 * Implemented `Add completer for settings names. <https://github.com/django-commons/django-typer/issues/203>`_
+* Implemented `Separate ModelObjectCompleter default queries out into standalone functions. <https://github.com/django-commons/django-typer/issues/202>`_
 * Fixed `Shell completion tests let failures through in CI <https://github.com/django-commons/django-typer/issues/194>`_
 * Fixed `fish completion installs should respect XDG_CONFIG_HOME <https://github.com/django-commons/django-typer/issues/193>`_
 * Fixed `zsh completion installs should respect ZDOTDIR <https://github.com/django-commons/django-typer/issues/192>`_
