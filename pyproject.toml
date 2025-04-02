@@ -17,7 +17,7 @@ repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
-    "django~=5.2.0",
+    "django>=3.2,<6.0",
     "click>=8.1.8,<8.2",
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer

@@ -322,7 +322,7 @@ psycopg3 = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.8,<8.2" },
-    { name = "django", specifier = "~=5.2.0" },
+    { name = "django", specifier = ">=3.2,<6.0" },
     { name = "rich", marker = "extra == 'rich'", specifier = ">=10.11.0,<14.0.0" },
     { name = "shellingham", specifier = ">=1.5.4,<2.0" },
     { name = "typer-slim", specifier = ">=0.14.0,<0.16.0" },
