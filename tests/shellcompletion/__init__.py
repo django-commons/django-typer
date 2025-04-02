@@ -498,6 +498,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             env = {
                 **dict(os.environ),
                 "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+                "DJANGO_COLORS": "nocolor",
                 **env,
             }
 
@@ -561,6 +562,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             env = {
                 **dict(os.environ),
                 "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+                "DJANGO_COLORS": "nocolor",
                 **env,
             }
 
