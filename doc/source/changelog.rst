@@ -4,7 +4,7 @@
 Change Log
 ==========
 
-v3.1.0 (2024-03-31)
+v3.1.0 (2024-04-02)
 ===================
 
 * Fixed `Fish shell completion fails for any script named something other than "manage" <https://github.com/django-commons/django-typer/issues/207>`_
