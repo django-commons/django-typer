@@ -197,7 +197,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             else "--no-color"
             if self.command.force_color
             else "",
-            "fallback": f" --fallback {self.command.fallback_import}"
+            "fallback": f"--fallback={self.command.fallback_import}"
             if self.command.fallback
             else "",
             "is_installed": self.is_installed,

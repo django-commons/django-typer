@@ -23,7 +23,7 @@ $scriptblock = {
     $arguments = @("{{ django_command }}") +
     @($settingsOption) +
     @($pythonPathOption) +
-    @("--shell", "pwsh", "complete", $commandText, $cursorPosition) |
+    @("--shell", "pwsh", "complete", "{{ fallback }}", $commandText, $cursorPosition) |
     Where-Object { $_ }
 
     $results = & {{ manage_script_name }} @arguments 2>&1
