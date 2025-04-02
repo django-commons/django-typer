@@ -27,6 +27,7 @@ class _PowerShellMixin:
     environment = [
         f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
         f"$env:DJANGO_SETTINGS_MODULE='tests.settings.completion'",
+        f'$env:PYTHONPATH = "$PWD;$env:PYTHONPATH"',
         f"{Path(sys.executable).absolute().parent / 'activate.ps1'}",
     ]
 
