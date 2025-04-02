@@ -141,7 +141,7 @@ class _CompleteTestCase(with_typehint(TestCase)):
 
             assert self.shell
 
-            pty = winpty.PTY(128, 256)
+            pty = winpty.PTY(256, 512)
 
             def read_all() -> str:
                 output = ""
