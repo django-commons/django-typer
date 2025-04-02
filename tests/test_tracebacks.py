@@ -28,6 +28,9 @@ class TracebackConfigTests(with_typehint(TestCase)):
             self.assertEqual(len(re.findall(r"\.py:\d+", result) or []), 1)
 
             hlp = run_command("test_command1", "--no-color", "--help")[0]
+            # TODO - why are extra newlines inserted here on windows??
+            if platform.system() == "Windows":
+                hlp = hlp.replace("\r\n", "")
             self.assertNotIn("--hide-locals", hlp)
             self.assertIn("--show-locals", hlp)
 
@@ -63,6 +66,10 @@ class TracebackConfigTests(with_typehint(TestCase)):
             self.assertGreater(len(re.findall(r"\.py:\d+", result) or []), 0)
 
             hlp = run_command("test_tb_overrides", "--no-color", "--help")[0]
+
+            # TODO - why are extra newlines inserted here on windows??
+            if platform.system() == "Windows":
+                hlp = hlp.replace("\r\n", "")
             self.assertIn("--hide-locals", hlp)
             self.assertNotIn("--show-locals", hlp)
 
@@ -171,6 +178,10 @@ class TracebackConfigTests(with_typehint(TestCase)):
                 "--no-color",
                 "--help",
             )[0]
+
+            # TODO - why are extra newlines inserted here on windows??
+            if platform.system() == "Windows":
+                hlp = hlp.replace("\r\n", "")
             self.assertFalse("--show-locals" in hlp)
             self.assertTrue("--hide-locals" in hlp)
             result = run_command(

@@ -1,4 +1,5 @@
 import subprocess
+import typing as t
 from pathlib import Path
 
 from click.shell_completion import CompletionItem
@@ -79,15 +80,21 @@ class PowerShellComplete(DjangoTyperShellCompleter):
             "Unable to find the PowerShell user profile."
         )  # pragma: no cover
 
-    def install(self) -> Path:
+    def install(self, prompt: bool = True) -> t.List[Path]:
         assert self.prog_name
         self.uninstall()
         self.set_execution_policy()
         profile = self.get_user_profile()
-        profile.parent.mkdir(parents=True, exist_ok=True)
-        with profile.open(mode="a") as f:
-            f.writelines([self.source()])
-        return profile
+        start_line = 0 if not profile.exists() else profile.read_text().count("\n") + 1
+        source = self.source()
+        if self.prompt(
+            prompt=prompt, source=source, file=profile, start_line=start_line
+        ):
+            profile.parent.mkdir(parents=True, exist_ok=True)
+            with profile.open(mode="a") as f:
+                f.writelines(["", self.source()])
+            return [profile]
+        return []
 
     def uninstall(self) -> None:
         # annoyingly, powershell has one profile script for all completion commands

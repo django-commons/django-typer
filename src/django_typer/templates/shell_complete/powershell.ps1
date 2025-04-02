@@ -20,7 +20,13 @@ $scriptblock = {
         $pythonPathOption = "--pythonpath=$($matches[1])"
     }
 
-    $results = {{ manage_script_name }} {{ django_command }} $settingsOption $pythonPathOption --shell {{ shell }} {{ color }} complete  {{ fallback }} "$($commandText)" "$($cursorPosition)"
+    $arguments = @("{{ django_command }}") +
+    @($settingsOption) +
+    @($pythonPathOption) +
+    @("--shell", "pwsh", "complete", "{{ fallback }}", $commandText, $cursorPosition) |
+    Where-Object { $_ }
+
+    $results = & {{ manage_script_name }} @arguments 2>&1
 
     if ($results.Count -eq 0) {
         # avoid default path completion

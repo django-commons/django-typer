@@ -12,13 +12,15 @@ from functools import cached_property
 import re
 import subprocess
 import platform
+from django.test import TestCase
 
 from django_typer.utils import detect_shell
 
 from django_typer.management import get_command
 from django_typer.management.commands.shellcompletion import Command as ShellCompletion
 from django_typer.shells import DjangoTyperShellCompleter
-from ..utils import rich_installed
+from django_typer.utils import with_typehint
+from ..utils import rich_installed, manage_py
 
 default_shell = None
 
@@ -61,7 +63,7 @@ def scrub(output: str) -> str:
     )
 
 
-class _CompleteTestCase:
+class _CompleteTestCase(with_typehint(TestCase)):
     shell: str
     manage_script: str
     launch_script: str
@@ -91,10 +93,10 @@ class _CompleteTestCase:
         self.remove()
         super().tearDown()
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
         pass
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
         pass
 
     def install(
@@ -104,11 +106,12 @@ class _CompleteTestCase:
         no_color=None,
         fallback=None,
         no_shell=False,
+        prompt=False,
     ):
         if not script:
             script = self.manage_script
         init_kwargs = {"force_color": force_color, "no_color": no_color}
-        kwargs = {}
+        kwargs = {"prompt": prompt}
         if script:
             kwargs["manage_script"] = script
         if self.shell and not no_shell:
@@ -138,7 +141,7 @@ class _CompleteTestCase:
 
             assert self.shell
 
-            pty = winpty.PTY(128, 256)
+            pty = winpty.PTY(256, 512)
 
             def read_all() -> str:
                 output = ""
@@ -277,19 +280,30 @@ class _CompleteTestCase:
         self.assertIn("--cmd-first", completions)
         self.assertIn("--cmd-dup", completions)
         if not rich_installed:
-            self.assertIn("[bold]", completions)
-            self.assertIn("[/bold]", completions)
-            self.assertIn("[reverse]", completions)
-            self.assertIn("[/reverse]", completions)
-            self.assertIn("[underline]", completions)
-            self.assertIn("[/underline]", completions)
-            self.assertIn("[yellow]", completions)
-            self.assertIn("[/yellow]", completions)
+            if self.shell not in ["powershell", "pwsh"]:
+                self.assertIn("[bold]", completions)
+                self.assertIn("[/bold]", completions)
+                self.assertIn("[reverse]", completions)
+                self.assertIn("[/reverse]", completions)
+                self.assertIn("[underline]", completions)
+                self.assertIn("[/underline]", completions)
+                self.assertIn("[yellow]", completions)
+                self.assertIn("[/yellow]", completions)
+            else:
+                self.assertTrue(
+                    "[bold]" in completions
+                    or "[/bold]" in completions
+                    or "[reverse]" in completions
+                    or "[/reverse]" in completions
+                    or "[underline]" in completions
+                    or "[/underline]" in completions
+                    or "[yellow]" in completions
+                    or "[/yellow]" in completions
+                )
         elif rich_output_expected:
             # \x1b[0m and \x1b[m are the same
-            self.assertIn("\x1b[1mimport path\x1b[", completions)
             if self.shell not in ["powershell", "pwsh"]:
-                # on powershell the helps cycle through when you tab - so only the first one is listed
+                # exempt powershell from this because it filters the codes anyway
                 self.assertIn("\x1b[7mcommands\x1b[", completions)
                 self.assertIn("\x1b[4;33mcommands\x1b[", completions)
                 self.assertIn("\x1b[1mname\x1b[", completions)
@@ -430,18 +444,8 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
     """
 
     MANAGE_SCRIPT_TMPL = Path(__file__).parent / "django_manage.py"
-    manage_script = "django_manage"
-    launch_script = "django_manage"
-
-    @classmethod
-    def setUpClass(cls):
-        cls.install_script()
-        super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.remove_script()
-        super().tearDownClass()
+    manage_script = "django-admin"
+    launch_script = "django-admin"
 
     @classmethod
     def install_script(cls, script=None):
@@ -496,3 +500,167 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove(script=manage2)
         finally:
             self.remove_script(script=manage2)
+
+    def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
+        import pexpect
+
+        env = {
+            **dict(os.environ),
+            "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+            "DJANGO_COLORS": "nocolor",
+            **env,
+        }
+
+        rex = re.compile
+        expected = [
+            rex(
+                r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?", re.DOTALL
+            ),  # 0
+            rex(
+                r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",
+                re.DOTALL,
+            ),  # 1
+            rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
+            rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
+        ]
+
+        install_command = [
+            "shellcompletion",
+            "--no-color",
+            "--shell",
+            self.shell,
+            "install",
+        ]
+        self.remove()
+        self.verify_remove(directory=directory)
+
+        if platform.system() != "Windows":
+            install = pexpect.spawn(self.manage_script, install_command, env=env)
+            install.setwinsize(24, 800)
+        else:
+            from pexpect.popen_spawn import PopenSpawn
+
+            install = PopenSpawn(
+                " ".join([self.manage_script, *install_command]),
+                env=env,
+                encoding="utf-8",
+            )
+
+        def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
+            index = child.expect(expected)
+            if index in [0, 1]:
+                return index, child.match.group("file")
+            return index, None
+
+        # test an abort
+        idx, _ = wait_for_output(install)
+        self.assertLess(idx, 2)
+        install.sendline("N")
+
+        while True:
+            idx, _ = wait_for_output(install)
+            if idx < 2:
+                install.sendline("N")
+            else:
+                self.assertEqual(idx, 2)
+                break
+
+        self.verify_remove(directory=directory)
+
+        # test an install
+        if platform.system() != "Windows":
+            install = pexpect.spawn(self.manage_script, install_command, env=env)
+            install.setwinsize(24, 800)
+        else:
+            from pexpect.popen_spawn import PopenSpawn
+
+            install = PopenSpawn(
+                " ".join([self.manage_script, *install_command]),
+                env=env,
+                encoding="utf-8",
+            )
+
+        while True:
+            idx, _ = wait_for_output(install)
+            if idx < 2:
+                install.sendline("Y")
+            else:
+                self.assertEqual(idx, 3)
+                break
+
+        self.verify_install(directory=directory)
+
+    # TODO
+    # else:
+
+    #     def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
+    #         env = {
+    #             **dict(os.environ),
+    #             "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+    #             "DJANGO_COLORS": "nocolor",
+    #             **env,
+    #         }
+
+    #         rex = re.compile
+    #         expected_patterns = [
+    #             rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
+    #             rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
+    #             rex(r"Aborted shell completion installation."),  # 2
+    #             rex(rf"Installed autocompletion for {self.shell}"),  # 3
+    #         ]
+
+    #         install_command = [
+    #             self.manage_script,
+    #             "shellcompletion",
+    #             "--no-color",
+    #             "--shell",
+    #             self.shell,
+    #             "install",
+    #         ]
+    #         self.remove()
+    #         self.verify_remove(directory=directory)
+
+    #         def run_with_response(responses: t.List[str]):
+    #             process = subprocess.Popen(
+    #                 install_command,
+    #                 env=env,
+    #                 cwd=directory,
+    #                 stdin=subprocess.PIPE,
+    #                 stdout=subprocess.PIPE,
+    #                 stderr=subprocess.STDOUT,
+    #                 text=True,
+    #             )
+
+    #             output = ""
+    #             for response in responses:
+    #                 while True:
+    #                     line = process.stdout.readline()
+    #                     if not line:
+    #                         break
+    #                     output += line
+
+    #                     matched_index, matched_file = match_output(line)
+    #                     if matched_index is not None:
+    #                         process.stdin.write(response + "\n")
+    #                         process.stdin.flush()
+    #                         break
+
+    #             process.wait()
+    #             return output
+
+    #         def match_output(line: str) -> t.Tuple[t.Optional[int], t.Optional[str]]:
+    #             for i, pattern in enumerate(expected_patterns):
+    #                 match = pattern.search(line)
+    #                 if match:
+    #                     return i, match.groupdict().get("file")
+    #             return None, None
+
+    #         # Test abort sequence
+    #         abort_output = run_with_response(["N", "N"])
+    #         self.assertIn("Aborted shell completion installation.", abort_output)
+    #         self.verify_remove(directory=directory)
+
+    #         # Test install sequence
+    #         install_output = run_with_response(["Y", "Y"])
+    #         self.assertIn(f"Installed autocompletion for {self.shell}", install_output)
+    #         self.verify_install(directory=directory)

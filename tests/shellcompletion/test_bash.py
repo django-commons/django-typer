@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
+import typing as t
 
 import pytest
 from django.test import TestCase
@@ -20,21 +21,23 @@ class BashTests(_ScriptCompleteTestCase, TestCase):
     tabs = "\t\t"
 
     environment = [
-        f"export DJANGO_SETTINGS_MODULE=tests.settings.completion",
+        "export DJANGO_SETTINGS_MODULE=tests.settings.completion",
         f"export PATH={Path(sys.executable).parent}:$PATH",
-        f"source ~/.bashrc",
+        "source ~/.bashrc",
         f"source {Path(sys.executable).absolute().parent / 'activate'}",
     ]
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
-        self.assertTrue((self.directory / f"{script}.sh").exists())
+        self.assertTrue((directory / f"{script}.sh").exists())
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
-        self.assertFalse((self.directory / f"{script}.sh").exists())
+        self.assertFalse((directory / f"{script}.sh").exists())
 
     @pytest.mark.rich
     @pytest.mark.no_rich

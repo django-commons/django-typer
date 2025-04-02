@@ -160,6 +160,28 @@ check-docs-links: _link_check
 check-docs:
     @just run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
 
+# fetch the intersphinx references for the given package
+[script]
+fetch-refs LIB: install-docs
+    import os
+    from pathlib import Path
+    import logging as _logging
+    import sys
+    import runpy
+    from sphinx.ext.intersphinx import inspect_main
+    _logging.basicConfig()
+
+    libs = runpy.run_path(Path(os.getcwd()) / "doc/source/conf.py").get("intersphinx_mapping")
+    url = libs.get("{{ LIB }}", None)
+    if not url:
+        sys.exit(f"Unrecognized {{ LIB }}, must be one of: {', '.join(libs.keys())}")
+    if url[1] is None:
+        url = f"{url[0].rstrip('/')}/objects.inv"
+    else:
+        url = url[1]
+
+    raise SystemExit(inspect_main([url]))
+
 # lint the code
 check-lint:
     @just run ruff check --select I
@@ -241,27 +263,56 @@ list-missed-tests: install log-tests test-all
 # test bash shell completions
 [script("bash")]
 test-bash:
-    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py
+    uv sync --all-extras
+    source .venv/bin/activate
+    pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py || exit
+    uv sync --no-extra rich
+    source .venv/bin/activate
+    pytest --cov-append tests/shellcompletion/test_bash.py::BashExeTests::test_prompt_install || exit
 
 # test zsh shell completions
 [script("zsh")]
 test-zsh:
-    source .venv/bin/activate && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py
+    uv sync --all-extras
+    source .venv/bin/activate
+    pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py || exit
+    uv sync --no-extra rich
+    source .venv/bin/activate
+    pytest --cov-append tests/shellcompletion/test_zsh.py::ZshExeTests::test_prompt_install || exit
 
 # test powershell shell completions
 [script("powershell")]
 test-powershell:
-    .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
+    uv sync --no-extra rich
+    . .venv/Scripts/activate.ps1
+    pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    uv sync --no-extra rich
+    . .venv/Scripts/activate.ps1
+    pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # test pwsh shell completions
 [script("pwsh")]
 test-pwsh:
-    .venv/Scripts/activate.ps1; pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
+    uv sync --all-extras
+    . .venv/Scripts/activate.ps1
+    pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    uv sync --no-extra rich
+    . .venv/Scripts/activate.ps1
+    pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # test fish shell completions
 [script("fish")]
 test-fish:
-    source .venv/bin/activate.fish && pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py
+    uv sync --all-extras
+    source .venv/bin/activate.fish
+    pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py || exit
+    uv sync --no-extra rich
+    source .venv/bin/activate.fish
+    pytest --cov-append tests/shellcompletion/test_fish.py::FishExeShellTests::test_prompt_install || exit
 
 # run tests
 test *TESTS:

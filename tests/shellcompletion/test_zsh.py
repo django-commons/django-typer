@@ -1,10 +1,12 @@
 import shutil
 from pathlib import Path
+import typing as t
 
 import pytest
 from django.test import TestCase, override_settings
 import sys
 import os
+import platform
 
 from tests.shellcompletion import (
     _ScriptCompleteTestCase,
@@ -24,15 +26,17 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
         f"DJANGO_SETTINGS_MODULE=tests.settings.completion",
     ]
 
-    def verify_install(self, script=None):
+    def verify_install(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
-        self.assertTrue((self.directory / f"_{script}").exists())
+        self.assertTrue((directory / f"_{script}").exists())
 
-    def verify_remove(self, script=None):
+    def verify_remove(self, script=None, directory: t.Optional[Path] = None):
+        directory = directory or self.directory
         if not script:
             script = self.manage_script
-        self.assertFalse((self.directory / f"_{script}").exists())
+        self.assertFalse((directory / f"_{script}").exists())
 
 
 @pytest.mark.skipif(shutil.which("zsh") is None, reason="Z-Shell not available")
@@ -61,3 +65,17 @@ class ZshExeTests(_InstalledScriptCompleteTestCase, ZshTests, TestCase):
     @override_settings(TEMPLATES=[])
     def test_no_template_config(self):
         self.test_shell_complete()
+
+    if platform.system() != "Windows":
+
+        def test_prompt_install(self, env={}, directory=None):
+            zdot_dir = Path(__file__).parent / "zdotdir"
+            try:
+                zdot_dir.mkdir(exist_ok=True)
+                super().test_prompt_install(
+                    env={"ZDOTDIR": str(zdot_dir.absolute())},
+                    directory=zdot_dir / ".zfunc",
+                )
+            finally:
+                if zdot_dir.exists():
+                    shutil.rmtree(zdot_dir)

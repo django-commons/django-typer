@@ -31,7 +31,7 @@ def environment(
 
     typer.echo(f"Capturing python environment to {output_file}")
     with output_file.open("w") as f:
-        subprocess.run(["pip", "freeze"], stdout=f)
+        subprocess.run(["uv", "pip", "freeze"], stdout=f)
 
 
 @Backup.command()

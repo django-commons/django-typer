@@ -6,6 +6,9 @@
 Shells
 ======
 
+.. automodule:: django_typer.shells
+    :members: DjangoTyperShellCompleter, register_completion_class
+
 .. autoclass:: django_typer.shells.bash.BashComplete
     :members: name, template, color, supports_scripts
 

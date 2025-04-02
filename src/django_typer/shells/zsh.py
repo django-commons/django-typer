@@ -1,4 +1,5 @@
 import os
+import typing as t
 from functools import cached_property
 from pathlib import Path
 
@@ -64,25 +65,27 @@ class ZshComplete(DjangoTyperShellCompleter):
         hlp = self.process_rich_text(item.help.replace("\n", " ")) if item.help else "_"
         return f"{item.type}\n{self.process_rich_text(item.value)}\n{hlp}"
 
-    def install(self) -> Path:
+    def install(self, prompt: bool = True) -> t.List[Path]:
         assert self.prog_name
-        Path.home().mkdir(parents=True, exist_ok=True)
         zshrc = self.get_user_profile()
         zshrc_source = ""
+        start_line = 0
         if zshrc.is_file():
             zshrc_source = zshrc.read_text()
+            start_line = zshrc_source.count("\n") + 2
+        additions = ""
         if "fpath" not in zshrc_source:
-            zshrc_source += f"if type brew &>/dev/null; then{os.linesep}"
-            zshrc_source += (
+            additions += f"if type brew &>/dev/null; then{os.linesep}"
+            additions += (
                 f"\tfpath=(~/.zfunc $(brew --prefix)/share/zsh-completions $fpath)"
                 f"{os.linesep}"
             )
-            zshrc_source += f"else{os.linesep}"
-            zshrc_source += f"\tfpath=(~/.zfunc $fpath){os.linesep}"
-            zshrc_source += f"fi{os.linesep}{os.linesep}"
+            additions += f"else{os.linesep}"
+            additions += f"\tfpath=(~/.zfunc $fpath){os.linesep}"
+            additions += f"fi{os.linesep}{os.linesep}"
         if "compinit" not in zshrc_source:
-            zshrc_source += f"autoload -Uz compinit{os.linesep}"
-            zshrc_source += f"compinit{os.linesep}"
+            additions += f"autoload -Uz compinit{os.linesep}"
+            additions += f"compinit{os.linesep}"
 
         style = (
             f"zstyle ':completion:*:*:{self.prog_name}:*' menu select"
@@ -90,11 +93,26 @@ class ZshComplete(DjangoTyperShellCompleter):
             else "zstyle ':completion:*' menu select"
         )
         if style not in zshrc_source:
-            zshrc_source += f"{style}{os.linesep}"
-        zshrc.write_text(zshrc_source)
+            additions += f"{style}{os.linesep}"
+
+        edited = []
         script = self.install_dir / f"_{self.prog_name}"
-        script.write_text(self.source())
-        return script
+        if additions:
+            if self.prompt(
+                prompt=prompt,
+                source=additions,
+                file=zshrc,
+                start_line=start_line,
+            ):
+                Path.home().mkdir(parents=True, exist_ok=True)
+                with open(zshrc, "a") as zrc_file:
+                    zrc_file.write(f"{os.linesep}{additions}")
+                edited.append(zshrc)
+        source = self.source()
+        if self.prompt(prompt=prompt, source=source, file=script, start_line=0):
+            script.write_text(self.source())
+            edited.append(script)
+        return edited
 
     def uninstall(self):
         script = self.install_dir / f"_{self.prog_name}"
