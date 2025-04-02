@@ -504,8 +504,13 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             rex = re.compile
             expected = [
-                rex(r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?"),  # 0
-                rex(r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?"),  # 1
+                rex(
+                    r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?", re.DOTALL
+                ),  # 0
+                rex(
+                    r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",
+                    re.DOTALL,
+                ),  # 1
                 rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
                 rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
             ]
@@ -521,6 +526,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             self.verify_remove(directory=directory)
 
             install = pexpect.spawn(self.manage_script, install_command, env=env)
+            install.setwinsize(24, 800)
 
             def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
                 index = child.expect(expected)
@@ -545,6 +551,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             # test an install
             install = pexpect.spawn(self.manage_script, install_command, env=env)
+            install.setwinsize(24, 800)
 
             while True:
                 idx, _ = wait_for_output(install)
