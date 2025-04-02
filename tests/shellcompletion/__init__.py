@@ -504,10 +504,10 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             rex = re.compile
             expected = [
-                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
-                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
-                rex(r"Aborted shell completion installation."),  # 2
-                rex(rf"Installed autocompletion for {self.shell}"),  # 3
+                rex(r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?"),  # 0
+                rex(r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?"),  # 1
+                rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
+                rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
             ]
 
             install_command = [
