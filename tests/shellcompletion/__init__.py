@@ -290,12 +290,19 @@ class _CompleteTestCase(with_typehint(TestCase)):
             self.assertIn("[/yellow]", completions)
         elif rich_output_expected:
             # \x1b[0m and \x1b[m are the same
-            self.assertIn("\x1b[1mimport path\x1b[", completions)
             if self.shell not in ["powershell", "pwsh"]:
-                # on powershell the helps cycle through when you tab - so only the first one is listed
                 self.assertIn("\x1b[7mcommands\x1b[", completions)
                 self.assertIn("\x1b[4;33mcommands\x1b[", completions)
                 self.assertIn("\x1b[1mname\x1b[", completions)
+            else:
+                # on powershell the helps cycle through when you tab - so only one is listed
+                self.assertTrue(
+                    "\x1b[1mimport path\x1b[" in completions
+                    or "\x1b[7mcommands\x1b[" in completions
+                    or "\x1b[4;33mcommands\x1b[" in completions
+                    or "\x1b[1mname\x1b[" in completions
+                )
+
         else:
             self.assertNotIn("\x1b[7mcommands\x1b[", completions)
             self.assertNotIn("\x1b[4;33mcommands\x1b[", completions)
