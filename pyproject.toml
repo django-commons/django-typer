@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "django-typer"
 version = "3.1.0"
-requires-python = "==3.13.2"
+requires-python = ">=3.9,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
   {name = "Brian Kohan", email = "bckohan@gmail.com"},
@@ -17,7 +17,7 @@ repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
-    "django>=3.2,<6.0",
+    "Django>=3.2,<6.0",
     "click>=8.1.8,<8.2",
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer
