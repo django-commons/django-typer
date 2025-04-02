@@ -169,7 +169,8 @@ def run_command(
     try:
         env = kwargs.pop("env") if "env" in kwargs else os.environ.copy()
         if platform.system() == "Windows":
-            env.setdefault("PYTHONIOENCODING", "utf-8")
+            env["PYTHONIOENCODING"] = "utf-8"
+            env["PYTHONUTF8"] = "1"
         if chdir:
             os.chdir(manage_py.parent)
         result = subprocess.run(

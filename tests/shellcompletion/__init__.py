@@ -501,78 +501,94 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
         finally:
             self.remove_script(script=manage2)
 
-    if platform.system() != "Windows":
+    def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
+        import pexpect
 
-        def test_prompt_install(self, env={}, directory: t.Optional[Path] = None):
-            import pexpect
+        env = {
+            **dict(os.environ),
+            "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
+            "DJANGO_COLORS": "nocolor",
+            **env,
+        }
 
-            env = {
-                **dict(os.environ),
-                "DJANGO_SETTINGS_MODULE": "tests.settings.completion",
-                "DJANGO_COLORS": "nocolor",
-                **env,
-            }
+        rex = re.compile
+        expected = [
+            rex(
+                r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?", re.DOTALL
+            ),  # 0
+            rex(
+                r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",
+                re.DOTALL,
+            ),  # 1
+            rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
+            rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
+        ]
 
-            rex = re.compile
-            expected = [
-                rex(
-                    r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?", re.DOTALL
-                ),  # 0
-                rex(
-                    r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",
-                    re.DOTALL,
-                ),  # 1
-                rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
-                rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
-            ]
+        install_command = [
+            "shellcompletion",
+            "--no-color",
+            "--shell",
+            self.shell,
+            "install",
+        ]
+        self.remove()
+        self.verify_remove(directory=directory)
 
-            install_command = [
-                "shellcompletion",
-                "--no-color",
-                "--shell",
-                self.shell,
-                "install",
-            ]
-            self.remove()
-            self.verify_remove(directory=directory)
-
+        if platform.system() != "Windows":
             install = pexpect.spawn(self.manage_script, install_command, env=env)
             install.setwinsize(24, 800)
+        else:
+            from pexpect.popen_spawn import PopenSpawn
 
-            def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
-                index = child.expect(expected)
-                if index in [0, 1]:
-                    return index, child.match.group("file").decode()
-                return index, None
+            install = PopenSpawn(
+                " ".join([self.manage_script, *install_command]),
+                env=env,
+                encoding="utf-8",
+            )
 
-            # test an abort
+        def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
+            index = child.expect(expected)
+            if index in [0, 1]:
+                return index, child.match.group("file")
+            return index, None
+
+        # test an abort
+        idx, _ = wait_for_output(install)
+        self.assertLess(idx, 2)
+        install.sendline("N")
+
+        while True:
             idx, _ = wait_for_output(install)
-            self.assertLess(idx, 2)
-            install.sendline("N")
+            if idx < 2:
+                install.sendline("N")
+            else:
+                self.assertEqual(idx, 2)
+                break
 
-            while True:
-                idx, _ = wait_for_output(install)
-                if idx < 2:
-                    install.sendline("N")
-                else:
-                    self.assertEqual(idx, 2)
-                    break
+        self.verify_remove(directory=directory)
 
-            self.verify_remove(directory=directory)
-
-            # test an install
+        # test an install
+        if platform.system() != "Windows":
             install = pexpect.spawn(self.manage_script, install_command, env=env)
             install.setwinsize(24, 800)
+        else:
+            from pexpect.popen_spawn import PopenSpawn
 
-            while True:
-                idx, _ = wait_for_output(install)
-                if idx < 2:
-                    install.sendline("Y")
-                else:
-                    self.assertEqual(idx, 3)
-                    break
+            install = PopenSpawn(
+                " ".join([self.manage_script, *install_command]),
+                env=env,
+                encoding="utf-8",
+            )
 
-            self.verify_install(directory=directory)
+        while True:
+            idx, _ = wait_for_output(install)
+            if idx < 2:
+                install.sendline("Y")
+            else:
+                self.assertEqual(idx, 3)
+                break
+
+        self.verify_install(directory=directory)
 
     # TODO
     # else:
