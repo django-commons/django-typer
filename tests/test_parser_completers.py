@@ -224,6 +224,8 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         stdout, stderr, retcode = run_command(
             "model_fields", "--no-color", "test", "--help"
         )
+        if platform.system() == "Windows":
+            stdout = stdout.replace("\r\n", "")
         if retcode:
             self.fail(stderr)
         try:
@@ -250,6 +252,9 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
 
     def test_model_object_parser_metavar_override(self):
         stdout, stderr, retcode = run_command("poll_as_option", "--help", "--no-color")
+        # TODO - why are extra newlines inserted here on windows??
+        if platform.system() == "Windows":
+            stdout = stdout.replace("\r\n", "")
         if retcode:
             self.fail(stderr)
         try:
