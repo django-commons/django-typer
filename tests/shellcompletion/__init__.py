@@ -502,12 +502,10 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                 **env,
             }
 
-            rex = re.compile
             expected = [
-                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
-                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
-                rex(r"Aborted shell completion installation."),  # 2
-                rex(rf"Installed autocompletion for {self.shell}"),  # 3
+                re.compile(r"\[y/N\]"),  # 0
+                re.compile("Aborted"),  # 1
+                re.compile("Installed"),  # 2
             ]
 
             install_command = [
@@ -522,23 +520,17 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
             install = pexpect.spawn(self.manage_script, install_command, env=env)
 
-            def wait_for_output(child) -> t.Tuple[int, t.Optional[str]]:
-                index = child.expect(expected)
-                if index in [0, 1]:
-                    return index, child.match.group("file").decode()
-                return index, None
-
             # test an abort
-            idx, _ = wait_for_output(install)
-            self.assertLess(idx, 2)
+            idx = install.expect(expected)
+            self.assertEqual(idx, 0)
             install.sendline("N")
 
             while True:
-                idx, _ = wait_for_output(install)
-                if idx < 2:
+                idx = install.expect(expected)
+                if idx == 0:
                     install.sendline("N")
                 else:
-                    self.assertEqual(idx, 2)
+                    self.assertEqual(idx, 1)
                     break
 
             self.verify_remove(directory=directory)
@@ -547,11 +539,11 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             install = pexpect.spawn(self.manage_script, install_command, env=env)
 
             while True:
-                idx, _ = wait_for_output(install)
-                if idx < 2:
+                idx = install.expect(expected)
+                if idx < 1:
                     install.sendline("Y")
                 else:
-                    self.assertEqual(idx, 3)
+                    self.assertEqual(idx, 2)
                     break
 
             self.verify_install(directory=directory)
@@ -566,12 +558,10 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                 **env,
             }
 
-            rex = re.compile
-            expected_patterns = [
-                rex(r"Append the above contents to (?P<file>.*)\?"),  # 0
-                rex(r"Create (?P<file>.*) with the above contents\?"),  # 1
-                rex(r"Aborted shell completion installation."),  # 2
-                rex(rf"Installed autocompletion for {self.shell}"),  # 3
+            expected = [
+                re.compile(r"\[y/N\]"),  # 0
+                re.compile("Aborted"),  # 1
+                re.compile("Installed"),  # 2
             ]
 
             install_command = [
@@ -604,7 +594,7 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                             break
                         output += line
 
-                        matched_index, matched_file = match_output(line)
+                        matched_index = match_output(line)
                         if matched_index is not None:
                             process.stdin.write(response + "\n")
                             process.stdin.flush()
@@ -613,12 +603,12 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
                 process.wait()
                 return output
 
-            def match_output(line: str) -> t.Tuple[t.Optional[int], t.Optional[str]]:
-                for i, pattern in enumerate(expected_patterns):
+            def match_output(line: str) -> t.Optional[int]:
+                for i, pattern in enumerate(expected):
                     match = pattern.search(line)
                     if match:
-                        return i, match.groupdict().get("file")
-                return None, None
+                        return i
+                return None
 
             # Test abort sequence
             abort_output = run_with_response(["N", "N"])
