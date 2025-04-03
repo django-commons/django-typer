@@ -2188,7 +2188,9 @@ class TestRestrictedRootPathCompleters(ParserCompleterMixin, TestCase):
 
     def test_media_root_completer(self):
         completions = get_values(self.shellcompletion.complete("completion --media "))
-        self.assertEqual(completions, ["file.txt"])
+        self.assertEqual(
+            set(completions), {"file.txt", "file_text.txt", "file_binary.txt"}
+        )
 
     def test_static_root_completer(self):
         completions = get_values(self.shellcompletion.complete("completion --statics "))
