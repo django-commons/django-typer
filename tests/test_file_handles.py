@@ -40,6 +40,27 @@ class TestFileHandles(TestCase):
             if file_binary_write.exists():
                 file_binary_write.unlink()
 
+    def test_file_handles_run_pipe(self):
+        try:
+            self.assertTrue(file_text.exists())
+            self.assertTrue(file_binary.exists())
+            with open(file_text, "r", encoding="utf-8") as f:
+                _, stderr, retcode = run_command(
+                    "file_handles",
+                    "-",
+                    file_text_write,
+                    file_binary,
+                    file_binary_write,
+                    stdin=f,
+                )
+            self.assertEqual(retcode, 0, stderr)
+        finally:
+            # Clean up the files created during the test
+            if file_text_write.exists():
+                file_text_write.unlink()
+            if file_binary_write.exists():
+                file_binary_write.unlink()
+
     def test_file_handles_call(self):
         try:
             self.assertTrue(file_text.exists())
