@@ -15,6 +15,11 @@ class Command(TyperCommand):
         file_binary: typer.FileBinaryRead,
         file_binary_write: typer.FileBinaryWrite,
     ):
+        # workaround
+        # if file_text.closed:
+        #     file_text = open(file_text.name, "rt", encoding="utf-8")
+        # if file_binary.closed:
+        #     file_binary = open(file_binary.name, "rb")
         assert file_text.read().strip() == "FileText"
         assert file_binary.read().strip() == b"FileBinary"
 
