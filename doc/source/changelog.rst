@@ -4,6 +4,12 @@
 Change Log
 ==========
 
+
+v3.1.1 (2024-04-30)
+===================
+
+* Implemented `Support rich 14 <https://github.com/django-commons/django-typer/issues/213>`_
+
 v3.1.0 (2024-04-02)
 ===================
 
