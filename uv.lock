@@ -264,12 +264,31 @@ wheels = [
 name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/d4/7ebdbd03970677812aac39c869717059dbb71a4cfc033ca6e5221787892c/click-8.1.8-py3-none-any.whl", hash = "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2", size = 98188 },
+]
+
+[[package]]
+name = "click"
+version = "8.2.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+]
+dependencies = [
+    { name = "colorama", marker = "python_full_version >= '3.10' and sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cd/0f/62ca20172d4f87d93cf89665fbaedcd560ac48b465bd1d92bfc7ea6b0a41/click-8.2.0.tar.gz", hash = "sha256:f5452aeddd9988eefa20f90f05ab66f17fce1ee2a36907fd30b05bbb5953814d", size = 235857 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a2/58/1f37bf81e3c689cc74ffa42102fa8915b59085f54a6e4a80bc6265c0f6bf/click-8.2.0-py3-none-any.whl", hash = "sha256:6b303f0b2aa85f1cb4e5303078fadcbcd4e476f114fab9b5007005711839325c", size = 102156 },
 ]
 
 [[package]]
@@ -427,7 +446,7 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "4.2.20"
+version = "4.2.21"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version < '3.10'",
@@ -437,9 +456,9 @@ dependencies = [
     { name = "sqlparse", marker = "python_full_version < '3.10'" },
     { name = "tzdata", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0a/dd/33d2a11713f6b78493273a32d99bb449f2d93663ed4ec15a8b890d44ba04/Django-4.2.20.tar.gz", hash = "sha256:92bac5b4432a64532abb73b2ac27203f485e40225d2640a7fbef2b62b876e789", size = 10432686 }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/bb/2fad5edc1af2945cb499a2e322ac28e4714fc310bd5201ed1f5a9f73a342/django-4.2.21.tar.gz", hash = "sha256:b54ac28d6aa964fc7c2f7335138a54d78980232011e0cd2231d04eed393dcb0d", size = 10424638 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/5d/7571ba1c288ead056dda7adad46b25cbf64790576f095565282e996138b1/Django-4.2.20-py3-none-any.whl", hash = "sha256:213381b6e4405f5c8703fffc29cd719efdf189dec60c67c04f76272b3dc845b9", size = 7993584 },
+    { url = "https://files.pythonhosted.org/packages/2c/4f/aeaa3098da18b625ed672f3da6d1cd94e188d1b2cc27c2c841b2f9666282/django-4.2.21-py3-none-any.whl", hash = "sha256:1d658c7bf5d31c7d0cac1cab58bc1f822df89255080fec81909256c30e6180b3", size = 7993839 },
 ]
 
 [[package]]
@@ -469,7 +488,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "asgiref", marker = "python_full_version < '3.10'" },
-    { name = "django", version = "4.2.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "django", version = "4.2.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "django-stubs-ext", version = "5.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "tomli", marker = "python_full_version < '3.10'" },
     { name = "types-pyyaml", marker = "python_full_version < '3.10'" },
@@ -509,7 +528,7 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "django", version = "4.2.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "django", version = "4.2.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "typing-extensions", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9f/06/7b210e0073c6cb8824bde82afc25f268e8c410a99d3621297f44fa3f6a6c/django_stubs_ext-5.1.3.tar.gz", hash = "sha256:3e60f82337f0d40a362f349bf15539144b96e4ceb4dbd0239be1cd71f6a74ad0", size = 9613 }
@@ -539,8 +558,9 @@ name = "django-typer"
 version = "3.1.1"
 source = { editable = "." }
 dependencies = [
-    { name = "click" },
-    { name = "django", version = "4.2.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "click", version = "8.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "django", version = "4.2.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "django", version = "5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "shellingham" },
     { name = "typer-slim" },
@@ -596,11 +616,11 @@ psycopg3 = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=8.1.8,<8.2" },
+    { name = "click", specifier = ">=8.1.8,<8.3" },
     { name = "django", specifier = ">=3.2,<6.0" },
     { name = "rich", marker = "extra == 'rich'", specifier = ">=10.11.0,<15.0.0" },
     { name = "shellingham", specifier = ">=1.5.4,<2.0" },
-    { name = "typer-slim", specifier = ">=0.14.0,<0.16.0" },
+    { name = "typer-slim", specifier = ">=0.14.0,<0.17.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.10'", specifier = ">=3.7.4.3" },
 ]
 provides-extras = ["rich"]
@@ -1834,7 +1854,7 @@ name = "sphinxcontrib-django"
 version = "2.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "django", version = "4.2.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "django", version = "4.2.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "django", version = "5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "pprintpp" },
     { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -2044,15 +2064,16 @@ wheels = [
 
 [[package]]
 name = "typer-slim"
-version = "0.15.3"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click" },
+    { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "click", version = "8.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/62/b569dc0bdaf733250afb4693f00a88ef16232b19f8b6b6c3ef1c245e33a7/typer_slim-0.15.3.tar.gz", hash = "sha256:c134ae789afe8957c3f5f420eed07df53621271aca192b8e497d43a29b94c878", size = 101634 }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/96/5749d5b6920fab0db15ce39d850b86dfee21518cd1c81b7a5fe5a495a92a/typer_slim-0.16.0.tar.gz", hash = "sha256:d6483c367f98529884a5d45a028f5d2686ae93cd9d33d518661069f382c08546", size = 102664 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/b1/0f3d4f3e35fd82248ed5bcb70c6249baebb39f0ab3faf7f9818101eec991/typer_slim-0.15.3-py3-none-any.whl", hash = "sha256:626c125b1b01eebafdc2bb12326b401863d1c4752342e3f9c1d9f829939fe300", size = 45310 },
+    { url = "https://files.pythonhosted.org/packages/41/2d/dc1f0c872615aef018783408ac993be7832726a4b30032e317e9f2858267/typer_slim-0.16.0-py3-none-any.whl", hash = "sha256:8aa94eef73b876506b9d239cd70cfedefac95541be8f060688aabfc800f53d67", size = 46377 },
 ]
 
 [package.optional-dependencies]
@@ -2107,7 +2128,8 @@ name = "uvicorn"
 version = "0.34.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click" },
+    { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "click", version = "8.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "h11" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
@@ -2333,9 +2355,9 @@ wheels = [
 
 [[package]]
 name = "zipp"
-version = "3.21.0"
+version = "3.22.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3f/50/bad581df71744867e9468ebd0bcd6505de3b275e06f202c2cb016e3ff56f/zipp-3.21.0.tar.gz", hash = "sha256:2c9958f6430a2040341a52eb608ed6dd93ef4392e02ffe219417c1b28b5dd1f4", size = 24545 }
+sdist = { url = "https://files.pythonhosted.org/packages/12/b6/7b3d16792fdf94f146bed92be90b4eb4563569eca91513c8609aebf0c167/zipp-3.22.0.tar.gz", hash = "sha256:dd2f28c3ce4bc67507bfd3781d21b7bb2be31103b51a4553ad7d90b84e57ace5", size = 25257 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b7/1a/7e4798e9339adc931158c9d69ecc34f5e6791489d469f5e50ec15e35f458/zipp-3.21.0-py3-none-any.whl", hash = "sha256:ac1bbe05fd2991f160ebce24ffbac5f6d11d83dc90891255885223d42b3cd931", size = 9630 },
+    { url = "https://files.pythonhosted.org/packages/ad/da/f64669af4cae46f17b90798a827519ce3737d31dbafad65d391e49643dc4/zipp-3.22.0-py3-none-any.whl", hash = "sha256:fe208f65f2aca48b81f9e6fd8cf7b8b32c26375266b009b413d45306b6148343", size = 9796 },
 ]

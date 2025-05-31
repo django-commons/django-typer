@@ -18,11 +18,11 @@ homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
     "Django>=3.2,<6.0",
-    "click>=8.1.8,<8.2",
+    "click>=8.1.8,<8.3",
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer
     # version very strictly to bug fix releases for specific minor lines.
-    "typer-slim>=0.14.0,<0.16.0",
+    "typer-slim>=0.14.0,<0.17.0",
     "shellingham>=1.5.4,<2.0",
     # we need this on 3.9 for ParamSpec
     "typing-extensions>=3.7.4.3; python_version < '3.10'",
