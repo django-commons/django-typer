@@ -1,6 +1,7 @@
 import os
 import sys
-import django
+from django import VERSION
+from packaging.version import parse as parse_version
 
 
 def test():
@@ -10,17 +11,14 @@ def test():
     expected_python = os.environ["TEST_PYTHON_VERSION"]
     expected_django = os.environ["TEST_DJANGO_VERSION"]
 
-    expected_python = tuple(int(v) for v in expected_python.split(".") if v)
-    assert sys.version_info[: len(expected_python)] == expected_python, (
-        f"Python Version Mismatch: {sys.version_info[: len(expected_python)]} != "
-        f"{expected_python}"
+    expected_python = parse_version(expected_python)
+    assert sys.version_info[:2] == (expected_python.major, expected_python.minor), (
+        f"Python Version Mismatch: {sys.version_info[:2]} != {expected_python}"
     )
 
-    try:
-        expected_django = tuple(int(v) for v in expected_django.split(".") if v)
-        assert django.VERSION[: len(expected_django)] == expected_django, (
-            f"Django Version Mismatch: {django.VERSION[: len(expected_django)]} != "
-            f"{expected_django}"
-        )
-    except ValueError:
-        assert expected_django == django.__version__
+    dj_actual = VERSION[:2]
+    expected_django = parse_version(expected_django)
+    dj_expected = (expected_django.major, expected_django.minor)
+    assert dj_actual == dj_expected, (
+        f"Django Version Mismatch: {dj_actual} != {expected_django}"
+    )
