@@ -31,8 +31,10 @@ from types import ModuleType
 
 from click import get_current_context
 from click.core import ParameterSource
-from click.parser import split_arg_string
-from click.shell_completion import CompletionItem
+from click.shell_completion import (
+    CompletionItem,
+    split_arg_string,  # pyright: ignore[reportPrivateImportUsage]
+)
 from django.core.management import CommandError, ManagementUtility
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
