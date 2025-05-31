@@ -4,9 +4,10 @@
 Change Log
 ==========
 
-v3.2.0 (2025-04-30)
+v3.2.0 (2025-05-31)
 ===================
 
+* Support Python 3.14
 * Implemented `Support click 8.2 <https://github.com/django-commons/django-typer/issues/215>`_
 
 v3.1.1 (2025-04-30)
