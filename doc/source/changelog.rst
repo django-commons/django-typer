@@ -4,13 +4,17 @@
 Change Log
 ==========
 
+v3.2.0 (2025-04-30)
+===================
 
-v3.1.1 (2024-04-30)
+* Implemented `Support click 8.2 <https://github.com/django-commons/django-typer/issues/215>`_
+
+v3.1.1 (2025-04-30)
 ===================
 
 * Implemented `Support rich 14 <https://github.com/django-commons/django-typer/issues/213>`_
 
-v3.1.0 (2024-04-02)
+v3.1.0 (2025-04-02)
 ===================
 
 * Fixed `Fish shell completion fails for any script named something other than "manage" <https://github.com/django-commons/django-typer/issues/207>`_
@@ -29,7 +33,7 @@ v3.1.0 (2024-04-02)
 * Implemented `Require tests to pass before release action runs. <https://github.com/django-commons/django-typer/issues/173>`_
 
 
-v3.0.0 (2024-02-16)
+v3.0.0 (2025-02-16)
 ===================
 
 * Implemented `Completer for media files. <https://github.com/django-commons/django-typer/issues/175>`_
