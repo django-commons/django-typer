@@ -93,7 +93,7 @@ The release workflow is triggered by tag creation. You must have [git tag signin
 
 ## Just Recipes
 
-```
+```bash
 build                    # build src package and wheel
 build-docs               # build the docs
 build-docs-html          # build html documentation
@@ -111,11 +111,14 @@ clean-docs               # remove doc build artifacts
 clean-env                # remove the virtual environment
 clean-git-ignored        # remove all git ignored files
 coverage                 # generate the test coverage report
+coverage-erase           # erase any coverage data
 docs                     # build and open the documentation
 docs-live                # serve the documentation, with auto-reload
+fetch-refs LIB           # fetch the intersphinx references for the given package
 fix                      # fix formatting, linting issues and import sorting
 format                   # format the code and sort imports
 install *OPTS            # update and install development dependencies
+install-basic            # install without extra dependencies
 install-docs             # install documentation dependencies
 install-precommit        # install git pre-commit hooks
 install-psycopg3         # install with postgresql dependencies
@@ -124,7 +127,7 @@ install-uv               # install the uv package manager
 lint                     # sort the imports and fix linting issues
 list-missed-tests        # run the tests and report if any were not run - sanity check
 log-tests                # run all tests and log them
-manage *COMMAND          # run the django admin
+manage *COMMAND
 open-docs                # open the html documentation
 precommit                # run the pre-commit checks
 release VERSION          # issue a relase for the given semver string (e.g. 2.1.0)
@@ -132,14 +135,14 @@ run +ARGS                # run the command in the virtual environment
 setup python="python"    # setup the venv and pre-commit hooks
 sort-imports             # sort the python imports
 test *TESTS              # run tests
-test-all                 # run all tests
+test-all *ENV            # run all tests
 test-bash                # test bash shell completions
 test-fish                # test fish shell completions
 test-lock +PACKAGES      # lock to specific python and versions of given dependencies
-test-no-rich             # run the tests that require rich not to be installed
+test-no-rich *ENV        # run the tests that require rich not to be installed
 test-powershell          # test powershell shell completions
 test-pwsh                # test pwsh shell completions
-test-rich                # run the tests that require rich to be installed
+test-rich *ENV           # run the tests that require rich to be installed
 test-zsh                 # test zsh shell completions
 translate                # generate translations using google translate
 validate_version VERSION # validate the given version string against the lib version
