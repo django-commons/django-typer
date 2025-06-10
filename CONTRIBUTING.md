@@ -88,7 +88,7 @@ django-typer strictly adheres to [semantic versioning](https://semver.org).
 The release workflow is triggered by tag creation. You must have [git tag signing enabled](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). Our justfile has a release shortcut:
 
 ```bash
-    just release x.x.x
+just release x.x.x
 ```
 
 ## Just Recipes
