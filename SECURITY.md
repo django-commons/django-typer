@@ -1,7 +1,7 @@
 # Security Policy
 
 [![CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
-[![Zizmor](https://github.com/django-commons/django-typer/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://woodruffw.github.io/zizmor)
+[![Zizmor](https://github.com/django-commons/django-typer/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://docs.zizmor.sh/)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge)](https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer)
 
 ## Supported Versions
