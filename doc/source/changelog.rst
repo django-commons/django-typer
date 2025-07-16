@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.2.1 (2025-07-16)
+===================
+
+* Docs `Add django-admin role for shellcompletion reference. <https://github.com/django-commons/django-typer/issues/221>`_
+
 v3.2.0 (2025-05-31)
 ===================
 

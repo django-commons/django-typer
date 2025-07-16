@@ -118,7 +118,7 @@ def setup(app):
     # app.connect('html-page-context', add_page_class)
 
     app.add_directive("literalinclude", ExtendedLiteralInclude)
-    
+    app.add_crossref_type(directivename="django-admin", rolename="django-admin")
     # https://sphinxcontrib-typer.readthedocs.io/en/latest/howto.html#build-to-multiple-formats
     if Path(app.doctreedir).exists():
         shutil.rmtree(app.doctreedir)

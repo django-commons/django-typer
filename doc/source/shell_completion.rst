@@ -53,10 +53,10 @@ for django commands we need to register our completion logic for Django manage s
 the shell. This process has two phases:
 
 1. Ensure that your shell is configured to support completions.
-2. Use the :mod:`~django_typer.management.commands.shellcompletion` command to install the
-   completion hook for your Django manage script. This usually entails adding a specifically
-   named script to a certain directory or adding lines to an existing profile. The
-   :mod:`~django_typer.management.commands.shellcompletion` command will handle this for you.
+2. Use the :django-admin:`shellcompletion` command to install the completion hook for your Django
+   manage script. This usually entails adding a specifically named script to a certain directory or
+   adding lines to an existing profile. The :django-admin:`shellcompletion` command will handle this
+   for you.
 
 
 The goal of this guide is not to be an exhaustive list of how to enable completions for each
@@ -126,9 +126,8 @@ or have solutions, please `report them on our discussions page <https://github.c
 Install the Completion Hook
 ---------------------------
 
-django-typer_ comes with a management command called
-:mod:`~django_typer.management.commands.shellcompletion`. To install completions for your Django_
-project simply run the install command:
+django-typer_ comes with a management command called :django-admin:`shellcompletion`. To install
+completions for your Django_ project simply run the install command:
 
 .. code-block:: bash
 
@@ -145,8 +144,7 @@ will make and ask for permission before proceeding. To skip the prompt use** ``-
 
 The installation script should be able to automatically detect your shell and install the
 appropriate scripts. If it is unable to do so you may force it to install for a specific shell by
-passing the shell name as an argument. Refer to the
-:mod:`~django_typer.management.commands.shellcompletion` for details.
+passing the shell name as an argument. Refer to the :django-admin:`shellcompletion` for details.
 
 **After installation you will need to restart your shell or source the appropriate rc file.**
 

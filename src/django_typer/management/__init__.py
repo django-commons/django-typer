@@ -2602,7 +2602,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         - Using `rich_markup_mode
           <https://typer.tiangolo.com/tutorial/commands/help/#rich-markdown-and-markup>`_
           to enable markdown rendering in help output.
-        - Using the chain parameter to enable :ref:`click:multi-command-chaining`.
+        - Using the chain parameter to enable :ref:`click:command-chaining`.
 
 
     We can see that our help renders like so:
