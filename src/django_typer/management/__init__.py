@@ -221,12 +221,15 @@ def get_command(
     :param no_color: whether to disable color
     :param force_color: whether to force color
     :param kwargs: t.Any other parameters to pass through to the command constructor
-    :raises ModuleNotFoundError: if the command is not found
+    :raises CommandError: if the command is not found
     :raises LookupError: if the subcommand is not found
     """
-    module = import_module(
-        f"{get_commands()[command_name]}.management.commands.{command_name}"
-    )
+    try:
+        module = import_module(
+            f"{get_commands()[command_name]}.management.commands.{command_name}"
+        )
+    except (KeyError, ModuleNotFoundError) as err:
+        raise CommandError(f"Unknown command: {command_name}") from err
     cmd: BaseCommand = module.Command(
         stdout=stdout,
         stderr=stderr,

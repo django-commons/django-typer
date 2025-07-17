@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.2.2 (2025-07-17)
+===================
+
+* Fixed `Raise a CommandError instead of a KeyError if get_command does not find the command. <https://github.com/django-commons/django-typer/issues/222>`_
+
 v3.2.1 (2025-07-16)
 ===================
 

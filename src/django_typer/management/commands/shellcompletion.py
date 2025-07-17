@@ -508,7 +508,7 @@ class Command(TyperCommand):
                         cmd_idx += 1
                         try:
                             cmd = get_command(args[cmd_idx])
-                        except KeyError:
+                        except CommandError:
                             pass
                 except IndexError:
                     if command.endswith(" "):
