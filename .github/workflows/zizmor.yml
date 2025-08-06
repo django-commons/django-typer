@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Zizmor
         run: |
-          cargo install zizmor
+          cargo install --locked zizmor
 
       - name: Run Zizmor analysis
         run: |
