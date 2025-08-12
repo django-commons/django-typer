@@ -70,7 +70,7 @@ jobs:
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -131,7 +131,7 @@ jobs:
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -190,7 +190,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -269,7 +269,7 @@ jobs:
             - 5432:5432
 
       steps:
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v5
           with:
             persist-credentials: false
         - name: Set up Python ${{ matrix.python-version }}
@@ -328,7 +328,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -390,7 +390,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -455,7 +455,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -526,7 +526,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -587,7 +587,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -656,7 +656,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -730,7 +730,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -807,7 +807,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3.22
         with:
           detached: true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: actions/setup-python@v5
