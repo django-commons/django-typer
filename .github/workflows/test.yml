@@ -33,7 +33,7 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-beta.2']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-rc.2']
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
@@ -57,13 +57,13 @@ jobs:
             django-version: '5.0'
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.14.0-beta.2'
+          - python-version: '3.14.0-rc.2'
             django-version: '3.2'
-          - python-version: '3.14.0-beta.2'
+          - python-version: '3.14.0-rc.2'
             django-version: '4.2'
-          - python-version: '3.14.0-beta.2'
+          - python-version: '3.14.0-rc.2'
             django-version: '5.0'
-          - python-version: '3.14.0-beta.2'
+          - python-version: '3.14.0-rc.2'
             django-version: '5.1'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
