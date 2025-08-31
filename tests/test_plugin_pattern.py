@@ -71,7 +71,7 @@ adapted_adapted_rich_help = """
  Usage: ./manage.py adapted adapted [OPTIONS] MESSAGE                           
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      TEXT  [default: None] [required]                           │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -97,8 +97,8 @@ adapted_echo_rich_help = """
  Echo both messages.                                                            
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    msg1      TEXT  [default: None] [required]                              │
-│ *    msg2      TEXT  [default: None] [required]                              │
+│ *    msg1      TEXT  [required]                                              │
+│ *    msg2      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -109,7 +109,7 @@ adapted_help_no_adapters = """
  Usage: ./manage.py adapted [OPTIONS] MESSAGE                                   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      TEXT  [default: None] [required]                           │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

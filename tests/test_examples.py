@@ -10,8 +10,8 @@ basic_help = """
  A basic command that uses Typer                                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    arg1      TEXT  [default: None] [required]                              │
-│ *    arg2      TEXT  [default: None] [required]                              │
+│ *    arg1      TEXT  [required]                                              │
+│ *    arg2      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --arg3        FLOAT    [default: 0.5]                                        │
@@ -140,8 +140,7 @@ multi_create_help = """
  Create an object.                                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  The name of the object to create. [default: None]       │
-│                      [required]                                              │
+│ *    name      TEXT  The name of the object to create. [required]            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -154,8 +153,7 @@ multi_delete_help = """
  Delete an object.                                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    id      INTEGER  The id of the object to delete. [default: None]        │
-│                       [required]                                             │
+│ *    id      INTEGER  The id of the object to delete. [required].            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -233,8 +231,8 @@ hierarchy_math_divide_help = """
  Divide the given numbers.                                                      
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    numerator        FLOAT  The numerator [default: None] [required]        │
-│ *    denominator      FLOAT  The denominator [default: None] [required]      │
+│ *    numerator        FLOAT  The numerator [required]                        │
+│ *    denominator      FLOAT  The denominator [required]                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --floor    --no-floor      Use floor division [default: no-floor]            │
@@ -248,8 +246,7 @@ hierarchy_math_multiply_help = """
  Multiply the given numbers.                                                    
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    numbers      NUMBERS...  The numbers to multiply [default: None]        │
-│                               [required]                                     │
+│ *    numbers      NUMBERS...  The numbers to multiply [required]             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

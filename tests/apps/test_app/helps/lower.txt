@@ -7,6 +7,5 @@
 │ --begin        INTEGER  The starting index of the string to operate on.      │
 │                         [default: 0]                                         │
 │ --end          INTEGER  The ending index of the string to operate on.        │
-│                         [default: None]                                      │
 │ --help                  Show this message and exit.                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯

@@ -4,8 +4,7 @@
  Get or set Django settings.                                                    
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    setting      TEXT  The setting variable name. [default: None]           │
-│                         [required]                                           │
+│ *    setting      TEXT  The setting variable name. [required]                │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

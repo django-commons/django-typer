@@ -17,7 +17,7 @@ native_help_rich = """
  Usage: ./manage.py native [OPTIONS] NAME                                       
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  [default: None] [required]                              │
+│ *    name      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -102,7 +102,7 @@ native_groups_main_help_rich = """
  Usage: ./manage.py native_groups main [OPTIONS] NAME                            
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  [default: None] [required]                              │
+│ *    name      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -127,7 +127,7 @@ native_groups_grp1_subgrp_help_rich = """
  Usage: ./manage.py native_groups grp1 subgrp [OPTIONS] MSG COMMAND [ARGS]...    
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    msg      TEXT  [default: None] [required]                               │
+│ *    msg      TEXT  [required]                                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -138,7 +138,7 @@ native_groups_grp1_cmd1_help_rich = """
  Usage: ./manage.py native_groups grp1 cmd1 [OPTIONS] COUNT                      
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    count      INTEGER  [default: None] [required]                          │
+│ *    count      INTEGER  [required]                                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -149,7 +149,7 @@ native_groups_grp1_cmd2_help_rich = """
  Usage: ./manage.py native_groups grp1 cmd2 [OPTIONS] FRACTION                   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    fraction      FLOAT  [default: None] [required]                         │
+│ *    fraction      FLOAT  [required]                                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -357,7 +357,7 @@ native_tweaks_help_rich = """
  Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  [default: None] [required]                              │
+│ *    name      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

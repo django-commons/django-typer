@@ -7,7 +7,6 @@
 │   begin      [BEGIN]  The starting index of the string to operate on.        │
 │                       [default: 0]                                           │
 │   end        [END]    The ending index of the string to operate on.          │
-│                       [default: None]                                        │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

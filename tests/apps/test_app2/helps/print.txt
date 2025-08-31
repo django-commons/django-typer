@@ -3,8 +3,6 @@
  Print the setting value.                                                       
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ *  --safe    --no-safe      Do not assume the setting exists.                │
-│                             [default: no-safe]                               │
-│                             [required]                                       │
+│ *  --safe    --no-safe      Do not assume the setting exists. [required]     │
 │    --help                   Show this message and exit.                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯

@@ -4,7 +4,7 @@
  Echo the given message.                                                        
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      TEXT  [default: None] [required]                           │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

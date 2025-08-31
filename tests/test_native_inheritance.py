@@ -167,7 +167,7 @@ native_tweaks_help_rich = """
  Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  [default: None] [required]                              │
+│ *    name      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -242,7 +242,7 @@ native_override_sgcmd2_help_rich = """
  Subgroup command 2, Takes an int.                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    number      INTEGER  [default: None] [required]                         │
+│ *    number      INTEGER  [required]                                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

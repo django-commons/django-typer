@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.3 (2025-08-31)
+===================
+
+* Fixed `Support typer 0.17 <https://github.com/django-commons/django-typer/issues/225>`_
+
 v3.2.2 (2025-07-17)
 ===================
 
