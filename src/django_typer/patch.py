@@ -77,7 +77,7 @@ def apply() -> None:
 
         from typer import main
 
-        main.console_stderr = Console(
+        main.console_stderr = Console(  # pyright: ignore[reportAttributeAccessIssue]
             stderr=True, force_terminal=force_terminal, color_system=color_system
         )
 
