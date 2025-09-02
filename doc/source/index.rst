@@ -195,6 +195,7 @@ the self argument in your commands.**
    extensions
    shell_completion
    howto
+   performance
    showcase
    reference/index
    changelog

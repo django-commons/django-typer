@@ -649,6 +649,9 @@ docs = [
     { name = "sphinxcontrib-django" },
     { name = "sphinxcontrib-typer", extra = ["png"] },
 ]
+profiling = [
+    { name = "tuna" },
+]
 psycopg3 = [
     { name = "psycopg" },
 ]
@@ -696,6 +699,7 @@ docs = [
     { name = "sphinxcontrib-django", specifier = ">=2.5" },
     { name = "sphinxcontrib-typer", extras = ["png"], specifier = ">=0.5.1" },
 ]
+profiling = [{ name = "tuna", specifier = ">=0.5.11" }]
 psycopg3 = [{ name = "psycopg", specifier = ">=3.1.8" }]
 
 [[package]]
@@ -2190,6 +2194,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d1/3c/8b4358e81f2f2cfe71b66a267f023a91db20a817b9425dd964873796980a/trio_websocket-0.12.2.tar.gz", hash = "sha256:22c72c436f3d1e264d0910a3951934798dcc5b00ae56fc4ee079d46c7cf20fae", size = 33549, upload-time = "2025-02-25T05:16:58.947Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/19/eb640a397bba49ba49ef9dbe2e7e5c04202ba045b6ce2ec36e9cadc51e04/trio_websocket-0.12.2-py3-none-any.whl", hash = "sha256:df605665f1db533f4a386c94525870851096a223adcb97f72a07e8b4beba45b6", size = 21221, upload-time = "2025-02-25T05:16:57.545Z" },
+]
+
+[[package]]
+name = "tuna"
+version = "0.5.11"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/fb/5bf0865b2fdb44c0c62af24e77b5fe1bcfae4282b982a954fe7984587595/tuna-0.5.11.tar.gz", hash = "sha256:d47f3e39e80af961c8df016ac97d1643c3c60b5eb451299da0ab5fe411d8866c", size = 150600, upload-time = "2021-12-18T22:11:19.551Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d6/07/c115a27adb5228bdf78d0c2366637c5b1630427f879c674f7bab4e6eb637/tuna-0.5.11-py3-none-any.whl", hash = "sha256:ab352a6d836014ace585ecd882148f1f7c68be9ea4bf9e9298b7127594dab2ef", size = 149682, upload-time = "2021-12-18T22:11:16.716Z" },
 ]
 
 [[package]]

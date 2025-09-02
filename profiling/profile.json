@@ -1,0 +1,246 @@
+{
+    "0": {
+        "env": {
+            "django_typer": [
+                3,
+                3,
+                0
+            ],
+            "python": [
+                3,
+                13
+            ],
+            "django": [
+                5,
+                2
+            ],
+            "typer": [
+                0,
+                17
+            ]
+        },
+        "runs": {
+            "1447400898812585418": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": false,
+                    "app": false,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.13760000000000003,
+                "import_time": 0.126537,
+                "modules": 550
+            },
+            "156897129890272181": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": false,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.1502,
+                "import_time": 0.109779,
+                "modules": 592
+            },
+            "2176052577945945477": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": true,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.1494,
+                "import_time": 0.10648,
+                "modules": 592
+            },
+            "675072097072274051": {
+                "run": {
+                    "cmd": "shellcompletion",
+                    "typer": true,
+                    "app": true,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.18419999999999997,
+                "import_time": 0.108559,
+                "modules": 606
+            },
+            "2303909322008428434": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": false,
+                    "app": false,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.1494,
+                "import_time": 0.100977,
+                "modules": 573
+            },
+            "274962866163047735": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": true,
+                    "app": true,
+                    "rich": false,
+                    "help": false
+                },
+                "time": 0.168,
+                "import_time": 0.109771,
+                "modules": 615
+            },
+            "942508120957984993": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": false,
+                    "app": false,
+                    "rich": false,
+                    "help": true
+                },
+                "time": 0.1382,
+                "import_time": 0.102393,
+                "modules": 550
+            },
+            "506589674454807823": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": false,
+                    "rich": false,
+                    "help": true
+                },
+                "time": 0.1484,
+                "import_time": 0.108232,
+                "modules": 593
+            },
+            "426905945237278128": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": true,
+                    "rich": false,
+                    "help": true
+                },
+                "time": 0.1476,
+                "import_time": 0.109507,
+                "modules": 593
+            },
+            "174008683672669482": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": false,
+                    "app": false,
+                    "rich": false,
+                    "help": true
+                },
+                "time": 0.13520000000000001,
+                "import_time": 0.109942,
+                "modules": 551
+            },
+            "1942175217068420967": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": true,
+                    "app": true,
+                    "rich": false,
+                    "help": true
+                },
+                "time": 0.15039999999999998,
+                "import_time": 0.108588,
+                "modules": 594
+            },
+            "864373478621873697": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": false,
+                    "rich": true,
+                    "help": false
+                },
+                "time": 0.1864,
+                "import_time": 0.141692,
+                "modules": 744
+            },
+            "226255260169180632": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": true,
+                    "rich": true,
+                    "help": false
+                },
+                "time": 0.1886,
+                "import_time": 0.138694,
+                "modules": 745
+            },
+            "428097589213665847": {
+                "run": {
+                    "cmd": "shellcompletion",
+                    "typer": true,
+                    "app": true,
+                    "rich": true,
+                    "help": false
+                },
+                "time": 0.2218,
+                "import_time": 0.138445,
+                "modules": 755
+            },
+            "2100452363596306712": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": true,
+                    "app": true,
+                    "rich": true,
+                    "help": false
+                },
+                "time": 0.2316,
+                "import_time": 0.143397,
+                "modules": 768
+            },
+            "1284199138412852409": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": false,
+                    "rich": true,
+                    "help": true
+                },
+                "time": 0.22920000000000001,
+                "import_time": 0.153081,
+                "modules": 745
+            },
+            "2137499222435047482": {
+                "run": {
+                    "cmd": "minimal",
+                    "typer": true,
+                    "app": true,
+                    "rich": true,
+                    "help": true
+                },
+                "time": 0.195,
+                "import_time": 0.139081,
+                "modules": 746
+            },
+            "477819850357282012": {
+                "run": {
+                    "cmd": "polls",
+                    "typer": true,
+                    "app": true,
+                    "rich": true,
+                    "help": true
+                },
+                "time": 0.2008,
+                "import_time": 0.138571,
+                "modules": 747
+            }
+        },
+        "platform": {
+            "os": "darwin",
+            "arch": "arm64",
+            "name": "cricket"
+        }
+    }
+}
