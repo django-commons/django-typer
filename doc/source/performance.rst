@@ -35,7 +35,7 @@ improvements <https://github.com/django-commons/django-typer/issues/170>`_ are m
    .. raw:: html
       :file: _static/img/minimal_profile.svg
 
-.. only:: latex
+.. only:: latexpdf
 
    .. literalinclude:: _static/img/minimal_profile.txt
 
@@ -51,6 +51,6 @@ using :pypi:`django-typer` is minimal. On the order of a few 10s of milliseconds
    .. raw:: html
       :file: _static/img/polls_profile.svg
 
-.. only:: latex
+.. only:: latexpdf
 
    .. literalinclude:: _static/img/polls_profile.txt
