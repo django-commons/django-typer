@@ -53,8 +53,11 @@ extensions = [
     'sphinxcontrib.typer',
     'sphinx_tabs.tabs',
     "sphinx.ext.viewcode",
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.cairosvgconverter',  # this is the package’s module name
 ]
+
+svg2pdf_converter = ("cairosvg",)
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
