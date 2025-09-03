@@ -15,7 +15,13 @@ build:
     - libpango-1.0-0
     - libgdk-pixbuf2.0-0
     - libffi-dev
+    - chromium-browser
+    - libasound2
   jobs:
+    post_create_environment:
+      - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      - dpkg -x google-chrome-stable_current_amd64.deb $HOME/chrome
+      - touch $HOME/.rtd.build
     post_install:
       - pip install uv
       - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --all-extras --group docs --link-mode=copy

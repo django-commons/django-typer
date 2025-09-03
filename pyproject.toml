@@ -105,6 +105,9 @@ modules = "django_typer"
 max-line-length = 100
 sphinx = true
 ignore = [ "D004" ]
+ignore-path = [
+  "doc/source/_static/img/*.txt"
+]
 
 [tool.pytest.ini_options]
 # py.test options:
