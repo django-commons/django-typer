@@ -218,12 +218,15 @@ class TracebackConfigTests(with_typehint(TestCase)):
         )[1]
         self.assertNotIn("\x1b", result)
 
+        env = os.environ.copy()
+        if "GITHUB_ACTIONS" not in env:
+            env["GITHUB_ACTIONS"] = "1"
         result = run_command(
             "test_command1",
             "delete",
             "Brian",
             "--throw",
-            env={"GITHUB_ACTIONS": "1", **os.environ},
+            env=env,
         )[1]
         self.assertIn("\x1b", result)
 
