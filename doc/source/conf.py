@@ -53,8 +53,7 @@ extensions = [
     'sphinxcontrib.typer',
     'sphinx_tabs.tabs',
     "sphinx.ext.viewcode",
-    'sphinx.ext.intersphinx',
-    'sphinxcontrib.cairosvgconverter',  # this is the package’s module name
+    'sphinx.ext.intersphinx'
 ]
 
 svg2pdf_converter = ("cairosvg",)
