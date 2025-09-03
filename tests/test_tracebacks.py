@@ -1,5 +1,5 @@
 import re
-
+import os
 import pytest
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
@@ -218,8 +218,14 @@ class TracebackConfigTests(with_typehint(TestCase)):
         )[1]
         self.assertNotIn("\x1b", result)
 
-        result = run_command("test_command1", "delete", "Brian", "--throw")[1]
-        self.assertNotIn("\x1b", result)
+        result = run_command(
+            "test_command1",
+            "delete",
+            "Brian",
+            "--throw",
+            env={"GITHUB_ACTIONS": "1", **os.environ},
+        )[1]
+        self.assertIn("\x1b", result)
 
 
 @pytest.mark.rich
