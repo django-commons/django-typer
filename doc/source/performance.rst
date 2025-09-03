@@ -30,14 +30,9 @@ uninstall :pypi:`rich`. As of :pypi:`Typer` 0.17, :pypi:`rich` is lazily loaded,
 improvements <https://github.com/django-commons/django-typer/issues/170>`_ are made to :pypi:`Typer`
 , the import time penalty is still incurred by :pypi:`django-typer`.
 
-.. only:: html
+.. raw:: html
+    :file: _static/img/minimal_profile.svg
 
-   .. raw:: html
-      :file: _static/img/minimal_profile.svg
-
-.. only:: latex
-
-   .. literalinclude:: _static/img/minimal_profile.txt
 
 The second benchmark shows the same stats for the :ref:`polls example code <building_commands>`.
 These benchmarks compare the :class:`~django.core.management.BaseCommand` native implementation
@@ -46,11 +41,6 @@ using :pypi:`django-typer` is minimal. On the order of a few 10s of milliseconds
 :pypi:`rich` increases this overhead slightly, but the impact is still barely noticeable.
 
 
-.. only:: html
+.. raw:: html
+    :file: _static/img/polls_profile.svg
 
-   .. raw:: html
-      :file: _static/img/polls_profile.svg
-
-.. only:: latex
-
-   .. literalinclude:: _static/img/polls_profile.txt

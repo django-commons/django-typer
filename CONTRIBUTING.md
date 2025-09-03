@@ -98,7 +98,6 @@ benchmark                # generate and document benchmarks
 build                    # build src package and wheel
 build-docs               # build the docs
 build-docs-html          # build html documentation
-build-docs-pdf           # build pdf documentation
 check                    # run all static checks
 check-docs               # lint the documentation
 check-docs-links         # check the documentation links for broken links
