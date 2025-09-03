@@ -340,6 +340,12 @@ run +ARGS:
 translate: install-translate
     @just manage translate --settings tests.settings.translate
 
+# generate and document benchmarks
+benchmark:
+    @just run --no-dev --no-extra rich --exact ./profiling/profile.py generate
+    @just run --no-dev --extra rich --exact ./profiling/profile.py generate
+    @just run --group profiling ./profiling/profile.py document
+
 # validate the given version string against the lib version
 [script]
 validate_version VERSION:

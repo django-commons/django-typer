@@ -3,8 +3,8 @@
         "env": {
             "django_typer": [
                 3,
-                2,
-                2
+                3,
+                0
             ],
             "python": [
                 3,
@@ -28,8 +28,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.13760000000000003,
-                "import_time": 0.126537,
+                "time": 0.1598,
+                "import_time": 0.10276,
                 "modules": 550
             },
             "156897129890272181": {
@@ -40,8 +40,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.1502,
-                "import_time": 0.109779,
+                "time": 0.1642,
+                "import_time": 0.118827,
                 "modules": 592
             },
             "2176052577945945477": {
@@ -52,8 +52,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.1494,
-                "import_time": 0.10648,
+                "time": 0.1728,
+                "import_time": 0.115422,
                 "modules": 592
             },
             "675072097072274051": {
@@ -64,8 +64,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.18419999999999997,
-                "import_time": 0.108559,
+                "time": 0.19879999999999998,
+                "import_time": 0.122619,
                 "modules": 606
             },
             "2303909322008428434": {
@@ -76,8 +76,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.1494,
-                "import_time": 0.100977,
+                "time": 0.15259999999999999,
+                "import_time": 0.106744,
                 "modules": 573
             },
             "274962866163047735": {
@@ -88,8 +88,8 @@
                     "rich": false,
                     "help": false
                 },
-                "time": 0.168,
-                "import_time": 0.109771,
+                "time": 0.1734,
+                "import_time": 0.115975,
                 "modules": 615
             },
             "942508120957984993": {
@@ -100,8 +100,8 @@
                     "rich": false,
                     "help": true
                 },
-                "time": 0.1382,
-                "import_time": 0.102393,
+                "time": 0.1482,
+                "import_time": 0.104318,
                 "modules": 550
             },
             "506589674454807823": {
@@ -112,8 +112,8 @@
                     "rich": false,
                     "help": true
                 },
-                "time": 0.1484,
-                "import_time": 0.108232,
+                "time": 0.159,
+                "import_time": 0.115199,
                 "modules": 593
             },
             "426905945237278128": {
@@ -124,8 +124,8 @@
                     "rich": false,
                     "help": true
                 },
-                "time": 0.1476,
-                "import_time": 0.109507,
+                "time": 0.16260000000000002,
+                "import_time": 0.122901,
                 "modules": 593
             },
             "174008683672669482": {
@@ -136,8 +136,8 @@
                     "rich": false,
                     "help": true
                 },
-                "time": 0.13520000000000001,
-                "import_time": 0.109942,
+                "time": 0.1508,
+                "import_time": 0.104901,
                 "modules": 551
             },
             "1942175217068420967": {
@@ -148,8 +148,8 @@
                     "rich": false,
                     "help": true
                 },
-                "time": 0.15039999999999998,
-                "import_time": 0.108588,
+                "time": 0.1636,
+                "import_time": 0.116833,
                 "modules": 594
             },
             "864373478621873697": {
@@ -160,8 +160,8 @@
                     "rich": true,
                     "help": false
                 },
-                "time": 0.1864,
-                "import_time": 0.141692,
+                "time": 0.214,
+                "import_time": 0.159158,
                 "modules": 744
             },
             "226255260169180632": {
@@ -172,8 +172,8 @@
                     "rich": true,
                     "help": false
                 },
-                "time": 0.1886,
-                "import_time": 0.138694,
+                "time": 0.2352,
+                "import_time": 0.163347,
                 "modules": 745
             },
             "428097589213665847": {
@@ -184,8 +184,8 @@
                     "rich": true,
                     "help": false
                 },
-                "time": 0.2218,
-                "import_time": 0.138445,
+                "time": 0.265,
+                "import_time": 0.149312,
                 "modules": 755
             },
             "2100452363596306712": {
@@ -196,8 +196,8 @@
                     "rich": true,
                     "help": false
                 },
-                "time": 0.2316,
-                "import_time": 0.143397,
+                "time": 0.2404,
+                "import_time": 0.156697,
                 "modules": 768
             },
             "1284199138412852409": {
@@ -208,8 +208,8 @@
                     "rich": true,
                     "help": true
                 },
-                "time": 0.22920000000000001,
-                "import_time": 0.153081,
+                "time": 0.2214,
+                "import_time": 0.153582,
                 "modules": 745
             },
             "2137499222435047482": {
@@ -220,8 +220,8 @@
                     "rich": true,
                     "help": true
                 },
-                "time": 0.195,
-                "import_time": 0.139081,
+                "time": 0.2194,
+                "import_time": 0.16577,
                 "modules": 746
             },
             "477819850357282012": {
@@ -232,8 +232,8 @@
                     "rich": true,
                     "help": true
                 },
-                "time": 0.2008,
-                "import_time": 0.138571,
+                "time": 0.217,
+                "import_time": 0.148613,
                 "modules": 747
             }
         },

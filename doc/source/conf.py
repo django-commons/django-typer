@@ -108,7 +108,16 @@ intersphinx_mapping = {
 }
 
 
+def pypi_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+    from docutils import nodes
+
+    url = f"https://pypi.org/project/{text}/"
+    node = nodes.reference(rawtext, text, refuri=url, **options)
+    return [node], []
+
+
 def setup(app):
+    from docutils.parsers.rst import roles
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
     app.connect(
@@ -116,7 +125,7 @@ def setup(app):
         between('^.*[*]{79}.*$', exclude=True)
     )
     # app.connect('html-page-context', add_page_class)
-
+    roles.register_local_role("pypi", pypi_role)
     app.add_directive("literalinclude", ExtendedLiteralInclude)
     app.add_crossref_type(directivename="django-admin", rolename="django-admin")
     # https://sphinxcontrib-typer.readthedocs.io/en/latest/howto.html#build-to-multiple-formats

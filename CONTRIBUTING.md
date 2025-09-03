@@ -94,6 +94,7 @@ just release x.x.x
 ## Just Recipes
 
 ```bash
+benchmark                # generate and document benchmarks
 build                    # build src package and wheel
 build-docs               # build the docs
 build-docs-html          # build html documentation

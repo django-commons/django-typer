@@ -1,3 +1,5 @@
+#!python
+
 import bisect
 import json
 import os
@@ -419,7 +421,7 @@ def document():
         ).write_text(svg, encoding="utf-8")
 
     def polls_table():
-        console = Console(record=True, width=80)
+        console = Console(record=True, width=100)
 
         # Top "header"
         console.print(
@@ -456,6 +458,16 @@ def document():
             (
                 "polls --help (tutorial)",
                 RunKey(cmd="polls", typer=False, app=False, rich=False, help=True),
+            ),
+            (
+                "polls (typer)",
+                RunKey(cmd="polls", typer=True, app=True, rich=False, help=False),
+            ),
+            (
+                "shell completion",
+                RunKey(
+                    cmd="shellcompletion", typer=True, app=True, rich=False, help=False
+                ),
             ),
         ]
         rich_cols = [
