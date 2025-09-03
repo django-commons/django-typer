@@ -3,8 +3,8 @@
         "env": {
             "django_typer": [
                 3,
-                3,
-                0
+                2,
+                2
             ],
             "python": [
                 3,

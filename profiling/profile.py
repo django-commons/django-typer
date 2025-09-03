@@ -468,7 +468,7 @@ def document():
                 RunKey(cmd="polls", typer=True, app=True, rich=True, help=True),
             ),
             (
-                "shellcompletion (rich)",
+                "shell completion (rich)",
                 RunKey(
                     cmd="shellcompletion", typer=True, app=True, rich=True, help=False
                 ),

@@ -162,8 +162,8 @@ def interact(command, *args, **kwargs):
 
 
 def run_command(
-    command, *args, parse_json=True, chdir=True, **kwargs
-) -> Tuple[str, str, int]:
+    command, *args, parse_json=True, chdir=True, time=False, **kwargs
+) -> Union[Tuple[str, str, int], Tuple[str, str, int, float]]:
     # we want to use the same test database that was created for the test suite run
     cwd = os.getcwd()
     try:
@@ -173,13 +173,17 @@ def run_command(
             env["PYTHONUTF8"] = "1"
         if chdir:
             os.chdir(manage_py.parent)
+        cmd = [
+            sys.executable,
+            f"./{manage_py.name}" if chdir else manage_py,
+            command,
+            *args,
+        ]
+        time_seconds = 0.0
+        if time:
+            cmd.insert(0, "time")
         result = subprocess.run(
-            [
-                sys.executable,
-                f"./{manage_py.name}" if chdir else manage_py,
-                command,
-                *args,
-            ],
+            cmd,
             capture_output=True,
             text=False,
             env=env,
@@ -193,6 +197,8 @@ def run_command(
             "utf-8"  # getattr(from_bytes(result.stderr).best(), "encoding", "utf-8")
         )
         stderr = result.stderr.decode(stderr_encoding)
+        if time:
+            time_seconds = float(stderr.split("real")[0].strip())
 
         # Check the return code to ensure the script ran successfully
         if result.returncode != 0:
@@ -202,10 +208,24 @@ def run_command(
         if result.stdout:
             if parse_json:
                 try:
-                    return json.loads(stdout), stderr, result.returncode
+                    if time:
+                        return (
+                            json.loads(stdout),
+                            stderr,
+                            result.returncode,
+                            time_seconds,
+                        )
+                    else:
+                        return json.loads(stdout), stderr, result.returncode
                 except json.JSONDecodeError:
+                    if time:
+                        return stdout, stderr, result.returncode, time_seconds
                     return stdout, stderr, result.returncode
+            if time:
+                return stdout, stderr, result.returncode, time_seconds
             return stdout, stderr, result.returncode
+        if time:
+            return stdout, stderr, result.returncode, time_seconds
         return stdout, stderr, result.returncode
     finally:
         os.chdir(cwd)
