@@ -1,0 +1,8 @@
+                                                                                
+                                           TyperCommand        TyperCommand     
+            BaseCommand   TyperCommand        (rich)           --help (rich)    
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  modules       550           592               745                 746         
+  time         0.16           0.17             0.24                0.22         
+  imports      0.10           0.12             0.16                0.17         
+                                                                                

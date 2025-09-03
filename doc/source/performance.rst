@@ -37,8 +37,7 @@ improvements <https://github.com/django-commons/django-typer/issues/170>`_ are m
 
 .. only:: latex
 
-   .. image:: _static/img/minimal_profile.svg
-      :width: 80%
+   .. literalinclude:: _static/img/minimal_profile.txt
 
 The second benchmark shows the same stats for the :ref:`polls example code <building_commands>`.
 These benchmarks compare the :class:`~django.core.management.BaseCommand` native implementation
@@ -54,5 +53,4 @@ using :pypi:`django-typer` is minimal. On the order of a few 10s of milliseconds
 
 .. only:: latex
 
-   .. image:: _static/img/polls_profile.svg
-      :width: 80%
+   .. literalinclude:: _static/img/polls_profile.txt

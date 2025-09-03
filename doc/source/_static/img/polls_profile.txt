@@ -1,0 +1,10 @@
+                                                                                                    
+                                                                              polls                 
+                           polls                                 polls       --help       shell     
+              polls        --help       polls        shell       (typer      (typer     completion  
+            (tutorial)   (tutorial)    (typer)     completi…    w/rich)      w/rich)      (rich)    
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  modules      573          551          615          606         768          747         755      
+  time         0.15         0.15         0.17        0.20         0.24        0.22         0.27     
+  imports      0.11         0.10         0.12        0.12         0.16        0.15         0.15     
+                                                                                                    

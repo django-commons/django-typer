@@ -420,6 +420,13 @@ def document():
             Path(__file__).parent.parent / "doc/source/_static/img/minimal_profile.svg"
         ).write_text(svg, encoding="utf-8")
 
+        console.print(table)
+
+        svg = console.export_text()  # export as a string
+        (
+            Path(__file__).parent.parent / "doc/source/_static/img/minimal_profile.txt"
+        ).write_text(svg, encoding="utf-8")
+
     def polls_table():
         console = Console(record=True, width=100)
 
@@ -530,6 +537,12 @@ def document():
         svg = console.export_svg(title="CLI Startup Benchmarks")  # export as a string
         (
             Path(__file__).parent.parent / "doc/source/_static/img/polls_profile.svg"
+        ).write_text(svg, encoding="utf-8")
+
+        console.print(table)
+        svg = console.export_text()  # export as a string
+        (
+            Path(__file__).parent.parent / "doc/source/_static/img/polls_profile.txt"
         ).write_text(svg, encoding="utf-8")
 
     minimal_table()
