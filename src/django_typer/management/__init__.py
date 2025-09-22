@@ -257,7 +257,7 @@ def _common_options(  # pyright: ignore[reportRedeclaration]
     pythonpath: PythonPath = None,
     traceback: Traceback = False,
     show_locals: ShowLocals = False,
-    hide_locals: HideLocals = True,
+    hide_locals: HideLocals = False,
     no_color: NoColor = False,
     force_color: ForceColor = False,
     skip_checks: SkipChecks = False,

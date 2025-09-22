@@ -47,7 +47,7 @@ def set_force_color(context, _, value):
     return value
 
 
-def show_locals(context, param, value):
+def show_locals(context, param, _):
     from click.core import ParameterSource
 
     if context.get_parameter_source(param.name) is not ParameterSource.DEFAULT:
@@ -57,7 +57,7 @@ def show_locals(context, param, value):
         install_traceback(
             {
                 **traceback_config(),
-                "show_locals": not value if param.name == "hide_locals" else value,
+                "show_locals": param.name == "show_locals",
             }
         )
 
