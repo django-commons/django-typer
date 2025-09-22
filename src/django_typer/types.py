@@ -54,7 +54,12 @@ def show_locals(context, param, value):
         from .config import traceback_config
         from .utils import install_traceback
 
-        install_traceback({**traceback_config(), "show_locals": value})
+        install_traceback(
+            {
+                **traceback_config(),
+                "show_locals": not value if param.name == "hide_locals" else value,
+            }
+        )
 
 
 Version = Annotated[

@@ -7,6 +7,7 @@ Change Log
 v3.3.1 (2025-09-22)
 ===================
 
+* Fixed `--hide/show locals option on stack trace is not working as expected. <https://github.com/django-commons/django-typer/issues/233>`_
 * Implemented `Support typer 0.18-0.19 and click 8.3 <https://github.com/django-commons/django-typer/issues/232>`_
 
 v3.3.0 (2025-08-31)
