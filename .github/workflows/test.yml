@@ -7,9 +7,9 @@ on:
   push:
     tags-ignore:
       - '*'
-    branches:
-      - '*'
+    branches: ['main']
   pull_request:
+    branches: ['main']
   workflow_call:
   workflow_dispatch:
     inputs:
@@ -135,20 +135,21 @@ jobs:
         shell: pwsh
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
+      WINPTY_ROOT: ${{ github.workspace }}\winpty-msvc
     steps:
     - uses: actions/checkout@v5
       with:
@@ -158,6 +159,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@v3.22
@@ -193,14 +195,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # LTS April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -217,6 +219,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -263,7 +266,7 @@ jobs:
         TEST_DJANGO_VERSION: ${{ matrix.django-version }}
       strategy:
         matrix:
-          python-version: ['3.13']
+          python-version: ['3.14']
           postgres-version: ['latest']
           django-version:
             - '5.2' # April 2028
@@ -296,6 +299,7 @@ jobs:
           id: sp
           with:
             python-version: ${{ matrix.python-version }}
+            allow-prereleases: true
         - name: install-emacs-macos
           if: ${{ github.event.inputs.debug == 'true' }}
           run: |
@@ -332,14 +336,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -355,6 +359,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-linux
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -394,14 +399,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -417,6 +422,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-linux
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -458,14 +464,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -482,6 +488,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -529,14 +536,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -553,6 +560,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -590,14 +598,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.2' # April 2028
         exclude:
           - python-version: '3.9'
             django-version: '5.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -614,6 +622,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -659,14 +668,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.0' # April 2025
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -683,6 +692,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
@@ -733,14 +743,14 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.9', '3.14']
         django-version:
           - '3.2' # LTS April 2024
           - '5.0' # April 2025
         exclude:
           - python-version: '3.9'
             django-version: '5.0'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
 
     env:
@@ -757,6 +767,7 @@ jobs:
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@v1
