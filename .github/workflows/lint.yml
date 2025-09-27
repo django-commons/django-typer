@@ -7,9 +7,9 @@ on:
   push:
     tags-ignore:
       - '*'
-    branches:
-      - '*'
+    branches: ['main']
   pull_request:
+    branches: ['main']
   workflow_call:
   workflow_dispatch:
     inputs:
@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
-        python-version: [ '3.9', '3.10', '3.13' ]
+        python-version: [ '3.9', '3.10', '3.14' ]
         django-version:
           - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
@@ -34,9 +34,9 @@ jobs:
         exclude:
           - python-version: '3.9'
             django-version: '4.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '4.2'
-          - python-version: '3.13'
+          - python-version: '3.14'
             django-version: '3.2'
           - python-version: '3.10'
             django-version: '3.2'
@@ -57,6 +57,7 @@ jobs:
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
       
       - name: Install uv
         uses: astral-sh/setup-uv@v6
