@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.3.2 (2025-09-27)
+===================
+
+* Early support release for Django 6.0 (tested against 6.0a1)
+
 v3.3.1 (2025-09-22)
 ===================
 
