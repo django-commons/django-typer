@@ -204,6 +204,7 @@ docs = [
     "sphinx-tabs>=3.4.7",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-typer[png]>=0.5.1",
+    "cmarkgfm==2024.11.20" # TODO: remove after https://github.com/theacodes/cmarkgfm/issues/83
 ]
 profiling = [
     "tuna>=0.5.11",

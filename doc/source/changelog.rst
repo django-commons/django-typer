@@ -7,7 +7,7 @@ Change Log
 v3.4.0 (2025-10-20)
 ===================
 
-* Support Typer version >=0.20
+* `Support Typer version >=0.20 <https://github.com/django-commons/django-typer/issues/241>`_
 
 v3.3.2 (2025-09-27)
 ===================
