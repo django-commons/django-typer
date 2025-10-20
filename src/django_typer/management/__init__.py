@@ -952,6 +952,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # Rich settings
         rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
         rich_help_panel: t.Union[str, None] = Default(None),
+        suggest_commands: bool = True,
         pretty_exceptions_enable: bool = True,
         pretty_exceptions_show_locals: bool = False,
         pretty_exceptions_short: bool = True,
@@ -990,6 +991,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             add_completion=add_completion,
             rich_markup_mode=rich_markup_mode,
             rich_help_panel=rich_help_panel,
+            suggest_commands=suggest_commands,
             pretty_exceptions_enable=pretty_exceptions_enable,
             pretty_exceptions_show_locals=pretty_exceptions_show_locals,
             pretty_exceptions_short=pretty_exceptions_short,
@@ -2036,6 +2038,7 @@ class TyperCommandMeta(type):
         deprecated: bool = Default(False),
         rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
         rich_help_panel: t.Union[str, None] = Default(None),
+        suggest_commands: bool = True,
         pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
         pretty_exceptions_show_locals: t.Union[DefaultPlaceholder, bool] = Default(
             False
@@ -2107,6 +2110,7 @@ class TyperCommandMeta(type):
                 add_completion=False,  # see autocomplete command instead!
                 rich_markup_mode=rich_markup_mode,
                 rich_help_panel=rich_help_panel,
+                suggest_commands=suggest_commands,
                 pretty_exceptions_enable=pretty_exceptions_enable,
                 pretty_exceptions_show_locals=t.cast(
                     bool, pretty_exceptions_show_locals
