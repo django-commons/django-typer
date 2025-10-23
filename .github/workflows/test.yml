@@ -97,7 +97,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
       timeout-minutes: 60
@@ -162,7 +162,7 @@ jobs:
         allow-prereleases: true
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: install-vim-windows
@@ -226,7 +226,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -306,7 +306,7 @@ jobs:
             sudo apt install emacs
         - name: setup-ssh-debug
           if: ${{ github.event.inputs.debug == 'true' }}
-          uses: mxschmitt/action-tmate@v3.22
+          uses: mxschmitt/action-tmate@v3.23
           with:
             detached: true
         - name: Install uv
@@ -366,7 +366,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -429,7 +429,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -495,7 +495,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -567,7 +567,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -629,7 +629,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -698,7 +698,7 @@ jobs:
       uses: rhysd/action-setup-vim@v1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Add to Just to PATH
@@ -773,7 +773,7 @@ jobs:
       uses: rhysd/action-setup-vim@v1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Add to Just to PATH
@@ -834,7 +834,7 @@ jobs:
           sudo apt install emacs
       - name: setup-ssh-debug
         if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3.22
+        uses: mxschmitt/action-tmate@v3.23
         with:
           detached: true
       - uses: actions/checkout@v5
