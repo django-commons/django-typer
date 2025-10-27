@@ -854,7 +854,7 @@ jobs:
           just install
 
       - name: Get coverage files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: "*.coverage"
           merge-multiple: true
