@@ -55,12 +55,6 @@ from ..utils import (  # noqa: E402
     with_typehint,
 )
 
-if sys.version_info < (3, 10):
-    from typing_extensions import Concatenate, ParamSpec
-else:
-    from typing import Concatenate, ParamSpec
-
-
 DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
 
 
@@ -81,36 +75,14 @@ __all__ = [
     "get_command",
 ]
 
-P = ParamSpec("P")
-P2 = ParamSpec("P2")
+P = t.ParamSpec("P")
+P2 = t.ParamSpec("P2")
 R = t.TypeVar("R")
 R2 = t.TypeVar("R2")
 C = t.TypeVar("C", bound=BaseCommand)
 TC = t.TypeVar("TC", bound="TyperCommand")
 
 _CACHE_KEY = "_register_typer"
-
-
-if sys.version_info < (3, 10):
-    # todo - remove this when support for <3.10 is dropped
-    class static_factory(type):
-        def __call__(self, *args, **kwargs):
-            assert args
-            if type(args[0]).__name__ == "staticmethod":
-                return args[0]
-            return super().__call__(*args, **kwargs)
-
-    class staticmethod(t.Generic[P, R], metaclass=static_factory):
-        __func__: t.Callable[P, R]
-
-        def __init__(self, func: t.Callable[P, R]):
-            self.__func__ = func
-
-        def __getattr__(self, name):
-            return getattr(self.__func__, name)
-
-        def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-            return self.__func__(*args, **kwargs)
 
 
 @t.overload  # pragma: no cover
@@ -940,7 +912,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
         # Command
         context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        callback: t.Optional[t.Callable[Concatenate[TC, P], R]] = Default(None),
+        callback: t.Optional[t.Callable[t.Concatenate[TC, P], R]] = Default(None),
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
@@ -1246,7 +1218,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     ) -> t.Callable[
         [
             t.Callable[
-                Concatenate[TC, P2], R2  # pyright: ignore[reportInvalidTypeVarUse]
+                t.Concatenate[TC, P2], R2  # pyright: ignore[reportInvalidTypeVarUse]
             ]
         ],
         "Typer[P2, R2]",
@@ -1299,7 +1271,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         """
 
         def create_app(
-            func: t.Callable[Concatenate[TC, P2], R2],
+            func: t.Callable[t.Concatenate[TC, P2], R2],
         ) -> Typer[P2, R2]:
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
                 name=name or _strip_static(func).__name__.replace("_", "-"),
@@ -1697,7 +1669,7 @@ def group(
     rich_help_panel: t.Union[str, None] = Default(None),
     **kwargs: t.Any,
 ) -> t.Callable[
-    [t.Callable[Concatenate[TC, P], R]],  # pyright: ignore[reportInvalidTypeVarUse]
+    [t.Callable[t.Concatenate[TC, P], R]],  # pyright: ignore[reportInvalidTypeVarUse]
     Typer[P, R],
 ]:
     """
@@ -1766,7 +1738,7 @@ def group(
     """
 
     def create_app(
-        func: t.Callable[Concatenate[TC, P], R],
+        func: t.Callable[t.Concatenate[TC, P], R],
     ) -> Typer[P, R]:
         grp = Typer(
             name=name or _strip_static(func).__name__.replace("_", "-"),
@@ -2951,7 +2923,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     ) -> t.Callable[
         [
             t.Callable[
-                Concatenate[TC, P], R  # pyright: ignore[reportInvalidTypeVarUse]
+                t.Concatenate[TC, P], R  # pyright: ignore[reportInvalidTypeVarUse]
             ]
         ],
         Typer[P, R],
@@ -3023,7 +2995,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             )
 
         def create_app(
-            func: t.Callable[Concatenate[TC, P], R],
+            func: t.Callable[t.Concatenate[TC, P], R],
         ) -> Typer[P, R]:
             grp: Typer[P, R] = Typer(
                 name=name or func.__name__.replace("_", "-"),
