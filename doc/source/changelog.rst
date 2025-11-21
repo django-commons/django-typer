@@ -4,6 +4,12 @@
 Change Log
 ==========
 
+v3.5.0 (2025-11-21)
+===================
+
+* `Drop support for Django 3.2-4.1 <https://github.com/django-commons/django-typer/issues/248>`_
+* `Drop support for python 3.9 <https://github.com/django-commons/django-typer/issues/247>`_
+
 v3.4.0 (2025-10-20)
 ===================
 

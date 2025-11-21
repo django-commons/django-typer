@@ -33,50 +33,24 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
           - '4.2' # LTS April 2026
-          - '5.0' # April 2025
           - '5.1' # December 2025
           - '5.2' # April 2028
-          - '6.0a1' # prerelease
+          - '6.0rc1' # prerelease
         exclude:
-          - python-version: '3.9'
-            django-version: '5.0'
-          - python-version: '3.11'
-            django-version: '3.2'
-          - python-version: '3.12'
-            django-version: '3.2'
-          - python-version: '3.9'
-            django-version: '5.1'
-          - python-version: '3.13'
-            django-version: '3.2'
           - python-version: '3.13'
             django-version: '4.2'
-          - python-version: '3.13'
-            django-version: '5.0'
-          - python-version: '3.9'
-            django-version: '5.2'
-          - python-version: '3.14'
-            django-version: '3.2'
           - python-version: '3.14'
             django-version: '4.2'
-          - python-version: '3.14'
-            django-version: '5.0'
           - python-version: '3.14'
             django-version: '5.1'
 
-          - python-version: '3.9'
-            django-version: '6.0a1'
           - python-version: '3.10'
-            django-version: '6.0a1'
+            django-version: '6.0rc1'
           - python-version: '3.11'
-            django-version: '6.0a1'
-          - python-version: '3.12'
-            django-version: '6.0a1'
-          - python-version: '3.13'
-            django-version: '6.0a1'
+            django-version: '6.0rc1'
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -135,15 +109,26 @@ jobs:
         shell: pwsh
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-windows-dj${{ matrix.django-version }}.coverage
@@ -195,15 +180,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # LTS April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-macos-dj${{ matrix.django-version }}.coverage
@@ -336,15 +332,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -399,15 +406,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -464,15 +482,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: macos-zsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -536,15 +565,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: macos-bash-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -598,15 +638,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2028
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: macos-fish-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -668,15 +719,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2025
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: windows-powershell-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
@@ -743,15 +805,26 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.14']
+        python-version: ['3.10', '3.12', '3.14']
         django-version:
-          - '3.2' # LTS April 2024
-          - '5.2' # April 2025
+          - '4.2'    # LTS April 2024
+          - '5.2'    # April 2028
+          - '6.0rc1' # April 2027
         exclude:
-          - python-version: '3.9'
+          - python-version: '3.12'
+            django-version: '4.2'
+          - python-version: '3.14'
+            django-version: '4.2'
+
+          - python-version: '3.10'
             django-version: '5.2'
           - python-version: '3.14'
-            django-version: '3.2'
+            django-version: '5.2'
+
+          - python-version: '3.10'
+            django-version: '6.0rc1'
+          - python-version: '3.12'
+            django-version: '6.0rc1'
 
     env:
       COVERAGE_FILE: windows-pwsh-py${{ matrix.python-version }}-dj${{ matrix.django-version }}.coverage
