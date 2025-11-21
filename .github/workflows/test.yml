@@ -162,7 +162,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -235,7 +239,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -314,7 +322,11 @@ jobs:
         - name: Install Dependencies
           run: |
             just setup ${{ steps.sp.outputs.python-path }}
-            just test-lock Django~=${{ matrix.django-version }}.0
+            if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+              just test-lock Django==${{ matrix.django-version }}
+            else
+              just test-lock Django~=${{ matrix.django-version }}.0
+            fi
             just install-psycopg3
         - name: Run Unit Tests
           run: |
@@ -385,7 +397,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Test Tab Completion
       run: |
         just test ./tests/verify_environment.py
@@ -459,7 +475,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -546,7 +566,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
@@ -620,7 +644,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Run Unit Tests
       run: |
         just test ./tests/verify_environment.py
@@ -700,7 +728,11 @@ jobs:
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
@@ -776,7 +808,11 @@ jobs:
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
         just install
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
@@ -862,7 +898,11 @@ jobs:
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
         just install
-        just test-lock Django~=${{ matrix.django-version }}.0
+        if [[ "${{ matrix.django-version }}" =~ (a|b|rc) ]]; then
+          just test-lock Django==${{ matrix.django-version }}
+        else
+          just test-lock Django~=${{ matrix.django-version }}.0
+        fi
       shell: pwsh
     - name: Run Powershell Tab Completion Tests
       run: |
