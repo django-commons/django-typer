@@ -19,7 +19,9 @@ on:
         default: false
         type: boolean
   schedule:
-    - cron: '0 13 * * SUN'  # Runs at 6 am pacific every sunday
+    # Every Sunday at 9:00 AM Los Angeles time.
+    # GitHub cron is UTC; 09:00 PT == 17:00 UTC (PST).
+    - cron: '0 17 * * 0'
 
 env:
   ENABLE_CI_ONLY_TESTS: "1"
@@ -79,6 +81,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
@@ -157,6 +162,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
@@ -233,6 +241,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       run: |
         brew install just
@@ -317,6 +328,9 @@ jobs:
           uses: astral-sh/setup-uv@v7
           with:
             enable-cache: true
+        - name: Upgrade all dependencies for our weekly runs
+          if: github.event_name == 'schedule'
+          run: uv lock --upgrade
         - name: Setup Just
           uses: extractions/setup-just@v3
         - name: Install Dependencies
@@ -392,6 +406,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
@@ -470,6 +487,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
@@ -551,6 +571,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       run: |
         brew install just
@@ -638,6 +661,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       run: |
         brew install just
@@ -715,6 +741,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       run: |
         brew install just
@@ -802,6 +831,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
@@ -892,6 +924,9 @@ jobs:
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+    - name: Upgrade all dependencies for our weekly runs
+      if: github.event_name == 'schedule'
+      run: uv lock --upgrade
     - name: Setup Just
       uses: extractions/setup-just@v3
     - name: Install Dependencies
