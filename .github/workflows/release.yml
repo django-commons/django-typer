@@ -39,7 +39,7 @@ jobs:
       PACKAGE_NAME: ${{ steps.set-package.outputs.package_name }}
       RELEASE_VERSION: ${{ steps.set-package.outputs.release_version }}
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python
@@ -72,7 +72,7 @@ jobs:
     - name: Build the binary wheel and a source tarball
       run: just build
     - name: Store the distribution packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: python-package-distributions
         path: dist/
@@ -97,7 +97,7 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: python-package-distributions
         path: dist/
@@ -117,7 +117,7 @@ jobs:
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: python-package-distributions
         path: dist/
@@ -162,7 +162,7 @@ jobs:
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: python-package-distributions
         path: dist/

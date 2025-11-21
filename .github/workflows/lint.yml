@@ -51,7 +51,7 @@ jobs:
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
@@ -78,7 +78,7 @@ jobs:
           sudo apt install emacs
       - name: Setup tmate session
         if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3.22
+        uses: mxschmitt/action-tmate@v3.23
         with:
           detached: true
         timeout-minutes: 60

@@ -56,7 +56,7 @@ jobs:
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -71,7 +71,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
       timeout-minutes: 60
@@ -95,7 +95,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -136,7 +136,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
       WINPTY_ROOT: ${{ github.workspace }}\winpty-msvc
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -147,7 +147,7 @@ jobs:
         allow-prereleases: true
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: install-vim-windows
@@ -169,7 +169,7 @@ jobs:
         just test-all
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -207,7 +207,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -222,7 +222,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -241,7 +241,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -287,7 +287,7 @@ jobs:
             - 5432:5432
 
       steps:
-        - uses: actions/checkout@v5
+        - uses: actions/checkout@v6
           with:
             persist-credentials: false
         - name: Set up Python ${{ matrix.python-version }}
@@ -302,7 +302,7 @@ jobs:
             sudo apt install emacs
         - name: setup-ssh-debug
           if: ${{ github.event.inputs.debug == 'true' }}
-          uses: mxschmitt/action-tmate@v3.22
+          uses: mxschmitt/action-tmate@v3.23
           with:
             detached: true
         - name: Install uv
@@ -321,7 +321,7 @@ jobs:
             just test ./tests/verify_environment.py
             just test-all --group psycopg3
         - name: Store coverage files
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           with:
             name: ${{ env.COVERAGE_FILE }}
             path: ${{ env.COVERAGE_FILE }}
@@ -358,7 +358,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -373,7 +373,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -395,7 +395,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -432,7 +432,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -447,7 +447,7 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -471,7 +471,7 @@ jobs:
       shell: fish {0}
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -509,7 +509,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -524,7 +524,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -554,7 +554,7 @@ jobs:
         just test-zsh || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -592,7 +592,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -607,7 +607,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -627,7 +627,7 @@ jobs:
         just test-bash || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -665,7 +665,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -680,7 +680,7 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Install uv
@@ -708,7 +708,7 @@ jobs:
         just test-fish || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -746,7 +746,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -760,7 +760,7 @@ jobs:
       uses: rhysd/action-setup-vim@v1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Add to Just to PATH
@@ -794,7 +794,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -832,7 +832,7 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -846,7 +846,7 @@ jobs:
       uses: rhysd/action-setup-vim@v1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.22
+      uses: mxschmitt/action-tmate@v3.23
       with:
         detached: true
     - name: Add to Just to PATH
@@ -880,7 +880,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -907,10 +907,10 @@ jobs:
           sudo apt install emacs
       - name: setup-ssh-debug
         if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3.22
+        uses: mxschmitt/action-tmate@v3.23
         with:
           detached: true
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -927,7 +927,7 @@ jobs:
           just install
 
       - name: Get coverage files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: "*.coverage"
           merge-multiple: true
