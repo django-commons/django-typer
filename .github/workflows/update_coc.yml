@@ -43,7 +43,7 @@ jobs:
       # Create a pull request to merge the changes into the main branch
       - name: Create Pull Request
         if: steps.check_changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
             branch: bot-update-coc
