@@ -39,7 +39,7 @@ jobs:
           zizmor --format sarif .github/workflows/ > results.sarif
 
       - name: Upload analysis results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: zizmor-results
           path: results.sarif
