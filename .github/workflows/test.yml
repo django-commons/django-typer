@@ -100,7 +100,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -183,7 +183,7 @@ jobs:
         just test-all
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -262,7 +262,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -349,7 +349,7 @@ jobs:
             just test ./tests/verify_environment.py
             just test-all --group psycopg3
         - name: Store coverage files
-          uses: actions/upload-artifact@v5
+          uses: actions/upload-artifact@v6
           with:
             name: ${{ env.COVERAGE_FILE }}
             path: ${{ env.COVERAGE_FILE }}
@@ -430,7 +430,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -513,7 +513,7 @@ jobs:
       shell: fish {0}
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -603,7 +603,7 @@ jobs:
         just test-zsh || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -683,7 +683,7 @@ jobs:
         just test-bash || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -771,7 +771,7 @@ jobs:
         just test-fish || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -866,7 +866,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -961,7 +961,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
