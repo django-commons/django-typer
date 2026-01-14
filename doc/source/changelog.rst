@@ -4,6 +4,14 @@
 Change Log
 ==========
 
+v3.5.1 (2026-01-13)
+===================
+
+* Support typer-slim 0.21
+* Fixed `options_metavar interface change causes regression <https://github.com/django-commons/django-typer/issues/254>`_
+
+  - ``options_metavar`` parameters now apply correctly
+
 v3.5.0 (2025-11-21)
 ===================
 

@@ -237,3 +237,99 @@ class BasicTests(TestCase):
         else:
             cmd_idx = hlp.index("Commands")
             self.assertTrue(hlp.index(" z", cmd_idx) < hlp.index(" y", cmd_idx))
+
+    def test_cmd_metavar(self):
+        """
+        Test that metavar inheritance and overrides work as expected.
+        """
+        from tests.apps.test_app.management.commands.metavar import (
+            Command as MetavarCommand,
+        )
+
+        buffer = StringIO()
+        for cmd_name in [
+            "metavar",
+            "metavar2",
+        ]:
+            cmd = get_command(cmd_name, MetavarCommand, stdout=buffer, no_color=True)
+
+            cmd.print_help("./manage.py", cmd_name)
+            self.assertIn("[CLASS OPTS]", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "cmd")
+            self.assertIn("<CMD OPTS>", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "grp")
+            self.assertIn("(GRP OPTS)", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "grp", "grp-cmd")
+            self.assertIn("<<GRP CMD OPTS>>", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "grp", "subgrp")
+            self.assertIn("(GRP OPTS)", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "grp", "subgrp", "subgrp-cmd")
+            self.assertIn("(GRP OPTS)", buffer.getvalue())
+
+            buffer.seek(0)
+            buffer.truncate()
+
+            cmd.print_help("./manage.py", cmd_name, "grp", "subgrp", "subgrp-cmd2")
+            self.assertIn("(SUBGRP CMD2 OPTS)", buffer.getvalue())
+
+        metavar_init1 = get_command(
+            "metavar_init", TyperCommand, stdout=buffer, no_color=True
+        )
+        metavar_init1.print_help("./manage.py", "metavar_init")
+        self.assertIn("[OPTIONS]", buffer.getvalue())
+        buffer.seek(0)
+        buffer.truncate()
+        metavar_init2 = get_command(
+            "metavar_init2", TyperCommand, stdout=buffer, no_color=True
+        )
+        metavar_init2.print_help("./manage.py", "metavar_init2")
+        self.assertIn("{INIT OPTS}", buffer.getvalue())
+        buffer.seek(0)
+        buffer.truncate()
+        metavar_init3 = get_command(
+            "metavar_init3", TyperCommand, stdout=buffer, no_color=True
+        )
+        metavar_init3.print_help("./manage.py", "metavar_init3")
+        self.assertIn("[CLASS OPTS]", buffer.getvalue())
+
+        metavar3 = get_command("metavar3", MetavarCommand, stdout=buffer, no_color=True)
+        metavar3.print_help("./manage.py", "metavar3")
+        self.assertIn("{INIT OVERRIDE}", buffer.getvalue())
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        metavar3.print_help("./manage.py", "metavar3", "cmd")
+        self.assertIn("(CMD OVERRIDE)", buffer.getvalue())
+
+        buffer.seek(0)
+        buffer.truncate()
+
+        metavar3.print_help("./manage.py", "metavar3", "grp")
+        self.assertIn("[GRP OVERRIDE]", buffer.getvalue())
+        buffer.seek(0)
+        buffer.truncate()
+
+        metavar4 = get_command("metavar4", MetavarCommand, stdout=buffer, no_color=True)
+        metavar4.print_help("./manage.py", "metavar4")
+        self.assertIn("{SUBCLASS OPTS}", buffer.getvalue())
