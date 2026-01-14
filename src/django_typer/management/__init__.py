@@ -922,7 +922,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         deprecated: bool = Default(False),
         add_completion: bool = True,
         # Rich settings
-        rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
+        rich_markup_mode: typer.core.MarkupMode = DEFAULT_MARKUP_MODE,
         rich_help_panel: t.Union[str, None] = Default(None),
         suggest_commands: bool = True,
         pretty_exceptions_enable: bool = True,
@@ -997,7 +997,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: str = Default("[OPTIONS]"),
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
@@ -1031,7 +1031,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 help=t.cast(str, help),
                 epilog=epilog,
                 short_help=t.cast(str, short_help),
-                options_metavar=options_metavar,
+                options_metavar=(
+                    options_metavar or self._info_val_str("options_metavar")
+                ),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -1053,7 +1055,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
         short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: str = "[OPTIONS]",
+        options_metavar: t.Optional[str] = None,
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
@@ -1148,7 +1150,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: str = Default("[OPTIONS]"),
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
@@ -1208,7 +1210,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: str = Default("[OPTIONS]"),
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
@@ -1269,6 +1271,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
+        options_metavar = options_metavar or self._info_val_str("options_metavar")
 
         def create_app(
             func: t.Callable[t.Concatenate[TC, P2], R2],
@@ -1295,7 +1298,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 **kwargs,
             )
             self.add_typer(
-                grp, name=name or _strip_static(func).__name__.replace("_", "-")
+                grp,
+                name=name or _strip_static(func).__name__.replace("_", "-"),
+                options_metavar=options_metavar,
             )
             return grp
 
@@ -1375,7 +1380,7 @@ def initialize(
     help: t.Optional[t.Union[str, Promise]] = Default(None),
     epilog: t.Optional[str] = Default(None),
     short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-    options_metavar: str = Default("[OPTIONS]"),
+    options_metavar: t.Optional[str] = Default(None),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
     deprecated: bool = Default(False),
@@ -1559,7 +1564,7 @@ def command(
     help: t.Optional[t.Union[str, Promise]] = None,
     epilog: t.Optional[str] = None,
     short_help: t.Optional[t.Union[str, Promise]] = None,
-    options_metavar: str = "[OPTIONS]",
+    options_metavar: t.Optional[str] = None,
     add_help_option: bool = True,
     no_args_is_help: bool = False,
     hidden: bool = False,
@@ -2008,7 +2013,7 @@ class TyperCommandMeta(type):
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
-        rich_markup_mode: typer.core.MarkupMode = Default(DEFAULT_MARKUP_MODE),
+        rich_markup_mode: typer.core.MarkupMode = DEFAULT_MARKUP_MODE,
         rich_help_panel: t.Union[str, None] = Default(None),
         suggest_commands: bool = True,
         pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
@@ -2045,12 +2050,17 @@ class TyperCommandMeta(type):
                 )
 
             attr_help = attrs.get("help", Default(None))
-            if not help:
-                for base in [base for base in bases if issubclass(base, TyperCommand)]:
-                    if isinstance(help, DefaultPlaceholder):
-                        help = base._help_kwarg  # type: ignore[unreachable]
-                    if isinstance(attr_help, DefaultPlaceholder):
-                        attr_help = base.help
+            for base in [
+                base
+                for base in bases
+                if issubclass(base, TyperCommand) and base is not TyperCommand
+            ]:
+                if isinstance(help, DefaultPlaceholder):
+                    help = base._help_kwarg  # type: ignore[unreachable]
+                if isinstance(attr_help, DefaultPlaceholder):
+                    attr_help = base.help
+                if isinstance(options_metavar, DefaultPlaceholder):
+                    options_metavar = base.typer_app.info.options_metavar
 
             def command_bases() -> t.Generator[t.Type[TyperCommand], None, None]:
                 # the mro is not yet resolved so we have to do it manually
@@ -2137,7 +2147,11 @@ class TyperCommandMeta(type):
                 if grp.top_level:
                     cpy = deepcopy(grp)
                     cpy.parent = typer_app
-                    typer_app.add_typer(cpy, name=cpy.info.name)
+                    typer_app.add_typer(
+                        cpy,
+                        name=cpy.info.name,
+                        options_metavar=cpy.info.options_metavar or options_metavar,
+                    )
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
@@ -2678,7 +2692,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: str = Default("[OPTIONS]"),
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
@@ -2814,7 +2828,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
         short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: str = "[OPTIONS]",
+        options_metavar: t.Optional[str] = None,
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
@@ -2913,7 +2927,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         help: t.Optional[t.Union[str, Promise]] = Default(None),
         epilog: t.Optional[str] = Default(None),
         short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: str = Default("[OPTIONS]"),
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
@@ -2973,6 +2987,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
+        options_metavar = options_metavar or cmd.typer_app._info_val_str(
+            "options_metavar"
+        )
         if called_from_command_definition():
             return group(
                 name=name,
@@ -3018,7 +3035,11 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 parent=None,
                 **kwargs,
             )
-            cmd.typer_app.add_typer(grp, name=name or func.__name__.replace("_", "-"))
+            cmd.typer_app.add_typer(
+                grp,
+                name=name or func.__name__.replace("_", "-"),
+                options_metavar=options_metavar,
+            )
             return grp
 
         return create_app

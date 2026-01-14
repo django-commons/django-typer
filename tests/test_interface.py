@@ -124,6 +124,9 @@ class InterfaceTests(TestCase):
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
         typer_params.remove("callback")
 
+        command_params.remove("options_metavar")
+        typer_params.remove("options_metavar")
+
         self.assertFalse(command_params.symmetric_difference(typer_params))
         self.assertEqual(
             self.compare_defaults(command_params, group, typer.Typer.add_typer),
