@@ -5,7 +5,7 @@ command is also the entry point for running the completion logic and can be used
 debug completer code.
 
 .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app
-    :prog: manage.py shellcompletion
+    :prog: django-admin shellcompletion
     :width: 80
     :convert-png: latex
 
@@ -342,6 +342,7 @@ class Command(TyperCommand):
         We run the upstream typer installation routines, with some augmentation.
 
         .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:install
+            :prog: django-admin shellcompletion install
             :width: 85
             :convert-png: latex
 
@@ -415,7 +416,7 @@ class Command(TyperCommand):
         where the completion script is installed and then we remove it.
 
         .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:uninstall
-            :prog: shellcompletion
+            :prog: django-admin shellcompletion uninstall
             :width: 80
             :convert-png: latex
 
@@ -479,7 +480,7 @@ class Command(TyperCommand):
                 $ ./manage.py shellcompletion complete "./manage.py your_command --option "
 
         .. typer:: django_typer.management.commands.shellcompletion.Command:typer_app:complete
-            :prog: shellcompletion
+            :prog: django-admin shellcompletion complete
             :width: 80
             :convert-png: latex
         """
