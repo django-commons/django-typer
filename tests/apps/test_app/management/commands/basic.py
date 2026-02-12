@@ -1,9 +1,10 @@
 import json
 
 from django_typer.management import TyperCommand
+from django_typer.utils import rich_installed
 
 
-class Command(TyperCommand):
+class Command(TyperCommand, rich_markup_mode="rich" if rich_installed else None):
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
         assert self.__class__ is Command
         opts = {"arg1": arg1, "arg2": arg2, "arg3": arg3, "arg4": arg4}

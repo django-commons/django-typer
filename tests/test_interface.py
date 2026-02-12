@@ -37,7 +37,11 @@ class InterfaceTests(TestCase):
         for param in params:
             dt_default = dt_defaults[param]
             ty_default = typer_defaults[param]
-            err_msg = f"param {param} does not mnatch between {dt_function}::{dt_default} and {typer_function}::{ty_default}"
+            if param == "rich_markup_mode":
+                from typer.core import DEFAULT_MARKUP_MODE
+
+                ty_default = DEFAULT_MARKUP_MODE
+            err_msg = f"param {param} does not match between {dt_function}::{dt_default} and {typer_function}::{ty_default}"
             if isinstance(dt_default, typer.models.DefaultPlaceholder):
                 if require_placeholder_match:
                     self.assertIsInstance(

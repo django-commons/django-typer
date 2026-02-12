@@ -217,11 +217,11 @@ check: install-docs check-lint check-format check-types check-package check-docs
 
 # run the tests that require rich not to be installed
 test-no-rich *ENV:
-    uv run {{ ENV }} --no-extra rich --exact pytest --cov-append -m no_rich
+    uv run {{ ENV }} --exact pytest --cov-append -m no_rich
 
 # run the tests that require rich to be installed
 test-rich *ENV:
-    uv run {{ ENV }} --extra rich --exact pytest --cov-append -m rich
+    uv run {{ ENV }} --exact pytest --cov-append -m rich
 
 # run all tests
 test-all *ENV: coverage-erase
@@ -265,7 +265,7 @@ test-bash:
     uv sync --all-extras
     source .venv/bin/activate
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_bash tests/test_parser_completers.py tests/shellcompletion/test_bash.py || exit
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     source .venv/bin/activate
     pytest --cov-append tests/shellcompletion/test_bash.py::BashExeTests::test_prompt_install || exit
 
@@ -275,18 +275,18 @@ test-zsh:
     uv sync --all-extras
     source .venv/bin/activate
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_zsh tests/test_parser_completers.py tests/shellcompletion/test_zsh.py || exit
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     source .venv/bin/activate
     pytest --cov-append tests/shellcompletion/test_zsh.py::ZshExeTests::test_prompt_install || exit
 
 # test powershell shell completions
 [script("powershell")]
 test-powershell:
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     . .venv/Scripts/activate.ps1
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell tests/test_parser_completers.py tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PowerShellTests tests/shellcompletion/test_powershell.py::PowerShellExeTests
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     . .venv/Scripts/activate.ps1
     pytest --cov-append tests/shellcompletion/test_powershell.py::PowerShellExeTests::test_prompt_install
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -298,7 +298,7 @@ test-pwsh:
     . .venv/Scripts/activate.ps1
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh tests/test_parser_completers.py tests/shellcompletion/test_powershell.py::PWSHTests tests/shellcompletion/test_powershell.py::PWSHExeTests
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     . .venv/Scripts/activate.ps1
     pytest --cov-append tests/shellcompletion/test_powershell.py::PWSHExeTests::test_prompt_install
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -309,7 +309,7 @@ test-fish:
     uv sync --all-extras
     source .venv/bin/activate.fish
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py || exit
-    uv sync --no-extra rich
+    uv sync # --no-extra rich
     source .venv/bin/activate.fish
     pytest --cov-append tests/shellcompletion/test_fish.py::FishExeShellTests::test_prompt_install || exit
 
@@ -341,8 +341,7 @@ translate: install-translate
 
 # generate and document benchmarks
 benchmark:
-    @just run --no-dev --no-extra rich --exact ./profiling/profile.py generate
-    @just run --no-dev --extra rich --exact ./profiling/profile.py generate
+    @just run --no-dev --exact ./profiling/profile.py generate
     @just run --group profiling ./profiling/profile.py document
 
 # validate the given version string against the lib version

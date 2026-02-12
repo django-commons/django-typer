@@ -30,7 +30,7 @@ import typing as t
 
 import click
 
-from django_typer.utils import get_current_command
+from django_typer.utils import get_current_command, rich_installed
 
 PATCH_APPLIED = False
 
@@ -60,7 +60,7 @@ def apply() -> None:
     except ImportError:
         pass
 
-    try:
+    if rich_installed:
         from rich.console import Console  # pyright: ignore[reportMissingImports]
 
         # this has to go here before rich Consoles are instantiated by Typer
@@ -117,8 +117,6 @@ def apply() -> None:
             return console
 
         rich_utils._get_rich_console = get_console
-    except ImportError:
-        pass
 
     # this is a patch to fix lazy translation failure in some circumstances
     # when Argument helps are gettext_lazy proxies. This is I think actually

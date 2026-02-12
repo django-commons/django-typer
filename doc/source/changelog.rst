@@ -4,6 +4,32 @@
 Change Log
 ==========
 
+v3.6.0 (2026-02-12)
+===================
+
+* `Support typer 0.22.0. <https://github.com/django-commons/django-typer/pull/259>`_
+
+  * :pypi:`typer-slim` has been `made an alias for typer <https://github.com/fastapi/typer/pull/1522>`_. This means rich is installed
+    automatically now.
+  * If you want to disable rich:
+
+    1. **At runtime**: you can set the environment variable ``TYPER_USE_RICH`` to ``0`` or
+       ``false``.
+    2. **In code (for all invocations)**: you can set the class variable ``rich_markup_mode`` to
+       ``None`` on your command class or any parent group. This will disable rich for that command
+       and all subcommands.
+
+* You may also run into an `error like this <https://github.com/fastapi/typer/issues/1537>`_:
+
+  .. code-block:: console
+
+    Traceback (most recent call last):
+      File "/home/user/code/myproject/main.py", line 1, in <module>
+        import typer
+    ModuleNotFoundError: No module named 'typer'
+
+  If this happens just reinstall your virtual environment.
+
 v3.5.1 (2026-01-13)
 ===================
 
