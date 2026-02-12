@@ -33,10 +33,13 @@ __all__ = [
     "duration_iso_string",
     "parse_iso_duration",
     "model_parser_completer",
+    "rich_installed",
 ]
 
 
-rich_installed = find_spec("rich") is not None
+rich_installed = find_spec("rich") is not None and os.environ.get(
+    "TYPER_USE_RICH", "true"
+).lower() not in {"0", "false"}
 
 
 def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:

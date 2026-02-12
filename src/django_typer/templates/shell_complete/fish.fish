@@ -29,7 +29,7 @@ function __fish_{{prog_name}}_complete
         set completeCmd $completeCmd $pythonPathOption
     end
 
-    set results ({{ manage_script_name }} $completeCmd)
+    set results (env TYPER_USE_RICH=0 {{ manage_script_name }} $completeCmd)
 
     for completion in $results;
         set -l metadata (string split "," $completion);

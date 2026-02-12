@@ -55,6 +55,17 @@ from ..utils import (  # noqa: E402
     with_typehint,
 )
 
+if not rich_installed:
+    # TODO - remove this - monkeypatch needed to get around upstream bug
+    # https://github.com/fastapi/typer/pull/1539
+    from typer import core, main
+
+    core.HAS_RICH = False
+    core.DEFAULT_MARKUP_MODE = None
+    main.HAS_RICH = False  # pyright: ignore[reportPrivateImportUsage]
+    main.DEFAULT_MARKUP_MODE = None  # pyright: ignore[reportPrivateImportUsage]
+
+
 DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
 
 
@@ -1007,6 +1018,8 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     ) -> t.Callable[
         [typer.models.CommandFunctionType], typer.models.CommandFunctionType
     ]:
+        """"""
+
         def make_callback(
             func: typer.models.CommandFunctionType,
         ) -> typer.models.CommandFunctionType:
@@ -1055,7 +1068,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
         short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: t.Optional[str] = None,
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
@@ -1153,11 +1166,12 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
-        deprecated: bool = Default(False),
+        deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,
     ) -> None:
+        """ """
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
 
@@ -1213,7 +1227,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
-        deprecated: bool = Default(False),
+        deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,
@@ -1564,7 +1578,7 @@ def command(
     help: t.Optional[t.Union[str, Promise]] = None,
     epilog: t.Optional[str] = None,
     short_help: t.Optional[t.Union[str, Promise]] = None,
-    options_metavar: t.Optional[str] = None,
+    options_metavar: t.Optional[str] = Default(None),
     add_help_option: bool = True,
     no_args_is_help: bool = False,
     hidden: bool = False,
@@ -1669,7 +1683,7 @@ def group(
     options_metavar: str = Default("[OPTIONS]"),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
-    deprecated: bool = Default(False),
+    deprecated: bool = False,
     # Rich settings
     rich_help_panel: t.Union[str, None] = Default(None),
     **kwargs: t.Any,
@@ -2828,7 +2842,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         help: t.Optional[t.Union[str, Promise]] = None,
         epilog: t.Optional[str] = None,
         short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: t.Optional[str] = None,
+        options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
@@ -2930,7 +2944,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         options_metavar: t.Optional[str] = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
-        deprecated: bool = Default(False),
+        deprecated: bool = False,
         # Rich settings
         rich_help_panel: t.Union[str, None] = Default(None),
         **kwargs: t.Any,

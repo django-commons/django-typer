@@ -5,7 +5,9 @@ Test options metavar propagation and overrides
 from django_typer.management import TyperCommand, command, group
 
 
-class Command(TyperCommand, options_metavar="[CLASS OPTS]"):  # <-- default
+class Command(
+    TyperCommand, options_metavar="[CLASS OPTS]", rich_markup_mode=None
+):  # <-- default
     # @initialize(options_metavar="{INIT OPTS}")  # <-- override
     # def init(self):
     #     print("init")

@@ -39,7 +39,9 @@
       esac
     done
 
-    response=("${(@f)$("${manage}" {{ django_command }} --shell zsh ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} {{ color }} complete {{ fallback }} "${words[*]}" "$CURSOR")}")
+    response=("${(@f)$(TYPER_USE_RICH=0 "${manage}" {{ django_command }} --shell zsh \
+        ${settings_option:+${settings_option}} ${pythonpath_option:+${pythonpath_option}} \
+        {{ color }} complete {{ fallback }} "${words[*]}" "$CURSOR")}")
 
     for type key descr in ${response}; do
         if [[ "$type" == "dir" ]]; then

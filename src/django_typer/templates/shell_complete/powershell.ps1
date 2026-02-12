@@ -26,7 +26,15 @@ $scriptblock = {
     @("--shell", "pwsh", "complete", "{{ fallback }}", $commandText, $cursorPosition) |
     Where-Object { $_ }
 
-    $results = & {{ manage_script_name }} @arguments 2>&1
+    $old = $env:TYPER_USE_RICH
+    $had = Test-Path Env:\TYPER_USE_RICH
+    $env:TYPER_USE_RICH = '0'
+    try {
+        $results = & {{ manage_script_name }} @arguments 2>&1
+    }
+    finally {
+        if ($had) { $env:TYPER_USE_RICH = $old } else { Remove-Item Env:\TYPER_USE_RICH -ErrorAction SilentlyContinue }
+    }
 
     if ($results.Count -eq 0) {
         # avoid default path completion

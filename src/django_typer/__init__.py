@@ -40,10 +40,10 @@ used directly to achieve this. We rely on robust CI to catch breaking changes up
 and keep a tight version lock on Typer.
 """
 
-VERSION = (3, 5, 1)
+VERSION = (3, 6, 0)
 
 __title__ = "Django Typer"
 __version__ = ".".join(str(i) for i in VERSION)
 __author__ = "Brian Kohan"
 __license__ = "MIT"
-__copyright__ = "Copyright 2023-2025 Brian Kohan"
+__copyright__ = "Copyright 2023-2026 Brian Kohan"

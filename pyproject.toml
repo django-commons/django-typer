@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.5.1"
+version = "3.6.0"
 requires-python = ">=3.10,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -22,8 +22,7 @@ dependencies = [
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer
     # version very strictly to bug fix releases for specific minor lines.
-    "typer>=0.20.1,<0.22.0",
-    "shellingham>=1.5.4,<2.0",
+    "typer>=0.22.0,<0.23.0",
     # we need this on 3.9 for ParamSpec
     "typing-extensions>=3.7.4.3; python_version < '3.10'",
 ]
@@ -34,7 +33,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Development Status :: 5 - Production/Stable",
     "Framework :: Django :: 4.2",
-    "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
@@ -57,11 +55,6 @@ package = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/django_typer"]
-
-[project.optional-dependencies]
-# this should track typer's rich dependency, so long as our console
-# patches still work - so be sure to test on the low end of the range
-rich = ["rich>=10.11.0,<15.0.0"]
 
 [project.urls]
 "Homepage" = "https://django-typer.readthedocs.io"
@@ -95,7 +88,7 @@ warn_no_return = true
 mypy_path = "src"
 modules = "django_typer"
 
-# todo doc8 configuration here is not being picked up and doesnt seem to be working
+# todo doc8 configuration here is not being picked up and doesn't seem to be working
 # as expected - for now pass these parameters manually
 [tool.doc8]
 max-line-length = 100
@@ -113,8 +106,8 @@ norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__ shellcompleti
 env = [
     "TERMINAL_WIDTH=80",
 ]
-
 addopts = [
+  "-p tests.toggle_rich",
   "--strict-markers",
   "--cov=django_typer",
   "--cov-branch",
@@ -159,6 +152,7 @@ exclude = [
     "dist",
     "examples"
 ]
+target-version = "py310"
 
 [tool.ruff.lint]
 exclude = [
@@ -185,7 +179,7 @@ dev = [
     "pytest-django>=4.10.0",
     "pytest-env>=1.1.5",
     "pytest-timeout>=2.3.1",
-    "ruff>=0.9.10",
+    "ruff>=0.15.0",
     "pywinpty>=3.0.0; sys_platform == 'win32'",
     "maturin>=1.9.4; sys_platform == 'win32'",
     "tomlkit>=0.13.2",
@@ -198,8 +192,7 @@ docs = [
     "sphinx-autobuild>=2024.10.3",
     "sphinx-tabs>=3.4.7",
     "sphinxcontrib-django>=2.5",
-    "sphinxcontrib-typer[png]>=0.5.1",
-    "cmarkgfm==2024.11.20" # TODO: remove after https://github.com/theacodes/cmarkgfm/issues/83
+    "sphinxcontrib-typer[png]>=0.8.0"
 ]
 profiling = [
     "tuna>=0.5.11",
