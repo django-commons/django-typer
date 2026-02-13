@@ -22,7 +22,7 @@ dependencies = [
     # typer's release history is full of breaking changes for minor versions
     # given the reliance on some of its private internals we peg the typer
     # version very strictly to bug fix releases for specific minor lines.
-    "typer>=0.22.0,<0.23.1",
+    "typer>=0.23.1,<0.24.0",
     # we need this on 3.9 for ParamSpec
     "typing-extensions>=3.7.4.3; python_version < '3.10'",
 ]
