@@ -165,4 +165,4 @@ django_typer/tests/dj_params.json
 .ruff_cache
 **/tests/*.json
 **/tests/apps/util/*.key
-
+uv.lock

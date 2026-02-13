@@ -9,13 +9,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-    commit-message:
-      prefix: ⬆
-  # Python
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    commit-message:
-      prefix: ⬆
+      interval: "monthly"
+
+    groups:
+      gha-updates:
+        patterns:
+          - "*"
