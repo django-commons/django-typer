@@ -55,17 +55,6 @@ from ..utils import (  # noqa: E402
     with_typehint,
 )
 
-if not rich_installed:
-    # TODO - remove this - monkeypatch needed to get around upstream bug
-    # https://github.com/fastapi/typer/pull/1539
-    from typer import core, main
-
-    core.HAS_RICH = False
-    core.DEFAULT_MARKUP_MODE = None
-    main.HAS_RICH = False  # pyright: ignore[reportPrivateImportUsage]
-    main.DEFAULT_MARKUP_MODE = None  # pyright: ignore[reportPrivateImportUsage]
-
-
 DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
 
 
