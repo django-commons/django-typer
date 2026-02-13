@@ -140,6 +140,10 @@ source = [
     "src/django_typer"
 ]
 
+[tool.django-stubs]
+django_settings_module = "tests.settings.base"
+
+
 [tool.pyright]
 exclude = ["tests/**/*"]
 include = [
@@ -196,7 +200,9 @@ lint = [
 precommit = [
     "pre-commit>=3.5.0",
 ]
-coverage = ["coverage>=7.6.1"]
+coverage = [
+    "coverage[toml]>=7.6.1"
+]
 test = [
     { include-group = "coverage" },
     "playwright>=1.58.0",
