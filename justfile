@@ -324,8 +324,8 @@ test-rich *ENV:
 test-all *ENV: coverage-erase
     @just test-rich {{ ENV }}
     @just test-no-rich {{ ENV }}
-    uv run --no-default-groups --exact --all-extras --group test --group colorama --isolated pytest --cov-append -m "not rich and not no_rich"
-    uv run --no-default-groups --exact --all-extras --group test --no-group colorama --isolated pytest --cov-append -k test_ctor_params
+    uv run --no-default-groups --exact --all-extras --group test --group colorama --isolated {{ ENV }}pytest --cov-append -m "not rich and not no_rich"
+    uv run --no-default-groups --exact --all-extras --group test --no-group colorama --isolated {{ ENV }} pytest --cov-append -k test_ctor_params
 
 # debug an test
 debug-test *TESTS:

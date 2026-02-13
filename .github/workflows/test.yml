@@ -174,10 +174,10 @@ jobs:
       run: |
         just setup "$PYTHON_PATH"
 
-        if ($DJANGO_VERSION -match "(a|b|rc)") {
-          just test-lock "Django==$DJANGO_VERSION"
+        if ($env:DJANGO_VERSION -match "(a|b|rc)") {
+          just test-lock "Django==$env:DJANGO_VERSION"
         } else {
-          just test-lock "Django~=$DJANGO_VERSION.0"
+          just test-lock "Django~=$env:DJANGO_VERSION.0"
         }
     - name: Run Unit Tests
       run: |
@@ -867,10 +867,10 @@ jobs:
       run: |
         just setup "$PYTHON_PATH"
 
-        if ($DJANGO_VERSION -match "(a|b|rc)") {
-          just test-lock "Django==$DJANGO_VERSION"
+        if ($env:DJANGO_VERSION -match "(a|b|rc)") {
+          just test-lock "Django==$env:DJANGO_VERSION"
         } else {
-          just test-lock "Django~=$DJANGO_VERSION.0"
+          just test-lock "Django~=$env:DJANGO_VERSION.0"
         }
       shell: powershell
     - name: Run Powershell Tab Completion Tests
@@ -963,10 +963,10 @@ jobs:
       run: |
         just setup "$PYTHON_PATH"
 
-        if ($DJANGO_VERSION -match "(a|b|rc)") {
-          just test-lock "Django==$DJANGO_VERSION"
+        if ($env:DJANGO_VERSION -match "(a|b|rc)") {
+          just test-lock "Django==$env:DJANGO_VERSION"
         } else {
-          just test-lock "Django~=$DJANGO_VERSION.0"
+          just test-lock "Django~=$env:DJANGO_VERSION.0"
         }
       shell: pwsh
     - name: Run Powershell Tab Completion Tests
