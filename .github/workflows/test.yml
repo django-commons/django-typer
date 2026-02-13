@@ -55,11 +55,11 @@ jobs:
       TEST_PYTHON_VERSION: ${{ matrix.python-version }}
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -70,19 +70,19 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
       timeout-minutes: 60
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       shell: bash
       run: |
@@ -97,7 +97,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -138,32 +138,32 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
       WINPTY_ROOT: ${{ github.workspace }}\winpty-msvc
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: rhysd/action-setup-vim@v1
+      uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
@@ -180,7 +180,7 @@ jobs:
         just test-all
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -218,11 +218,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -233,11 +233,11 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
@@ -259,7 +259,7 @@ jobs:
         just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -305,11 +305,11 @@ jobs:
             - 5432:5432
 
       steps:
-        - uses: actions/checkout@v6
+        - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
           with:
             persist-credentials: false
         - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v6
+          uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
           id: sp
           with:
             python-version: ${{ matrix.python-version }}
@@ -320,18 +320,18 @@ jobs:
             sudo apt install emacs
         - name: setup-ssh-debug
           if: ${{ github.event.inputs.debug == 'true' }}
-          uses: mxschmitt/action-tmate@v3.23
+          uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
           with:
             detached: true
         - name: Install uv
-          uses: astral-sh/setup-uv@v7
+          uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
           with:
             enable-cache: true
         - name: Upgrade all dependencies for our weekly runs
           if: github.event_name == 'schedule'
           run: uv lock --upgrade
         - name: Setup Just
-          uses: extractions/setup-just@v3
+          uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
         - name: Install Dependencies
           run: |
             just setup ${{ steps.sp.outputs.python-path }}
@@ -346,7 +346,7 @@ jobs:
             just test ./tests/verify_environment.py
             just test-all --group psycopg3
         - name: Store coverage files
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
           with:
             name: ${{ env.COVERAGE_FILE }}
             path: ${{ env.COVERAGE_FILE }}
@@ -383,11 +383,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -398,18 +398,18 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
@@ -427,7 +427,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -464,11 +464,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -479,18 +479,18 @@ jobs:
         sudo apt install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
@@ -510,7 +510,7 @@ jobs:
       shell: fish {0}
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -548,11 +548,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -563,11 +563,11 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
@@ -600,7 +600,7 @@ jobs:
         just test-zsh || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -638,11 +638,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -653,11 +653,11 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
@@ -680,7 +680,7 @@ jobs:
         just test-bash || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -718,11 +718,11 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
@@ -733,11 +733,11 @@ jobs:
         brew install emacs
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
@@ -768,7 +768,7 @@ jobs:
         just test-fish || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -806,35 +806,35 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: rhysd/action-setup-vim@v1
+      uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Add to Just to PATH
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
@@ -863,7 +863,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -901,35 +901,35 @@ jobs:
       TEST_DJANGO_VERSION: ${{ matrix.django-version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       id: sp
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: rhysd/action-setup-vim@v1
+      uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
     - name: setup-ssh-debug
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Add to Just to PATH
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: pwsh
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
       with:
         enable-cache: true
     - name: Upgrade all dependencies for our weekly runs
       if: github.event_name == 'schedule'
       run: uv lock --upgrade
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install Dependencies
       run: |
         just setup ${{ steps.sp.outputs.python-path }}
@@ -958,7 +958,7 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -985,27 +985,27 @@ jobs:
           sudo apt install emacs
       - name: setup-ssh-debug
         if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3.23
+        uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
         with:
           detached: true
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         id: sp
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
         with:
           enable-cache: true
       - name: Setup Just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
       - name: Install Release Dependencies
         run: |
           just setup ${{ steps.sp.outputs.python-path }}
           just install
 
       - name: Get coverage files
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
         with:
           pattern: "*.coverage"
           merge-multiple: true
