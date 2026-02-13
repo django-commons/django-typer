@@ -64,7 +64,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
         with:
-          enable-cache: true
+          enable-cache: false
       - name: Install Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
       - name: Install Dependencies
@@ -75,7 +75,6 @@ jobs:
           else
             just test-lock Django~=${{ matrix.django-version }}.0
           fi
-          just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
@@ -94,3 +93,4 @@ jobs:
           just check-types
           just check-package
           just check-readme
+          just check-docs
