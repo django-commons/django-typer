@@ -87,6 +87,7 @@ warn_unreachable = true
 warn_no_return = true
 mypy_path = "src"
 modules = "django_typer"
+plugins = ["mypy_django_plugin.main"]
 
 # todo doc8 configuration here is not being picked up and doesn't seem to be working
 # as expected - for now pass these parameters manually

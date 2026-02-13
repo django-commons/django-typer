@@ -226,21 +226,6 @@ check: check-lint check-format check-types check-package check-docs check-readme
 # run all checks including documentation link checking (slow)
 check-all: check check-docs-links
 
-# run the tests that require rich not to be installed
-test-no-rich *ENV:
-    uv run {{ ENV }} --exact pytest --cov-append -m no_rich
-
-# run the tests that require rich to be installed
-test-rich *ENV:
-    uv run {{ ENV }} --exact pytest --cov-append -m rich
-
-# run all tests
-test-all *ENV: coverage-erase
-    @just test-rich {{ ENV }}
-    @just test-no-rich {{ ENV }}
-    uv run {{ ENV }} --all-extras --group colorama --exact pytest --cov-append -m "not rich and not no_rich"
-    uv run {{ ENV }} --all-extras --no-group colorama --exact pytest --cov-append -k test_ctor_params
-
 _log-tests:
     uv run pytest --collect-only --disable-warnings -q --no-cov
 
@@ -326,6 +311,21 @@ test-fish:
 
 test *TESTS:
     @just run --no-default-groups --exact --all-extras --group test --isolated pytest {{ TESTS }} --cov-append
+
+# run the tests that require rich not to be installed
+test-no-rich *ENV:
+    @just run --no-default-groups --exact --all-extras --group test --group colorama --isolated {{ ENV }} pytest --cov-append -m no_rich
+
+# run the tests that require rich to be installed
+test-rich *ENV:
+    @just run --no-default-groups --exact --all-extras --group test --group colorama --isolated {{ ENV }} pytest --cov-append -m rich
+
+# run all tests
+test-all *ENV: coverage-erase
+    @just test-rich {{ ENV }}
+    @just test-no-rich {{ ENV }}
+    uv run --no-default-groups --exact --all-extras --group test --group colorama --isolated pytest --cov-append -m "not rich and not no_rich"
+    uv run --no-default-groups --exact --all-extras --group test --no-group colorama --isolated pytest --cov-append -k test_ctor_params
 
 # debug an test
 debug-test *TESTS:

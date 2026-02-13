@@ -10,10 +10,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
-import django_stubs_ext
 import django
 
-django_stubs_ext.monkeypatch()
+try:
+    import django_stubs_ext
+
+    django_stubs_ext.monkeypatch()
+except ImportError:
+    pass
 
 # Set default terminal width for help outputs - necessary for
 # testing help output in CI environments.
