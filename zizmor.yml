@@ -1,5 +1,0 @@
-rules:
-  misfeature:
-    ignore: true
-    paths:
-      - .github/workflows/test.yml

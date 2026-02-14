@@ -224,7 +224,12 @@ fix: lint format
 check: check-lint check-format check-types check-package check-docs check-readme
 
 # run all checks including documentation link checking (slow)
-check-all: check check-docs-links
+check-all: check zizmor check-docs-links
+
+# run zizmor security analysis of CI
+zizmor:
+    cargo install --locked zizmor
+    zizmor --format sarif .github/workflows/ > zizmor.sarif
 
 _log-tests:
     uv run pytest --collect-only --disable-warnings -q --no-cov
@@ -314,7 +319,7 @@ test-rich *ENV:
 test-all *ENV: coverage-erase
     @just test-rich {{ ENV }}
     @just test-no-rich {{ ENV }}
-    uv run --no-default-groups --exact --all-extras --group test --group colorama --isolated {{ ENV }}pytest --cov-append -m "not rich and not no_rich"
+    uv run --no-default-groups --exact --all-extras --group test --group colorama --isolated {{ ENV }} pytest --cov-append -m "not rich and not no_rich"
     uv run --no-default-groups --exact --all-extras --group test --no-group colorama --isolated {{ ENV }} pytest --cov-append -k test_ctor_params
 
 # debug an test

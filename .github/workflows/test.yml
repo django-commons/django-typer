@@ -866,7 +866,7 @@ jobs:
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        uv sync --group test
         . .venv\Scripts\activate.ps1
         cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell"
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -877,7 +877,7 @@ jobs:
       run: |
         call .venv\Scripts\activate
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
-      shell: cmd
+      shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
@@ -961,7 +961,7 @@ jobs:
       shell: pwsh
     - name: Run Powershell Tab Completion Tests
       run: |
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        uv sync --group test
         . .venv\Scripts\activate.ps1
         cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -972,7 +972,7 @@ jobs:
       run: |
         call .venv\Scripts\activate
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
-      shell: cmd
+      shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
