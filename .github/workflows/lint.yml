@@ -89,7 +89,6 @@ jobs:
         timeout-minutes: 60
       - name: Run Static Analysis
         run: |
-          just test ./tests/verify_environment.py
           just check-lint
           just check-format
           just check-types

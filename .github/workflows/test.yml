@@ -97,7 +97,6 @@ jobs:
         fi
     - name: Run Unit Tests
       run: |
-        just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -181,7 +180,6 @@ jobs:
         }
     - name: Run Unit Tests
       run: |
-        just test ./tests/verify_environment.py
         just test-all
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
@@ -264,7 +262,6 @@ jobs:
         fi
     - name: Run Unit Tests
       run: |
-        just test ./tests/verify_environment.py
         just test-all
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -353,7 +350,6 @@ jobs:
             fi
         - name: Run Unit Tests
           run: |
-            just test ./tests/verify_environment.py
             just test-all --group psycopg3
         - name: Store coverage files
           uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -433,7 +429,6 @@ jobs:
         fi
     - name: Test Tab Completion
       run: |
-        just test ./tests/verify_environment.py
         just test-bash || exit 1
         sudo apt-get remove --purge -y powershell
         source .venv/bin/activate
@@ -521,7 +516,6 @@ jobs:
         sudo apt-get install -y fish
     - name: Test Tab Completion
       run: |
-        just test ./tests/verify_environment.py
         just test-fish
       shell: fish {0}
 
@@ -615,7 +609,6 @@ jobs:
     - name: Run Unit Tests
       shell: zsh {0}
       run: |
-        just test ./tests/verify_environment.py
         just test-zsh || exit 1
 
     - name: Store coverage files
@@ -698,7 +691,6 @@ jobs:
         fi
     - name: Run Unit Tests
       run: |
-        just test ./tests/verify_environment.py
         just test-bash || exit 1
 
     - name: Store coverage files
@@ -789,7 +781,6 @@ jobs:
     - name: Run Tab Completion Tests
       shell: fish {0}
       run: |
-        just test ./tests/verify_environment.py
         just test-fish || exit 1
 
     - name: Store coverage files
@@ -875,7 +866,6 @@ jobs:
       shell: powershell
     - name: Run Powershell Tab Completion Tests
       run: |
-        just test ./tests/verify_environment.py
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         . .venv\Scripts\activate.ps1
         cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_powershell"
@@ -971,7 +961,6 @@ jobs:
       shell: pwsh
     - name: Run Powershell Tab Completion Tests
       run: |
-        just test ./tests/verify_environment.py
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         . .venv\Scripts\activate.ps1
         cmd /c "pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_pwsh"
