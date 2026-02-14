@@ -224,8 +224,8 @@ fix: lint format
 # run all static checks
 check: check-lint check-format check-types check-package check-docs check-readme
 
-# run all checks including documentation link checking (slow)
-check-all: check zizmor check-docs-links
+# run all checks except documentation link checking (too slow!)
+check-all: check zizmor
 
 # run zizmor security analysis of CI
 zizmor:
@@ -378,4 +378,4 @@ validate_version VERSION:
 release VERSION: install check-all
     @just validate_version v{{ VERSION }}
     git tag -s v{{ VERSION }} -m "{{ VERSION }} Release"
-    git push origin v{{ VERSION }}
+    git push https://github.com/django-commons/django-typer.git v{{ VERSION }}
