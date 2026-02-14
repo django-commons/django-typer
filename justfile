@@ -224,8 +224,8 @@ fix: lint format
 # run all static checks
 check: check-lint check-format check-types check-package check-docs check-readme
 
-# run all checks including documentation link checking (slow)
-check-all: check zizmor check-docs-links
+# run all checks except documentation link checking (too slow!)
+check-all: check zizmor
 
 # run zizmor security analysis of CI
 zizmor:
