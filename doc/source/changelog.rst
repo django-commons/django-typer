@@ -4,6 +4,14 @@
 Change Log
 ==========
 
+v3.6.1 (2026-02-14)
+===================
+
+* Remove monkey patch for ``TYPER_USE_RICH`` environment variable - `this was fixed upstream.
+  <https://github.com/fastapi/typer/pull/1539>`_
+* Minimum typer is now 0.23.1.
+
+
 v3.6.0 (2026-02-12)
 ===================
 

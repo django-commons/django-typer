@@ -12,8 +12,22 @@ We provide a platform independent justfile with recipes for all the development 
 
 `django-typer` uses [uv](https://docs.astral.sh/uv) for environment, package, and dependency management. ``just setup`` will install the necessary build tooling if you do not already have it:
 
-```shell
-just setup
+```bash
+just setup <python version>
+```
+
+**This will also install pre-commit** If you wish to submit code that does not pass pre-commit checks you can disable pre-commit by running:
+
+```bash
+just run pre-commit uninstall
+```
+
+### Install the Dev environment
+
+To install all development dependencies run the ``install`` recipe:
+
+```bash
+just install
 ```
 
 ### Windows
@@ -79,6 +93,16 @@ just test tests/test_basics.py::BasicTests
 just test tests/test_basics.py::BasicTests::test_call_command
 ```
 
+### Debugging tests
+
+To debug a test use the ``debug-test`` recipe:
+
+```shell
+just debug-test tests/test_basics.py::BasicTests::test_call_command
+```
+
+This will set a breakpoint at the start of the test.
+
 ## Versioning
 
 django-typer strictly adheres to [semantic versioning](https://semver.org).
@@ -94,56 +118,59 @@ just release x.x.x
 ## Just Recipes
 
 ```bash
-benchmark                # generate and document benchmarks
-build                    # build src package and wheel
-build-docs               # build the docs
-build-docs-html          # build html documentation
-check                    # run all static checks
-check-docs               # lint the documentation
-check-docs-links         # check the documentation links for broken links
-check-format             # check if the code needs formatting
-check-lint               # lint the code
-check-package            # run package checks
-check-readme             # check that the readme renders
-check-types              # run static type checking
-clean                    # remove all non repository artifacts
-clean-docs               # remove doc build artifacts
-clean-env                # remove the virtual environment
-clean-git-ignored        # remove all git ignored files
-coverage                 # generate the test coverage report
-coverage-erase           # erase any coverage data
-docs                     # build and open the documentation
-docs-live                # serve the documentation, with auto-reload
-fetch-refs LIB           # fetch the intersphinx references for the given package
-fix                      # fix formatting, linting issues and import sorting
-format                   # format the code and sort imports
-install *OPTS            # update and install development dependencies
-install-basic            # install without extra dependencies
-install-docs             # install documentation dependencies
-install-precommit        # install git pre-commit hooks
-install-psycopg3         # install with postgresql dependencies
-install-translate        # install translation dependencies
-install-uv               # install the uv package manager
-lint                     # sort the imports and fix linting issues
-list-missed-tests        # run the tests and report if any were not run - sanity check
-log-tests                # run all tests and log them
-manage *COMMAND
-open-docs                # open the html documentation
-precommit                # run the pre-commit checks
-release VERSION          # issue a relase for the given semver string (e.g. 2.1.0)
-run +ARGS                # run the command in the virtual environment
-setup python="python"    # setup the venv and pre-commit hooks
-sort-imports             # sort the python imports
-test *TESTS              # run tests
-test-all *ENV            # run all tests
-test-bash                # test bash shell completions
-test-fish                # test fish shell completions
-test-lock +PACKAGES      # lock to specific python and versions of given dependencies
-test-no-rich *ENV        # run the tests that require rich not to be installed
-test-powershell          # test powershell shell completions
-test-pwsh                # test pwsh shell completions
-test-rich *ENV           # run the tests that require rich to be installed
-test-zsh                 # test zsh shell completions
-translate                # generate translations using google translate
-validate_version VERSION # validate the given version string against the lib version
+benchmark                     # generate and document benchmarks
+build                         # build src package and wheel
+build-docs                    # build the docs
+build-docs-html               # build html documentation
+check                         # run all static checks
+check-all                     # run all checks including documentation link checking (slow)
+check-docs                    # lint the documentation
+check-docs-links              # check the documentation links for broken links
+check-format                  # check if the code needs formatting
+check-lint                    # lint the code
+check-package                 # run package checks
+check-readme                  # check that the readme renders
+check-types                   # run all static type checking
+check-types-isolated          # run all static type checking in an isolated environment
+check-types-mypy *RUN_ARGS    # run static type checking with mypy
+check-types-pyright *RUN_ARGS # run static type checking with pyright
+clean                         # remove all non repository artifacts
+clean-docs                    # remove doc build artifacts
+clean-env                     # remove the virtual environment
+clean-git-ignored             # remove all git ignored files
+coverage                      # generate the test coverage report
+coverage-erase                # erase any coverage data
+debug-test *TESTS             # debug an test
+docs                          # build and open the documentation
+docs-live                     # serve the documentation, with auto-reload
+fetch-refs LIB                # fetch the intersphinx references for the given package
+fix                           # fix formatting, linting issues and import sorting
+format                        # format the code and sort imports
+install *OPTS="--all-extras"  # update and install development dependencies
+install-basic                 # install without extra dependencies
+install-precommit             # install git pre-commit hooks
+install-psycopg3              # install with postgresql dependencies
+install-uv                    # install the uv package manager
+lint                          # sort the imports and fix linting issues
+list-missed-tests             # run the tests and report if any were not run - sanity check
+log-tests                     # run all tests and log them
+manage *COMMAND               # run django-admin
+open-docs                     # open the html documentation
+precommit                     # run the pre-commit checks
+release VERSION               # issue a relase for the given semver string (e.g. 2.1.0)
+run +ARGS                     # run the command in the virtual environment
+setup python="python"         # setup the venv, pre-commit hooks
+sort-imports                  # sort the python imports
+test *TESTS                   # run specific tests
+test-all *ENV                 # run all tests
+test-bash                     # test bash shell completions
+test-fish                     # test fish shell completions
+test-lock +PACKAGES           # lock to specific python and versions of given dependencies
+test-no-rich *ENV             # run the tests that require rich not to be installed
+test-powershell               # test powershell shell completions
+test-pwsh                     # test pwsh shell completions
+test-rich *ENV                # run the tests that require rich to be installed
+test-zsh                      # test zsh shell completions
+validate_version VERSION      # validate the given version string against the lib version
+zizmor                        # run zizmor security analysis of CI
 ```

@@ -8,6 +8,7 @@ export PYTHONPATH := source_directory()
 default:
     @just --list --list-submodules
 
+# run django-admin
 [script]
 manage *COMMAND:
     import os
@@ -304,6 +305,7 @@ test-fish:
     pytest --cov-append tests/shellcompletion/test_shell_resolution.py::TestShellResolution::test_fish tests/test_parser_completers.py tests/shellcompletion/test_fish.py || exit
     pytest --cov-append tests/shellcompletion/test_fish.py::FishExeShellTests::test_prompt_install || exit
 
+# run specific tests
 test *TESTS:
     @just run --no-default-groups --exact --all-extras --group test --isolated pytest {{ TESTS }} --cov-append
 
