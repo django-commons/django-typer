@@ -6,7 +6,7 @@ Django Typer
 ============
 
 |MIT license| |Ruff| |PyPI version fury.io| |PyPI pyversions| |PyPi djversions| |PyPI status|
-|Documentation Status| |Code Cov| |Test Status|
+|Documentation Status| |Code Cov| |Test Status| |Lint Status|
 
 
 |Django Packages| |OpenSSF Scorecard| |OpenSSF Best Practices|
