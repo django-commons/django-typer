@@ -7,6 +7,7 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/django-typer.svg)](https://pypi.python.org/pypi/django-typer/)
 [![PyPI djversions](https://img.shields.io/pypi/djversions/django-typer.svg)](https://pypi.org/project/django-typer/)
 [![PyPI status](https://img.shields.io/pypi/status/django-typer.svg)](https://pypi.python.org/pypi/django-typer)
+[![PyPI - Types](https://img.shields.io/pypi/types/django-typer.svg)](https://pypi.python.org/pypi/django-typer)
 [![Documentation Status](https://readthedocs.org/projects/django-typer/badge/?version=latest)](http://django-typer.readthedocs.io/?badge=latest/)
 [![Code Cov](https://codecov.io/gh/django-commons/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/django-commons/django-typer)
 [![Test Status](https://github.com/django-commons/django-typer/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/test.yml?query=branch:main)

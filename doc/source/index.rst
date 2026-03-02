@@ -6,7 +6,7 @@ Django Typer
 ============
 
 |MIT license| |Ruff| |PyPI version fury.io| |PyPI pyversions| |PyPi djversions| |PyPI status|
-|Documentation Status| |Code Cov| |Test Status| |Lint Status|
+|PyPi Typed| |Documentation Status| |Code Cov| |Test Status| |Lint Status|
 
 
 |Django Packages| |OpenSSF Scorecard| |OpenSSF Best Practices|
@@ -27,6 +27,9 @@ Django Typer
    :target: https://pypi.org/project/django-typer/
 
 .. |PyPI status| image:: https://img.shields.io/pypi/status/django-typer.svg
+   :target: https://pypi.python.org/pypi/django-typer
+
+.. |PyPI Typed| image:: https://img.shields.io/pypi/types/django-typer.svg
    :target: https://pypi.python.org/pypi/django-typer
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/django-typer/badge/?version=latest
