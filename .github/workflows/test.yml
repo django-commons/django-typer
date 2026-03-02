@@ -77,11 +77,11 @@ jobs:
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       timeout-minutes: 60
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Run Unit Tests
       shell: bash
       env:
@@ -89,12 +89,12 @@ jobs:
       run: |
         just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION"
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -153,11 +153,11 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Run Unit Tests
       env:
         TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -165,12 +165,12 @@ jobs:
         just test-all -p $env:TEST_PYTHON --group $env:TEST_DJANGO_VERSION
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -227,7 +227,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
@@ -239,12 +239,12 @@ jobs:
       run: |
         just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION"
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -309,23 +309,23 @@ jobs:
           if: ${{ github.event.inputs.debug == 'true' }}
           uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
         - name: Install uv
-          uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+          uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
           with:
             enable-cache: false
         - name: Setup Just
-          uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+          uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
         - name: Run Unit Tests
           env:
             TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
           run: |
             just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION" --group psycopg3
         - name: Store coverage files
-          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+          uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
           with:
             name: ${{ env.COVERAGE_FILE }}
             path: ${{ env.COVERAGE_FILE }}
         - name: Store env files
-          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+          uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
           with:
             name: ${{ env.ENV_FILE }}
             path: requirements-test*.txt
@@ -381,11 +381,11 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Test Tab Completion
       env:
         TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -397,12 +397,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -458,11 +458,11 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Install Fish shell
       run: |
         sudo apt-get update
@@ -477,12 +477,12 @@ jobs:
       shell: fish {0}
 
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -539,7 +539,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
@@ -564,12 +564,12 @@ jobs:
         just test-zsh || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -626,7 +626,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
@@ -641,12 +641,12 @@ jobs:
         just test-bash || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -703,7 +703,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
@@ -726,12 +726,12 @@ jobs:
         just test-fish || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -790,11 +790,11 @@ jobs:
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Run Powershell Tab Completion Tests
       env:
         TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -812,12 +812,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -876,11 +876,11 @@ jobs:
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: pwsh
     - name: Install uv
-      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
       with:
         enable-cache: false
     - name: Setup Just
-      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
     - name: Run Powershell Tab Completion Tests
       env:
         TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -898,12 +898,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -939,11 +939,11 @@ jobs:
         with:
           python-version: 3.14
       - name: Install uv
-        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b
+        uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098
         with:
           enable-cache: false
       - name: Setup Just
-        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
       - name: Install Release Dependencies
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -951,7 +951,7 @@ jobs:
           just setup "$TEST_PYTHON"
 
       - name: Get coverage files
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3
         with:
           pattern: "*.coverage"
           merge-multiple: true
