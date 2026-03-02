@@ -41,10 +41,19 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 
             return sorted(lines)
 
-        num = 0
-        while (file := Path(f"requirements-test-{num}.txt")).exists():
-            num += 1
-        file.write_text("\n".join(freeze()) + "\n")
+        def write_reqs(number: int) -> bool:
+            try:
+                with open(
+                    f"requirements-test-{number}.txt", "x", encoding="utf-8"
+                ) as f:
+                    f.write("\n".join(freeze()) + "\n")
+                return True
+            except FileExistsError:
+                return False
+
+        run = 0
+        while not write_reqs(run):
+            run += 1
 
 
 # conftest.py
