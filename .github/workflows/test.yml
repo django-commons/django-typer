@@ -10,6 +10,12 @@ on:
     branches: ['main']
   pull_request:
     branches: ['main']
+    paths:
+      - "src/**/*.py"
+      - "tests/**/*.py"
+      - ".github/workflows/test.yml"
+      - "pyproject.toml"
+      - "justfile"
   workflow_call:
     secrets:
       CODECOV_TOKEN:
