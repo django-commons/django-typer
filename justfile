@@ -122,9 +122,16 @@ open-docs:
 # build and open the documentation
 docs: build-docs-html open-docs
 
+[script]
+_available_port:
+    import socket;
+    s=socket.socket();
+    s.bind(('',0));
+    print(s.getsockname()[1]);s.close()
+
 # serve the documentation, with auto-reload
 docs-live:
-    @just run --no-default-groups --group docs --all-extras --isolated --exact sphinx-autobuild doc/source doc/build --open-browser --watch src --port 8000 --delay 1
+    @just run --no-default-groups --group docs --all-extras --isolated --exact sphinx-autobuild doc/source doc/build --open-browser --watch src --port {{ shell("just _available_port") }} --delay 1
 
 _link_check:
     -uv run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
