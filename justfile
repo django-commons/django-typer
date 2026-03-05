@@ -51,10 +51,6 @@ install-basic:
 _install-docs:
     uv sync --no-default-groups --group docs --all-extras
 
-# install with postgresql dependencies
-install-psycopg3:
-    uv sync --all-extras --group psycopg3
-
 # run static type checking with mypy
 check-types-mypy *ENV:
     @just run --no-default-groups --all-extras --group typing {{ ENV }} mypy
@@ -95,8 +91,8 @@ clean-git-ignored:
 clean: clean-docs clean-git-ignored clean-env
 
 # build html documentation
-build-docs-html: _install-docs
-    @just run sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
+build-docs-html:
+    @just run --group docs --all-extras --isolated --exact sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
 
 # [script]
 # _open-pdf-docs:
@@ -127,8 +123,8 @@ open-docs:
 docs: build-docs-html open-docs
 
 # serve the documentation, with auto-reload
-docs-live: _install-docs
-    @just run --no-default-groups --group docs sphinx-autobuild doc/source doc/build --open-browser --watch src --port 8000 --delay 1
+docs-live:
+    @just run --no-default-groups --group docs --all-extras --isolated --exact sphinx-autobuild doc/source doc/build --open-browser --watch src --port 8000 --delay 1
 
 _link_check:
     -uv run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
