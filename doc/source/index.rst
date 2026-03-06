@@ -5,53 +5,63 @@
 Django Typer
 ============
 
-|MIT license| |Ruff| |PyPI version fury.io| |PyPI pyversions| |PyPi djversions| |PyPI status|
-|PyPi Typed| |Documentation Status| |Code Cov| |Test Status| |Lint Status|
+.. only:: html
 
+    .. image:: https://img.shields.io/badge/License-MIT-blue.svg
+        :target: https://lbesson.mit-license.org/
+        :alt: MIT License
 
-|Django Packages| |OpenSSF Scorecard| |OpenSSF Best Practices|
+    .. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+        :target: https://docs.astral.sh/ruff
+        :alt: Ruff
 
-.. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
-   :target: https://lbesson.mit-license.org/
+    .. image:: https://badge.fury.io/py/django-typer.svg
+        :target: https://pypi.python.org/pypi/django-typer/
+        :alt: PyPI Version
 
-.. |Ruff| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
-   :target: https://docs.astral.sh/ruff
+    .. image:: https://img.shields.io/pypi/pyversions/django-typer.svg
+        :target: https://pypi.python.org/pypi/django-typer/
+        :alt: Python Versions
 
-.. |PyPI version fury.io| image:: https://badge.fury.io/py/django-typer.svg
-   :target: https://pypi.python.org/pypi/django-typer/
+    .. image:: https://img.shields.io/pypi/djversions/django-typer.svg
+        :target: https://pypi.org/project/django-typer/
+        :alt: Django Versions
 
-.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/django-typer.svg
-   :target: https://pypi.python.org/pypi/django-typer/
+    .. image:: https://img.shields.io/pypi/status/django-typer.svg
+        :target: https://pypi.python.org/pypi/django-typer
+        :alt: Development Status
 
-.. |PyPI djversions| image:: https://img.shields.io/pypi/djversions/django-typer.svg
-   :target: https://pypi.org/project/django-typer/
+    .. image:: https://img.shields.io/pypi/types/django-typer.svg
+        :target: https://pypi.python.org/pypi/django-typer
+        :alt: Typed
 
-.. |PyPI status| image:: https://img.shields.io/pypi/status/django-typer.svg
-   :target: https://pypi.python.org/pypi/django-typer
+    .. image:: https://readthedocs.org/projects/django-typer/badge/?version=latest
+        :target: http://django-typer.readthedocs.io/?badge=latest/
+        :alt: Documentation Status
 
-.. |PyPI Typed| image:: https://img.shields.io/pypi/types/django-typer.svg
-   :target: https://pypi.python.org/pypi/django-typer
+    .. image:: https://codecov.io/gh/django-commons/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL
+        :target: https://codecov.io/gh/django-commons/django-typer
+        :alt: Code Coverage
 
-.. |Documentation Status| image:: https://readthedocs.org/projects/django-typer/badge/?version=latest
-   :target: http://django-typer.readthedocs.io/?badge=latest/
+    .. image:: https://github.com/django-commons/django-typer/actions/workflows/test.yml/badge.svg?branch=main
+        :target: https://github.com/django-commons/django-typer/actions/workflows/test.yml
+        :alt: Test Status
 
-.. |Code Cov| image:: https://codecov.io/gh/django-commons/django-typer/branch/main/graph/badge.svg?token=0IZOKN2DYL
-   :target: https://codecov.io/gh/django-commons/django-typer
+    .. image:: https://github.com/django-commons/django-typer/actions/workflows/lint.yml/badge.svg
+        :target: https://github.com/django-commons/django-typer/actions/workflows/lint.yml
+        :alt: Lint Status
 
-.. |Test Status| image:: https://github.com/django-commons/django-typer/actions/workflows/test.yml/badge.svg?branch=main
-   :target: https://github.com/django-commons/django-typer/actions/workflows/test.yml
+    .. image:: https://img.shields.io/badge/Published%20on-Django%20Packages-0c3c26
+        :target: https://djangopackages.org/packages/p/django-typer/
+        :alt: Published on Django Packages
 
-.. |Lint Status| image:: https://github.com/django-commons/django-typer/actions/workflows/lint.yml/badge.svg
-   :target: https://github.com/django-commons/django-typer/actions/workflows/lint.yml
+    .. image:: https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge
+        :target: https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer
+        :alt: OSSF Scorecard
 
-.. |Django Packages| image:: https://img.shields.io/badge/Published%20on-Django%20Packages-0c3c26
-   :target: https://djangopackages.org/packages/p/django-typer/
-
-.. |OpenSSF Scorecard| image:: https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge
-   :target: https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer
-
-.. |OpenSSF Best Practices| image:: https://www.bestpractices.dev/projects/12046/badge
-   :target: https://www.bestpractices.dev/projects/12046
+    .. image:: https://www.bestpractices.dev/projects/12046/badge
+        :target: https://www.bestpractices.dev/projects/12046
+        :alt: OSSF Best Practices
 
 
 Use static typing to define the CLI for your Django_ management commands with Typer_. Optionally

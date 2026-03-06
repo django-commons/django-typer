@@ -130,6 +130,13 @@ def setup(app):
     roles.register_local_role("pypi", pypi_role)
     app.add_directive("literalinclude", ExtendedLiteralInclude)
     app.add_crossref_type(directivename="django-admin", rolename="django-admin")
+    
+    def flatten_tabs(app):
+        if app.builder.name == "latex":
+            app.config.sphinx_tabs_disable_tab_closing = True
+
+    app.connect("builder-inited", flatten_tabs)
+
     # https://sphinxcontrib-typer.readthedocs.io/en/latest/howto.html#build-to-multiple-formats
     if Path(app.doctreedir).exists():
         shutil.rmtree(app.doctreedir)
