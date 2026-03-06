@@ -205,6 +205,10 @@ fix *ENV:
     @just lint {{ ENV }}
     @just format {{ ENV }}
 
+# run bandit static security analysis
+bandit:
+    @just run --no-default-groups --group lint bandit -c pyproject.toml -r ./src -f sarif -o bandit.sarif
+
 # run all static checks
 check *ENV:
     @just check-lint {{ ENV }}

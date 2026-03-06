@@ -2,6 +2,7 @@
 
 [![CodeQL](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/django-commons/django-typer/actions/workflows/github-code-scanning/codeql?query=branch:main)
 [![Zizmor](https://github.com/django-commons/django-typer/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://docs.zizmor.sh/)
+[![Bandit](https://github.com/django-commons/django-typer/actions/workflows/bandit.yml/badge.svg?branch=main)](https://bandit.readthedocs.io)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/django-commons/django-typer/badge)](https://securityscorecards.dev/viewer/?uri=github.com/django-commons/django-typer)
 
 ## Supported Versions
