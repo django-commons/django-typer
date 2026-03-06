@@ -171,6 +171,31 @@ exclude = [
     "tests/**/*"
 ]
 
+
+[tool.bandit]
+targets = ["src"]
+exclude_dirs = [
+    "./tests",
+    "./examples",
+    "./profiling",
+    "./.venv",
+    "./doc",
+]
+
+skips = [
+    "B101",  # assert_used - assertions are fine in tests and Django code
+    "B110",  # Try, Except, Pass detected - these are intentional
+]
+
+# Severity level threshold
+# Options: LOW, MEDIUM, HIGH
+severity = "MEDIUM"
+
+# Confidence level threshold
+# Options: LOW, MEDIUM, HIGH
+confidence = "MEDIUM"
+
+
 [dependency-groups]
 colorama = [
     "colorama>=0.4.6; sys_platform == 'win32'",
@@ -202,7 +227,8 @@ typing = [
 lint = [
     "ruff>=0.15.0", 
     "readme-renderer[md]>=43.0",
-    "doc8>=1.1.2"
+    "doc8>=1.1.2",
+    "bandit[toml,sarif]>=1.7.10"
 ]
 precommit = [
     "pre-commit>=3.5.0",

@@ -169,3 +169,4 @@ uv.lock
 zizmor.sarif
 requirements-test*.txt
 constraints.txt
+bandit.sarif
