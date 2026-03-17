@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.6.5 (2026-03-16)
+===================
+
+* Switch from [pre-commit](https://pre-commit.com/) to [prek](https://prek.j178.dev/).
+
 v3.6.4 (2026-03-02)
 ===================
 

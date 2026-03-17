@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.6.4"
+version = "3.6.5"
 requires-python = ">=3.10,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -230,9 +230,6 @@ lint = [
     "doc8>=1.1.2",
     "bandit[toml,sarif]>=1.7.10"
 ]
-precommit = [
-    "pre-commit>=3.5.0",
-]
 coverage = [
     "coverage[toml]>=7.6.1"
 ]
@@ -256,7 +253,6 @@ dev = [
     { include-group = "test" },
     { include-group = "docs" },
     { include-group = "lint" },
-    { include-group = "precommit" },
     { include-group = "colorama" },
     "packaging>=24.2",
     "tomlkit>=0.13.3",
