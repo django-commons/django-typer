@@ -928,6 +928,7 @@ jobs:
       windows-pwsh-complete
     ]
     runs-on: ubuntu-latest
+    environment: codecov
 
     steps:
       - name: install-emacs-linux
