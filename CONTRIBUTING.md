@@ -161,7 +161,7 @@ fix                           # fix formatting, linting issues and import sortin
 format                        # format the code and sort imports
 install *OPTS="--all-extras"  # update and install development dependencies
 install-basic                 # install without extra dependencies
-install-prek             # install git pre-commit hooks
+install-prek                  # install git pre-commit hooks
 install-psycopg3              # install with postgresql dependencies
 install-uv                    # install the uv package manager
 lint                          # sort the imports and fix linting issues
@@ -169,7 +169,7 @@ list-missed-tests             # run the tests and report if any were not run - s
 log-tests                     # run all tests and log them
 manage *COMMAND               # run django-admin
 open-docs                     # open the html documentation
-prek                     # run the pre-commit checks
+prek                          # run the pre-commit checks
 release VERSION               # issue a relase for the given semver string (e.g. 2.1.0)
 run +ARGS                     # run the command in the virtual environment
 setup python="python"         # setup the venv, pre-commit hooks
