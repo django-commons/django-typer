@@ -56,9 +56,9 @@ class BashComplete(DjangoTyperShellCompleter):
     @staticmethod
     def _check_version() -> t.Optional[t.Tuple[int, int]]:
         import re
-        import subprocess
+        import subprocess  # nosec B404
 
-        output = subprocess.run(
+        output = subprocess.run(  # nosec B603 B607
             ["bash", "-c", 'echo "${BASH_VERSION}"'], stdout=subprocess.PIPE
         )
         match = re.search(r"^(\d+)\.(\d+)\.\d+", output.stdout.decode())

@@ -1,4 +1,4 @@
-import subprocess
+import subprocess  # nosec B404
 import typing as t
 from pathlib import Path
 
@@ -53,7 +53,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
         )
 
     def set_execution_policy(self) -> None:
-        subprocess.run(
+        subprocess.run(  # nosec B603
             [
                 self.name,
                 "-Command",
@@ -65,7 +65,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
         )
 
     def get_user_profile(self) -> Path:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603
             [self.name, "-NoProfile", "-Command", "echo", "$profile"],
             check=True,
             stdout=subprocess.PIPE,

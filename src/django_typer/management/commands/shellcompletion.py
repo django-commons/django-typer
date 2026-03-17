@@ -378,7 +378,7 @@ class Command(TyperCommand):
         if install_paths:
             self.stdout.write(
                 self.style.SUCCESS(
-                    _("Installed autocompletion for {shell}").format(shell=self.shell)
+                    _("Installed autocompletion for {shell}").format(shell=self.shell)  # nosec B604
                 )
             )
         else:

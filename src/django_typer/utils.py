@@ -275,7 +275,7 @@ def get_win_shell() -> str:
     """
     import json
     import shutil
-    import subprocess
+    import subprocess  # nosec B404
 
     from shellingham import ShellDetectionFailure
 
@@ -290,7 +290,7 @@ def get_win_shell() -> str:
             """
             pid = os.getpid()
             while True:
-                result = subprocess.run(
+                result = subprocess.run(  # nosec B603
                     [pwsh, "-NoProfile", "-Command", ps_command.format(pid=pid)],
                     capture_output=True,
                     text=True,
