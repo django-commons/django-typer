@@ -7,7 +7,8 @@ Change Log
 v3.6.5 (2026-03-16)
 ===================
 
-* Switch from [pre-commit](https://pre-commit.com/) to [prek](https://prek.j178.dev/).
+* Switch from `pre-commit <https://pre-commit.com/>`_ to `prek <https://prek.j178.dev/>`_.
+* Run `Bandit <https://bandit.readthedocs.io/en/latest/>`_ in CI.
 
 v3.6.4 (2026-03-02)
 ===================
