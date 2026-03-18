@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.6.5"
+version = "3.6.6"
 requires-python = ">=3.10,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -225,7 +225,7 @@ typing = [
     "django-stubs-ext>=5.1.3",
 ]
 lint = [
-    "ruff>=0.15.0", 
+    "ruff>=0.15.0",
     "readme-renderer[md]>=43.0",
     "doc8>=1.1.2",
     "bandit[toml,sarif]>=1.7.10"
