@@ -531,7 +531,7 @@ class ModelObjectCompleter:
         - :class:`~django.db.models.DateField` **(Must use ISO 8601: YYYY-MM-DD)**
         - :class:`~django.db.models.TimeField` **(Must use ISO 8601: HH:MM:SS.ssssss)**
         - :class:`~django.db.models.DateTimeField` **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
-        - :class:`~django.db.models.DurationField` **(Must use ISO 8601: YYYY-MM-DDTHH:MM:SS.ssssss±HH:MM)**
+        - :class:`~django.db.models.DurationField` **(Must use ISO 8601 duration, e.g. ``P[n]DT[n]H[n]M[n]S``)**
         - :class:`~django.db.models.UUIDField`
         - :class:`~django.db.models.FloatField`
         - :class:`~django.db.models.DecimalField`
