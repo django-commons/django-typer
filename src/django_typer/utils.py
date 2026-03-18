@@ -318,7 +318,8 @@ def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
     tuple.
 
     .. note::
-        We use a subset of ISO8601, the supported markers are D, H, M, S.
+        We use a subset of ISO8601, the supported markers are Y, M, W, D, H, M, S.
+        Years are approximated as 365 days and months as 30 days.
 
     :return: A tuple of the parsed duration and the ambiguous trailing number
     """
@@ -353,14 +354,20 @@ def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
                 raise Incomplete(match.group(1))
         return 0
 
+    years = 0
+    months = 0
+    weeks = 0
     days = 0
     hours = 0
     minutes = 0
     seconds = 0
     microseconds = 0
 
-    # examples: 1 T1
+    # date portion: PnYnMnWnD
     try:
+        years = eat(("Y",))
+        months = eat(("M",))
+        weeks = eat(("W",))
         days = eat(("D",))
     except Incomplete as incomplete:
         ambiguous = incomplete.value
@@ -380,8 +387,10 @@ def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
         # should have been consumed
         raise ValueError(f"Invalid ISO 8601 duration format: {original}")
 
+    total_days = years * 365 + months * 30 + weeks * 7 + days
+
     return sign * timedelta(
-        days=days,
+        days=total_days,
         hours=hours,
         minutes=minutes,
         seconds=seconds,

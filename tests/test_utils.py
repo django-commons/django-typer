@@ -216,3 +216,38 @@ def test_parse_iso_duration():
 
     assert parse_iso_duration("PT5") == (timedelta(), "5")
     assert parse_iso_duration("-PT5") == (-timedelta(), "5")
+
+    # weeks (W = 7 days)
+    assert parse_iso_duration("P1W") == (timedelta(weeks=1), None)
+    assert parse_iso_duration("P2W") == (timedelta(days=14), None)
+    assert parse_iso_duration("-P3W") == (-timedelta(days=21), None)
+    assert parse_iso_duration("P2WT3H") == (timedelta(days=14, hours=3), None)
+    assert parse_iso_duration("P1W2D") == (timedelta(days=9), None)
+
+    # months (M before T = 30 days)
+    assert parse_iso_duration("P1M") == (timedelta(days=30), None)
+    assert parse_iso_duration("P2M") == (timedelta(days=60), None)
+    assert parse_iso_duration("-P6M") == (-timedelta(days=180), None)
+    assert parse_iso_duration("P1MT12H") == (timedelta(days=30, hours=12), None)
+    assert parse_iso_duration("P2M3W") == (timedelta(days=60 + 21), None)
+
+    # years (Y = 365 days)
+    assert parse_iso_duration("P1Y") == (timedelta(days=365), None)
+    assert parse_iso_duration("P2Y") == (timedelta(days=730), None)
+    assert parse_iso_duration("-P1Y") == (-timedelta(days=365), None)
+    assert parse_iso_duration("P1YT6H") == (timedelta(days=365, hours=6), None)
+
+    # combined date designators
+    assert parse_iso_duration("P1Y2M3W4D") == (
+        timedelta(days=365 + 60 + 21 + 4),
+        None,
+    )
+    assert parse_iso_duration("P1Y2M") == (timedelta(days=365 + 60), None)
+    assert parse_iso_duration("P1Y6MT12H30M") == (
+        timedelta(days=365 + 180, hours=12, minutes=30),
+        None,
+    )
+
+    # partial / ambiguous with new designators
+    assert parse_iso_duration("P1Y2") == (timedelta(days=365), "2")
+    assert parse_iso_duration("P1Y2M3") == (timedelta(days=365 + 60), "3")

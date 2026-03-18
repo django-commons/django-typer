@@ -7,7 +7,7 @@ Change Log
 v3.6.6 (2026-03-18)
 ===================
 
-* Fix typo in duration completer docs.
+* Duraton parser now supports Y, M, and W.
 
 v3.6.5 (2026-03-16)
 ===================
