@@ -601,6 +601,58 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 cmds.remove(defined)
         return ordered + cmds
 
+    def invoke(self, ctx: click.Context) -> t.Any:
+        """
+        Override click.Group.invoke to include the group callback's return value in
+        the results list when chain=True and invoke_without_command=True. In Click's
+        default implementation the group callback's return is discarded in chain mode;
+        here we prepend it to the subcommand results so finalize handlers can see it.
+
+        Hopefully this gets fixed upstream and we can remove this override.
+        """
+        if not self.chain or not self.invoke_without_command:
+            return super().invoke(ctx)
+
+        def _process_result(value: t.Any) -> t.Any:
+            if self._result_callback is not None:
+                value = ctx.invoke(self._result_callback, value, **ctx.params)
+            return value
+
+        # No subcommands provided — run group callback and pass its return as a
+        # single-element list (or empty list if it returned None) to the finalizer.
+        if not ctx._protected_args:
+            with ctx:
+                group_rv = click.Command.invoke(self, ctx)
+                return _process_result([group_rv] if group_rv is not None else [])
+
+        args = [*ctx._protected_args, *ctx.args]
+        ctx.args = []
+        ctx._protected_args = []
+
+        with ctx:
+            ctx.invoked_subcommand = "*" if args else None
+            group_rv = click.Command.invoke(self, ctx)
+
+            contexts = []
+            while args:
+                cmd_name, cmd, args = self.resolve_command(ctx, args)
+                assert cmd is not None
+                sub_ctx = cmd.make_context(
+                    cmd_name,
+                    args,
+                    parent=ctx,
+                    allow_extra_args=True,
+                    allow_interspersed_args=False,
+                )
+                contexts.append(sub_ctx)
+                args, sub_ctx.args = sub_ctx.args, []
+
+            rv = [group_rv] if group_rv is not None else []
+            for sub_ctx in contexts:
+                with sub_ctx:
+                    rv.append(sub_ctx.command.invoke(sub_ctx))
+            return _process_result(rv)
+
 
 # staticmethod objects are not picklable which causes problems with deepcopy
 # hence the following mishegoss

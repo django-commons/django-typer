@@ -540,3 +540,86 @@ class TestFinalize(TestCase):
             ).strip(),
             "root_final: [\"grp2_collect: grp2_final: ['cmd3', 'cmd4'] | g2_opt=False\"] | init_opt=False",
         )
+
+    def test_finalize_chain_group_run(self):
+        """
+        Test that:
+        1. When chain=True and multiple commands are called, the results from each
+           called subcommand are passed to the results list in the finalize handler.
+        2. Results returned by the group function that the finalize callback is for
+           are also added to the results list.
+        """
+        # Condition 1: multiple direct subcommands - all results in the list
+        stdout, _, _ = run_command("finalize_chain_group", "cmd1", "cmd2")
+        self.assertEqual(stdout.strip(), "root_final: ['cmd1 1', 'cmd2 2']")
+
+        # Condition 1: subgroup with explicit subcommands - each subcommand result
+        # in the subgroup's finalize list
+        stdout, _, _ = run_command("finalize_chain_group", "grp", "cmd3")
+        self.assertEqual(stdout.strip(), "root_final: [\"grp_final: ['cmd3 3']\"]")
+
+        stdout, _, _ = run_command("finalize_chain_group", "grp", "cmd4")
+        self.assertEqual(stdout.strip(), "root_final: [\"grp_final: ['cmd4 4']\"]")
+
+        stdout, _, _ = run_command("finalize_chain_group", "grp", "cmd3", "cmd4")
+        self.assertEqual(
+            stdout.strip(), "root_final: [\"grp_final: ['cmd3 3', 'cmd4 4']\"]"
+        )
+
+        # Condition 2: when grp is invoked without explicit subcommands its callback
+        # runs all subcommands itself and returns their results; that return value is
+        # added to the finalize results list
+        stdout, _, _ = run_command("finalize_chain_group", "grp")
+        self.assertEqual(
+            stdout.strip(),
+            "root_final: [\"grp_final: [['cmd3 3', 'cmd4 5']]\"]",
+        )
+
+        # Both conditions together: direct command result alongside the group result
+        stdout, _, _ = run_command("finalize_chain_group", "cmd1", "grp", "cmd3")
+        self.assertEqual(
+            stdout.strip(),
+            "root_final: ['cmd1 1', \"grp_final: ['cmd3 3']\"]",
+        )
+
+    def test_finalize_chain_group_call(self):
+        """
+        Test that:
+        1. When chain=True and multiple commands are called, the results from each
+           called subcommand are passed to the results list in the finalize handler.
+        2. Results returned by the group function that the finalize callback is for
+           are also added to the results list.
+        """
+        # Condition 1: multiple direct subcommands - all results in the list
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "cmd1", "cmd2")
+        self.assertEqual(out.getvalue().strip(), "root_final: ['cmd1 1', 'cmd2 2']")
+
+        # Condition 1: subgroup with explicit subcommands
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "grp", "cmd3", "cmd4")
+        self.assertEqual(
+            out.getvalue().strip(),
+            "root_final: [\"grp_final: ['cmd3 3', 'cmd4 4']\"]",
+        )
+
+        # Condition 2: grp invoked without explicit subcommands - its return value
+        # is added to the finalize results list
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "grp")
+        self.assertEqual(
+            out.getvalue().strip(),
+            "root_final: [\"grp_final: [['cmd3 3', 'cmd4 5']]\"]",
+        )
+
+        # Both conditions together
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "cmd1", "grp", "cmd3")
+        self.assertEqual(
+            out.getvalue().strip(),
+            "root_final: ['cmd1 1', \"grp_final: ['cmd3 3']\"]",
+        )

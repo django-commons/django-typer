@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.7.0 (2026-03-19)
+===================
+
+* Results returned from groups are now included in the result sets passed to finalize().
+
 v3.6.6 (2026-03-18)
 ===================
 
