@@ -623,3 +623,33 @@ class TestFinalize(TestCase):
             out.getvalue().strip(),
             "root_final: ['cmd1 1', \"grp_final: ['cmd3 3']\"]",
         )
+
+    def test_finalize_chain_group_no_return(self):
+        """
+        When the group function returns nothing (None), no extra entry is added to
+        the finalize results list — only the explicit subcommand results appear.
+        """
+        # grp returns None when subcommands are supplied; the finalize list must
+        # contain only the subcommand results, not a leading None.
+        stdout, _, _ = run_command("finalize_chain_group", "grp", "cmd3")
+        self.assertEqual(stdout.strip(), "root_final: [\"grp_final: ['cmd3 3']\"]")
+
+        stdout, _, _ = run_command("finalize_chain_group", "grp", "cmd3", "cmd4")
+        self.assertEqual(
+            stdout.strip(), "root_final: [\"grp_final: ['cmd3 3', 'cmd4 4']\"]"
+        )
+
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "grp", "cmd3")
+        self.assertEqual(
+            out.getvalue().strip(), "root_final: [\"grp_final: ['cmd3 3']\"]"
+        )
+
+        out = StringIO()
+        with contextlib.redirect_stdout(out):
+            call_command("finalize_chain_group", "grp", "cmd3", "cmd4")
+        self.assertEqual(
+            out.getvalue().strip(),
+            "root_final: [\"grp_final: ['cmd3 3', 'cmd4 4']\"]",
+        )
