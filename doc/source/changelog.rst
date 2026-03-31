@@ -4,6 +4,14 @@
 Change Log
 ==========
 
+v3.7.1 (2026-03-31)
+===================
+
+* Update installation instructions to reflect `rich <https://github.com/textualize/rich>`_ `no
+  longer being an optional dependency <https://github.com/fastapi/typer/pull/1522>`_. You can
+  `disable rich formatting <https://typer.tiangolo.com/?h=typer_use_rich#license>`_ by setting
+  ``TYPER_USE_RICH=False``
+
 v3.7.0 (2026-03-19)
 ===================
 

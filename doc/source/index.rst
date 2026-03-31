@@ -109,13 +109,6 @@ based interface that Django developers will be familiar with. All of the
 
         pip install django-typer
 
-    :doc:`rich <rich:index>` is a powerful library for rich text and beautiful formatting in the terminal.
-    It is not required, but highly recommended for the best experience:
-
-    .. code:: bash
-
-        pip install "django-typer[rich]"
-
 
 2. Optionally add ``django_typer`` to your :setting:`INSTALLED_APPS` setting:
 
