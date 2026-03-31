@@ -47,12 +47,6 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
    pip install django-typer
    ```
 
-   [rich](https://rich.readthedocs.io/en/latest/) is a powerful library for rich text and beautiful formatting in the terminal. It is not required but highly recommended for the best experience:
-
-   ```bash
-   pip install "django-typer[rich]"
-   ```
-
 2. Optionally add `django_typer` to your `INSTALLED_APPS` setting:
 
    ```python
