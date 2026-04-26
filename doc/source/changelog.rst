@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v3.7.2 (2026-04-26)
+===================
+
+* Support `Typer 0.25.x <https://github.com/fastapi/typer/releases/tag/0.25.0>`_
+
 v3.7.1 (2026-03-31)
 ===================
 
