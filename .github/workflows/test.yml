@@ -80,7 +80,7 @@ jobs:
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       timeout-minutes: 60
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -92,12 +92,12 @@ jobs:
       run: |
         just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION"
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -156,7 +156,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@febef33995d6649302e9d88dda81e071b68f16a7
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -168,12 +168,12 @@ jobs:
         just test-all -p $env:TEST_PYTHON --group $env:TEST_DJANGO_VERSION
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -230,7 +230,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -242,12 +242,12 @@ jobs:
       run: |
         just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION"
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -312,7 +312,7 @@ jobs:
           if: ${{ github.event.inputs.debug == 'true' }}
           uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
         - name: Install uv
-          uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+          uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
           with:
             enable-cache: false
         - name: Setup Just
@@ -323,12 +323,12 @@ jobs:
           run: |
             just test-all -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION" --group psycopg3
         - name: Store coverage files
-          uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
           with:
             name: ${{ env.COVERAGE_FILE }}
             path: ${{ env.COVERAGE_FILE }}
         - name: Store env files
-          uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
           with:
             name: ${{ env.ENV_FILE }}
             path: requirements-test*.txt
@@ -384,7 +384,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -400,12 +400,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -461,7 +461,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -480,12 +480,12 @@ jobs:
       shell: fish {0}
 
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -542,7 +542,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -567,12 +567,12 @@ jobs:
         just test-zsh || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -629,7 +629,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -644,12 +644,12 @@ jobs:
         just test-bash || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -706,7 +706,7 @@ jobs:
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -729,12 +729,12 @@ jobs:
         just test-fish || exit 1
 
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -793,7 +793,7 @@ jobs:
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: powershell
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -815,12 +815,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
       shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -879,7 +879,7 @@ jobs:
       run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
       shell: pwsh
     - name: Install uv
-      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       with:
         enable-cache: false
     - name: Setup Just
@@ -901,12 +901,12 @@ jobs:
         pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure
       shell: cmd  # zizmor: ignore[misfeature]
     - name: Store coverage files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
     - name: Store env files
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: ${{ env.ENV_FILE }}
         path: requirements-test*.txt
@@ -944,7 +944,7 @@ jobs:
         with:
           python-version: 3.14
       - name: Install uv
-        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
         with:
           enable-cache: false
       - name: Setup Just
