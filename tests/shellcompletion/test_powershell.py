@@ -23,6 +23,12 @@ class _PowerShellMixin:
     profile: Path
     tabs = "\t"
     completer_class = PowerShellComplete
+    # PSReadLine reads input byte-by-byte and treats the high-bit bytes
+    # of the default multi-byte sentinel (0xe2 0x80 0xa1 for ``‡``) as
+    # Meta-key chord input, which flips the line into multi-line
+    # continuation state ("\n>>") and breaks completion. Fall back to
+    # pure quiet-period detection.
+    tab_sentinel = None
 
     environment = [
         f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
