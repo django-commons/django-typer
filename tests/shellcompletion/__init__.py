@@ -39,6 +39,34 @@ def scrub(output: str) -> str:
     )
 
 
+def flat_scrub(output: str) -> str:
+    """Strip ALL ANSI/escape sequences without simulating a terminal screen.
+
+    Use this instead of :func:`render` for shells whose completion display
+    is *ephemeral* -- i.e. characters drawn to the screen and then erased
+    by a follow-up control sequence (cursor-up + ``\\x1b[J`` erase-below
+    is the canonical pattern). Pyte faithfully replays such erasures and
+    loses the text, but for an assertion like ``assertIn("completers")``
+    we want to know what was *transmitted*, not what survived on a final
+    rendered screen.
+
+    Currently used by fish (the pager that displays multi-candidate
+    completion menus closes itself when extra input arrives and
+    overwrites its own region of the screen).
+    """
+    # CSI sequences (covers SGR colors, cursor moves, mode toggles,
+    # private/extended forms like \x1b[?2004h, \x1b[>4;1m, \x1b[=5u).
+    output = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output)
+    # OSC sequences (set window title etc.): ESC ] ... BEL | ST.
+    output = re.sub(r"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)", "", output)
+    # Character set designation: ESC ( B, ESC ) 0, ESC * B, ESC + B.
+    output = re.sub(r"\x1B[\(\)*+][\dA-Z=]", "", output)
+    # Two-char escape forms: ESC =, ESC >, ESC 7, ESC 8.
+    output = re.sub(r"\x1B[=>78]", "", output)
+    # Stray control chars that aren't escape-introduced.
+    return output.replace("\x08", "").replace("\t", "").replace("\r", "")
+
+
 def render(output: str, cols: int = 500, rows: int = 200) -> str:
     """Render terminal control sequences via pyte to recover visible screen text.
 
@@ -120,6 +148,14 @@ class _CompleteTestCase(with_typehint(TestCase)):
     environment: t.List[str] = []
 
     tabs: str
+
+    # When True (Unix only), spawn the shell with os.setsid() + TIOCSCTTY so
+    # the child becomes session leader with a proper controlling terminal.
+    # Fish requires this -- it disables interactive features (including TAB
+    # completion) without a controlling TTY. zsh on the other hand REGRESSES
+    # under this setup -- ZLE / job-control init paths differ enough that
+    # our captured-output flow stops working. Bash is unaffected either way.
+    requires_controlling_terminal: bool = False
 
     # Per-instance shell process state (None when no shell is running).
     _shell_state: t.Any = None
@@ -305,6 +341,13 @@ class _CompleteTestCase(with_typehint(TestCase)):
             win_size = struct.pack("HHHH", 24, 80, 0, 0)
             fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, win_size)
 
+            def _become_session_leader() -> None:
+                # Give the child a proper controlling terminal. Fish refuses
+                # to run interactively without one (prints "warning: No TTY
+                # for interactive shell" and disables completion / readline).
+                os.setsid()
+                fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)
+
             shell = self.shell or detect_shell()[0]
             process = subprocess.Popen(
                 [shell, *([self.interactive_opt] if self.interactive_opt else [])],
@@ -312,6 +355,11 @@ class _CompleteTestCase(with_typehint(TestCase)):
                 stdout=slave_fd,
                 stderr=slave_fd,
                 text=True,
+                preexec_fn=(
+                    _become_session_leader
+                    if self.requires_controlling_terminal
+                    else None
+                ),
             )
             self._shell_state = (master_fd, slave_fd, process)
 
@@ -359,7 +407,18 @@ class _CompleteTestCase(with_typehint(TestCase)):
         # Strip the sentinel so callers never see this test artifact in
         # the rendered completion output.
         output = output.replace(_TAB_SENTINEL, "")
-        return render(output) if scrub_output else output
+        return self._render_output(output) if scrub_output else output
+
+    def _render_output(self, output: str) -> str:
+        """Convert raw PTY bytes to assertion-friendly text.
+
+        Default implementation uses :func:`render` (pyte-based) which
+        accurately reflects the *final* visible screen state. Shells whose
+        completion menus are drawn-then-overwritten (notably fish)
+        override this to use :func:`flat_scrub` so candidate text that
+        was transmitted but later erased remains in the result.
+        """
+        return render(output)
 
     def run_app_completion(self):
         completions = self.get_completions(self.launch_script, "completion", " ")

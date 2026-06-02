@@ -10,6 +10,7 @@ from django.core.management import CommandError
 from tests.shellcompletion import (
     _ScriptCompleteTestCase,
     _InstalledScriptCompleteTestCase,
+    flat_scrub,
 )
 
 
@@ -19,11 +20,23 @@ class _FishMixin:
     tabs = "\t"
     directory = Path("~/.config/fish/completions").expanduser()
     interactive_opt = "--interactive"
+    # Fish disables interactive features (incl. completion) without a
+    # proper controlling TTY -- it prints "warning: No TTY for interactive
+    # shell (tcgetpgrp failed)" and degrades into a non-interactive mode.
+    requires_controlling_terminal = True
 
     environment = [
         f"set -x DJANGO_SETTINGS_MODULE 'tests.settings.completion'",
         f"source {Path(sys.executable).absolute().parent / 'activate.fish'}",
     ]
+
+    def _render_output(self, output: str) -> str:
+        # Fish's pager draws candidate menus and then erases them with
+        # cursor-up + \x1b[J before redrawing the prompt. pyte's screen
+        # simulation loses the candidates because they've been erased on
+        # screen. flat_scrub keeps the transmitted bytes so we can assert
+        # against what fish actually emitted.
+        return flat_scrub(output)
 
     def verify_install(self, script=None, directory: t.Optional[Path] = None):
         directory = directory or self.directory
@@ -76,37 +89,6 @@ class FishExeShellTests(_FishMixin, _InstalledScriptCompleteTestCase, TestCase):
     @pytest.mark.skip(reason="fish does not support ansi control sequences")
     def test_rich_output(self): ...
 
-    # TODO - fix fish tests, having trouble running it in a subprocess!!
-    def test_shell_complete(self):
-        self.remove()
-        self.verify_remove()
-        self.remove()
-        self.verify_remove()
-        self.install()
-        self.verify_install()
-        self.install()
-        self.verify_install()
-        self.remove()
-        self.verify_remove()
-
     @pytest.mark.rich
-    @pytest.mark.skip(reason="TODO")
+    @pytest.mark.skip(reason="fish does not support ansi control sequences")
     def test_no_rich_output(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_settings_pass_through(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_pythonpath_pass_through(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_fallback(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_reentrant_install_uninstall(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_multi_install(self): ...
-
-    @pytest.mark.skip(reason="TODO")
-    def test_path_completion(self): ...
