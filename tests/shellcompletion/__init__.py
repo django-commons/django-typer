@@ -66,6 +66,16 @@ def render(output: str, cols: int = 500, rows: int = 200) -> str:
 
 _SENTINEL_PREFIX = "__DJT_SENTINEL_"
 
+# Sentinel byte written immediately after TAB. Because shell input is
+# processed serially, this character can only be echoed back AFTER the
+# shell has finished the TAB-triggered completion (subprocess call +
+# line rewrite). Spotting it in the captured stream is a positive
+# "completion is done" signal that avoids relying on a long
+# silence-based quiet_period. Chosen to be a printable char that no
+# shell treats as a control action AND that is exceedingly unlikely to
+# appear in any real Django completion candidate.
+_TAB_SENTINEL = "‡"  # double dagger: ‡
+
 
 def _wait_for(
     read_fn: t.Callable[[], str],
@@ -328,18 +338,27 @@ class _CompleteTestCase(with_typehint(TestCase)):
             elif position < 0:
                 self._write_shell("\x1b[D" * abs(position))
             self._write_shell(self.tabs)
+            # Sentinel-after-TAB: shells process input serially, so this
+            # character can only be echoed back AFTER TAB-triggered
+            # completion has fully finished (including the Django
+            # subprocess call that powers our completer). Waiting for
+            # the sentinel in the captured stream is much faster and
+            # more reliable than waiting for a quiet period long enough
+            # to cover slow CI Django boots.
+            self._write_shell(_TAB_SENTINEL)
 
-            # TAB triggers an inline completion display -- no sentinel is
-            # possible, so wait for the output to settle.  The quiet_period
-            # must be long enough to bridge the Django-bootstrap gap between
-            # the shell echoing our typed text and the completion subprocess
-            # actually producing output (the registered completer shells out
-            # to `django-admin shellcompletion complete`, which loads Django
-            # -- typically 1-2s on a cold interpreter).
-            output = _wait_for(self._read_shell, quiet_period=2.0, timeout=15.0)
+            output = _wait_for(
+                self._read_shell,
+                sentinel=_TAB_SENTINEL,
+                quiet_period=0.3,
+                timeout=25.0,
+            )
         finally:
             self._invalidate_shell()
 
+        # Strip the sentinel so callers never see this test artifact in
+        # the rendered completion output.
+        output = output.replace(_TAB_SENTINEL, "")
         return render(output) if scrub_output else output
 
     def run_app_completion(self):
