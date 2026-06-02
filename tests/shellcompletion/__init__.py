@@ -99,10 +99,15 @@ _SENTINEL_PREFIX = "__DJT_SENTINEL_"
 # shell has finished the TAB-triggered completion (subprocess call +
 # line rewrite). Spotting it in the captured stream is a positive
 # "completion is done" signal that avoids relying on a long
-# silence-based quiet_period. Chosen to be a printable char that no
-# shell treats as a control action AND that is exceedingly unlikely to
-# appear in any real Django completion candidate.
-_TAB_SENTINEL = "‡"  # double dagger: ‡
+# silence-based quiet_period.
+#
+# Must be a SINGLE-BYTE printable ASCII character. Multi-byte UTF-8
+# sentinels (e.g. ``‡`` = 0xe2 0x80 0xa1) break PSReadLine on
+# PowerShell -- it reads input byte-by-byte and treats high-bit bytes
+# as Meta-key prefixes (chord triggers), which flips the line into
+# continuation-prompt state ("\n>>") instead of cleanly appending.
+# Tilde is treated as a regular keystroke by all supported shells.
+_TAB_SENTINEL = "~"
 
 
 def _wait_for(
