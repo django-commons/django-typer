@@ -1,3 +1,4 @@
+import glob
 import shutil
 from pathlib import Path
 import typing as t
@@ -25,6 +26,22 @@ class ZshTests(_ScriptCompleteTestCase, TestCase):
         f"PATH={Path(sys.executable).parent}:$PATH",
         f"DJANGO_SETTINGS_MODULE=tests.settings.completion",
     ]
+
+    def setUp(self):
+        # Force a fresh compinit on every shell spawn. A stale
+        # ~/.zcompdump (which persists across test methods on macOS CI
+        # runners, where a single $HOME is shared for the whole job)
+        # can cause a newly-installed completion function -- e.g. the
+        # one rewritten by test_fallback with a --fallback arg -- to
+        # be missed entirely on the first TAB. Costs ~200-500ms per
+        # test for the full compinit security check, no risk of
+        # regressing other tests.
+        for f in glob.glob(str(Path.home() / ".zcompdump*")):
+            try:
+                os.unlink(f)
+            except OSError:
+                pass
+        super().setUp()
 
     def verify_install(self, script=None, directory: t.Optional[Path] = None):
         directory = directory or self.directory
