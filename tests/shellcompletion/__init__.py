@@ -101,13 +101,18 @@ _SENTINEL_PREFIX = "__DJT_SENTINEL_"
 # "completion is done" signal that avoids relying on a long
 # silence-based quiet_period.
 #
-# Must be a SINGLE-BYTE printable ASCII character. Multi-byte UTF-8
-# sentinels (e.g. ``‡`` = 0xe2 0x80 0xa1) break PSReadLine on
-# PowerShell -- it reads input byte-by-byte and treats high-bit bytes
-# as Meta-key prefixes (chord triggers), which flips the line into
-# continuation-prompt state ("\n>>") instead of cleanly appending.
-# Tilde is treated as a regular keystroke by all supported shells.
-_TAB_SENTINEL = "~"
+# Chosen as a multi-byte UTF-8 character that is exceedingly unlikely
+# to appear in any real completion candidate, in shell prompts, or in
+# terminal escape sequences (so it won't false-match in the captured
+# stream). Trade-off: PSReadLine reads input byte-by-byte and treats
+# the individual high-bit bytes (0xe2, 0x80, 0xa1 for ``‡``) as
+# Meta-key prefixes that flip the line into continuation-prompt state,
+# so PowerShell opts out of the sentinel path -- see ``tab_sentinel``.
+#
+# Single-byte ASCII alternatives (``~``, ``Q``, etc.) were tried but
+# either appear in shell prompts / escape sequences (false-match) or
+# in completion output (collision with .replace strip).
+_TAB_SENTINEL = "‡"
 
 
 def _wait_for(
@@ -161,6 +166,23 @@ class _CompleteTestCase(with_typehint(TestCase)):
     # under this setup -- ZLE / job-control init paths differ enough that
     # our captured-output flow stops working. Bash is unaffected either way.
     requires_controlling_terminal: bool = False
+
+    # When non-None, write this string immediately after TAB and wait for it
+    # to be echoed back as a positive "completion is done" signal. Shells
+    # process input serially, so the sentinel is guaranteed to be processed
+    # only AFTER the TAB-triggered completion finishes. Set to None to fall
+    # back to a pure quiet-period wait -- required for PowerShell, where
+    # PSReadLine interprets the multi-byte UTF-8 sentinel bytes (0xe2 0x80
+    # 0xa1 for ``‡``) as Meta-key chord input that puts the line into
+    # continuation-prompt state, breaking completion entirely.
+    tab_sentinel: t.Optional[str] = _TAB_SENTINEL
+
+    # Quiet period (seconds of silence) used when ``tab_sentinel`` is None.
+    # Must be long enough to bridge the Django-bootstrap gap between echoing
+    # the typed text and the completion subprocess actually producing
+    # output. On slow CI VMs (especially Windows) cold-start Django can
+    # take 3-4s, so we default to a generous value.
+    tab_quiet_period: float = 4.0
 
     # Per-instance shell process state (None when no shell is running).
     _shell_state: t.Any = None
@@ -391,27 +413,37 @@ class _CompleteTestCase(with_typehint(TestCase)):
             elif position < 0:
                 self._write_shell("\x1b[D" * abs(position))
             self._write_shell(self.tabs)
-            # Sentinel-after-TAB: shells process input serially, so this
-            # character can only be echoed back AFTER TAB-triggered
-            # completion has fully finished (including the Django
-            # subprocess call that powers our completer). Waiting for
-            # the sentinel in the captured stream is much faster and
-            # more reliable than waiting for a quiet period long enough
-            # to cover slow CI Django boots.
-            self._write_shell(_TAB_SENTINEL)
-
-            output = _wait_for(
-                self._read_shell,
-                sentinel=_TAB_SENTINEL,
-                quiet_period=0.3,
-                timeout=25.0,
-            )
+            if self.tab_sentinel is not None:
+                # Sentinel-after-TAB: shells process input serially, so
+                # this character can only be echoed back AFTER TAB-
+                # triggered completion has fully finished (including the
+                # Django subprocess call that powers our completer).
+                # Waiting for the sentinel in the captured stream is
+                # much faster and more reliable than waiting for a quiet
+                # period long enough to cover slow CI Django boots.
+                self._write_shell(self.tab_sentinel)
+                output = _wait_for(
+                    self._read_shell,
+                    sentinel=self.tab_sentinel,
+                    quiet_period=0.3,
+                    timeout=25.0,
+                )
+            else:
+                # Sentinel-less path: fall back to pure quiet-period
+                # detection. Required for PowerShell -- see comment on
+                # ``tab_sentinel``.
+                output = _wait_for(
+                    self._read_shell,
+                    quiet_period=self.tab_quiet_period,
+                    timeout=25.0,
+                )
         finally:
             self._invalidate_shell()
 
-        # Strip the sentinel so callers never see this test artifact in
-        # the rendered completion output.
-        output = output.replace(_TAB_SENTINEL, "")
+        # Strip the sentinel (no-op for sentinel-less shells) so callers
+        # never see this test artifact in the rendered completion output.
+        if self.tab_sentinel is not None:
+            output = output.replace(self.tab_sentinel, "")
         return self._render_output(output) if scrub_output else output
 
     def _render_output(self, output: str) -> str:
