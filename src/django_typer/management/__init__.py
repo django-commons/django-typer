@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import inspect
 import sys
 import typing as t
 from collections import deque
 from copy import copy, deepcopy
-from functools import cached_property, lru_cache
+from functools import cache, cached_property
 from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
@@ -20,17 +22,17 @@ from django_typer import patch
 
 patch.apply()
 
-import typer  # noqa: E402
-import typer.core  # noqa: E402
-from typer.core import TyperCommand as CoreTyperCommand  # noqa: E402
-from typer.core import TyperGroup as CoreTyperGroup  # noqa: E402
-from typer.main import get_command as get_typer_command  # noqa: E402
-from typer.main import get_params_convertors_ctx_param_name_from_function  # noqa: E402
-from typer.models import Context as TyperContext  # noqa: E402
-from typer.models import Default, DefaultPlaceholder  # noqa: E402
+import typer
+import typer.core
+from typer.core import TyperCommand as CoreTyperCommand
+from typer.core import TyperGroup as CoreTyperGroup
+from typer.main import get_command as get_typer_command
+from typer.main import get_params_convertors_ctx_param_name_from_function
+from typer.models import Context as TyperContext
+from typer.models import Default, DefaultPlaceholder
 
-from ..config import show_locals, traceback_config, use_rich_tracebacks  # noqa: E402
-from ..types import (  # noqa: E402
+from ..config import show_locals, traceback_config, use_rich_tracebacks
+from ..types import (
     ForceColor,
     HideLocals,
     NoColor,
@@ -42,7 +44,7 @@ from ..types import (  # noqa: E402
     Verbosity,
     Version,
 )
-from ..utils import (  # noqa: E402
+from ..utils import (
     _command_context,
     _load_command_plugins,
     accepted_kwargs,
@@ -59,20 +61,20 @@ DEFAULT_MARKUP_MODE = getattr(typer.core, "DEFAULT_MARKUP_MODE", None)
 
 
 __all__ = [
-    "TyperCommand",
-    "CommandNode",
     "BoundProxy",
-    "Typer",
-    "DjangoTyperMixin",
+    "CommandNode",
+    "Context",
     "DTCommand",
     "DTGroup",
-    "Context",
-    "initialize",
-    "finalize",
+    "DjangoTyperMixin",
+    "Typer",
+    "TyperCommand",
     "callback",
     "command",
-    "group",
+    "finalize",
     "get_command",
+    "group",
+    "initialize",
 ]
 
 P = t.ParamSpec("P")
@@ -88,8 +90,8 @@ _CACHE_KEY = "_register_typer"
 @t.overload  # pragma: no cover
 def get_command(
     command_name: str,
-    stdout: t.Optional[t.IO[str]] = None,
-    stderr: t.Optional[t.IO[str]] = None,
+    stdout: t.IO[str] | None = None,
+    stderr: t.IO[str] | None = None,
     no_color: bool = False,
     force_color: bool = False,
     **kwargs: t.Any,
@@ -100,9 +102,9 @@ def get_command(
 # mypy seems to break on this one, but this is correct
 def get_command(
     command_name: str,
-    cmd_type: t.Type[C],
-    stdout: t.Optional[t.IO[str]] = None,
-    stderr: t.Optional[t.IO[str]] = None,
+    cmd_type: type[C],
+    stdout: t.IO[str] | None = None,
+    stderr: t.IO[str] | None = None,
     no_color: bool = False,
     force_color: bool = False,
     **kwargs: t.Any,
@@ -114,8 +116,8 @@ def get_command(
     command_name: str,
     path0: str,
     *path: str,
-    stdout: t.Optional[t.IO[str]] = None,
-    stderr: t.Optional[t.IO[str]] = None,
+    stdout: t.IO[str] | None = None,
+    stderr: t.IO[str] | None = None,
     no_color: bool = False,
     force_color: bool = False,
     **kwargs: t.Any,
@@ -212,11 +214,9 @@ def get_command(
     if path and (isinstance(path[0], str) or len(path) > 1):
         return t.cast(TyperCommand, cmd).get_subcommand(*path).callback
 
-    if not hasattr(cmd, "__call__"):
-        setattr(
-            cmd.__class__,
-            "__call__",
-            lambda self, *args, **options: self.handle(*args, **options),
+    if not callable(cmd):
+        cmd.__class__.__call__ = lambda self, *args, **options: self.handle(
+            *args, **options
         )
 
     return cmd
@@ -241,20 +241,18 @@ def _common_options(  # pyright: ignore[reportRedeclaration]
 
 # cache common params to avoid this extra work on every command
 # we cant resolve these at module scope because translations break it
-_common_params: t.Sequence[t.Union[click.Argument, click.Option]] = []
+_common_params: t.Sequence[click.Argument | click.Option] = []
 
 
 def _normalize_suppressed_arguments(
-    command: t.Union[t.Type["TyperCommand"], "TyperCommand"],
-) -> t.Set[str]:
+    command: type[TyperCommand] | TyperCommand,
+) -> set[str]:
     suppressed = set()
     if command.suppressed_base_arguments:
-        suppressed = set(
-            [
-                arg.lstrip("--").replace("-", "_")
-                for arg in command.suppressed_base_arguments
-            ]
-        )
+        suppressed = {
+            arg.lstrip("-").replace("-", "_")
+            for arg in command.suppressed_base_arguments
+        }
     if not rich_installed or not use_rich_tracebacks():
         suppressed.update({"show_locals", "hide_locals"})
     else:
@@ -267,8 +265,8 @@ def _normalize_suppressed_arguments(
 
 
 def _get_common_params(
-    command: t.Type["TyperCommand"],
-) -> t.Sequence[t.Union[click.Argument, click.Option]]:
+    command: type[TyperCommand],
+) -> t.Sequence[click.Argument | click.Option]:
     """Use typer to convert the common options to click options"""
     global _common_params
     if not _common_params:
@@ -288,9 +286,10 @@ COMMON_DEFAULTS = {
 
 
 def _remove_suppressed(
-    command: "TyperCommand", params: t.Dict[str, t.Any], manual: t.Set[str] = set()
-) -> t.Dict[str, t.Any]:
+    command: TyperCommand, params: dict[str, t.Any], manual: set[str] | None = None
+) -> dict[str, t.Any]:
     suppressed = _normalize_suppressed_arguments(command)
+    manual = manual or set()
     return {k: v for k, v in params.items() if k not in suppressed or k in manual}
 
 
@@ -323,11 +322,11 @@ class Context(TyperContext):
     :func:`~django.core.management.call_command`.
     """
 
-    django_command: "TyperCommand"
-    children: t.List["Context"]
-    _supplied_params: t.Dict[str, t.Any]
+    django_command: TyperCommand
+    children: list[Context]
+    _supplied_params: dict[str, t.Any]
 
-    parent: "Context"
+    parent: Context  # pyright: ignore[reportIncompatibleVariableOverride]
 
     class ParamDict(dict):
         """
@@ -348,7 +347,7 @@ class Context(TyperContext):
                 super().__setitem__(key, value)
 
     @property
-    def supplied_params(self) -> t.Dict[str, t.Any]:
+    def supplied_params(self) -> dict[str, t.Any]:
         """
         Get the parameters that were supplied when the command was invoked via
         :func:`~django.core.management.call_command`, only the root context has these.
@@ -360,9 +359,9 @@ class Context(TyperContext):
     def __init__(
         self,
         command: click.Command,
-        parent: t.Optional["Context"] = None,
-        django_command: t.Optional["TyperCommand"] = None,
-        supplied_params: t.Optional[t.Dict[str, t.Any]] = None,
+        parent: Context | None = None,
+        django_command: TyperCommand | None = None,
+        supplied_params: dict[str, t.Any] | None = None,
         **kwargs: t.Any,
     ):
         super().__init__(command, parent=parent, **kwargs)
@@ -405,10 +404,10 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     and Groups.
     """
 
-    context_class: t.Type[click.Context] = Context
-    django_command: t.Type["TyperCommand"]
-    _callback: t.Optional[t.Callable[..., t.Any]] = None
-    _callback_is_method: t.Optional[bool] = None
+    context_class: type[click.Context] = Context
+    django_command: type[TyperCommand]
+    _callback: t.Callable[..., t.Any] | None = None
+    _callback_is_method: bool | None = None
     common_init: bool = False
 
     @property
@@ -420,7 +419,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         )
 
     @property
-    def is_method(self) -> t.Optional[bool]:
+    def is_method(self) -> bool | None:
         if self._callback_is_method is None:
             self._callback_is_method = is_method(self._callback)
         return self._callback_is_method
@@ -436,7 +435,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         infrastructure the conversion happens.
         """
 
-    def get_params(self, ctx: click.Context) -> t.List[click.Parameter]:
+    def get_params(self, ctx: click.Context) -> list[click.Parameter]:
         """
         We override get_params to check to make sure that prompt_required is not set for
         parameters that have already been prompted for during the initial parse phase.
@@ -450,19 +449,20 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         params = super().get_params(ctx)
         for param in params:
             if (
-                getattr(param, "prompt", None)
-                and getattr(param, "prompt_required", False)
+                isinstance(param, click.Option)
+                and param.prompt
+                and param.prompt_required
                 and getattr(ctx, "supplied_params", {}).get(param.name, None)
             ):
                 param = copy(param)
-                setattr(param, "prompt_required", False)
+                param.prompt_required = False
                 param.required = False
             modified.append(param)
         return modified
 
     def shell_complete(
         self, ctx: click.Context, incomplete: str
-    ) -> t.List[CompletionItem]:
+    ) -> list[CompletionItem]:
         """
         By default if the incomplete string is a space and there are no completions
         the click infrastructure will return _files. We'd rather return parameters
@@ -475,7 +475,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             )
         return completions
 
-    def common_params(self) -> t.Sequence[t.Union[click.Argument, click.Option]]:
+    def common_params(self) -> t.Sequence[click.Argument | click.Option]:
         """
         Add the common parameters to this group only if this group is the root
         command's user specified initialize callback.
@@ -489,8 +489,8 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     def __init__(
         self,
         *args,
-        callback: t.Optional[t.Callable[..., t.Any]],
-        params: t.Optional[t.List[click.Parameter]] = None,
+        callback: t.Callable[..., t.Any] | None,
+        params: list[click.Parameter] | None = None,
         **kwargs: t.Any,
     ):
         params = params or []
@@ -589,7 +589,7 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     and :doc:`click:advanced` for more information.
     """
 
-    def list_commands(self, ctx: click.Context) -> t.List[str]:
+    def list_commands(self, ctx: click.Context) -> list[str]:
         """
         Do our best to list commands in definition order.
         """
@@ -728,7 +728,7 @@ def _strip_static(func: t.Callable[P, R]) -> t.Callable[P, R]: ...
 def _strip_static(func: None) -> None: ...
 
 
-def _strip_static(func: t.Optional[t.Callable[P, R]]) -> t.Optional[t.Callable[P, R]]:
+def _strip_static(func: t.Callable[P, R] | None) -> t.Callable[P, R] | None:
     """
     Strip the staticmethod wrapper from a function if it is present.
     """
@@ -739,13 +739,13 @@ def _strip_static(func: t.Optional[t.Callable[P, R]]) -> t.Optional[t.Callable[P
 def _cache_initializer(
     callback: t.Callable[..., t.Any],
     common_init: bool,
-    help: t.Optional[t.Union[str, Promise]] = Default(None),
-    cls: t.Type[DTGroup] = DTGroup,
+    help: str | Promise | None = Default(None),
+    cls: type[DTGroup] = DTGroup,
     **kwargs: t.Any,
 ):
     def register(
-        cmd: t.Type["TyperCommand"],
-        _help: t.Optional[t.Union[str, Promise]] = Default(None),
+        cmd: type[TyperCommand],
+        _help: str | Promise | None = Default(None),
         **extra,
     ):
         extra.pop("_name", None)
@@ -764,7 +764,7 @@ def _cache_initializer(
 
 
 def _cache_finalizer(callback: t.Callable[..., t.Any]):
-    def register(cmd: t.Type["TyperCommand"]):
+    def register(cmd: type[TyperCommand]):
         finalizer = Finalizer(_strip_static(callback))
         cmd.typer_app.info.result_callback = finalizer
 
@@ -773,15 +773,15 @@ def _cache_finalizer(callback: t.Callable[..., t.Any]):
 
 def _cache_command(
     callback: t.Callable[..., t.Any],
-    name: t.Optional[str] = None,
-    help: t.Optional[t.Union[str, Promise]] = None,
-    cls: t.Type[DTCommand] = DTCommand,
+    name: str | None = None,
+    help: str | Promise | None = None,
+    cls: type[DTCommand] = DTCommand,
     **kwargs: t.Any,
 ):
     def register(
-        cmd: t.Type["TyperCommand"],
-        _name: t.Optional[str] = None,
-        _help: t.Optional[t.Union[str, Promise]] = None,
+        cmd: type[TyperCommand],
+        _name: str | None = None,
+        _help: str | Promise | None = None,
         **extra,
     ):
         return cmd.typer_app.command(
@@ -804,7 +804,7 @@ TyperFunction = t.Union[
 
 
 def _get_direct_function(
-    obj: "TyperCommand",
+    obj: TyperCommand,
     app_node: TyperFunction,
 ):
     """
@@ -830,7 +830,7 @@ class AppFactory(type):
     the Typer-like functional interface is used.
     """
 
-    def __call__(self, *args, **kwargs: t.Any) -> "Typer":
+    def __call__(self, *args, **kwargs: t.Any) -> Typer:
         if called_from_module():
             frame = inspect.currentframe()
             cmd_module = inspect.getmodule(frame.f_back) if frame else None
@@ -847,7 +847,7 @@ class AppFactory(type):
                 # spoof it so hard
                 Command.__module__ = cmd_module.__name__
                 Command.__qualname__ = f"{cmd_module.__name__}.Command"
-                setattr(cmd_module, "Command", Command)
+                cmd_module.Command = Command  # type: ignore[assignment]
                 return Command.typer_app
             else:
                 return Typer(**kwargs)
@@ -908,30 +908,32 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         therefore do not advise hardcoding this value.
     """
 
-    parent: t.Optional["Typer"] = None
+    parent: Typer | None = None
 
-    _django_command: t.Optional[t.Type["TyperCommand"]] = None
+    _django_command: type[TyperCommand] | None = None
 
     # these aren't defined on the super class which messes up __getattr__
-    registered_groups: t.List[typer.models.TyperInfo] = []
-    registered_commands: t.List[typer.models.CommandInfo] = []
-    registered_callback: t.Optional[typer.models.TyperInfo] = None
+    # they are class-level fallbacks only - Typer.__init__ assigns instance
+    # attributes, so ClassVar would be wrong and they are never mutated
+    registered_groups: list[typer.models.TyperInfo] = []  # noqa: RUF012
+    registered_commands: list[typer.models.CommandInfo] = []  # noqa: RUF012
+    registered_callback: typer.models.TyperInfo | None = None
 
-    is_method: t.Optional[bool] = None
+    is_method: bool | None = None
     top_level: bool = False
 
     @property
-    def django_command(self) -> t.Optional[t.Type["TyperCommand"]]:
+    def django_command(self) -> type[TyperCommand] | None:
         return self._django_command or getattr(self.parent, "django_command", None)
 
     @django_command.setter
-    def django_command(self, cmd: t.Optional[t.Type["TyperCommand"]]):
+    def django_command(self, cmd: type[TyperCommand] | None):
         self._django_command = cmd
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         return super().__call__(*args, **kwargs)
 
-    def __get__(self, obj, _=None) -> "Typer[P, R]":
+    def __get__(self, obj, _=None) -> Typer[P, R]:
         """
         Our Typer app wrapper also doubles as a descriptor, so when
         it is accessed on the instance, we return the wrapped function
@@ -954,27 +956,25 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             if name in _names(cmd_grp):
                 return cmd_grp
         raise AttributeError(
-            "{cls} object has no attribute {name}".format(
-                cls=self.__class__.__name__, name=name
-            )
+            f"{self.__class__.__name__} object has no attribute {name}"
         )
 
     def __init__(
         self,
         *args,
-        name: t.Optional[str] = Default(None),
-        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
+        name: str | None = Default(None),
+        cls: type[DTGroup] | None = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        callback: t.Optional[t.Callable[t.Concatenate[TC, P], R]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        callback: t.Callable[t.Concatenate[TC, P], R] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
@@ -982,13 +982,13 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         add_completion: bool = True,
         # Rich settings
         rich_markup_mode: typer.core.MarkupMode = DEFAULT_MARKUP_MODE,
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         suggest_commands: bool = True,
         pretty_exceptions_enable: bool = True,
         pretty_exceptions_show_locals: bool = False,
         pretty_exceptions_short: bool = True,
-        parent: t.Optional["Typer"] = None,
-        django_command: t.Optional[t.Type["TyperCommand"]] = None,
+        parent: Typer | None = None,
+        django_command: type[TyperCommand] | None = None,
         **kwargs: t.Any,
     ):
         assert not args  # should have been removed by metaclass
@@ -1045,28 +1045,29 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     def callback(  # type: ignore
         self,
         *,
-        cls: t.Type[DTGroup] = DTGroup,
+        cls: type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: t.Optional[str] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
+        options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[
         [typer.models.CommandFunctionType], typer.models.CommandFunctionType
     ]:
-        """"""
+        # intentionally blank - suppresses inheritance of typer's docstring
+        """"""  # noqa: D419
 
         def make_callback(
             func: typer.models.CommandFunctionType,
@@ -1109,20 +1110,20 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     def command(  # type: ignore
         self,
-        name: t.Optional[str] = None,
+        name: str | None = None,
         *,
-        cls: t.Type[DTCommand] = DTCommand,
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[t.Union[str, Promise]] = None,
-        epilog: t.Optional[str] = None,
-        short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: t.Optional[str] = Default(None),
+        cls: type[DTCommand] = DTCommand,
+        context_settings: dict[t.Any, t.Any] | None = None,
+        help: str | Promise | None = None,
+        epilog: str | None = None,
+        short_help: str | Promise | None = None,
+        options_metavar: str | None = Default(None),
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
         deprecated: bool = False,
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
         """
@@ -1196,30 +1197,31 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
     def add_typer(  # type: ignore
         self,
-        typer_instance: "Typer",
+        typer_instance: Typer,
         *,
-        name: t.Optional[str] = Default(None),
-        cls: t.Type[DTGroup] = Default(DTGroup),
+        name: str | None = Default(None),
+        cls: type[DTGroup] = Default(DTGroup),
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: t.Optional[str] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        callback: t.Callable[..., t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
+        options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = False,
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> None:
-        """ """
+        # intentionally blank - suppresses inheritance of typer's docstring
+        """ """  # noqa: D419
         typer_instance.parent = self
         typer_instance.django_command = self.django_command
 
@@ -1260,24 +1262,24 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     @t.no_type_check
     def group(
         self,
-        name: t.Optional[str] = Default(None),
-        cls: t.Type[DTGroup] = DTGroup,
+        name: str | None = Default(None),
+        cls: type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: t.Optional[str] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
+        options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = False,
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[
         [
@@ -1285,7 +1287,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 t.Concatenate[TC, P2], R2  # pyright: ignore[reportInvalidTypeVarUse]
             ]
         ],
-        "Typer[P2, R2]",
+        Typer[P2, R2],
     ]:
         """
         Create a new subgroup and attach it to this group. This is like creating a new
@@ -1390,10 +1392,10 @@ class BoundProxy(t.Generic[P, R]):
     to the django command instance.
     """
 
-    command: "TyperCommand"
-    proxied: t.Union[TyperFunction, Finalizer]
+    command: TyperCommand
+    proxied: TyperFunction | Finalizer
 
-    def __init__(self, command: "TyperCommand", proxied: TyperFunction):
+    def __init__(self, command: TyperCommand, proxied: TyperFunction):
         self.command = command
         self.proxied = proxied
 
@@ -1423,31 +1425,29 @@ class BoundProxy(t.Generic[P, R]):
             return BoundProxy(self.command, self.proxied.info.result_callback)
 
         raise AttributeError(
-            "{cls} object has no attribute {name}".format(
-                cls=self.__class__.__name__, name=name
-            )
+            f"{self.__class__.__name__} object has no attribute {name}"
         )
 
 
 def initialize(
     *,
-    cls: t.Type[DTGroup] = DTGroup,
+    cls: type[DTGroup] = DTGroup,
     invoke_without_command: bool = Default(False),
     no_args_is_help: bool = Default(False),
-    subcommand_metavar: t.Optional[str] = Default(None),
+    subcommand_metavar: str | None = Default(None),
     chain: bool = Default(False),
-    result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+    result_callback: t.Callable[..., t.Any] | None = Default(None),
     # Command
-    context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[t.Union[str, Promise]] = Default(None),
-    epilog: t.Optional[str] = Default(None),
-    short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-    options_metavar: t.Optional[str] = Default(None),
+    context_settings: dict[t.Any, t.Any] | None = Default(None),
+    help: str | Promise | None = Default(None),
+    epilog: str | None = Default(None),
+    short_help: str | Promise | None = Default(None),
+    options_metavar: str | None = Default(None),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
     deprecated: bool = Default(False),
     # Rich settings
-    rich_help_panel: t.Union[str, None] = Default(None),
+    rich_help_panel: str | None = Default(None),
     **kwargs: t.Any,
 ) -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
     """
@@ -1619,20 +1619,20 @@ def finalize() -> t.Callable[[t.Callable[P2, R2]], t.Callable[P2, R2]]:
 
 
 def command(
-    name: t.Optional[str] = None,
+    name: str | None = None,
     *,
-    cls: t.Type[DTCommand] = DTCommand,
-    context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-    help: t.Optional[t.Union[str, Promise]] = None,
-    epilog: t.Optional[str] = None,
-    short_help: t.Optional[t.Union[str, Promise]] = None,
-    options_metavar: t.Optional[str] = Default(None),
+    cls: type[DTCommand] = DTCommand,
+    context_settings: dict[t.Any, t.Any] | None = None,
+    help: str | Promise | None = None,
+    epilog: str | None = None,
+    short_help: str | Promise | None = None,
+    options_metavar: str | None = Default(None),
     add_help_option: bool = True,
     no_args_is_help: bool = False,
     hidden: bool = False,
     deprecated: bool = False,
     # Rich settings
-    rich_help_panel: t.Union[str, None] = Default(None),
+    rich_help_panel: str | None = Default(None),
     **kwargs: t.Any,
 ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
     """
@@ -1716,24 +1716,24 @@ def command(
 
 
 def group(
-    name: t.Optional[str] = Default(None),
-    cls: t.Type[DTGroup] = DTGroup,
+    name: str | None = Default(None),
+    cls: type[DTGroup] = DTGroup,
     invoke_without_command: bool = Default(False),
     no_args_is_help: bool = Default(False),
-    subcommand_metavar: t.Optional[str] = Default(None),
+    subcommand_metavar: str | None = Default(None),
     chain: bool = Default(False),
-    result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+    result_callback: t.Callable[..., t.Any] | None = Default(None),
     # Command
-    context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-    help: t.Optional[t.Union[str, Promise]] = Default(None),
-    epilog: t.Optional[str] = Default(None),
-    short_help: t.Optional[t.Union[str, Promise]] = Default(None),
+    context_settings: dict[t.Any, t.Any] | None = Default(None),
+    help: str | Promise | None = Default(None),
+    epilog: str | None = Default(None),
+    short_help: str | Promise | None = Default(None),
     options_metavar: str = Default("[OPTIONS]"),
     add_help_option: bool = Default(True),
     hidden: bool = Default(False),
     deprecated: bool = False,
     # Rich settings
-    rich_help_panel: t.Union[str, None] = Default(None),
+    rich_help_panel: str | None = Default(None),
     **kwargs: t.Any,
 ) -> t.Callable[
     [t.Callable[t.Concatenate[TC, P], R]],  # pyright: ignore[reportInvalidTypeVarUse]
@@ -1835,8 +1835,8 @@ def group(
 
 
 def _add_common_initializer(
-    cmd: t.Union["TyperCommandMeta", t.Type["TyperCommand"], "TyperCommand"],
-) -> t.Optional[typer.models.TyperInfo]:
+    cmd: TyperCommandMeta | type[TyperCommand] | TyperCommand,
+) -> typer.models.TyperInfo | None:
     """
     Add a callback to the typer app that will add the unsuppressed
     common django base command parameters to the CLI if the command
@@ -1860,7 +1860,7 @@ def _add_common_initializer(
     return cmd.typer_app.registered_callback
 
 
-def _resolve_help(dj_cmd: "TyperCommand"):
+def _resolve_help(dj_cmd: TyperCommand):
     """
     If no help string would be rendered for the root level command and a class docstring
     is present, use it as the help string.
@@ -1900,7 +1900,7 @@ def _resolve_help(dj_cmd: "TyperCommand"):
         dj_cmd.typer_app.registered_commands[0].help = dj_cmd.typer_app.info.help
 
 
-def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.Set[str]:
+def _names(tc: typer.models.CommandInfo | Typer) -> set[str]:
     """
     For a command or group, get a list of attribute name and its CLI name.
 
@@ -1924,10 +1924,10 @@ def _names(tc: t.Union[typer.models.CommandInfo, Typer]) -> t.Set[str]:
     return names
 
 
-@lru_cache(maxsize=None)
+@cache
 def _bfs_match(
     app: Typer, name: str
-) -> t.Optional[t.Union[typer.models.CommandInfo, Typer, Finalizer]]:
+) -> typer.models.CommandInfo | Typer | Finalizer | None:
     """
     Perform a breadth first search for a command or group by name.
 
@@ -1938,7 +1938,7 @@ def _bfs_match(
 
     def find_at_level(
         lvl: Typer,
-    ) -> t.Optional[t.Union[typer.models.CommandInfo, Typer, Finalizer]]:
+    ) -> typer.models.CommandInfo | Typer | Finalizer | None:
         for cmd in reversed(lvl.registered_commands):
             if name in _names(cmd):
                 return cmd
@@ -1956,7 +1956,7 @@ def _bfs_match(
     if found := find_at_level(app):
         return found
 
-    bfs_order: t.List[Typer] = []
+    bfs_order: list[Typer] = []
     queue = deque([app])
 
     while queue:
@@ -2041,48 +2041,47 @@ class TyperCommandMeta(type):
     style: ColorStyle
     stdout: BaseOutputWrapper
     stderr: BaseOutputWrapper
-    requires_system_checks: t.Union[t.Sequence[str], str]
-    suppressed_base_arguments: t.Optional[t.Iterable[str]]
+    requires_system_checks: t.Sequence[str] | str
+    suppressed_base_arguments: set[str]
     typer_app: Typer
     no_color: bool
     force_color: bool
     skip_checks: bool
     is_compound_command: bool
-    _handle: t.Optional[t.Callable[..., t.Any]]
+    _handle: t.Callable[..., t.Any] | None
 
     # this holds the Typer app commands and groups defined directly on the class
-    # and its parents.
-    _defined_groups: t.Dict[str, Typer] = {}
+    # and its parents. This default is never mutated - the metaclass builds a
+    # fresh dict for each command class it creates
+    _defined_groups: dict[str, Typer] = {}  # noqa: RUF012
 
     def __new__(
         mcs,
         cls_name,
         bases,
         attrs,
-        name: t.Optional[str] = Default(None),
-        cls: t.Optional[t.Type[DTGroup]] = DTGroup,
+        name: str | None = Default(None),
+        cls: type[DTGroup] | None = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        callback: t.Callable[..., t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
         options_metavar: str = Default("[OPTIONS]"),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
         rich_markup_mode: typer.core.MarkupMode = DEFAULT_MARKUP_MODE,
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         suggest_commands: bool = True,
-        pretty_exceptions_enable: t.Union[DefaultPlaceholder, bool] = Default(True),
-        pretty_exceptions_show_locals: t.Union[DefaultPlaceholder, bool] = Default(
-            False
-        ),
-        pretty_exceptions_short: t.Union[DefaultPlaceholder, bool] = Default(True),
+        pretty_exceptions_enable: DefaultPlaceholder | bool = Default(True),
+        pretty_exceptions_show_locals: DefaultPlaceholder | bool = Default(False),
+        pretty_exceptions_short: DefaultPlaceholder | bool = Default(True),
         **kwargs: t.Any,
     ):
         """
@@ -2124,15 +2123,18 @@ class TyperCommandMeta(type):
                 if isinstance(options_metavar, DefaultPlaceholder):
                     options_metavar = base.typer_app.info.options_metavar
 
-            def command_bases() -> t.Generator[t.Type[TyperCommand], None, None]:
+            def command_bases() -> t.Generator[type[TyperCommand], None, None]:
                 # the mro is not yet resolved so we have to do it manually
                 seen = set()
                 for first_level in reversed(bases):
                     for base in reversed(first_level.__mro__):
-                        if issubclass(base, TyperCommand) and base is not TyperCommand:
-                            if base not in seen:
-                                seen.add(base)
-                                yield base
+                        if (
+                            issubclass(base, TyperCommand)
+                            and base is not TyperCommand
+                            and base not in seen
+                        ):
+                            seen.add(base)
+                            yield base
 
             typer_app = Typer(
                 name=name or attrs.get("__module__", "").rsplit(".", maxsplit=1)[-1],
@@ -2164,13 +2166,13 @@ class TyperCommandMeta(type):
             )
 
             # move up here
-            def get_ctor(attr: t.Any) -> t.Optional[t.Callable[..., t.Any]]:
+            def get_ctor(attr: t.Any) -> t.Callable[..., t.Any] | None:
                 return getattr(attr, _CACHE_KEY, None)
 
             # because we're mapping a non-class based interface onto a class based
             # interface, we have to handle this class mro stuff manually here
             handle = None  # there can be only one or none
-            _defined_groups: t.Dict[str, Typer] = {}
+            _defined_groups: dict[str, Typer] = {}
             to_remove = []
             to_register = []
             local_handle = attrs.pop("handle", None)
@@ -2184,22 +2186,22 @@ class TyperCommandMeta(type):
                     for cmd in getattr(cmd_cls, "_defined_order", [])
                     if cmd not in defined_order
                 ]
-                for name, attr in list(cls_attrs.items()):
-                    if name == "_handle":
+                for nm, attr in list(cls_attrs.items()):
+                    if nm == "_handle":
                         continue
-                    if name == "_defined_groups":
+                    if nm == "_defined_groups":
                         _defined_groups = {**_defined_groups, **attr}
                         continue
-                    if name != "typer_app" and isinstance(attr, Typer):
-                        assert name
-                        to_remove.append(name)
-                        _defined_groups[name] = attr
-                        if cmd_cls is None and name not in defined_order:
-                            defined_order.append(name)
+                    if nm != "typer_app" and isinstance(attr, Typer):
+                        assert nm
+                        to_remove.append(nm)
+                        _defined_groups[nm] = attr
+                        if cmd_cls is None and nm not in defined_order:
+                            defined_order.append(nm)
                     elif register := get_ctor(attr):
                         to_register.append(register)
-                        if cmd_cls is None and name not in defined_order:
-                            defined_order.append(name)
+                        if cmd_cls is None and nm not in defined_order:
+                            defined_order.append(nm)
 
                 handle = getattr(cmd_cls, "_handle", handle)
 
@@ -2217,8 +2219,8 @@ class TyperCommandMeta(type):
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
-            for name in to_remove:
-                attrs.pop(name)
+            for nm in to_remove:
+                attrs.pop(nm)
 
             attrs["_defined_groups"] = _defined_groups
 
@@ -2262,14 +2264,14 @@ class TyperCommandMeta(type):
         """
         This method is called after a new class is created.
         """
-        self = t.cast(t.Type["TyperCommand"], self)
-        if getattr(self, "typer_app", None):
-            self.typer_app.django_command = self
-            self.typer_app.info.name = (
-                self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
+        cls = t.cast(type["TyperCommand"], self)
+        if getattr(cls, "typer_app", None):
+            cls.typer_app.django_command = cls
+            cls.typer_app.info.name = (
+                cls.typer_app.info.name or cls.__module__.rsplit(".", maxsplit=1)[-1]
             )
-            for cmd in getattr(self, "_to_register", []):
-                cmd(self)
+            for cmd in getattr(cls, "_to_register", []):
+                cmd(cls)
 
             _add_common_initializer(self)
 
@@ -2283,15 +2285,12 @@ class TyperCommandMeta(type):
             Command.sub_grp or Command.sub_cmd or Command.finalizer
         """
         if name != "typer_app":
-            if called_from_command_definition():
-                if name in cls._defined_groups:
-                    return cls._defined_groups[name]
+            if called_from_command_definition() and name in cls._defined_groups:
+                return cls._defined_groups[name]
             found = _bfs_match(cls.typer_app, name)
             if found:
                 return found
-        raise AttributeError(
-            "{cls} object has no attribute {name}".format(cls=cls.__name__, name=name)
-        )
+        raise AttributeError(f"{cls.__name__} object has no attribute {name}")
 
 
 class CommandNode:
@@ -2322,13 +2321,13 @@ class CommandNode:
     The Typer context object used to run this command.
     """
 
-    django_command: "TyperCommand"
+    django_command: TyperCommand
     """
     Back reference to the django command instance that this command belongs to.
     """
 
     @cached_property
-    def children(self) -> t.Dict[str, "CommandNode"]:
+    def children(self) -> dict[str, CommandNode]:
         """
         The child group and command nodes of this command node.
         """
@@ -2353,16 +2352,18 @@ class CommandNode:
     @property
     def callback(self) -> t.Callable[..., t.Any]:
         """Get the function for this command or group"""
+        assert self.click_command._callback
         return _get_direct_function(
-            self.django_command, getattr(self.click_command._callback, "__wrapped__")
+            self.django_command,
+            self.click_command._callback.__wrapped__,  # pyright: ignore[reportFunctionMemberAccess]
         )
 
     def __init__(
         self,
         name: str,
         click_command: DjangoTyperMixin,
-        django_command: "TyperCommand",
-        parent: t.Optional[Context] = None,
+        django_command: TyperCommand,
+        parent: Context | None = None,
     ):
         self.name = name
         self.click_command = click_command
@@ -2374,7 +2375,7 @@ class CommandNode:
             parent=parent,
         )
 
-    def print_help(self) -> t.Optional[str]:
+    def print_help(self) -> str | None:
         """
         Prints the help for this command to stdout of the django command.
         """
@@ -2383,7 +2384,7 @@ class CommandNode:
         # stack
         return self.click_command.get_help(self.context)
 
-    def get_command(self, *command_path: str) -> "CommandNode":
+    def get_command(self, *command_path: str) -> CommandNode:
         """
         Return the command node for the given command path at or below
         this node.
@@ -2438,7 +2439,7 @@ class TyperParser:
             self.param = param
 
         @property
-        def dest(self) -> t.Optional[str]:
+        def dest(self) -> str | None:
             """
             The name of the parameter as passed to the command.
             """
@@ -2452,7 +2453,7 @@ class TyperParser:
             return 0 if getattr(self.param, "is_flag", False) else self.param.nargs
 
         @property
-        def option_strings(self) -> t.List[str]:
+        def option_strings(self) -> list[str]:
             """
             call_command uses this to determine a mapping of supplied options to
             function arguments. I.e. it will remap option_string: dest. We don't want
@@ -2462,14 +2463,14 @@ class TyperParser:
             """
             return []
 
-    _actions: t.List[t.Any]
-    _mutually_exclusive_groups: t.List[t.Any] = []
+    _actions: list[t.Any]
+    _mutually_exclusive_groups: t.ClassVar[list[t.Any]] = []
 
-    django_command: "TyperCommand"
+    django_command: TyperCommand
     prog_name: str
     subcommand: str
 
-    def __init__(self, django_command: "TyperCommand", prog_name, subcommand):
+    def __init__(self, django_command: TyperCommand, prog_name, subcommand):
         self._actions = []
         self.django_command = django_command
         self.prog_name = prog_name
@@ -2702,7 +2703,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     # we do not use verbosity because the base command does not do anything with it
     # if users want to use a verbosity flag like the base django command adds
     # they can use the type from django_typer.types.Verbosity
-    suppressed_base_arguments = {"verbosity"}
+    # never mutated - matches BaseCommand's declaration in django-stubs, which
+    # is not a ClassVar
+    suppressed_base_arguments = {"verbosity"}  # noqa: RUF012
 
     missing_args_message = "Missing parameter: {parameter}"
 
@@ -2716,12 +2719,12 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     _handle: t.Callable[..., t.Any]
     _traceback: bool = False
-    _help_kwarg: t.Optional[str] = Default(None)
-    _defined_groups: t.Dict[str, Typer] = {}
-    _finalizer: t.Optional[Finalizer] = None
-    _suppressed_base_arguments: t.Optional[t.Set[str]] = None
+    _help_kwarg: str | None = Default(None)
+    # never mutated - the metaclass assigns a fresh dict to each command class
+    _defined_groups: dict[str, Typer] = {}  # noqa: RUF012
+    _finalizer: Finalizer | None = None
 
-    help: t.Optional[t.Union[DefaultPlaceholder, str, Promise]] = Default(None)  # type: ignore
+    help: DefaultPlaceholder | str | Promise | None = Default(None)  # type: ignore
 
     # allow deriving commands to override handle() from BaseCommand
     # without triggering static type checking complaints
@@ -2743,23 +2746,23 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     def initialize(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
         *,
-        cls: t.Type[DTGroup] = DTGroup,
+        cls: type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: t.Optional[str] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
+        options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = Default(False),
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
@@ -2883,20 +2886,20 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     @classmethod
     def command(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
-        name: t.Optional[str] = None,
+        name: str | None = None,
         *,
-        cls: t.Type[DTCommand] = DTCommand,
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = None,
-        help: t.Optional[t.Union[str, Promise]] = None,
-        epilog: t.Optional[str] = None,
-        short_help: t.Optional[t.Union[str, Promise]] = None,
-        options_metavar: t.Optional[str] = Default(None),
+        cls: type[DTCommand] = DTCommand,
+        context_settings: dict[t.Any, t.Any] | None = None,
+        help: str | Promise | None = None,
+        epilog: str | None = None,
+        short_help: str | Promise | None = None,
+        options_metavar: str | None = Default(None),
         add_help_option: bool = True,
         no_args_is_help: bool = False,
         hidden: bool = False,
         deprecated: bool = False,
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[[t.Callable[P, R]], t.Callable[P, R]]:
         """
@@ -2977,24 +2980,24 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     @classmethod
     def group(
         cmd,  # pyright: ignore[reportSelfClsParameterName]
-        name: t.Optional[str] = Default(None),
-        cls: t.Type[DTGroup] = DTGroup,
+        name: str | None = Default(None),
+        cls: type[DTGroup] = DTGroup,
         invoke_without_command: bool = Default(False),
         no_args_is_help: bool = Default(False),
-        subcommand_metavar: t.Optional[str] = Default(None),
+        subcommand_metavar: str | None = Default(None),
         chain: bool = Default(False),
-        result_callback: t.Optional[t.Callable[..., t.Any]] = Default(None),
+        result_callback: t.Callable[..., t.Any] | None = Default(None),
         # Command
-        context_settings: t.Optional[t.Dict[t.Any, t.Any]] = Default(None),
-        help: t.Optional[t.Union[str, Promise]] = Default(None),
-        epilog: t.Optional[str] = Default(None),
-        short_help: t.Optional[t.Union[str, Promise]] = Default(None),
-        options_metavar: t.Optional[str] = Default(None),
+        context_settings: dict[t.Any, t.Any] | None = Default(None),
+        help: str | Promise | None = Default(None),
+        epilog: str | None = Default(None),
+        short_help: str | Promise | None = Default(None),
+        options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
         deprecated: bool = False,
         # Rich settings
-        rich_help_panel: t.Union[str, None] = Default(None),
+        rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
     ) -> t.Callable[
         [
@@ -3139,7 +3142,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
             # we might be in a subcommand - so make sure we pull that help out
             # by walking up the context tree until we're at root
-            cmd_pth: t.List[str] = []
+            cmd_pth: list[str] = []
             ctx = exc_val.ctx
             while ctx and ctx.parent:
                 assert ctx.info_name
@@ -3156,8 +3159,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __init__(
         self,
-        stdout: t.Optional[t.TextIO] = None,
-        stderr: t.Optional[t.TextIO] = None,
+        stdout: t.TextIO | None = None,
+        stderr: t.TextIO | None = None,
         no_color: bool = no_color,
         force_color: bool = force_color,
         **kwargs: t.Any,
@@ -3261,9 +3264,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         if found:
             return BoundProxy(self, found)
         raise AttributeError(
-            "{cls} object has no attribute {name}".format(
-                cls=self.__class__.__name__, name=name
-            )
+            f"{self.__class__.__name__} object has no attribute {name}"
         )
 
     def __call__(self, *args, **kwargs):
@@ -3404,9 +3405,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.force_color = force_color
             self.skip_checks = skip_checks
 
-    def echo(
-        self, message: t.Optional[t.Any] = None, nl: bool = True, err: bool = False
-    ):
+    def echo(self, message: t.Any | None = None, nl: bool = True, err: bool = False):
         """
         A wrapper for `typer.echo()
         <https://typer.tiangolo.com/tutorial/printing/#typer-echo>`_ that response
@@ -3427,7 +3426,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def secho(
         self,
-        message: t.Optional[t.Any] = None,
+        message: t.Any | None = None,
         nl: bool = True,
         err: bool = False,
         **styles: t.Any,

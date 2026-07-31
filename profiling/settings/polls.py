@@ -1,3 +1,3 @@
-from .basic import *  # noqa: F403
+from .basic import *
 
-INSTALLED_APPS.insert(0, "profiling.polls")  # noqa: F405
+INSTALLED_APPS.insert(0, "profiling.polls")

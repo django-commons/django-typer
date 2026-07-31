@@ -1,5 +1,4 @@
 import os
-import typing as t
 from functools import cached_property
 from pathlib import Path
 
@@ -65,7 +64,7 @@ class ZshComplete(DjangoTyperShellCompleter):
         hlp = self.process_rich_text(item.help.replace("\n", " ")) if item.help else "_"
         return f"{item.type}\n{self.process_rich_text(item.value)}\n{hlp}"
 
-    def install(self, prompt: bool = True) -> t.List[Path]:
+    def install(self, prompt: bool = True) -> list[Path]:
         assert self.prog_name
         zshrc = self.get_user_profile()
         zshrc_source = ""
@@ -97,17 +96,16 @@ class ZshComplete(DjangoTyperShellCompleter):
 
         edited = []
         script = self.install_dir / f"_{self.prog_name}"
-        if additions:
-            if self.prompt(
-                prompt=prompt,
-                source=additions,
-                file=zshrc,
-                start_line=start_line,
-            ):
-                Path.home().mkdir(parents=True, exist_ok=True)
-                with open(zshrc, "a") as zrc_file:
-                    zrc_file.write(f"{os.linesep}{additions}")
-                edited.append(zshrc)
+        if additions and self.prompt(
+            prompt=prompt,
+            source=additions,
+            file=zshrc,
+            start_line=start_line,
+        ):
+            Path.home().mkdir(parents=True, exist_ok=True)
+            with open(zshrc, "a") as zrc_file:
+                zrc_file.write(f"{os.linesep}{additions}")
+            edited.append(zshrc)
         source = self.source()
         if self.prompt(prompt=prompt, source=source, file=script, start_line=0):
             script.write_text(self.source())

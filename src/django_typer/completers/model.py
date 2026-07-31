@@ -10,7 +10,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 
-def int_ranges(incomplete: str, max_val: int) -> t.List[t.Tuple[int, int]]:
+def int_ranges(incomplete: str, max_val: int) -> list[tuple[int, int]]:
     lower = int(incomplete)
     neg = lower < 0
     lower = abs(lower)
@@ -109,7 +109,7 @@ def text_query(
     return models.Q(**{f"{lookup_field}__startswith": incomplete})
 
 
-def uuid_query(incomplete: str, lookup_field: str, **_) -> t.Tuple[models.Q, int]:
+def uuid_query(incomplete: str, lookup_field: str, **_) -> tuple[models.Q, int]:
     """
     The default completion query builder for UUID fields. This method will
     return a Q object that will match any value that starts with the incomplete
@@ -309,8 +309,8 @@ def duration_query(
         horizon = timedelta(days=1)
 
     if "T" in incomplete:
-        hours, seconds = divmod(duration.seconds, 3600)
-        minutes, seconds = divmod(seconds, 60)
+        _hours, seconds = divmod(duration.seconds, 3600)
+        _minutes, seconds = divmod(seconds, 60)
 
         # if we are here, we may or may not have an ambiguous time component
         # or (exclusively) we may be missing time components
@@ -342,8 +342,8 @@ def duration_query(
             else:
                 # ambiguity is at least a seconds ambiguity
                 int_amb = int(ambiguity)
-                compound_horizon: t.List[
-                    t.Tuple[int, int]
+                compound_horizon: list[
+                    tuple[int, int]
                 ] = []  # seconds horizons small -> large
                 compound_horizon.append(
                     (
@@ -420,7 +420,7 @@ def duration_query(
     return qry
 
 
-def get_date_bounds(incomplete: str) -> t.Tuple[date, date]:
+def get_date_bounds(incomplete: str) -> tuple[date, date]:
     """
     Turn an incomplete YYYY-MM-DD date string into upper and lower bound date
     objects.
@@ -457,7 +457,7 @@ def get_date_bounds(incomplete: str) -> t.Tuple[date, date]:
     return lower_bound, upper_bound
 
 
-def get_time_bounds(incomplete: str) -> t.Tuple[time, time]:
+def get_time_bounds(incomplete: str) -> tuple[time, time]:
     """
     Turn an incomplete HH::MM::SS.ssssss time string into upper and lower bound time
     objects.
@@ -620,15 +620,17 @@ class ModelObjectCompleter:
         ["ModelObjectCompleter", Context, Parameter, str], models.Q
     ]
 
-    model_cls: t.Type[models.Model]
+    model_cls: type[models.Model]
     queryset: QuerySet
     lookup_field: str
-    help_field: t.Optional[str] = None
-    query: t.Callable[..., t.Union[models.Q, t.Tuple[models.Q, int]]]
-    limit: t.Optional[int] = 50
+    help_field: str | None = None
+    query: t.Callable[..., models.Q | tuple[models.Q, int]]
+    limit: int | None = 50
     case_insensitive: bool = False
     distinct: bool = True
-    order_by: t.List[str] = []
+    # class attributes double as __init__ defaults; __init__ assigns a fresh
+    # list per instance and this fallback is never mutated
+    order_by: list[str] = []  # noqa: RUF012
     use_choices: bool = True
 
     _field: models.Field
@@ -646,9 +648,7 @@ class ModelObjectCompleter:
             if settings.USE_TZ and get_default_timezone():
                 obj = obj.astimezone(get_default_timezone())
             return obj.isoformat()
-        elif isinstance(obj, time):
-            return obj.isoformat()
-        elif isinstance(obj, date):
+        elif isinstance(obj, (time, date)):
             return obj.isoformat()
         elif isinstance(obj, timedelta):
             from django_typer.utils import duration_iso_string
@@ -658,14 +658,14 @@ class ModelObjectCompleter:
 
     def __init__(
         self,
-        model_or_qry: t.Union[t.Type[models.Model], QuerySet],
-        lookup_field: t.Optional[str] = None,
-        help_field: t.Optional[str] = help_field,
-        query: t.Optional[QueryBuilder] = None,
-        limit: t.Optional[int] = limit,
+        model_or_qry: type[models.Model] | QuerySet,
+        lookup_field: str | None = None,
+        help_field: str | None = help_field,
+        query: QueryBuilder | None = None,
+        limit: int | None = limit,
         case_insensitive: bool = case_insensitive,
         distinct: bool = distinct,
-        order_by: t.Optional[t.Union[str, t.Sequence[str]]] = order_by,
+        order_by: str | t.Sequence[str] | None = order_by,
         use_choices: bool = use_choices,
     ):
         import inspect
@@ -730,7 +730,7 @@ class ModelObjectCompleter:
 
     def __call__(
         self, context: Context, parameter: Parameter, incomplete: str
-    ) -> t.List[CompletionItem]:
+    ) -> list[CompletionItem]:
         """
         The completer method. This method will return a list of CompletionItem
         objects. If the help_field constructor parameter is not None, the help
@@ -770,7 +770,7 @@ class ModelObjectCompleter:
         if self.help_field:
             columns.append(self.help_field)
 
-        excluded: t.List[models.Model] = []
+        excluded: list[models.Model] = []
         if (
             self.distinct
             and parameter.name

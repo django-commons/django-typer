@@ -23,17 +23,17 @@ from .parsers.model import ModelObjectParser, ReturnType
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
 
 __all__ = [
-    "detect_shell",
-    "get_usage_script",
-    "get_current_command",
-    "with_typehint",
-    "register_command_plugins",
-    "called_from_module",
     "called_from_command_definition",
+    "called_from_module",
+    "detect_shell",
     "duration_iso_string",
-    "parse_iso_duration",
+    "get_current_command",
+    "get_usage_script",
     "model_parser_completer",
+    "parse_iso_duration",
+    "register_command_plugins",
     "rich_installed",
+    "with_typehint",
 ]
 
 
@@ -42,7 +42,7 @@ rich_installed = find_spec("rich") is not None and os.environ.get(
 ).lower() not in {"0", "false"}
 
 
-def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:
+def detect_shell(max_depth: int = 10) -> tuple[str, str]:
     """
     Detect the current shell.
 
@@ -61,7 +61,7 @@ def detect_shell(max_depth: int = 10) -> t.Tuple[str, str]:
         raise
 
 
-def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
+def get_usage_script(script: str | None = None) -> Path | str:
     """
     Return the script name if it is on the path or the absolute path to the script
     if it is not.
@@ -72,7 +72,7 @@ def get_usage_script(script: t.Optional[str] = None) -> t.Union[Path, str]:
     import shutil
 
     cmd_pth = Path(script or sys.argv[0])
-    on_path: t.Optional[t.Union[str, Path]] = shutil.which(cmd_pth.name)
+    on_path: str | Path | None = shutil.which(cmd_pth.name)
     on_path = on_path and Path(on_path)
     if (
         on_path
@@ -114,7 +114,7 @@ def get_current_command() -> t.Optional["TyperCommand"]:  # type: ignore  # noqa
 T = t.TypeVar("T")  # pylint: disable=C0103
 
 
-def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
+def with_typehint(baseclass: type[T]) -> type[T]:
     """
     Type hinting mixin inheritance is really annoying. The current
     canonical way is to use Protocols but this is prohibitive when
@@ -127,12 +127,10 @@ def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
     return object  # type: ignore
 
 
-_command_plugins: t.Dict[str, t.List[ModuleType]] = {}
+_command_plugins: dict[str, list[ModuleType]] = {}
 
 
-def register_command_plugins(
-    package: ModuleType, commands: t.Optional[t.List[str]] = None
-):
+def register_command_plugins(package: ModuleType, commands: list[str] | None = None):
     """
     Register a command plugin for the given command within the given package.
 
@@ -202,7 +200,7 @@ def _check_call_frame(frame_name: str, look_back=1) -> bool:
     :param frame_name: The name of the frame to check for
     """
     frame = inspect.currentframe()
-    for _ in range(0, look_back + 1):
+    for _ in range(look_back + 1):
         if not frame:
             break
         frame = frame.f_back
@@ -216,8 +214,8 @@ called_from_command_definition = partial(_check_call_frame, "Command")
 
 
 def is_method(
-    func_or_params: t.Optional[t.Union[t.Callable[..., t.Any], t.List[str]]],
-) -> t.Optional[bool]:
+    func_or_params: t.Callable[..., t.Any] | list[str] | None,
+) -> bool | None:
     """
     This logic is used to to determine if a function should be bound as a method
     or not. Right now django-typer will treat module scope functions as methods
@@ -253,8 +251,8 @@ def accepts_var_kwargs(func: t.Callable[..., t.Any]) -> bool:
 
 
 def accepted_kwargs(
-    func: t.Callable[..., t.Any], kwargs: t.Dict[str, t.Any]
-) -> t.Dict[str, t.Any]:
+    func: t.Callable[..., t.Any], kwargs: dict[str, t.Any]
+) -> dict[str, t.Any]:
     """
     Return the named keyword arguments that are accepted by the given function.
     """
@@ -294,6 +292,7 @@ def get_win_shell() -> str:
                     [pwsh, "-NoProfile", "-Command", ps_command.format(pid=pid)],
                     capture_output=True,
                     text=True,
+                    check=False,
                 ).stdout.strip()
                 if not result:
                     break
@@ -310,7 +309,7 @@ def get_win_shell() -> str:
     raise ShellDetectionFailure("Unable to detect windows shell")
 
 
-def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
+def parse_iso_duration(duration: str) -> tuple[timedelta, str | None]:
     """
     Progressively parse an ISO8601 duration type - can be a partial
     duration string. If it is a partial duration string with an ambiguous
@@ -331,7 +330,7 @@ def parse_iso_duration(duration: str) -> t.Tuple[timedelta, t.Optional[str]]:
     sign = -1 if duration.startswith("-") else 1
     duration = duration.lstrip("-").lstrip("+").lstrip("P")
 
-    ambiguous: t.Optional[str] = None
+    ambiguous: str | None = None
 
     class Incomplete(Exception):
         value: str
@@ -431,17 +430,17 @@ def duration_iso_string(duration: timedelta) -> str:
 
 
 def model_parser_completer(
-    model_or_qry: t.Union[t.Type[Model], QuerySet],
-    lookup_field: t.Optional[str] = None,
+    model_or_qry: type[Model] | QuerySet,
+    lookup_field: str | None = None,
     case_insensitive: bool = False,
-    help_field: t.Optional[str] = ModelObjectCompleter.help_field,
-    query: t.Optional[ModelObjectCompleter.QueryBuilder] = None,
-    limit: t.Optional[int] = ModelObjectCompleter.limit,
+    help_field: str | None = ModelObjectCompleter.help_field,
+    query: ModelObjectCompleter.QueryBuilder | None = None,
+    limit: int | None = ModelObjectCompleter.limit,
     distinct: bool = ModelObjectCompleter.distinct,
-    on_error: t.Optional[ModelObjectParser.error_handler] = ModelObjectParser.on_error,
-    order_by: t.Optional[t.Union[str, t.Sequence[str]]] = None,
+    on_error: ModelObjectParser.error_handler | None = ModelObjectParser.on_error,
+    order_by: str | t.Sequence[str] | None = None,
     return_type: ReturnType = ModelObjectParser.return_type,
-) -> t.Dict[str, t.Any]:
+) -> dict[str, t.Any]:
     """
     A factory function that returns a dictionary that can be used to specify
     a parser and completer for a typer.Option or typer.Argument. This is a
@@ -500,7 +499,7 @@ def model_parser_completer(
     }
 
 
-def install_traceback(tb_config: t.Optional[t.Dict[str, t.Any]] = None):
+def install_traceback(tb_config: dict[str, t.Any] | None = None):
     from .config import use_rich_tracebacks
 
     if not use_rich_tracebacks():

@@ -29,10 +29,10 @@ def dataclass_encoder(obj):
 
 @dataclass(frozen=True)
 class EnvKey:
-    django_typer: t.Tuple[int, int, int]
-    python: t.Tuple[int, int]
-    django: t.Tuple[int, int]
-    typer: t.Tuple[int, int]
+    django_typer: tuple[int, int, int]
+    python: tuple[int, int]
+    django: tuple[int, int]
+    typer: tuple[int, int]
 
     def astuple(self):
         return (self.django_typer, self.python, self.django, self.typer)
@@ -80,7 +80,7 @@ class RunKey:
         return int.from_bytes(
             sha256(
                 f"{self.cmd}|{int(self.typer)}|{int(self.app)}|"
-                f"{int(self.rich)}|{int(self.help)}".encode("utf-8")
+                f"{int(self.rich)}|{int(self.help)}".encode()
             ).digest(),
             byteorder="big",
         )
@@ -131,6 +131,7 @@ def run_command(*cmd, **env):
         capture_output=True,
         text=True,
         env={"PYTHONPATH": pythonpath, "VIRTUAL_ENV": os.environ["VIRTUAL_ENV"], **env},
+        check=False,
     )
     stdout = result.stdout
     if stdout:
@@ -216,13 +217,10 @@ def generate():
     env_keys = sorted([run["env"].astuple() for run in profile_data.values()])
     pos = bisect.bisect_left(env_keys, env_key.astuple()) or 0
     pos_str = str(pos)
-    if pos_str in profile_data:
-        if profile_data[pos_str]["env"] != env_key:
-            for idx in reversed(
-                range(pos, max((int(i) for i in profile_data.keys())) + 1)
-            ):
-                if str(idx) in profile_data:
-                    profile_data[str(idx + 1)] = profile_data.pop(str(idx))
+    if pos_str in profile_data and profile_data[pos_str]["env"] != env_key:
+        for idx in reversed(range(pos, max(int(i) for i in profile_data) + 1)):
+            if str(idx) in profile_data:
+                profile_data[str(idx + 1)] = profile_data.pop(str(idx))
 
     profile_data.setdefault(pos_str, {"env": env_key, "runs": {}})
     profile_data[pos_str]["platform"] = get_platform()
@@ -260,7 +258,7 @@ def generate():
 
             if cmd[0] == "minimal":
                 # sanity checks
-                stats: t.Dict[str, t.Any] = run_command(
+                stats: dict[str, t.Any] = run_command(
                     django_admin, "minimal", "5", "--print", **env
                 )[0]  # type: ignore
                 assert (
@@ -318,11 +316,11 @@ def document():
     from rich.text import Text
 
     profile = load()
-    key = max((int(k) for k in profile.keys()))
+    key = max(int(k) for k in profile)
     current = profile[str(key)]
 
     def to_str(ver):
-        return ".".join((str(v) for v in ver))
+        return ".".join(str(v) for v in ver)
 
     def minimal_table():
         console = Console(record=True, width=80)

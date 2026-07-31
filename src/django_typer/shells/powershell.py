@@ -1,5 +1,4 @@
 import subprocess  # nosec B404
-import typing as t
 from pathlib import Path
 
 from click.shell_completion import CompletionItem
@@ -61,7 +60,8 @@ class PowerShellComplete(DjangoTyperShellCompleter):
                 "Unrestricted",
                 "-Scope",
                 "CurrentUser",
-            ]
+            ],
+            check=False,
         )
 
     def get_user_profile(self) -> Path:
@@ -80,7 +80,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
             "Unable to find the PowerShell user profile."
         )  # pragma: no cover
 
-    def install(self, prompt: bool = True) -> t.List[Path]:
+    def install(self, prompt: bool = True) -> list[Path]:
         assert self.prog_name
         self.uninstall()
         self.set_execution_policy()
@@ -107,7 +107,7 @@ class PowerShellComplete(DjangoTyperShellCompleter):
         edited_lines = []
         mark = None
         with open(profile, "rt", encoding="utf-8") as pwr_sh:
-            for line in pwr_sh.readlines():
+            for line in pwr_sh:
                 edited_lines.append(line)
                 if line.startswith("Import-Module PSReadLine"):
                     mark = len(edited_lines) - 1

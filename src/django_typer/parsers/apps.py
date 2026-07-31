@@ -1,10 +1,8 @@
-import typing as t
-
 from django.apps import AppConfig, apps
 from django.core.management import CommandError
 
 
-def app_config(label: t.Union[str, AppConfig]):
+def app_config(label: str | AppConfig):
     """
     A parser for app :attr:`~django.apps.AppConfig.label`. If the label is already
     an :class:`~django.apps.AppConfig` instance, the instance is returned. The label

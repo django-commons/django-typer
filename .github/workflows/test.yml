@@ -47,7 +47,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -72,9 +72,9 @@ jobs:
             dependencies: "lowest-direct"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.11"
-            django-version: "dj60"
+            django-version: "dj61"
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}.coverage
       ENV_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}
@@ -134,7 +134,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -157,9 +157,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-windows-${{ matrix.django-version }}.coverage
@@ -216,7 +216,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -239,9 +239,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-macos-${{ matrix.django-version }}.coverage
@@ -377,7 +377,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -400,9 +400,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
       ENV_FILE: linux-bash-py${{ matrix.python-version }}-${{ matrix.django-version }}-env
@@ -463,7 +463,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -486,9 +486,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
       ENV_FILE: linux-fish-py${{ matrix.python-version }}-${{ matrix.django-version }}-env
@@ -552,7 +552,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -568,9 +568,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
           - python-version: "3.10"
             dependencies: "highest"
@@ -648,7 +648,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -664,9 +664,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
           - python-version: "3.10"
             dependencies: "highest"
@@ -734,7 +734,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -750,9 +750,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
           - python-version: "3.10"
             dependencies: "highest"
@@ -828,7 +828,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -844,9 +844,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
           - python-version: "3.10"
             dependencies: "highest"
@@ -923,7 +923,7 @@ jobs:
         django-version:
           - "dj42" # LTS April 2026
           - "dj52" # April 2028
-          - "dj60" # April 2027
+          - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
@@ -939,9 +939,9 @@ jobs:
             django-version: "dj52"
 
           - python-version: "3.10"
-            django-version: "dj60"
+            django-version: "dj61"
           - python-version: "3.12"
-            django-version: "dj60"
+            django-version: "dj61"
 
           - python-version: "3.10"
             dependencies: "highest"

@@ -64,10 +64,10 @@ def apply() -> None:
         from rich.console import Console  # pyright: ignore[reportMissingImports]
 
         # this has to go here before rich Consoles are instantiated by Typer
-        color_system: t.Optional[
-            t.Literal["auto", "standard", "256", "truecolor", "windows"]
-        ] = "auto"
-        force_terminal: t.Optional[bool] = None
+        color_system: (
+            t.Literal["auto", "standard", "256", "truecolor", "windows"] | None
+        ) = "auto"
+        force_terminal: bool | None = None
         if "--no-color" in sys.argv and "--force-color" not in sys.argv:
             os.environ["NO_COLOR"] = "1"
             color_system = None

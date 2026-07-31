@@ -3,7 +3,7 @@ import typing as t
 from django.conf import settings
 
 
-def traceback_config() -> t.Dict[str, t.Any]:
+def traceback_config() -> dict[str, t.Any]:
     """
     Fetch the rich traceback installation parameters from our settings. By default
     rich tracebacks are on with show_locals = True. If the config is set to False
@@ -19,7 +19,7 @@ def traceback_config() -> t.Dict[str, t.Any]:
     return cfg
 
 
-def show_locals() -> t.Optional[bool]:
+def show_locals() -> bool | None:
     """
     Return the show_locals parameter from the rich traceback configuration.
     """

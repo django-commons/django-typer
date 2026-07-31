@@ -13,7 +13,7 @@ class Command(TyperCommand):
     def handle(
         self,
         polls: t.Annotated[
-            t.List[Poll],
+            list[Poll],
             Argument(
                 **model_parser_completer(Poll, help_field="question_text"),
                 help="The database IDs of the poll(s) to close.",
