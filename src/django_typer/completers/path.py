@@ -9,7 +9,7 @@ from click.shell_completion import CompletionItem
 from django.conf import settings
 
 
-def _settings_path(name: str) -> t.Optional[Path]:
+def _settings_path(name: str) -> Path | None:
     s_pth = getattr(settings, name, None)
     if s_pth:
         return Path(s_pth)
@@ -20,8 +20,8 @@ def import_paths(
     ctx: Context,
     param: Parameter,
     incomplete: str,
-    root: t.Union[t.Callable[[], t.Optional[Path]], t.Optional[Path]] = None,
-) -> t.List[CompletionItem]:
+    root: t.Callable[[], Path | None] | Path | None = None,
+) -> list[CompletionItem]:
     """
     A completer that completes a python dot import path string based on sys.path.
 
@@ -67,9 +67,9 @@ def paths(
     ctx: Context,
     param: Parameter,
     incomplete: str,
-    dir_only: t.Optional[bool] = None,
-    root: t.Union[t.Callable[[], t.Optional[Path]], t.Optional[Path]] = None,
-) -> t.List[CompletionItem]:
+    dir_only: bool | None = None,
+    root: t.Callable[[], Path | None] | Path | None = None,
+) -> list[CompletionItem]:
     """
     A completer that completes a path. Relative incomplete paths are interpreted
     relative to the current working directory.

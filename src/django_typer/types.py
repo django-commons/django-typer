@@ -4,7 +4,7 @@ Common types for command line argument specification.
 
 import sys
 from pathlib import Path
-from typing import Annotated, Optional, cast
+from typing import Annotated, cast
 
 from django.core.management import CommandError
 from django.utils.translation import gettext_lazy as _
@@ -136,7 +136,7 @@ module to use.
 
 
 PythonPath = Annotated[
-    Optional[Path],
+    Path | None,
     Option(
         help=cast(
             str,

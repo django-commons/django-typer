@@ -54,17 +54,19 @@ class BashComplete(DjangoTyperShellCompleter):
         return install_dir
 
     @staticmethod
-    def _check_version() -> t.Optional[t.Tuple[int, int]]:
+    def _check_version() -> tuple[int, int] | None:
         import re
         import subprocess  # nosec B404
 
         output = subprocess.run(  # nosec B603 B607
-            ["bash", "-c", 'echo "${BASH_VERSION}"'], stdout=subprocess.PIPE
+            ["bash", "-c", 'echo "${BASH_VERSION}"'],
+            stdout=subprocess.PIPE,
+            check=False,
         )
         match = re.search(r"^(\d+)\.(\d+)\.\d+", output.stdout.decode())
         return (int(match.groups()[0]), int(match.groups()[1])) if match else None
 
-    def source_vars(self) -> t.Dict[str, t.Any]:
+    def source_vars(self) -> dict[str, t.Any]:
         """
         When the bash version is 4.4 or higher, the ``nosort`` option is
         available and can be used to disable sorting of completions. We
@@ -86,7 +88,7 @@ class BashComplete(DjangoTyperShellCompleter):
     def format_completion(self, item: CompletionItem) -> str:
         return f"{item.type},{item.value}"
 
-    def install(self, prompt: bool = True) -> t.List[Path]:
+    def install(self, prompt: bool = True) -> list[Path]:
         assert self.prog_name
         edited = []
         script = self.install_dir / f"{self.prog_name}.sh"

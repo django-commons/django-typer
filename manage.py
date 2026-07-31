@@ -3,10 +3,9 @@
 
 import os
 import sys
-import typing as t
 
 
-def main(settings: t.Optional[str] = None):
+def main(settings: str | None = None):
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings or "tests.settings.base")
     try:

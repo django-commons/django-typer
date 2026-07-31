@@ -48,67 +48,65 @@ Contrast this with the backup plugin example where after the plugins are loaded 
 ```
 
 ```python
+class Command(UpstreamCommand):
+    # This must *not* alter the grp1 app on the base
+    # app tree but instead create a new one on this
+    # commands app tree when it is created
+    @UpstreamCommand.grp1.command()
+    def cmd3(self):
+        pass
 
-    class Command(UpstreamCommand):
+    # this gets interesting though, because these should be
+    # equivalent:
+    @UpstreamCommand.grp2.command()
+    def cmd4(self):
+        pass
 
-      # This must *not* alter the grp1 app on the base
-      # app tree but instead create a new one on this
-      # commands app tree when it is created
-      @UpstreamCommand.grp1.command()
-      def cmd3(self):
-          pass
-
-      # this gets interesting though, because these should be
-      # equivalent:
-      @UpstreamCommand.grp2.command()
-      def cmd4(self):
-          pass
-
-      # we use custom __getattr__ methods on TyperCommand and Typer to
-      # dynamically run BFS search for command and groups if the members
-      # are not present on the command definition.
-      @UpstreamCommand.grp1.grp2.command()
-      def cmd4(self):
-          pass
+    # we use custom __getattr__ methods on TyperCommand and Typer to
+    # dynamically run BFS search for command and groups if the members
+    # are not present on the command definition.
+    @UpstreamCommand.grp1.grp2.command()
+    def cmd4(self):
+        pass
 ```
 
 ```python
-
-  # extensions called at module scope should modify the app tree of the
-  # command directly
-  @UpstreamCommand.grp1.command()
-  def cmd4(self):
-      pass
-
+# extensions called at module scope should modify the app tree of the
+# command directly
+@UpstreamCommand.grp1.command()
+def cmd4(self):
+    pass
 ```
 
 ```python
+app = Typer()
 
-  app = Typer()
 
-  # similar to extensions these calls should modify the app tree directly
-  # the Command class exists after the first Typer() call and app is a reference
-  # directly to Command.typer_app
-  @app.callback()
-  def init():
+# similar to extensions these calls should modify the app tree directly
+# the Command class exists after the first Typer() call and app is a reference
+# directly to Command.typer_app
+@app.callback()
+def init():
     pass
 
 
-  @app.command()
-  def main():
-      pass
+@app.command()
+def main():
+    pass
 
-  grp2 = Typer()
-  app.add_typer(grp2)
 
-  @grp2.callback(name="grp1")
-  def init_grp1():
-      pass
+grp2 = Typer()
+app.add_typer(grp2)
 
-  @grp2.command()
-  def cmd2():
-      pass
 
+@grp2.callback(name="grp1")
+def init_grp1():
+    pass
+
+
+@grp2.command()
+def cmd2():
+    pass
 ```
 
 ## Notes on [BaseCommand](https://docs.djangoproject.com/en/stable/howto/custom-management-commands/#django.core.management.BaseCommand)

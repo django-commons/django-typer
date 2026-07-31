@@ -1,3 +1,3 @@
-from .polls import *  # noqa: F403
+from .polls import *
 
-INSTALLED_APPS.insert(0, "profiling.no_typer")  # noqa: F405
+INSTALLED_APPS.insert(0, "profiling.no_typer")

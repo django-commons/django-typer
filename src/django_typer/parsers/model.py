@@ -60,12 +60,12 @@ class ModelObjectParser(ParamType):
         from the parser including QuerySets or the primitive values of the model fields.
     """
 
-    error_handler = t.Callable[[t.Type[models.Model], str, Exception], None]
+    error_handler = t.Callable[[type[models.Model], str, Exception], None]
 
-    model_cls: t.Type[models.Model]
+    model_cls: type[models.Model]
     lookup_field: str
     case_insensitive: bool = False
-    on_error: t.Optional[error_handler] = None
+    on_error: error_handler | None = None
     return_type: ReturnType = ReturnType.MODEL_INSTANCE
 
     _lookup: str = ""
@@ -101,10 +101,10 @@ class ModelObjectParser(ParamType):
 
     def __init__(
         self,
-        model_cls: t.Type[models.Model],
-        lookup_field: t.Optional[str] = None,
+        model_cls: type[models.Model],
+        lookup_field: str | None = None,
         case_insensitive: bool = case_insensitive,
-        on_error: t.Optional[error_handler] = on_error,
+        on_error: error_handler | None = on_error,
         return_type: ReturnType = return_type,
     ):
         from django.contrib.contenttypes.fields import GenericForeignKey
@@ -118,16 +118,14 @@ class ModelObjectParser(ParamType):
         self.case_insensitive = case_insensitive
         field = self.model_cls._meta.get_field(self.lookup_field)
         assert not isinstance(field, (models.ForeignObjectRel, GenericForeignKey)), (
-            "{cls} is not a supported lookup field."
-        ).format(cls=self._field.__class__.__name__)
+            f"{field.__class__.__name__} is not a supported lookup field."
+        )
         self._field = field
         if self.case_insensitive and "iexact" in self._field.get_lookups():
             self._lookup = "__iexact"
         self.__name__ = self._get_metavar()
 
-    def convert(
-        self, value: t.Any, param: t.Optional[Parameter], ctx: t.Optional[Context]
-    ):
+    def convert(self, value: t.Any, param: Parameter | None, ctx: Context | None):
         """
         Invoke the parsing action on the given string. If the value is
         already a model instance of the expected type the value will

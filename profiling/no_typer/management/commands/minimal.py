@@ -2,7 +2,7 @@ from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
-    requires_system_checks = []
+    requires_system_checks = ()
     requires_migrations_checks = False
 
     def add_arguments(self, parser) -> None:

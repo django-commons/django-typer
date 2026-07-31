@@ -39,20 +39,20 @@ from click import Context, Parameter
 from click.core import ParameterSource
 from click.shell_completion import CompletionItem
 
-Completer = t.Callable[[Context, Parameter, str], t.List[CompletionItem]]
+Completer = t.Callable[[Context, Parameter, str], list[CompletionItem]]
 
-ItemTuple = t.Union[t.Any, t.Tuple[t.Any, t.Any]]
-Strings = t.Union[
-    t.Sequence[ItemTuple],
-    t.KeysView[t.Any],
-    t.ValuesView[t.Any],
-    t.ItemsView[t.Any, t.Any],
-    t.Generator[ItemTuple, None, None],
-]
+ItemTuple = t.Any | tuple[t.Any, t.Any]
+Strings = (
+    t.Sequence[ItemTuple]
+    | t.KeysView[t.Any]
+    | t.ValuesView[t.Any]
+    | t.ItemsView[t.Any, t.Any]
+    | t.Generator[ItemTuple, None, None]
+)
 
 
 def these_strings(
-    strings: t.Union[t.Callable[[], Strings], Strings],
+    strings: t.Callable[[], Strings] | Strings,
     allow_duplicates: bool = False,
 ):
     """

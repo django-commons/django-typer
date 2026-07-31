@@ -1,14 +1,10 @@
-import typing as t
-
 from click import Context, Parameter
 from click.core import ParameterSource
 from click.shell_completion import CompletionItem
 from django.apps import apps
 
 
-def app_labels(
-    ctx: Context, param: Parameter, incomplete: str
-) -> t.List[CompletionItem]:
+def app_labels(ctx: Context, param: Parameter, incomplete: str) -> list[CompletionItem]:
     """
     A case-sensitive completer for Django app labels or names. The completer
     prefers labels but names will also work.

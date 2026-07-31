@@ -57,7 +57,7 @@ except (ShellDetectionFailure, RuntimeError):  # pragma: no cover
     pass
 
 
-def django_autocomplete(args: t.List[str], incomplete: str) -> t.List[CompletionItem]:
+def django_autocomplete(args: list[str], incomplete: str) -> list[CompletionItem]:
     # spoof bash environment variables
     # the first one is lopped off, so we insert a placeholder 0
     args = ["0", *args]
@@ -108,34 +108,36 @@ class Command(TyperCommand):
     help = t.cast(str, _("Install autocompletion for the current shell."))
 
     # disable the system checks - no reason to run these for this one-off command
-    requires_system_checks = []
+    requires_system_checks = ()
     requires_migrations_checks = False
 
     # remove unnecessary django command base parameters - these just clutter the help
-    suppressed_base_arguments = {
+    # never mutated - matches BaseCommand's declaration in django-stubs, which
+    # is not a ClassVar
+    suppressed_base_arguments = {  # noqa: RUF012
         "version",
         "skip_checks",
         "verbosity",
     }
 
-    _shell: t.Optional[str] = DETECTED_SHELL
+    _shell: str | None = DETECTED_SHELL
     shell_module: ModuleType
 
     ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
-    _fallback: t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]] = None
-    _manage_script: t.Optional[t.Union[str, Path]] = None
+    _fallback: t.Callable[[list[str], str], list[CompletionItem]] | None = None
+    _manage_script: str | Path | None = None
 
     color_default: bool = True
 
     @property
     def fallback(
         self,
-    ) -> t.Optional[t.Callable[[t.List[str], str], t.List[CompletionItem]]]:
+    ) -> t.Callable[[list[str], str], list[CompletionItem]] | None:
         return self._fallback
 
     @fallback.setter
-    def fallback(self, fb: t.Optional[str]):
+    def fallback(self, fb: str | None):
         try:
             self._fallback = import_string(fb) if fb else django_autocomplete
         except ImportError as err:
@@ -144,7 +146,7 @@ class Command(TyperCommand):
             ) from err
 
     @property
-    def fallback_import(self) -> t.Optional[str]:
+    def fallback_import(self) -> str | None:
         return (
             f"{self.fallback.__module__}.{self.fallback.__name__}"
             if self.fallback
@@ -152,7 +154,7 @@ class Command(TyperCommand):
         )
 
     @property
-    def manage_script(self) -> t.Union[str, Path]:
+    def manage_script(self) -> str | Path:
         """
         Returns the name of the manage command as a string if it is available as a
         command on the user path. If it is a script that is not available as a command
@@ -174,7 +176,7 @@ class Command(TyperCommand):
         return self._manage_script  # type: ignore
 
     @manage_script.setter
-    def manage_script(self, script: t.Optional[str]):
+    def manage_script(self, script: str | None):
         self._manage_script = get_usage_script(script)
         if isinstance(self._manage_script, Path):
             self._manage_script = self._manage_script.absolute()
@@ -199,7 +201,7 @@ class Command(TyperCommand):
         return self._shell
 
     @shell.setter
-    def shell(self, shell: t.Optional[str]):
+    def shell(self, shell: str | None):
         """Set the shell to install autocompletion for."""
         if shell:
             self._shell = shell
@@ -225,7 +227,7 @@ class Command(TyperCommand):
     def init(
         self,
         shell: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -236,7 +238,7 @@ class Command(TyperCommand):
             ),
         ] = DETECTED_SHELL,
         no_color: t.Annotated[
-            t.Optional[bool],
+            bool | None,
             Option(
                 "--no-color",
                 help=t.cast(
@@ -287,7 +289,7 @@ class Command(TyperCommand):
     def install(
         self,
         manage_script: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -299,7 +301,7 @@ class Command(TyperCommand):
             ),
         ] = None,
         fallback: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -312,7 +314,7 @@ class Command(TyperCommand):
             ),
         ] = None,
         template: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -334,7 +336,7 @@ class Command(TyperCommand):
                 ),
             ),
         ] = True,
-    ) -> t.Optional[t.List[Path]]:
+    ) -> list[Path] | None:
         """
         Install autocompletion for the given shell. If the shell is not specified, it
         will try to detect the shell. If the shell is not detected, it will fail.
@@ -395,7 +397,7 @@ class Command(TyperCommand):
     def uninstall(
         self,
         manage_script: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -446,10 +448,10 @@ class Command(TyperCommand):
             ),
         ] = "",
         cursor: t.Annotated[
-            t.Optional[int], Argument(help=t.cast(str, _("The cursor position.")))
+            int | None, Argument(help=t.cast(str, _("The cursor position.")))
         ] = None,
         fallback: t.Annotated[
-            t.Optional[str],
+            str | None,
             Option(
                 help=t.cast(
                     str,
@@ -489,9 +491,10 @@ class Command(TyperCommand):
         if args:
             try:
                 # lop the manage script off the front if it's there
-                if args[0] == self.manage_script_name:
-                    args = args[1:]
-                elif Path(args[0]).resolve() == Path(sys.argv[0]).resolve():
+                if (
+                    args[0] == self.manage_script_name
+                    or Path(args[0]).resolve() == Path(sys.argv[0]).resolve()
+                ):
                     args = args[1:]
             except (TypeError, ValueError, OSError):  # pragma: no cover
                 pass

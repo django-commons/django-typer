@@ -2,7 +2,7 @@ from django_typer.management import TyperCommand
 
 
 class Command(TyperCommand):
-    requires_system_checks = []
+    requires_system_checks = ()
     requires_migrations_checks = False
 
     def handle(self, test_arg: int, print: bool = False):

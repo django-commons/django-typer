@@ -4,7 +4,6 @@ installation logic.
 """
 
 import inspect
-import typing as t
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -21,13 +20,13 @@ install_traceback()
 
 
 @register("settings")
-def check_traceback_config(app_configs, **kwargs) -> t.List[CheckMessage]:
+def check_traceback_config(app_configs, **kwargs) -> list[CheckMessage]:
     """
     A system check that validates that the traceback config is valid and
     contains only the expected parameters.
     """
 
-    warnings: t.List[CheckMessage] = []
+    warnings: list[CheckMessage] = []
     if use_rich_tracebacks():
         tb_config = traceback_config()
         from rich import traceback  # pyright: ignore[reportMissingImports]

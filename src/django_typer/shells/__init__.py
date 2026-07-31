@@ -63,7 +63,7 @@ class DjangoTyperShellCompleter(ShellComplete):
 
     command: "ShellCompletion"
     command_str: str
-    command_args: t.List[str]
+    command_args: list[str]
 
     console = None  # type: ignore[var-annotated]
 
@@ -74,15 +74,15 @@ class DjangoTyperShellCompleter(ShellComplete):
 
     def __init__(
         self,
-        cli: t.Optional[ClickCommand] = None,
-        ctx_args: cabc.MutableMapping[str, t.Any] = {},
+        cli: ClickCommand | None = None,
+        ctx_args: cabc.MutableMapping[str, t.Any] | None = None,
         prog_name: str = "",
         complete_var: str = "",
         command: t.Optional["ShellCompletion"] = None,
-        command_str: t.Optional[str] = None,
-        command_args: t.Optional[t.List[str]] = None,
-        template: t.Optional[str] = None,
-        color: t.Optional[bool] = None,
+        command_str: str | None = None,
+        command_args: list[str] | None = None,
+        template: str | None = None,
+        color: bool | None = None,
         color_default: bool = color_default,
         **kwargs,
     ):
@@ -123,7 +123,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         if cli:
             super().__init__(
                 cli=cli,
-                ctx_args=ctx_args,
+                ctx_args=ctx_args or {},
                 complete_var=complete_var,
                 prog_name=prog_name,
                 **kwargs,
@@ -136,9 +136,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         """
         return Path(self.load_template().origin.name).read_text()
 
-    def get_completions(
-        self, args: t.List[str], incomplete: str
-    ) -> t.List[CompletionItem]:
+    def get_completions(self, args: list[str], incomplete: str) -> list[CompletionItem]:
         """
         Get the completions for the current command string and incomplete string.
         """
@@ -146,7 +144,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             return self.command.fallback(args, incomplete)
         return super().get_completions(args[1:], incomplete)
 
-    def get_completion_args(self) -> t.Tuple[t.List[str], str]:
+    def get_completion_args(self) -> tuple[list[str], str]:
         """
         Return the list of completion arguments and the incomplete string.
         """
@@ -159,7 +157,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             cwords[-1] if cwords else "",
         )
 
-    def source_vars(self) -> t.Dict[str, t.Any]:
+    def source_vars(self) -> dict[str, t.Any]:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         This returns the context that will be used to render the completion script
         template.
@@ -212,7 +210,7 @@ class DjangoTyperShellCompleter(ShellComplete):
         """
         return not isinstance(self.command.manage_script, Path)
 
-    def load_template(self) -> t.Union[BaseTemplate, DjangoTemplate]:
+    def load_template(self) -> BaseTemplate | DjangoTemplate:
         """
         Return a compiled Template object for the completion script template.
         """
@@ -241,7 +239,7 @@ class DjangoTyperShellCompleter(ShellComplete):
             return self.load_template().render(Context(self.source_vars()))  # type: ignore
 
     @abstractmethod
-    def install(self, prompt: bool = True) -> t.List[Path]:
+    def install(self, prompt: bool = True) -> list[Path]:
         """
         Deriving classes must implement this method to install the completion script.
 
@@ -328,10 +326,10 @@ class DjangoTyperShellCompleter(ShellComplete):
         return text
 
 
-_completers: t.Dict[str, t.Type[DjangoTyperShellCompleter]] = {}
+_completers: dict[str, type[DjangoTyperShellCompleter]] = {}
 
 
-def register_completion_class(cls: t.Type[DjangoTyperShellCompleter]) -> None:
+def register_completion_class(cls: type[DjangoTyperShellCompleter]) -> None:
     """
     Register a shell completion class for use with the Django shellcompletion command.
     """

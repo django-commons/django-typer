@@ -65,6 +65,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 ```python
 from django_typer.management import TyperCommand
 
+
 class Command(TyperCommand):
     def handle(self, arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
         """
@@ -79,11 +80,12 @@ from django_typer.management import Typer
 
 app = Typer()
 
+
 @app.command()
 def main(arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
-   """
-   A basic command that uses Typer
-   """
+    """
+    A basic command that uses Typer
+    """
 ```
 
 ![Basic Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/basic.svg)
@@ -95,36 +97,35 @@ def main(arg1: str, arg2: str, arg3: float = 0.5, arg4: int = 1):
 Commands with multiple subcommands can be defined:
 
 ```python
-   import typing as t
+import typing as t
 
-   from django.utils.translation import gettext_lazy as _
-   from typer import Argument
+from django.utils.translation import gettext_lazy as _
+from typer import Argument
 
-   from django_typer.management import TyperCommand, command
+from django_typer.management import TyperCommand, command
 
 
-   class Command(TyperCommand):
-      """
-      A command that defines subcommands.
-      """
+class Command(TyperCommand):
+    """
+    A command that defines subcommands.
+    """
 
-      @command()
-      def create(
-         self,
-         name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
-      ):
-         """
-         Create an object.
-         """
+    @command()
+    def create(
+        self,
+        name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
+    ):
+        """
+        Create an object.
+        """
 
-      @command()
-      def delete(
-         self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
-      ):
-         """
-         Delete an object.
-         """
-
+    @command()
+    def delete(
+        self, id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
+    ):
+        """
+        Delete an object.
+        """
 ```
 
 Or using the typer-style interface this could be written:
@@ -138,21 +139,21 @@ from typer import Argument
 
 app = Typer(help="A command that defines subcommands.")
 
-@app.command()
-def create(
-   name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
-):
-   """
-   Create an object.
-   """
 
 @app.command()
-def delete(
-   id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]
+def create(
+    name: t.Annotated[str, Argument(help=_("The name of the object to create."))],
 ):
-   """
-   Delete an object.
-   """
+    """
+    Create an object.
+    """
+
+
+@app.command()
+def delete(id: t.Annotated[int, Argument(help=_("The id of the object to delete."))]):
+    """
+    Delete an object.
+    """
 ```
 
 ![Multiple Subcommands Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/multi.svg)
@@ -172,62 +173,59 @@ More complex groups and subcommand hierarchies can be defined. For example, this
 Using the class-based interface we could define the command like this:
 
 ```python
-   import typing as t
-   from functools import reduce
+import typing as t
+from functools import reduce
 
-   from django.utils.translation import gettext_lazy as _
-   from typer import Argument, Option
+from django.utils.translation import gettext_lazy as _
+from typer import Argument, Option
 
-   from django_typer.management import TyperCommand, group
+from django_typer.management import TyperCommand, group
 
 
-   class Command(TyperCommand):
+class Command(TyperCommand):
+    help = _("A more complex command that defines a hierarchy of subcommands.")
 
-      help = _("A more complex command that defines a hierarchy of subcommands.")
+    precision = 2
 
-      precision = 2
-
-      @group(help=_("Do some math at the given precision."))
-      def math(
-         self,
-         precision: t.Annotated[
+    @group(help=_("Do some math at the given precision."))
+    def math(
+        self,
+        precision: t.Annotated[
             int, Option(help=_("The number of decimal places to output."))
-         ] = precision,
-      ):
-         self.precision = precision
+        ] = precision,
+    ):
+        self.precision = precision
 
-      # helps can be passed to the decorators
-      @math.command(help=_("Multiply the given numbers."))
-      def multiply(
-         self,
-         numbers: t.Annotated[
+    # helps can be passed to the decorators
+    @math.command(help=_("Multiply the given numbers."))
+    def multiply(
+        self,
+        numbers: t.Annotated[
             t.List[float], Argument(help=_("The numbers to multiply"))
-         ],
-      ):
-         return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+        ],
+    ):
+        return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
 
-      # or if no help is supplied to the decorators, the docstring if present
-      # will be used!
-      @math.command()
-      def divide(
-         self,
-         numerator: t.Annotated[float, Argument(help=_("The numerator"))],
-         denominator: t.Annotated[float, Argument(help=_("The denominator"))],
-         floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
-      ):
-         """
-         Divide the given numbers.
-         """
-         if floor:
-               return str(numerator // denominator)
-         return f"{numerator / denominator:.{self.precision}f}"
-
+    # or if no help is supplied to the decorators, the docstring if present
+    # will be used!
+    @math.command()
+    def divide(
+        self,
+        numerator: t.Annotated[float, Argument(help=_("The numerator"))],
+        denominator: t.Annotated[float, Argument(help=_("The denominator"))],
+        floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
+    ):
+        """
+        Divide the given numbers.
+        """
+        if floor:
+            return str(numerator // denominator)
+        return f"{numerator / denominator:.{self.precision}f}"
 ```
 
 The typer-style interface builds a [TyperCommand](https://django-typer.readthedocs.io/en/latest/reference.html#django_typer.TyperCommand) class for us **that allows you to optionally accept the self argument in your commands.** We could define the above command using the typer interface like this:
 
 ```python
-
 import typing as t
 from functools import reduce
 
@@ -244,38 +242,38 @@ math_grp = Typer(help=_("Do some math at the given precision."))
 
 app.add_typer(math_grp, name="math")
 
+
 @math_grp.callback()
 def math(
-   self,
-   precision: t.Annotated[
-      int, Option(help=_("The number of decimal places to output."))
-   ] = 2,
+    self,
+    precision: t.Annotated[
+        int, Option(help=_("The number of decimal places to output."))
+    ] = 2,
 ):
-   self.precision = precision
+    self.precision = precision
 
 
 @math_grp.command(help=_("Multiply the given numbers."))
 def multiply(
-   self,
-   numbers: t.Annotated[
-      t.List[float], Argument(help=_("The numbers to multiply"))
-   ],
+    self,
+    numbers: t.Annotated[t.List[float], Argument(help=_("The numbers to multiply"))],
 ):
-   return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+    return f"{reduce(lambda x, y: x * y, [1, *numbers]):.{self.precision}f}"
+
 
 @math_grp.command()
 def divide(
-   self,
-   numerator: t.Annotated[float, Argument(help=_("The numerator"))],
-   denominator: t.Annotated[float, Argument(help=_("The denominator"))],
-   floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
+    self,
+    numerator: t.Annotated[float, Argument(help=_("The numerator"))],
+    denominator: t.Annotated[float, Argument(help=_("The denominator"))],
+    floor: t.Annotated[bool, Option(help=_("Use floor division"))] = False,
 ):
-   """
-   Divide the given numbers.
-   """
-   if floor:
-         return str(numerator // denominator)
-   return f"{numerator / denominator:.{self.precision}f}"
+    """
+    Divide the given numbers.
+    """
+    if floor:
+        return str(numerator // denominator)
+    return f"{numerator / denominator:.{self.precision}f}"
 ```
 
 ![Grouping and Hierarchies Example](https://raw.githubusercontent.com/django-commons/django-typer/main/examples/helps/hierarchy.svg)

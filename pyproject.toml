@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.7.3"
+version = "3.7.4"
 requires-python = ">=3.10,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -17,7 +17,7 @@ repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
-    "Django>=4.2,<6.1",
+    "Django>=4.2,<6.2",
     # feature releases of click have broken compat before so we set
     # an upper bound on tested feature releases.
     "click>=8.1.8,<8.5",
@@ -56,7 +56,7 @@ conflicts = [
   [
     { group = "dj42" },
     { group = "dj52" },
-    { group = "dj60" },
+    { group = "dj61" },
   ],
 ]
 
@@ -165,11 +165,22 @@ exclude = [
     "examples"
 ]
 target-version = "py310"
+extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
 exclude = [
     "tests/**/*"
 ]
+
+[tool.ruff.lint.flake8-bugbear]
+# typer's Default() returns an immutable DefaultPlaceholder sentinel and is
+# designed to be called in argument defaults - we mirror typer's API surface
+extend-immutable-calls = ["typer.models.Default"]
+
+[tool.ruff.lint.per-file-ignores]
+# faithful copy of the Django tutorial's poll closing command for benchmark
+# comparison - keep it exactly as the Django docs write it
+"profiling/no_typer/management/commands/polls.py" = ["UP031"]
 
 
 [tool.bandit]
@@ -262,11 +273,11 @@ dev = [
 
 # for CI and testing
 dj42 = [
-    "Django~=4.2; python_version < '3.13'",
+    "Django>=4.2,<5.0; python_version < '3.13'",
 ]
 dj52 = [
-    "Django~=5.2",
+    "Django>=5.2,<6.0"
 ]
-dj60 = [
-    "Django~=6.0; python_version >= '3.12'",
+dj61 = [
+    "Django>=6.1rc1,<6.2; python_version >= '3.12'",
 ]
