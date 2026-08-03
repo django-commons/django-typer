@@ -4,6 +4,13 @@
 Change Log
 ==========
 
+v3.8.0 (2026-08-XX)
+===================
+
+* Fixed `Model field completers can return completions that don't extend the typed text; integer completer hangs on "0" <https://github.com/django-commons/django-typer/issues/304>`_
+* Fixed `Get fish completion tests working <https://github.com/django-commons/django-typer/issues/180>`_
+    - Fish shellcompletion is now better supported.
+
 v3.7.4 (2026-07-31)
 ===================
 
