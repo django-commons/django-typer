@@ -385,6 +385,25 @@ class _CompleteTestCase(with_typehint(TestCase)):
             )
             self._shell_state = (master_fd, slave_fd, process)
 
+            # Wait for the shell's line editor (readline/zle) to take over
+            # the pty before typing anything. Until then the pty is in
+            # canonical mode and the KERNEL echoes writes straight back --
+            # which satisfies sentinel waits without the shell having
+            # processed (or even seen) the input. The line editor switching
+            # the terminal out of canonical mode is a positive readiness
+            # signal the tty driver cannot fake. Without this, everything
+            # below races shell startup and TAB can be consumed before
+            # completions are registered (first spawn on a cold CI runner,
+            # or any slow .zshrc).
+            deadline = time.time() + 15.0
+            while time.time() < deadline:
+                # drain startup output so the shell can't stall on a full
+                # pty buffer before it reaches its first prompt
+                self._read_shell()
+                if not termios.tcgetattr(slave_fd)[3] & termios.ICANON:
+                    break
+                time.sleep(0.01)
+
             sentinel = self._next_sentinel()
             self._write_shell(f"echo {sentinel}{os.linesep}")
             _wait_for(self._read_shell, sentinel=sentinel, timeout=15.0)
