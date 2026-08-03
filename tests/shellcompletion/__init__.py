@@ -316,11 +316,17 @@ class _CompleteTestCase(with_typehint(TestCase)):
                 self.shell, *([self.interactive_opt] if self.interactive_opt else [])
             )
 
-            # Wait for first prompt by echoing a sentinel; the shell will
-            # process it once the prompt is ready.
-            sentinel = self._next_sentinel()
-            self._write_shell(f"echo {sentinel}{os.linesep}")
-            _wait_for(self._read_shell, sentinel=sentinel, timeout=20.0)
+            # Wait for the shell to PAINT its first prompt ("PS <cwd>>")
+            # before typing anything. An echoed sentinel is NOT a readiness
+            # signal here: until PowerShell takes over the console, conhost's
+            # cooked-mode echo reflects written input straight back,
+            # satisfying the wait while the shell is still initializing.
+            # Input typed during PSReadLine's console mode switch can then be
+            # split mid-line -- a half-submitted quoted env line leaves the
+            # shell in a ">>" continuation prompt that swallows everything
+            # typed after it. Nothing we write contains "PS ", so its
+            # appearance can only come from the shell itself.
+            _wait_for(self._read_shell, sentinel="PS ", quiet_period=0.5, timeout=30.0)
 
             for line in self.environment:
                 self._write_shell(f"{line}{os.linesep}")
