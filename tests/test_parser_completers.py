@@ -204,6 +204,17 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
             timedelta(minutes=1),
             timedelta(hours=1),
             timedelta(days=1),
+            # deterministic regressions for the ambiguous-digit completion
+            # windows in duration_query. Canonical iso strings elide zero
+            # components and never use leading zeros, so none of these may
+            # complete PT0 (except PT0S), PT1H0, PT5M1 or PT40:
+            timedelta(seconds=587, microseconds=603183),  # PT9M47.603183S
+            timedelta(minutes=19, seconds=47, microseconds=603183),  # PT19M47.603183S
+            timedelta(hours=1, microseconds=500000),  # PT1H0.500000S
+            timedelta(minutes=5, seconds=1),  # PT5M1S
+            timedelta(hours=1, minutes=5, seconds=30),  # PT1H5M30S
+            timedelta(minutes=40, seconds=5),  # PT40M5S
+            timedelta(hours=40, minutes=30),  # P1DT16H30M
             # we add some random values. neat little trick to explore more edge
             # cases each time the tests are run! - make sure hard coded tests
             # 100% coverage
@@ -1442,6 +1453,18 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
                 json.loads(call_command("model_fields", "test", "--id", str(id))),
                 {"id": id},
             )
+
+        # integers are never rendered with leading zeros, so a lone 0 can
+        # only match an exact 0 value (regression: this used to infinite
+        # loop in int_ranges)
+        result = call_command(
+            "shellcompletion",
+            "--shell",
+            SHELL,
+            "complete",
+            "model_fields test --id 0",
+        )
+        self.assertEqual(list(get_values(result)), [])
 
         # test the limit option
         result = call_command(
