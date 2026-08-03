@@ -16,6 +16,11 @@ def int_ranges(incomplete: str, max_val: int) -> list[tuple[int, int]]:
     lower = abs(lower)
     upper = abs(lower + 1)
     ranges = [(-upper, -lower)] if neg else [(lower, upper)]
+    if not lower:
+        # integers are never rendered with leading zeros, so 0 can only be
+        # completed by 0 itself (and appending digits below would never
+        # terminate)
+        return ranges
     while (lower := lower * 10) <= max_val:
         upper *= 10
         ranges.append((-upper, -lower) if neg else (lower, upper))
@@ -274,7 +279,7 @@ def duration_query(
     :raises AssertionError: If the incomplete string is not a valid partial
         duration.
     """
-    from django_typer.utils import parse_iso_duration
+    from django_typer.utils import duration_iso_string, parse_iso_duration
 
     duration, ambiguity = parse_iso_duration(incomplete)
     if incomplete.endswith("S") or (duration.microseconds and not ambiguity):
@@ -341,6 +346,14 @@ def duration_query(
                 )
             else:
                 # ambiguity is at least a seconds ambiguity
+                #
+                # completions are rendered with duration_iso_string, which
+                # elides zero components and never uses leading zeros -- so
+                # only continuations that canonical rendering can actually
+                # produce may be matched. A trailing 0 can only continue as
+                # a fractional seconds component (or PT0S for a total zero
+                # duration), and component values must be renderable
+                # (minutes <= 59, hours <= 23).
                 int_amb = int(ambiguity)
                 compound_horizon: list[
                     tuple[int, int]
@@ -351,40 +364,45 @@ def duration_query(
                         int_amb + 1,
                     )
                 )
-                compound_horizon.append(
-                    (int(f"{ambiguity}0"), min(int(f"{ambiguity}9") + 1, 60))
-                )
-                if "M" not in incomplete:
-                    # ambiguity is minutes or seconds
+                if int_amb:
                     compound_horizon.append(
-                        (
-                            int_amb * 60,
-                            int_amb * 60 + 60,
-                        )
+                        (int(f"{ambiguity}0"), min(int(f"{ambiguity}9") + 1, 60))
                     )
-                    if len(ambiguity) == 1:
+                    if "M" not in incomplete and int_amb <= 59:
+                        # ambiguity is minutes or seconds
                         compound_horizon.append(
                             (
-                                int(f"{ambiguity}0") * 60,
-                                min(int(f"{ambiguity}9") + 1, 60) * 60,
+                                int_amb * 60,
+                                int_amb * 60 + 60,
                             )
                         )
-                if "H" not in incomplete:
-                    # ambiguity is hours or minutes or seconds
-                    # bug here T1 could be T1H or T10H-T19H
-                    compound_horizon.append(
-                        (
-                            int_amb * 3600,
-                            int_amb * 3600 + 3600,
-                        )
-                    )
-                    if len(ambiguity) == 1:
+                        if len(ambiguity) == 1:
+                            compound_horizon.append(
+                                (
+                                    int(f"{ambiguity}0") * 60,
+                                    min(int(f"{ambiguity}9") + 1, 60) * 60,
+                                )
+                            )
+                    if (
+                        "H" not in incomplete
+                        and "M" not in incomplete
+                        and int_amb <= 23
+                    ):
+                        # ambiguity may also be hours, but only if a minutes
+                        # component has not already been given
                         compound_horizon.append(
                             (
-                                int(f"{ambiguity}0") * 3600,
-                                min(int(f"{ambiguity}9") + 1, 24) * 3600,
+                                int_amb * 3600,
+                                int_amb * 3600 + 3600,
                             )
                         )
+                        if len(ambiguity) == 1:
+                            compound_horizon.append(
+                                (
+                                    int(f"{ambiguity}0") * 3600,
+                                    min(int(f"{ambiguity}9") + 1, 24) * 3600,
+                                )
+                            )
                 c_qry = models.Q()
                 for lower, upper in compound_horizon:
                     lwr, upr = (
@@ -404,7 +422,12 @@ def duration_query(
                     c_qry |= h_qry
                 qry &= c_qry
 
-    inclusive = "" if incomplete.endswith("T") and duration.days else "e"
+    # the exact duration value is only a valid completion if its canonical
+    # rendering extends the incomplete string (e.g. PT0S extends PT0, but
+    # PT1H does not extend PT1H0 or PT1H0.)
+    inclusive = (
+        "e" if duration_iso_string(duration).startswith(incomplete.upper()) else ""
+    )
     qry &= (
         models.Q(**{f"{lookup_field}__lt{inclusive}": duration})
         if neg
