@@ -737,17 +737,17 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
             **env,
         }
 
-        rex = re.compile
+        # NB: these must be pattern STRINGS, not pre-compiled patterns. pexpect
+        # compiles string patterns itself with re.DOTALL (needed so
+        # (?P<file>.*) can span the line folds rich inserts into long paths on
+        # narrow terminals). Pre-compiled str patterns handed to a bytes-mode
+        # spawn get recompiled by pexpect's _coerce_expect_re WITHOUT their
+        # flags -- silently dropping DOTALL and timing out on folded prompts.
         expected = [
-            rex(
-                r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?", re.DOTALL
-            ),  # 0
-            rex(
-                r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",
-                re.DOTALL,
-            ),  # 1
-            rex(r"Aborted\s+shell\s+completion\s+installation."),  # 2
-            rex(rf"Installed\s+autocompletion\s+for\s+{self.shell}"),  # 3
+            r"Append\s+the\s+above\s+contents\s+to\s+(?P<file>.*)\?",  # 0
+            r"Create\s+(?P<file>.*)\s+with\s+the\s+above\s+contents\?",  # 1
+            r"Aborted\s+shell\s+completion\s+installation\.",  # 2
+            rf"Installed\s+autocompletion\s+for\s+{self.shell}",  # 3
         ]
 
         install_command = [
@@ -761,8 +761,12 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
         self.verify_remove(directory=directory)
 
         if platform.system() != "Windows":
-            install = pexpect.spawn(self.manage_script, install_command, env=env)
-            install.setwinsize(24, 800)
+            # dimensions must be given at spawn -- a setwinsize() call after
+            # spawn races the child's first read of the terminal size, and a
+            # child that reads the 80-col default wraps long prompt paths
+            install = pexpect.spawn(
+                self.manage_script, install_command, env=env, dimensions=(24, 800)
+            )
         else:
             from pexpect.popen_spawn import PopenSpawn
 
@@ -795,8 +799,9 @@ class _InstalledScriptCompleteTestCase(_CompleteTestCase):
 
         # test an install
         if platform.system() != "Windows":
-            install = pexpect.spawn(self.manage_script, install_command, env=env)
-            install.setwinsize(24, 800)
+            install = pexpect.spawn(
+                self.manage_script, install_command, env=env, dimensions=(24, 800)
+            )
         else:
             from pexpect.popen_spawn import PopenSpawn
 
