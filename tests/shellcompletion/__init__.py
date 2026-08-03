@@ -1,3 +1,4 @@
+import codecs
 import os
 import re
 import select
@@ -9,8 +10,6 @@ import typing as t
 from pathlib import Path
 import pytest
 from functools import cached_property
-import re
-import subprocess
 import platform
 from django.test import TestCase
 
@@ -28,15 +27,6 @@ try:
     default_shell = detect_shell()[0]
 except Exception:
     pass
-
-
-def scrub(output: str) -> str:
-    """Scrub control code characters and ansi escape sequences for terminal colors from output"""
-    return (
-        re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output, flags=re.IGNORECASE)
-        .replace("\t", "")
-        .replace("\x08", "")
-    )
 
 
 def flat_scrub(output: str) -> str:
@@ -187,6 +177,11 @@ class _CompleteTestCase(with_typehint(TestCase)):
     # Per-instance shell process state (None when no shell is running).
     _shell_state: t.Any = None
     _sentinel_counter: int = 0
+    # Incremental UTF-8 decoder (Unix path), recreated per shell spawn. A
+    # multi-byte UTF-8 sequence -- notably the 3-byte tab sentinel -- can
+    # straddle two os.read() chunks; a plain per-chunk decode would mangle
+    # it into replacement characters and the sentinel would never match.
+    _decoder: t.Any = None
 
     @cached_property
     def command(self) -> ShellCompletion:
@@ -215,7 +210,7 @@ class _CompleteTestCase(with_typehint(TestCase)):
         return f"{_SENTINEL_PREFIX}{self._sentinel_counter}__"
 
     def _invalidate_shell(self) -> None:
-        """Tear down the long-running shell, if any.
+        """Tear down the current shell process, if any.
 
         Called whenever shell state (profile, registered completers) may
         have changed and a fresh shell process is required.
@@ -225,10 +220,10 @@ class _CompleteTestCase(with_typehint(TestCase)):
         if state is None:
             return
         if platform.system() == "Windows":
-            try:
-                state.close()
-            except Exception:
-                pass
+            # winpty.PTY exposes no close()/terminate() API. Dropping the
+            # last reference frees the underlying console, which terminates
+            # the attached shell process.
+            del state
         else:
             master_fd, slave_fd, process = state
             # Close the fds first so the shell sees EOF on stdin and exits
@@ -286,7 +281,6 @@ class _CompleteTestCase(with_typehint(TestCase)):
         if self.shell:
             self.command.init(shell=self.shell)
         self.command.uninstall(**kwargs)
-        self.get_completions("ping")  # just to reinit shell
         self.verify_remove(script=script)
 
     # ------------------------------------------------------------------ #
@@ -349,7 +343,7 @@ class _CompleteTestCase(with_typehint(TestCase)):
                 return ""
             if not data:
                 return ""
-            return data.decode(errors="replace")
+            return self._decoder.decode(data)
 
         def _write_shell(self, data: str) -> None:
             assert self._shell_state is not None
@@ -362,6 +356,7 @@ class _CompleteTestCase(with_typehint(TestCase)):
             import termios
             import pty
 
+            self._decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
             master_fd, slave_fd = pty.openpty()
             os.set_blocking(slave_fd, False)
             os.set_blocking(master_fd, False)
