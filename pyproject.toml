@@ -17,7 +17,7 @@ repository = "https://github.com/django-commons/django-typer"
 homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
-    "Django>=4.2,<6.2",
+    "Django>=5.2,<6.2",
     # feature releases of click have broken compat before so we set
     # an upper bound on tested feature releases.
     "click>=8.1.8,<8.5",
@@ -31,7 +31,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Development Status :: 5 - Production/Stable",
-    "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Framework :: Django :: 6.1",
@@ -44,6 +43,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Site Management",
     "Topic :: Software Development :: Libraries",
@@ -55,7 +55,6 @@ classifiers = [
 package = true
 conflicts = [
   [
-    { group = "dj42" },
     { group = "dj52" },
     { group = "dj61" },
   ],
@@ -274,9 +273,6 @@ dev = [
 ]
 
 # for CI and testing
-dj42 = [
-    "Django>=4.2,<5.0; python_version < '3.13'",
-]
 dj52 = [
     "Django>=5.2,<6.0"
 ]
