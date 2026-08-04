@@ -15,6 +15,7 @@ from django_typer.shells.powershell import (
 from tests.shellcompletion import (
     _ScriptCompleteTestCase,
     _InstalledScriptCompleteTestCase,
+    render,
 )
 
 
@@ -29,6 +30,21 @@ class _PowerShellMixin:
     # continuation state ("\n>>") and breaks completion. Fall back to
     # pure quiet-period detection.
     tab_sentinel = None
+    # The completion path on Windows CI (PSReadLine tab handler -> our
+    # scriptblock -> cold Django subprocess) can stay silent for several
+    # seconds before producing output; a short quiet period returns with a
+    # pre-completion screen.
+    tab_quiet_period = 6.0
+
+    def _bad_capture(self, output: str) -> bool:
+        # PSReadLine under ConPTY intermittently drops the input line into
+        # multi-line continuation state -- the capture ends with a ">>"
+        # continuation prompt and the typed line was never completed. This
+        # is a long-standing environment flake (identical signatures appear
+        # in CI logs across unrelated tests and harness implementations
+        # since at least June 2026). The state cannot be recovered
+        # in-session; retry against a fresh shell.
+        return render(output).rstrip().endswith(">>")
 
     environment = [
         f"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
