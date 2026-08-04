@@ -43,19 +43,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.13"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
 
           - python-version: "3.10"
             dependencies: "highest"
@@ -67,8 +62,10 @@ jobs:
             dependencies: "lowest-direct"
           - python-version: "3.14"
             dependencies: "lowest-direct"
+          - python-version: "3.15"
+            dependencies: "lowest-direct"
 
-          - django-version: "dj52"
+          - django-version: "dj61"
             dependencies: "lowest-direct"
 
           - python-version: "3.10"
@@ -130,35 +127,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
-
-          - python-version: "3.10"
+          - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
           - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
             django-version: "dj61"
 
     env:
@@ -212,35 +195,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
-
-          - python-version: "3.10"
+          - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
           - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
             django-version: "dj61"
 
     env:
@@ -373,35 +342,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
-
-          - python-version: "3.10"
+          - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
           - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
             django-version: "dj61"
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -459,35 +414,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
-
-          - python-version: "3.10"
+          - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
           - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
             django-version: "dj61"
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -548,36 +489,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
-          - python-version: "3.10"
-            django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
-          - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
-            django-version: "dj61"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
+          - python-version: "3.15"
+            django-version: "dj52"
+          - python-version: "3.10"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: macos-zsh-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -644,36 +571,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
-          - python-version: "3.10"
-            django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
-          - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
-            django-version: "dj61"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
+          - python-version: "3.15"
+            django-version: "dj52"
+          - python-version: "3.10"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: macos-bash-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -730,36 +643,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
-          - python-version: "3.10"
-            django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
-          - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
-            django-version: "dj61"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
+          - python-version: "3.15"
+            django-version: "dj52"
+          - python-version: "3.10"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: macos-fish-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -824,36 +723,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
-          - python-version: "3.10"
-            django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
-          - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
-            django-version: "dj61"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
+          - python-version: "3.15"
+            django-version: "dj52"
+          - python-version: "3.10"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: windows-powershell-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -919,36 +804,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.15"]
         django-version:
-          - "dj42" # LTS April 2026
           - "dj52" # April 2028
           - "dj61" # April 2027
         dependencies:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.12"
-            django-version: "dj42"
-          - python-version: "3.14"
-            django-version: "dj42"
-
-          - python-version: "3.10"
-            django-version: "dj52"
-          - python-version: "3.14"
-            django-version: "dj52"
-
-          - python-version: "3.10"
-            django-version: "dj61"
-          - python-version: "3.12"
-            django-version: "dj61"
-
           - python-version: "3.10"
             dependencies: "highest"
-          - python-version: "3.12"
+          - python-version: "3.15"
             dependencies: "lowest-direct"
-          - python-version: "3.14"
-            dependencies: "lowest-direct"
+          - python-version: "3.15"
+            django-version: "dj52"
+          - python-version: "3.10"
+            django-version: "dj61"
 
     env:
       COVERAGE_FILE: windows-pwsh-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
