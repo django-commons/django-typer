@@ -420,51 +420,64 @@ class _CompleteTestCase(with_typehint(TestCase)):
                 self._write_shell(f"echo {sentinel}{os.linesep}")
                 _wait_for(self._read_shell, sentinel=sentinel, timeout=10.0)
 
-    def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
-        # Ensure a clean shell for every call; previous test interactions
-        # (typed but un-Entered text, completion menus, prediction overlays)
-        # could otherwise contaminate the captured output.
-        self._invalidate_shell()
-        self._ensure_shell()
-        try:
-            self._write_shell(" ".join(cmds))
-            if position > 0:
-                self._write_shell("\x1b[C" * position)
-            elif position < 0:
-                self._write_shell("\x1b[D" * abs(position))
-            self._write_shell(self.tabs)
-            if self.tab_sentinel is not None:
-                # Sentinel-after-TAB: shells process input serially, so
-                # this character can only be echoed back AFTER TAB-
-                # triggered completion has fully finished (including the
-                # Django subprocess call that powers our completer).
-                # Waiting for the sentinel in the captured stream is
-                # much faster and more reliable than waiting for a quiet
-                # period long enough to cover slow CI Django boots.
-                self._write_shell(self.tab_sentinel)
-                output = _wait_for(
-                    self._read_shell,
-                    sentinel=self.tab_sentinel,
-                    quiet_period=0.3,
-                    timeout=25.0,
-                )
-            else:
-                # Sentinel-less path: fall back to pure quiet-period
-                # detection. Required for PowerShell -- see comment on
-                # ``tab_sentinel``.
-                output = _wait_for(
-                    self._read_shell,
-                    quiet_period=self.tab_quiet_period,
-                    timeout=25.0,
-                )
-        finally:
-            self._invalidate_shell()
+    # Number of attempts (each against a freshly spawned shell) a
+    # get_completions() call makes when :meth:`_bad_capture` flags the
+    # captured output as a known-bad interactive state.
+    completion_attempts: int = 3
 
-        # Strip the sentinel (no-op for sentinel-less shells) so callers
-        # never see this test artifact in the rendered completion output.
-        if self.tab_sentinel is not None:
-            output = output.replace(self.tab_sentinel, "")
+    def get_completions(self, *cmds: str, scrub_output=True, position=0) -> str:
+        for attempt in range(self.completion_attempts):
+            # Ensure a clean shell for every call; previous test interactions
+            # (typed but un-Entered text, completion menus, prediction
+            # overlays) could otherwise contaminate the captured output.
+            self._invalidate_shell()
+            self._ensure_shell()
+            try:
+                self._write_shell(" ".join(cmds))
+                if position > 0:
+                    self._write_shell("\x1b[C" * position)
+                elif position < 0:
+                    self._write_shell("\x1b[D" * abs(position))
+                self._write_shell(self.tabs)
+                if self.tab_sentinel is not None:
+                    # Sentinel-after-TAB: shells process input serially, so
+                    # this character can only be echoed back AFTER TAB-
+                    # triggered completion has fully finished (including the
+                    # Django subprocess call that powers our completer).
+                    # Waiting for the sentinel in the captured stream is
+                    # much faster and more reliable than waiting for a quiet
+                    # period long enough to cover slow CI Django boots.
+                    self._write_shell(self.tab_sentinel)
+                    output = _wait_for(
+                        self._read_shell,
+                        sentinel=self.tab_sentinel,
+                        quiet_period=0.3,
+                        timeout=25.0,
+                    )
+                else:
+                    # Sentinel-less path: fall back to pure quiet-period
+                    # detection. Required for PowerShell -- see comment on
+                    # ``tab_sentinel``.
+                    output = _wait_for(
+                        self._read_shell,
+                        quiet_period=self.tab_quiet_period,
+                        timeout=25.0,
+                    )
+            finally:
+                self._invalidate_shell()
+
+            # Strip the sentinel (no-op for sentinel-less shells) so callers
+            # never see this test artifact in the rendered completion output.
+            if self.tab_sentinel is not None:
+                output = output.replace(self.tab_sentinel, "")
+            if not self._bad_capture(output):
+                break
         return self._render_output(output) if scrub_output else output
+
+    def _bad_capture(self, output: str) -> bool:
+        """Return True if the capture shows a known-bad interactive state
+        that warrants a retry with a fresh shell (see PowerShell override)."""
+        return False
 
     def _render_output(self, output: str) -> str:
         """Convert raw PTY bytes to assertion-friendly text.
