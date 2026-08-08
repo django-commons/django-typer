@@ -43,35 +43,57 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
-        django-version:
-          - "dj52" # April 2028
-          - "dj61" # April 2027
-        dependencies:
-          - "lowest-direct"
-          - "highest"
-        exclude:
-
+        include:
+          # Django 5.2
           - python-version: "3.10"
+            django-version: "dj52"
+            dependencies: "lowest-direct"
+
+          - python-version: "3.11"
+            django-version: "dj52"
             dependencies: "highest"
-          - python-version: "3.11"
-            dependencies: "lowest-direct"
+
           - python-version: "3.12"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.13"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.14"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.15"
+            django-version: "dj52"
+            dependencies: "highest"
+
+          # Django 6.0 — retain lower/upper boundary coverage
+          - python-version: "3.12"
+            django-version: "dj60"
             dependencies: "lowest-direct"
 
-          - django-version: "dj61"
+          - python-version: "3.14"
+            django-version: "dj60"
+            dependencies: "highest"
+
+          # Django 6.1
+          - python-version: "3.12"
+            django-version: "dj61"
             dependencies: "lowest-direct"
 
-          - python-version: "3.10"
+          - python-version: "3.13"
             django-version: "dj61"
-          - python-version: "3.11"
+            dependencies: "highest"
+
+          - python-version: "3.14"
             django-version: "dj61"
+            dependencies: "highest"
+
+          - python-version: "3.15"
+            django-version: "dj61"
+            dependencies: "highest"
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}.coverage
       ENV_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}
