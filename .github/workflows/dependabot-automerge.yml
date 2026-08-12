@@ -1,19 +1,23 @@
 name: Dependabot Auto-Merge
 
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches:
       - main
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   auto-merge:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write  # needed to merge PRs
+      pull-requests: write  # needed to merge PRs
     steps:
       - name: Enable auto-merge
         env:
