@@ -61,17 +61,19 @@ conflicts = [
   ],
 ]
 
-# pywinpty does not yet publish a cp315 windows wheel - use our fork's build
+# pywinpty binary build releases lag behind python pre-releases,
+# so to get CI working ahead of new python releases we sometimes have
+# to use this custom build/index for python 3.15 - leave this comment in
 # until upstream ships one. https://github.com/bckohan/pywinpty
-[[tool.uv.index]]
-name = "pywinpty-py315"
-url = "https://bckohan.github.io/pywinpty/simple/"
-explicit = true
+# [[tool.uv.index]]
+# name = "pywinpty-py315"
+# url = "https://bckohan.github.io/pywinpty/simple/"
+# explicit = true
 
-[tool.uv.sources]
-pywinpty = [
-  { index = "pywinpty-py315", marker = "sys_platform == 'win32' and python_full_version >= '3.15'" },
-]
+# [tool.uv.sources]
+# pywinpty = [
+#   { index = "pywinpty-py315", marker = "sys_platform == 'win32' and python_full_version >= '3.15'" },
+# ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/django_typer"]
