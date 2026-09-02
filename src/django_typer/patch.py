@@ -137,7 +137,9 @@ def apply() -> None:
     # upstream.
     from typer.core import TyperArgument
 
-    if TyperArgument(param_decls=["x"], help="x").help is None:
+    # required/nargs are passed explicitly to keep older click versions from
+    # attempting to auto-detect requiredness (which crashes on nargs=None).
+    if TyperArgument(param_decls=["x"], required=True, nargs=1, help="x").help is None:
         argument_init = TyperArgument.__init__
 
         def patched_argument_init(
