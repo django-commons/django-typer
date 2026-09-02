@@ -126,3 +126,46 @@ def apply() -> None:
 
     strip_ansi = _compat.strip_ansi
     _compat.strip_ansi = lambda value: strip_ansi(str(value))
+
+    # click 8.5.0 added a ``help`` parameter to click.Argument.__init__() which
+    # unconditionally sets ``self.help`` (defaulting to None). TyperArgument
+    # assigns ``self.help`` *before* calling super().__init__() and does not
+    # forward ``help`` to click, so under click>=8.5 the help text typer
+    # recorded is clobbered back to None and argument descriptions vanish from
+    # help output. We restore the help text after initialization. The feature
+    # detection makes this a no-op on click<8.5 and once typer fixes this
+    # upstream.
+    from typer.core import TyperArgument
+
+    if TyperArgument(param_decls=["x"], help="x").help is None:
+        argument_init = TyperArgument.__init__
+
+        def patched_argument_init(
+            self: TyperArgument,
+            *args: t.Any,
+            help: str | None = None,  # pylint: disable=redefined-builtin
+            **kwargs: t.Any,
+        ) -> None:
+            argument_init(self, *args, help=help, **kwargs)
+            self.help = help
+
+        TyperArgument.__init__ = patched_argument_init  # type: ignore[method-assign]
+
+    # click 8.5.0 also added a format_arguments() hook to click.Command.format_help()
+    # which renders a native "Positional arguments" help section. Typer renders
+    # arguments itself in its format_options() override, so when argument help
+    # is present (see the patch above) the arguments would be listed twice in
+    # non-rich help output. No-op the new hook on typer's command classes -
+    # unless typer has defined its own override, in which case leave it alone.
+    from typer.core import TyperCommand, TyperGroup
+
+    if hasattr(click.Command, "format_arguments"):
+
+        def format_arguments(
+            self: click.Command, ctx: click.Context, formatter: click.HelpFormatter
+        ) -> None:
+            pass
+
+        for cmd_cls in (TyperCommand, TyperGroup):
+            if "format_arguments" not in vars(cmd_cls):
+                cmd_cls.format_arguments = format_arguments  # type: ignore[method-assign]

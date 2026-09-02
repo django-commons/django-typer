@@ -398,20 +398,15 @@ class ExampleTests(TestCase):
             "multiply",
             "--help",
         )[0].strip()
-        try:
-            self.assertGreater(
-                similarity(
-                    observed_help,
-                    hierarchy_math_multiply_help
-                    if rich_installed
-                    else hierarchy_math_multiply_help_no_rich,
-                ),
-                0.99,
-            )
-        except AssertionError:
-            import ipdb
-
-            ipdb.set_trace()
+        self.assertGreater(
+            similarity(
+                observed_help,
+                hierarchy_math_multiply_help
+                if rich_installed
+                else hierarchy_math_multiply_help_no_rich,
+            ),
+            0.99,
+        )
 
         self.assertEqual(
             run_command(
