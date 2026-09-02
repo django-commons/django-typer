@@ -124,6 +124,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         shell: bash
         env:
@@ -195,6 +197,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -343,6 +347,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -410,6 +416,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Test Tab Completion
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -482,6 +490,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Install Fish shell
         run: |
           sudo apt-get update
@@ -794,6 +804,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Powershell Tab Completion Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -875,6 +887,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Powershell Tab Completion Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -941,6 +955,8 @@ jobs:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Install Release Dependencies
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
