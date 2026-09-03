@@ -83,7 +83,7 @@ class ModelObjectParser(ParamType):
         elif isinstance(self._field, models.URLField):
             return "URL"
         elif isinstance(self._field, models.GenericIPAddressField):
-            return "IPv4|IPv6"
+            return "[IPv4|IPv6]"
         elif isinstance(self._field, models.UUIDField):
             return "UUID"
         elif isinstance(self._field, (models.FloatField, models.DecimalField)):

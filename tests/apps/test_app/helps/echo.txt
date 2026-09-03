@@ -1,10 +1,10 @@
                                                                                 
- Usage: ./manage.py groups echo [OPTIONS] {message}                             
+ Usage: ./manage.py groups echo [OPTIONS] MESSAGE                               
                                                                                 
  Echo the given message.                                                        
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      <str>  [required]                                          │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

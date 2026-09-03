@@ -12,18 +12,17 @@ adapted_help = """
 Usage: ./manage.py adapted [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --version            Show program's version number and exit.
-  --settings <str>     The Python path to a settings module, e.g.
-                       "myproject.settings.main". If this isn't provided, the
-                       DJANGO_SETTINGS_MODULE environment variable will be
-                       used.
-  --pythonpath <path>  A directory to add to the Python path, e.g.
-                       "/home/djangoprojects/myproject".
-  --traceback          Raise on CommandError exceptions
-  --no-color           Don't colorize the command output.
-  --force-color        Force colorization of the command output.
-  --skip-checks        Skip system checks.
-  --help               Show this message and exit.
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 
 Commands:
   adapted
@@ -32,10 +31,10 @@ Commands:
 """
 
 adapted_adapted_help = """
-Usage: ./manage.py adapted adapted [OPTIONS] {message}
+Usage: ./manage.py adapted adapted [OPTIONS] MESSAGE
 
 Arguments:
-  message  [required]
+  MESSAGE  [required]
 
 Options:
   --help  Show this message and exit.
@@ -49,18 +48,18 @@ adapted_rich_help = """
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                    Show program's version number and exit.         │
-│ --settings           <str>   The Python path to a settings module, e.g.      │
-│                              "myproject.settings.main". If this isn't        │
-│                              provided, the DJANGO_SETTINGS_MODULE            │
-│                              environment variable will be used.              │
-│ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-│                              "/home/djangoprojects/myproject".               │
-│ --traceback                  Raise on CommandError exceptions                │
-│ --show-locals                Print local variables in tracebacks.            │
-│ --no-color                   Don't colorize the command output.              │
-│ --force-color                Force colorization of the command output.       │
-│ --skip-checks                Skip system checks.                             │
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ adapted                                                                      │
@@ -71,10 +70,10 @@ adapted_rich_help = """
 
 adapted_adapted_rich_help = """
                                                                                 
- Usage: ./manage.py adapted adapted [OPTIONS] {message}                         
+ Usage: ./manage.py adapted adapted [OPTIONS] MESSAGE                           
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      <str>  [required]                                          │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -82,13 +81,13 @@ adapted_adapted_rich_help = """
 """
 
 adapted_echo_help = """
-Usage: ./manage.py adapted echo [OPTIONS] {msg1} {msg2}
+Usage: ./manage.py adapted echo [OPTIONS] MSG1 MSG2
 
   Echo both messages.
 
 Arguments:
-  msg1  [required]
-  msg2  [required]
+  MSG1  [required]
+  MSG2  [required]
 
 Options:
   --help  Show this message and exit.
@@ -96,13 +95,13 @@ Options:
 
 adapted_echo_rich_help = """
                                                                                 
- Usage: ./manage.py adapted echo [OPTIONS] {msg1} {msg2}                        
+ Usage: ./manage.py adapted echo [OPTIONS] MSG1 MSG2                            
                                                                                 
  Echo both messages.                                                            
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    msg1      <str>  [required]                                             │
-│ *    msg2      <str>  [required]                                             │
+│ *    msg1      TEXT  [required]                                              │
+│ *    msg2      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -111,48 +110,47 @@ adapted_echo_rich_help = """
 
 adapted_help_no_adapters = """
                                                                                 
- Usage: ./manage.py adapted [OPTIONS] {message}                                 
+ Usage: ./manage.py adapted [OPTIONS] MESSAGE                                   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      <str>  [required]                                          │
+│ *    message      TEXT  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                    Show program's version number and exit.         │
-│ --settings           <str>   The Python path to a settings module, e.g.      │
-│                              "myproject.settings.main". If this isn't        │
-│                              provided, the DJANGO_SETTINGS_MODULE            │
-│                              environment variable will be used.              │
-│ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-│                              "/home/djangoprojects/myproject".               │
-│ --traceback                  Raise on CommandError exceptions                │
-│ --show-locals                Print local variables in tracebacks.            │
-│ --no-color                   Don't colorize the command output.              │
-│ --force-color                Force colorization of the command output.       │
-│ --skip-checks                Skip system checks.                             │
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 adapted_help_no_adapters_no_rich = """
-Usage: ./manage.py adapted [OPTIONS] {message}
+Usage: ./manage.py adapted [OPTIONS] MESSAGE
 
 Arguments:
-  message  [required]
+  MESSAGE  [required]
 
 Options:
-  --version            Show program's version number and exit.
-  --settings <str>     The Python path to a settings module, e.g.
-                       "myproject.settings.main". If this isn't provided, the
-                       DJANGO_SETTINGS_MODULE environment variable will be
-                       used.
-  --pythonpath <path>  A directory to add to the Python path, e.g.
-                       "/home/djangoprojects/myproject".
-  --traceback          Raise on CommandError exceptions
-  --no-color           Don't colorize the command output.
-  --force-color        Force colorization of the command output.
-  --skip-checks        Skip system checks.
-  --help               Show this message and exit.
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 """
 
 

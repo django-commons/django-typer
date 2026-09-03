@@ -6,59 +6,58 @@ from tests.utils import rich_installed, run_command, similarity
 
 basic_help = """
                                                                                 
- Usage: ./manage.py basic [OPTIONS] {arg1} {arg2}                               
+ Usage: ./manage.py basic [OPTIONS] ARG1 ARG2                                   
                                                                                 
  A basic command that uses Typer                                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    arg1      <str>  [required]                                             │
-│ *    arg2      <str>  [required]                                             │
+│ *    arg1      TEXT  [required]                                              │
+│ *    arg2      TEXT  [required]                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --arg3        <float>  [default: 0.5]                                        │
-│ --arg4        <int>    [default: 1]                                          │
+│ --arg3        FLOAT    [default: 0.5]                                        │
+│ --arg4        INTEGER  [default: 1]                                          │
 │ --help                 Show this message and exit.                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                    Show program's version number and exit.         │
-│ --settings           <str>   The Python path to a settings module, e.g.      │
-│                              "myproject.settings.main". If this isn't        │
-│                              provided, the DJANGO_SETTINGS_MODULE            │
-│                              environment variable will be used.              │
-│ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-│                              "/home/djangoprojects/myproject".               │
-│ --traceback                  Raise on CommandError exceptions                │
-│ --show-locals                Print local variables in tracebacks.            │
-│ --no-color                   Don't colorize the command output.              │
-│ --force-color                Force colorization of the command output.       │
-│ --skip-checks                Skip system checks.                             │
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 basic_help_no_rich = """
-Usage: ./manage.py basic [OPTIONS] {arg1} {arg2}
+Usage: ./manage.py basic [OPTIONS] ARG1 ARG2
 
   A basic command that uses Typer
 
 Arguments:
-  arg1  [required]
-  arg2  [required]
+  ARG1  [required]
+  ARG2  [required]
 
 Options:
-  --arg3 <float>       [default: 0.5]
-  --arg4 <int>         [default: 1]
-  --version            Show program's version number and exit.
-  --settings <str>     The Python path to a settings module, e.g.
-                       "myproject.settings.main". If this isn't provided, the
-                       DJANGO_SETTINGS_MODULE environment variable will be
-                       used.
-  --pythonpath <path>  A directory to add to the Python path, e.g.
-                       "/home/djangoprojects/myproject".
-  --traceback          Raise on CommandError exceptions
-  --no-color           Don't colorize the command output.
-  --force-color        Force colorization of the command output.
-  --skip-checks        Skip system checks.
-  --help               Show this message and exit.
+  --arg3 FLOAT       [default: 0.5]
+  --arg4 INTEGER     [default: 1]
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 """
 
 multi_help_no_rich = """
@@ -67,18 +66,17 @@ Usage: ./manage.py multi [OPTIONS] COMMAND [ARGS]...
   A command that defines subcommands.
 
 Options:
-  --version            Show program's version number and exit.
-  --settings <str>     The Python path to a settings module, e.g.
-                       "myproject.settings.main". If this isn't provided, the
-                       DJANGO_SETTINGS_MODULE environment variable will be
-                       used.
-  --pythonpath <path>  A directory to add to the Python path, e.g.
-                       "/home/djangoprojects/myproject".
-  --traceback          Raise on CommandError exceptions
-  --no-color           Don't colorize the command output.
-  --force-color        Force colorization of the command output.
-  --skip-checks        Skip system checks.
-  --help               Show this message and exit.
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 
 Commands:
   create  Create an object.
@@ -86,24 +84,24 @@ Commands:
 """
 
 multi_create_help_no_rich = """
-Usage: ./manage.py multi create [OPTIONS] {name}
+Usage: ./manage.py multi create [OPTIONS] NAME
 
   Create an object.
 
 Arguments:
-  name  The name of the object to create.  [required]
+  NAME  The name of the object to create.  [required]
 
 Options:
   --help  Show this message and exit.
 """
 
 multi_delete_help_no_rich = """
-Usage: ./manage.py multi delete [OPTIONS] {id}
+Usage: ./manage.py multi delete [OPTIONS] ID
 
   Delete an object.
 
 Arguments:
-  id  The id of the object to delete.  [required]
+  ID  The id of the object to delete.  [required]
 
 Options:
   --help  Show this message and exit.
@@ -119,18 +117,18 @@ multi_help = """
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                    Show program's version number and exit.         │
-│ --settings           <str>   The Python path to a settings module, e.g.      │
-│                              "myproject.settings.main". If this isn't        │
-│                              provided, the DJANGO_SETTINGS_MODULE            │
-│                              environment variable will be used.              │
-│ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-│                              "/home/djangoprojects/myproject".               │
-│ --traceback                  Raise on CommandError exceptions                │
-│ --show-locals                Print local variables in tracebacks.            │
-│ --no-color                   Don't colorize the command output.              │
-│ --force-color                Force colorization of the command output.       │
-│ --skip-checks                Skip system checks.                             │
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ create  Create an object.                                                    │
@@ -140,12 +138,12 @@ multi_help = """
 
 multi_create_help = """
                                                                                 
- Usage: ./manage.py multi create [OPTIONS] {name}                               
+ Usage: ./manage.py multi create [OPTIONS] NAME                                 
                                                                                 
  Create an object.                                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      <str>  The name of the object to create. [required]           │
+│ *    name      TEXT  The name of the object to create. [required]            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -154,12 +152,12 @@ multi_create_help = """
 
 multi_delete_help = """
                                                                                 
- Usage: ./manage.py multi delete [OPTIONS] {id}                                 
+ Usage: ./manage.py multi delete [OPTIONS] ID                                   
                                                                                 
  Delete an object.                                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    id      <int>  The id of the object to delete. [required]               │
+│ *    id      INTEGER  The id of the object to delete. [required]             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -176,18 +174,18 @@ hierarchy_help = """
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                    Show program's version number and exit.         │
-│ --settings           <str>   The Python path to a settings module, e.g.      │
-│                              "myproject.settings.main". If this isn't        │
-│                              provided, the DJANGO_SETTINGS_MODULE            │
-│                              environment variable will be used.              │
-│ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-│                              "/home/djangoprojects/myproject".               │
-│ --traceback                  Raise on CommandError exceptions                │
-│ --show-locals                Print local variables in tracebacks.            │
-│ --no-color                   Don't colorize the command output.              │
-│ --force-color                Force colorization of the command output.       │
-│ --skip-checks                Skip system checks.                             │
+│ --version                  Show program's version number and exit.           │
+│ --settings           TEXT  The Python path to a settings module, e.g.        │
+│                            "myproject.settings.main". If this isn't          │
+│                            provided, the DJANGO_SETTINGS_MODULE environment  │
+│                            variable will be used.                            │
+│ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+│                            "/home/djangoprojects/myproject".                 │
+│ --traceback                Raise on CommandError exceptions                  │
+│ --show-locals              Print local variables in tracebacks.              │
+│ --no-color                 Don't colorize the command output.                │
+│ --force-color              Force colorization of the command output.         │
+│ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ math  Do some math at the given precision.                                   │
@@ -200,18 +198,17 @@ Usage: ./manage.py hierarchy [OPTIONS] COMMAND [ARGS]...
   A more complex command that defines a hierarchy of subcommands.
 
 Options:
-  --version            Show program's version number and exit.
-  --settings <str>     The Python path to a settings module, e.g.
-                       "myproject.settings.main". If this isn't provided, the
-                       DJANGO_SETTINGS_MODULE environment variable will be
-                       used.
-  --pythonpath <path>  A directory to add to the Python path, e.g.
-                       "/home/djangoprojects/myproject".
-  --traceback          Raise on CommandError exceptions
-  --no-color           Don't colorize the command output.
-  --force-color        Force colorization of the command output.
-  --skip-checks        Skip system checks.
-  --help               Show this message and exit.
+  --version          Show program's version number and exit.
+  --settings TEXT    The Python path to a settings module, e.g.
+                     "myproject.settings.main". If this isn't provided, the
+                     DJANGO_SETTINGS_MODULE environment variable will be used.
+  --pythonpath PATH  A directory to add to the Python path, e.g.
+                     "/home/djangoprojects/myproject".
+  --traceback        Raise on CommandError exceptions
+  --no-color         Don't colorize the command output.
+  --force-color      Force colorization of the command output.
+  --skip-checks      Skip system checks.
+  --help             Show this message and exit.
 
 Commands:
   math  Do some math at the given precision.
@@ -224,9 +221,9 @@ hierarchy_math_help = """
  Do some math at the given precision.                                           
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --precision        <int>  The number of decimal places to output.            │
-│                           [default: 2]                                       │
-│ --help                    Show this message and exit.                        │
+│ --precision        INTEGER  The number of decimal places to output.          │
+│                             [default: 2]                                     │
+│ --help                      Show this message and exit.                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ multiply  Multiply the given numbers.                                        │
@@ -236,13 +233,13 @@ hierarchy_math_help = """
 
 hierarchy_math_divide_help = """
                                                                                 
- Usage: ./manage.py hierarchy math divide [OPTIONS] {numerator} {denominator}   
+ Usage: ./manage.py hierarchy math divide [OPTIONS] NUMERATOR DENOMINATOR       
                                                                                 
  Divide the given numbers.                                                      
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    numerator        <float>  The numerator [required]                      │
-│ *    denominator      <float>  The denominator [required]                    │
+│ *    numerator        FLOAT  The numerator [required]                        │
+│ *    denominator      FLOAT  The denominator [required]                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --floor    --no-floor      Use floor division [default: no-floor]            │
@@ -252,12 +249,12 @@ hierarchy_math_divide_help = """
 
 hierarchy_math_multiply_help = """
                                                                                 
- Usage: ./manage.py hierarchy math multiply [OPTIONS] {numbers}...              
+ Usage: ./manage.py hierarchy math multiply [OPTIONS] NUMBERS...                
                                                                                 
  Multiply the given numbers.                                                    
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    numbers      <float>  The numbers to multiply [required]                │
+│ *    numbers...      FLOAT  The numbers to multiply [required]               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -270,8 +267,8 @@ Usage: ./manage.py hierarchy math [OPTIONS] COMMAND [ARGS]...
   Do some math at the given precision.
 
 Options:
-  --precision <int>  The number of decimal places to output.  [default: 2]
-  --help             Show this message and exit.
+  --precision INTEGER  The number of decimal places to output.  [default: 2]
+  --help               Show this message and exit.
 
 Commands:
   multiply  Multiply the given numbers.
@@ -279,13 +276,13 @@ Commands:
 """
 
 hierarchy_math_divide_help_no_rich = """
-Usage: ./manage.py hierarchy math divide [OPTIONS] {numerator} {denominator}
+Usage: ./manage.py hierarchy math divide [OPTIONS] NUMERATOR DENOMINATOR
 
   Divide the given numbers.
 
 Arguments:
-  numerator    The numerator  [required]
-  denominator  The denominator  [required]
+  NUMERATOR    The numerator  [required]
+  DENOMINATOR  The denominator  [required]
 
 Options:
   --floor / --no-floor  Use floor division  [default: no-floor]
@@ -293,12 +290,12 @@ Options:
 """
 
 hierarchy_math_multiply_help_no_rich = """
-Usage: ./manage.py hierarchy math multiply [OPTIONS] {numbers}...
+Usage: ./manage.py hierarchy math multiply [OPTIONS] NUMBERS...
 
   Multiply the given numbers.
 
 Arguments:
-  numbers...  The numbers to multiply  [required]
+  NUMBERS...  The numbers to multiply  [required]
 
 Options:
   --help  Show this message and exit.

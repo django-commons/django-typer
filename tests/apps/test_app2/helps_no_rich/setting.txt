@@ -1,9 +1,9 @@
-Usage: ./manage.py groups setting [OPTIONS] {setting} COMMAND [ARGS]...
+Usage: ./manage.py groups setting [OPTIONS] SETTING COMMAND [ARGS]...
 
   Get or set Django settings.
 
 Arguments:
-  setting  The setting variable name.  [required]
+  SETTING  The setting variable name.  [required]
 
 Options:
   --help  Show this message and exit.
