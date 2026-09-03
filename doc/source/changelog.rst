@@ -8,7 +8,9 @@ v4.0.0 (2026-09-XX)
 ===================
 
 * Support Typer 0.26.x
-* Drop dependency on Click (vendored by Typer)
+* Drop dependency on Click (vendored by Typer). The Click types needed to write completers
+  and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
+  ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
 * Drop support for Python 3.10
 * Passing a ``prompt_required=False`` option flag without a value no longer triggers
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
