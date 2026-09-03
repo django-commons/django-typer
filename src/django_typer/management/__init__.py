@@ -476,6 +476,20 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             completions = super().shell_complete(
                 ctx, min(getattr(ctx, "_opt_prefixes", [""]))
             )
+        # Typer's vendored click dropped chain support - any command may be part
+        # of a chained group, so sibling commands are valid completions at any
+        # point during command completion.
+        parent = ctx
+        while parent.parent is not None:
+            parent = parent.parent
+            if getattr(parent.command, "chain", False):
+                completions.extend(
+                    CompletionItem(name, help=command.get_short_help_str())
+                    for name, command in _click.core._complete_visible_commands(
+                        parent, incomplete
+                    )
+                    if name not in parent._protected_args
+                )
         return completions
 
     def common_params(self) -> t.Sequence[CoreTyperArgument | CoreTyperOption]:
@@ -595,8 +609,25 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     chain: bool = False
     """
     Whether this group chains subcommands. Typer's vendored click dropped chain
-    support, so django-typer tracks the setting itself.
+    support, so django-typer tracks the setting itself and reimplements the
+    chain behavior of click's Group on this class.
     """
+
+    def __init__(
+        self,
+        *args,
+        subcommand_metavar: str | None = None,
+        **kwargs: t.Any,
+    ):
+        if subcommand_metavar is None and self.chain:
+            subcommand_metavar = "COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]..."
+        super().__init__(*args, subcommand_metavar=subcommand_metavar, **kwargs)
+        if self.chain:
+            for param in self.params:
+                if isinstance(param, CoreTyperArgument) and not param.required:
+                    raise RuntimeError(
+                        "A group in chain mode cannot have optional arguments."
+                    )
 
     def list_commands(self, ctx: _click.Context) -> list[str]:
         """
@@ -610,16 +641,31 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 cmds.remove(defined)
         return ordered + cmds
 
+    def parse_args(self, ctx: _click.Context, args: list[str]) -> list[str]:
+        """
+        In chain mode all remaining arguments are protected so that they can be
+        resolved into a sequence of subcommands by :meth:`invoke`.
+        """
+        if not self.chain:
+            return super().parse_args(ctx, args)
+        if not args and self.no_args_is_help and not ctx.resilient_parsing:
+            raise _click.exceptions.NoArgsIsHelpError(ctx)
+        ctx._protected_args = _click.Command.parse_args(self, ctx, args)
+        ctx.args = []
+        return ctx.args
+
     def invoke(self, ctx: _click.Context) -> t.Any:
         """
-        Override click.Group.invoke to include the group callback's return value in
-        the results list when chain=True and invoke_without_command=True. In Click's
-        default implementation the group callback's return is discarded in chain mode;
-        here we prepend it to the subcommand results so finalize handlers can see it.
+        Reimplements click's Group.invoke chain mode, which Typer's vendored click
+        dropped. Each subcommand context is created in sequence after the group
+        callback has run and the list of subcommand results is passed to the result
+        callback (finalizer).
 
-        Hopefully this gets fixed upstream and we can remove this override.
+        Unlike click, when ``invoke_without_command`` is set the group callback's
+        return value is included at the front of the results list so that finalize
+        handlers can see it.
         """
-        if not self.chain or not self.invoke_without_command:
+        if not self.chain:
             return super().invoke(ctx)
 
         def _process_result(value: t.Any) -> t.Any:
@@ -627,17 +673,24 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 value = ctx.invoke(self._result_callback, value, **ctx.params)
             return value
 
-        # No subcommands provided — run group callback and pass its return as a
-        # single-element list (or empty list if it returned None) to the finalizer.
         if not ctx._protected_args:
-            with ctx:
-                group_rv = _click.Command.invoke(self, ctx)
-                return _process_result([group_rv] if group_rv is not None else [])
+            if self.invoke_without_command:
+                # No subcommands provided - run group callback and pass its return
+                # as a single-element list (or empty list if it returned None) to
+                # the finalizer.
+                with ctx:
+                    group_rv = _click.Command.invoke(self, ctx)
+                    return _process_result([group_rv] if group_rv is not None else [])
+            ctx.fail("Missing command.")
 
         args = [*ctx._protected_args, *ctx.args]
         ctx.args = []
         ctx._protected_args = []
 
+        # In chain mode we create the contexts step by step, but after the base
+        # command has been invoked. Because at that point we do not know the
+        # subcommands yet, the invoked subcommand attribute is set to ``*`` to
+        # inform the command that subcommands are executed but nothing else.
         with ctx:
             ctx.invoked_subcommand = "*" if args else None
             group_rv = _click.Command.invoke(self, ctx)
@@ -656,7 +709,11 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 contexts.append(sub_ctx)
                 args, sub_ctx.args = sub_ctx.args, []
 
-            rv = [group_rv] if group_rv is not None else []
+            rv = (
+                [group_rv]
+                if group_rv is not None and self.invoke_without_command
+                else []
+            )
             for sub_ctx in contexts:
                 with sub_ctx:
                     rv.append(sub_ctx.command.invoke(sub_ctx))
