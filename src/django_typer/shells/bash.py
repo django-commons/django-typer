@@ -2,7 +2,7 @@ import typing as t
 from functools import cached_property
 from pathlib import Path
 
-from click.shell_completion import CompletionItem
+from typer._click.shell_completion import CompletionItem
 
 from . import DjangoTyperShellCompleter
 

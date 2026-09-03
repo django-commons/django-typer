@@ -48,7 +48,7 @@ def set_force_color(context, _, value):
 
 
 def show_locals(context, param, _):
-    from click.core import ParameterSource
+    from typer._click.core import ParameterSource
 
     if context.get_parameter_source(param.name) is not ParameterSource.DEFAULT:
         from .config import traceback_config

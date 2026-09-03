@@ -1,6 +1,6 @@
 import typing as t
 from django_typer.management import TyperCommand, DTGroup, command, group
-from click import Context
+from typer import Context
 
 
 class AlphabetizeCommands(DTGroup):

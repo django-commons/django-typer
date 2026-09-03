@@ -4,9 +4,9 @@ import typing as t
 from functools import partial
 from pathlib import Path
 
-from click import Context, Parameter
-from click.shell_completion import CompletionItem
 from django.conf import settings
+from typer._click import Context, Parameter
+from typer._click.shell_completion import CompletionItem
 
 
 def _settings_path(name: str) -> Path | None:

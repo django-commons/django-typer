@@ -35,9 +35,9 @@ types:
 
 import typing as t
 
-from click import Context, Parameter
-from click.core import ParameterSource
-from click.shell_completion import CompletionItem
+from typer._click import Context, Parameter
+from typer._click.core import ParameterSource
+from typer._click.shell_completion import CompletionItem
 
 Completer = t.Callable[[Context, Parameter, str], list[CompletionItem]]
 

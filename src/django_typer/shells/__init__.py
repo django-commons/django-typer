@@ -7,13 +7,17 @@ from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
 
-from click.core import Command as ClickCommand
-from click.shell_completion import CompletionItem, ShellComplete, add_completion_class
 from django.template import Context, Engine
 from django.template.backends.django import Template as DjangoTemplate
 from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.utils.translation import gettext as _
+from typer._click.core import Command as ClickCommand
+from typer._click.shell_completion import (
+    CompletionItem,
+    ShellComplete,
+    add_completion_class,
+)
 
 __all__ = ["DjangoTyperShellCompleter", "register_completion_class"]
 
@@ -334,4 +338,4 @@ def register_completion_class(cls: type[DjangoTyperShellCompleter]) -> None:
     Register a shell completion class for use with the Django shellcompletion command.
     """
     _completers[cls.name] = cls
-    add_completion_class(cls)
+    add_completion_class(cls, cls.name)

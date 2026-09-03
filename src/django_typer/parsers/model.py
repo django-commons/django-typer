@@ -3,9 +3,10 @@ from datetime import date, datetime, time
 from enum import Enum
 from uuid import UUID
 
-from click import Context, Parameter, ParamType
 from django.core.management import CommandError
 from django.db import models
+from typer._click import Context, Parameter
+from typer._click.types import ParamType
 
 from django_typer.completers.model import ModelObjectCompleter
 
