@@ -7,7 +7,7 @@ Change Log
 v4.0.0 (2026-09-XX)
 ===================
 
-* Support Typer 0.26.x
+* Support Typer 0.26.8+
 * Drop dependency on Click (vendored by Typer). The Click types needed to write completers
   and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
   ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
@@ -22,7 +22,7 @@ Migrating from 3.x to 4.x
 
 * Python 3.10 is no longer supported, 4.x requires Python 3.11 or later.
 
-* Typer_ 0.26 or later is required and Click_ is no longer a dependency of django-typer_. Typer_
+* Typer_ 0.26.8 or later is required and Click_ is no longer a dependency of django-typer_. Typer_
   now vendors Click_, so the ``click`` package may not be installed in your environment and even
   when it is, its classes are not the ones Typer_ uses. If your commands import from ``click``:
 
