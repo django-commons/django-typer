@@ -47,18 +47,18 @@ class TestGroupsHowto(TestCase):
     │ --help          Show this message and exit.                                  │
     ╰──────────────────────────────────────────────────────────────────────────────╯
     ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-    │ --version                    Show program's version number and exit.         │
-    │ --settings           <str>   The Python path to a settings module, e.g.      │
-    │                              "myproject.settings.main". If this isn't        │
-    │                              provided, the DJANGO_SETTINGS_MODULE            │
-    │                              environment variable will be used.              │
-    │ --pythonpath         <path>  A directory to add to the Python path, e.g.     │
-    │                              "/home/djangoprojects/myproject".               │
-    │ --traceback                  Raise on CommandError exceptions                │
-    │ --show-locals                Print local variables in tracebacks.            │
-    │ --no-color                   Don't colorize the command output.              │
-    │ --force-color                Force colorization of the command output.       │
-    │ --skip-checks                Skip system checks.                             │
+    │ --version                  Show program's version number and exit.           │
+    │ --settings           TEXT  The Python path to a settings module, e.g.        │
+    │                            "myproject.settings.main". If this isn't          │
+    │                            provided, the DJANGO_SETTINGS_MODULE environment  │
+    │                            variable will be used.                            │
+    │ --pythonpath         PATH  A directory to add to the Python path, e.g.       │
+    │                            "/home/djangoprojects/myproject".                 │
+    │ --traceback                Raise on CommandError exceptions                  │
+    │ --show-locals              Print local variables in tracebacks.              │
+    │ --no-color                 Don't colorize the command output.                │
+    │ --force-color              Force colorization of the command output.         │
+    │ --skip-checks              Skip system checks.                               │
     ╰──────────────────────────────────────────────────────────────────────────────╯
     ╭─ Commands ───────────────────────────────────────────────────────────────────╮
     │ group1                                                                       │
@@ -167,24 +167,25 @@ class TestDefaultOptionsHowto(TestCase):
     │ --help          Show this message and exit.                                  │
     ╰──────────────────────────────────────────────────────────────────────────────╯
     ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-    │ --verbosity          <int range> [0<=x<=3]  Verbosity level; 0=minimal       │
-    │                                             output, 1=normal output,         │
-    │                                             2=verbose output, 3=very verbose │
-    │                                             output                           │
-    │                                             [default: 1]                     │
-    │ --version                                   Show program's version number    │
-    │                                             and exit.                        │
-    │ --pythonpath         <path>                 A directory to add to the Python │
-    │                                             path, e.g.                       │
-    │                                             "/home/djangoprojects/myproject… │
-    │ --traceback                                 Raise on CommandError exceptions │
-    │ --show-locals                               Print local variables in         │
-    │                                             tracebacks.                      │
-    │ --no-color                                  Don't colorize the command       │
-    │                                             output.                          │
-    │ --force-color                               Force colorization of the        │
-    │                                             command output.                  │
-    │ --skip-checks                               Skip system checks.              │
+    │ --verbosity          INTEGER RANGE [0<=x<=3]  Verbosity level; 0=minimal     │
+    │                                               output, 1=normal output,       │
+    │                                               2=verbose output, 3=very       │
+    │                                               verbose output                 │
+    │                                               [default: 1]                   │
+    │ --version                                     Show program's version number  │
+    │                                               and exit.                      │
+    │ --pythonpath         PATH                     A directory to add to the      │
+    │                                               Python path, e.g.              │
+    │                                               "/home/djangoprojects/myproje… │
+    │ --traceback                                   Raise on CommandError          │
+    │                                               exceptions                     │
+    │ --show-locals                                 Print local variables in       │
+    │                                               tracebacks.                    │
+    │ --no-color                                    Don't colorize the command     │
+    │                                               output.                        │
+    │ --force-color                                 Force colorization of the      │
+    │                                               command output.                │
+    │ --skip-checks                                 Skip system checks.            │
     ╰──────────────────────────────────────────────────────────────────────────────╯
     """
 

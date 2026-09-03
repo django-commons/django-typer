@@ -1,9 +1,9 @@
-Usage: ./manage.py groups string [OPTIONS] {string} COMMAND [ARGS]...
+Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]...
 
   String operations.
 
 Arguments:
-  string  The string to operate on.  [required]
+  STRING  The string to operate on.  [required]
 
 Options:
   --help  Show this message and exit.

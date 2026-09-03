@@ -7,14 +7,12 @@ Change Log
 v4.0.0 (2026-09-XX)
 ===================
 
-* Support Typer 0.27+
+* Support Typer 0.26.x
 * Drop dependency on Click (vendored by Typer)
-* Help output follows Typer 0.27's metavar rendering (e.g. ``<str>`` instead of
-  ``TEXT`` and ``{arg}`` instead of ``ARG`` in usage lines)
+* Drop support for Python 3.10
 * Passing a ``prompt_required=False`` option flag without a value no longer triggers
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
-* Drop support for Python 3.10
 
 
 v3.9.0 (2026-09-02)
