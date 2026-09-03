@@ -1,6 +1,6 @@
 import sys
 
-import click
+from typer._click.exceptions import UsageError
 from django.core.management.base import CommandError
 
 from django_typer.management import TyperCommand, command
@@ -13,7 +13,7 @@ class Command(TyperCommand):
     def error(self, throw_command: bool = False, throw_other: bool = False):
         assert self.__class__ is Command
         if throw_command and throw_other:
-            raise click.exceptions.UsageError(
+            raise UsageError(
                 "--throw-command and --throw-other are mutually exclusive."
             )
         if throw_command:

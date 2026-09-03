@@ -1,5 +1,5 @@
 from django_typer.management import TyperCommand, initialize, group, finalize
-from click import get_current_context
+from typer._click.globals import get_current_context
 
 
 class Command(TyperCommand):

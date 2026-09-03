@@ -1,5 +1,5 @@
 from django_typer.management import Typer, DTGroup
-from click import Context
+from typer import Context
 import typing as t
 
 

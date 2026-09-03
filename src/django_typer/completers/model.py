@@ -2,12 +2,12 @@ import typing as t
 from datetime import date, time, timedelta
 from functools import partial
 
-from click import Context, Parameter
-from click.core import ParameterSource
-from click.shell_completion import CompletionItem
 from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
+from typer._click import Context, Parameter
+from typer._click.core import ParameterSource
+from typer._click.shell_completion import CompletionItem
 
 
 def int_ranges(incomplete: str, max_val: int) -> list[tuple[int, int]]:

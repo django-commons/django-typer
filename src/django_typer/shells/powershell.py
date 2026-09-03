@@ -1,7 +1,7 @@
 import subprocess  # nosec B404
 from pathlib import Path
 
-from click.shell_completion import CompletionItem
+from typer._click.shell_completion import CompletionItem
 
 from . import DjangoTyperShellCompleter
 
