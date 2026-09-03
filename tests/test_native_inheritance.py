@@ -27,6 +27,7 @@ class TestNativeInheritanceGroupsWithSelf(test_native.TestNativeGroups):
 
 
 native_override_init_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -34,42 +35,40 @@ native_override_init_help_rich = """
 │ --help                  Show this message and exit.                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --verbosity        INTEGER RANGE [0<=x<=3]  Verbosity level; 0=minimal       │
-│                                             output, 1=normal output,         │
-│                                             2=verbose output, 3=very verbose │
-│                                             output                           │
-│                                             [default: 0]                     │
-│ --version                                   Show program's version number    │
-│                                             and exit.                        │
-│ --settings         TEXT                     The Python path to a settings    │
-│                                             module, e.g.                     │
-│                                             "myproject.settings.main". If    │
-│                                             this isn't provided, the         │
-│                                             DJANGO_SETTINGS_MODULE           │
-│                                             environment variable will be     │
-│                                             used.                            │
-│ --no-color                                  Don't colorize the command       │
-│                                             output.                          │
+│ --verbosity        <int range> [0<=x<=3]  Verbosity level; 0=minimal output, │
+│                                           1=normal output, 2=verbose output, │
+│                                           3=very verbose output              │
+│                                           [default: 0]                       │
+│ --version                                 Show program's version number and  │
+│                                           exit.                              │
+│ --settings         <str>                  The Python path to a settings      │
+│                                           module, e.g.                       │
+│                                           "myproject.settings.main". If this │
+│                                           isn't provided, the                │
+│                                           DJANGO_SETTINGS_MODULE environment │
+│                                           variable will be used.             │
+│ --no-color                                Don't colorize the command output. │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ grp1   Override GRP1 (initialize only)                                       │
 │ main                                                                         │
+│ grp1  Override GRP1 (initialize only)                                        │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 
 native_override_init_grp1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init grp1 [OPTIONS] COMMAND [ARGS]...       
                                                                                 
  Override GRP1 (initialize only)                                                
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --flag        INTEGER  [default: 4]                                          │
-│ --help                 Show this message and exit.                           │
+│ --flag        <int>  [default: 4]                                            │
+│ --help               Show this message and exit.                             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1                                                                         │
 │ cmd2                                                                         │
+│ cmd1                                                                         │
 │ subgrp                                                                       │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
@@ -164,39 +163,41 @@ class TestNativeInitOverride(test_native.TestNativeGroups):
 
 
 native_tweaks_help_rich = """
- Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
+                                                                                
+ Usage: ./manage.py native_tweaks [OPTIONS] {name}                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    name      TEXT  [required]                                              │
+│ *    name      <str>  [required]                                             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Django ─────────────────────────────────────────────────────────────────────╮
-│ --version                                    Show program's version number   │
-│                                              and exit.                       │
-│ --verbosity         INTEGER RANGE [0<=x<=3]  Verbosity level; 0=minimal      │
-│                                              output, 1=normal output,        │
-│                                              2=verbose output, 3=very        │
-│                                              verbose output                  │
-│                                              [default: 1]                    │
-│ --settings          TEXT                     The Python path to a settings   │
-│                                              module, e.g.                    │
-│                                              "myproject.settings.main". If   │
-│                                              this isn't provided, the        │
-│                                              DJANGO_SETTINGS_MODULE          │
-│                                              environment variable will be    │
-│                                              used.                           │
-│ --pythonpath        PATH                     A directory to add to the       │
-│                                              Python path, e.g.               │
-│                                              "/home/djangoprojects/myprojec… │
-│ --no-color                                   Don't colorize the command      │
-│                                              output.                         │
+│ --version                                  Show program's version number and │
+│                                            exit.                             │
+│ --verbosity         <int range> [0<=x<=3]  Verbosity level; 0=minimal        │
+│                                            output, 1=normal output,          │
+│                                            2=verbose output, 3=very verbose  │
+│                                            output                            │
+│                                            [default: 1]                      │
+│ --settings          <str>                  The Python path to a settings     │
+│                                            module, e.g.                      │
+│                                            "myproject.settings.main". If     │
+│                                            this isn't provided, the          │
+│                                            DJANGO_SETTINGS_MODULE            │
+│                                            environment variable will be      │
+│                                            used.                             │
+│ --pythonpath        <path>                 A directory to add to the Python  │
+│                                            path, e.g.                        │
+│                                            "/home/djangoprojects/myproject". │
+│ --no-color                                 Don't colorize the command        │
+│                                            output.                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 
 native_override_grp1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -204,29 +205,31 @@ native_override_grp1_help_rich = """
 │ --help                   Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1                                                                         │
 │ cmd2                                                                         │
-│ subgrp   Override SUBGROUP                                                   │
+│ cmd1                                                                         │
+│ subgrp  Override SUBGROUP                                                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_override_subgrp_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 subgrp [OPTIONS] COMMAND [ARGS]...     
                                                                                 
  Override SUBGROUP                                                              
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --option1    --no-option1      [default: no-option1]                         │
-│ --option2    --no-option2      [default: no-option2]                            │
+│ --option2    --no-option2      [default: no-option2]                         │
 │ --help                         Show this message and exit.                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ sg-cmd1   Subgroup command 1. No args.                                       │
-│ sg-cmd2   Subgroup command 2, Takes an int.                                  │
+│ sg-cmd1  Subgroup command 1. No args.                                        │
+│ sg-cmd2  Subgroup command 2, Takes an int.                                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_override_sgcmd1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 subgrp sg-cmd1 [OPTIONS]               
                                                                                 
  Subgroup command 1. No args.                                                   
@@ -237,12 +240,13 @@ native_override_sgcmd1_help_rich = """
 """
 
 native_override_sgcmd2_help_rich = """
- Usage: ./manage.py native_override grp1 subgrp sg-cmd2 [OPTIONS] NUMBER        
+                                                                                
+ Usage: ./manage.py native_override grp1 subgrp sg-cmd2 [OPTIONS] {number}      
                                                                                 
  Subgroup command 2, Takes an int.                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    number      INTEGER  [required]                                         │
+│ *    number      <int>  [required]                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

@@ -1,4 +1,4 @@
-Usage: ./manage.py groups string STRING case [OPTIONS] COMMAND [ARGS]...
+Usage: ./manage.py groups string {string} case [OPTIONS] COMMAND [ARGS]...
 
   Case operations.
 
@@ -6,5 +6,5 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  lower  Convert the given string to upper case.
   upper  Convert the given string to upper case.
+  lower  Convert the given string to upper case.
