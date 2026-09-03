@@ -257,7 +257,11 @@ class DjangoTyperShellCompleter(ShellComplete):
         * **shell**: the name of the shell
         """
         return {
-            **super().source_vars(),
+            # Typer's vendored click stubs out ShellComplete.source_vars, so we
+            # provide click's base variables ourselves
+            "complete_func": self.func_name,
+            "complete_var": self.complete_var,
+            "prog_name": self.prog_name,
             "manage_script": self.command.manage_script,
             "manage_script_name": self.command.manage_script_name,
             "python": sys.executable,
