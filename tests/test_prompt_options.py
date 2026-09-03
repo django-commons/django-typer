@@ -16,17 +16,19 @@ class TestPromptOptions(TestCase):
         cmd = interact("prompt", "--no-color", "cmd2", "bckohan")
         cmd.expect("bckohan None")
 
-        cmd = interact("prompt", "--no-color", "cmd2", "bckohan", "-p")
-        cmd.expect("Password:")
-        cmd.sendline("test_password2")
+        # Typer's vendored click dropped support for passing a prompt_required=False
+        # flag without a value to trigger the prompt - the value must be given
+        cmd = interact(
+            "prompt", "--no-color", "cmd2", "bckohan", "-p", "test_password2"
+        )
         cmd.expect("bckohan test_password2")
 
         cmd = interact("prompt", "--no-color", "cmd3", "bckohan")
         cmd.expect("bckohan default")
 
-        cmd = interact("prompt", "--no-color", "cmd3", "bckohan", "-p")
-        cmd.expect(r"Password \[default\]:")
-        cmd.sendline("test_password3")
+        cmd = interact(
+            "prompt", "--no-color", "cmd3", "bckohan", "-p", "test_password3"
+        )
         cmd.expect("bckohan test_password3")
 
         cmd = interact("prompt", "--no-color", "group1", "cmd4", "bckohan")
