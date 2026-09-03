@@ -4,6 +4,14 @@
 Change Log
 ==========
 
+v4.1.0 (2026-09-XX)
+===================
+
+* Support Typer 0.27+
+* Help output follows Typer 0.27's metavar rendering (e.g. ``<str>`` instead of
+  ``TEXT`` and ``{arg}`` instead of ``ARG`` in usage lines)
+* Model field parser metavars are lowercase to match Typer's (e.g. ``<int>``, ``<txt>``)
+
 v4.0.0 (2026-09-05)
 ===================
 
@@ -123,6 +131,12 @@ Migrating from 3.x to 4.x
   is printed unless the command sets ``print_result = True`` or the project sets
   ``DT_PRINT_RESULT = True`` - see :ref:`howto:Toggle on/off result printing`. If a command's
   return value doubled as its output, set one of those or write the output explicitly.
+
+* Starting with 4.1 (Typer_ 0.27+), help output renders type metavars in lowercase angle
+  brackets (``<str>``, ``<int>``, ``<path>``) instead of ``TEXT``, ``INTEGER`` and ``PATH``,
+  and usage lines show required arguments as ``{arg}`` and optional arguments as ``[arg]``
+  instead of ``ARG``. The provided model field parsers follow suit (``<int>``, ``<txt>``, ...).
+  Update any tests that assert on help text.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with
