@@ -4,6 +4,14 @@
 Change Log
 ==========
 
+v4.0.0 (2026-09-XX)
+===================
+
+* Support Typer 0.27+
+* Drop dependency on Click (vendored by Typer)
+* Drop support for Python 3.10
+
+
 v3.9.0 (2026-09-02)
 ===================
 

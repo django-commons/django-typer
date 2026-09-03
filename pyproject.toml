@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "3.9.0"
-requires-python = ">=3.10,<4.0"
+version = "4.0.0"
+requires-python = ">=3.11,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
   {name = "Brian Kohan", email = "bckohan@gmail.com"},
@@ -18,12 +18,9 @@ homepage = "https://django-typer.readthedocs.io"
 keywords = ["django", "CLI", "management", "Typer", "commands"]
 dependencies = [
     "Django>=5.2,<6.2",
-    # feature releases of click have broken compat before so we set
-    # an upper bound on tested feature releases.
-    "click>=8.1.8,<8.6",
     # given the reliance on private Typer internals we peg the
     # version very strictly to bug fix releases for specific feature lines.
-    "typer>=0.23.1,<0.26.0",
+    "typer>=0.26.0,<0.28.0",
 ]
 classifiers = [
     "Environment :: Console",
@@ -38,7 +35,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -56,7 +52,6 @@ package = true
 conflicts = [
   [
     { group = "dj52" },
-    { group = "dj60" },
     { group = "dj61" },
   ],
 ]
@@ -177,7 +172,7 @@ exclude = [
     "dist",
     "examples"
 ]
-target-version = "py310"
+target-version = "py311"
 extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
@@ -288,9 +283,6 @@ dev = [
 # for CI and testing
 dj52 = [
     "Django>=5.2,<6.0"
-]
-dj60 = [
-    "Django>=6.0,<6.1; python_version >= '3.12'",
 ]
 dj61 = [
     "Django>=6.1rc1,<6.2; python_version >= '3.12'",
