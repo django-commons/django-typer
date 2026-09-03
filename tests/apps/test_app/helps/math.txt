@@ -4,10 +4,10 @@
  Do some math at the given precision.                                           
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
-│ --precision        INTEGER  [default: 2]                                     │
-│ --help                      Show this message and exit.                      │
+│ --precision        <int>  [default: 2]                                       │
+│ --help                    Show this message and exit.                        │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ divide              Divide the given numbers.                                │
-│ multiply            Multiply the given numbers.                              │
+│ multiply  Multiply the given numbers.                                        │
+│ divide    Divide the given numbers.                                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯

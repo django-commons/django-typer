@@ -1,15 +1,15 @@
                                                                                 
- Usage: ./manage.py groups string [OPTIONS] STRING COMMAND [ARGS]...            
+ Usage: ./manage.py groups string [OPTIONS] {string} COMMAND [ARGS]...          
                                                                                 
  String operations.                                                             
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    string      TEXT  The string to operate on. [required]                  │
+│ *    string      <str>  The string to operate on. [required]                 │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ case      Case operations.                                                   │
-│ split     Split the given string on the given separator.                     │
+│ split  Split the given string on the given separator.                        │
+│ case   Case operations.                                                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯

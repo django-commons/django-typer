@@ -9,6 +9,8 @@ v4.0.0 (2026-09-XX)
 
 * Support Typer 0.27+
 * Drop dependency on Click (vendored by Typer)
+* Help output follows Typer 0.27's metavar rendering (e.g. ``<str>`` instead of
+  ``TEXT`` and ``{arg}`` instead of ``ARG`` in usage lines)
 * Drop support for Python 3.10
 
 
