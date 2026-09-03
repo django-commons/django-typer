@@ -17,6 +17,66 @@ v4.0.0 (2026-09-XX)
   prompted or pass the value explicitly.
 
 
+Migrating from 3.x to 4.x
+-------------------------
+
+* Python 3.10 is no longer supported, 4.x requires Python 3.11 or later.
+
+* Typer_ 0.26 or later is required and Click_ is no longer a dependency of django-typer_. Typer_
+  now vendors Click_, so the ``click`` package may not be installed in your environment and even
+  when it is, its classes are not the ones Typer_ uses. If your commands import from ``click``:
+
+  - Import the types used to write completers from :mod:`django_typer.completers`:
+
+    .. code-block:: python
+
+        # 3.x
+        from click import Context, Parameter
+        from click.shell_completion import CompletionItem
+
+        # 4.x
+        from django_typer.completers import CompletionItem, Context, Parameter
+
+  - Import the types used to write parsers from :mod:`django_typer.parsers`:
+
+    .. code-block:: python
+
+        # 3.x
+        from click import Context, Parameter, ParamType
+
+        # 4.x
+        from django_typer.parsers import Context, Parameter, ParamType
+
+  - Use ``typer.Exit``, ``typer.Abort`` and ``typer.BadParameter`` in place of their ``click``
+    counterparts. Raising :exc:`~django.core.management.CommandError` remains the recommended
+    way to report errors from a command.
+
+  - Replace calls to ``click.get_current_context()`` with a parameter annotated as
+    :class:`~django_typer.management.Context` on the command, group or callback that needs it,
+    Typer_ will pass the active context in. :func:`~django_typer.utils.get_current_command`
+    continues to provide the running command instance.
+
+  - ``isinstance`` checks against ``click`` classes will no longer match.
+
+  - The ``click_type`` parameter to ``typer.Option`` and ``typer.Argument`` was removed upstream,
+    pass the type to ``parser`` instead. Parsers already passed through ``parser`` are unaffected:
+    plain callables and ``ParamType`` subclasses, including ones derived from a separately
+    installed Click_, continue to work.
+
+* Options declared with ``prompt=True, prompt_required=False`` no longer prompt when the flag is
+  passed without a value, doing so is now a usage error. Omit the flag to be prompted or pass
+  the value explicitly.
+
+* If you document your commands with the ``typer`` directive from sphinxcontrib-typer_, upgrade
+  it to 0.10 or later. Earlier releases drive the real Click_ package and fail against
+  Typer_ 0.26+.
+
+* No changes are required for chained groups (``chain=True``), finalizers, the provided
+  completers and parsers, custom shell completer classes registered with
+  :func:`~django_typer.shells.register_completion_class` or the shellcompletion command. These
+  were reimplemented or adapted internally and behave as before.
+
+
 v3.9.0 (2026-09-02)
 ===================
 
