@@ -14,3 +14,4 @@
 .. _sphinxcontrib-typer: https://pypi.org/project/sphinxcontrib-typer
 .. _pluggy: https://pluggy.readthedocs.io
 .. _CLI: https://en.wikipedia.org/wiki/Command-line_interface
+.. _Click: https://click.palletsprojects.com/
