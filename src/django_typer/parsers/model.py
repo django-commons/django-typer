@@ -101,23 +101,23 @@ class ModelObjectParser(ParamType):
     _field: models.Field
     _completer: ModelObjectCompleter
 
-    __name__: str = "MODEL"  # typer internals expect this
+    __name__: str = "model"  # typer internals expect this
 
     def _get_metavar(self) -> str:
         if isinstance(self._field, models.IntegerField):
-            return "INT"
+            return "int"
         elif isinstance(self._field, models.EmailField):
-            return "EMAIL"
+            return "email"
         elif isinstance(self._field, models.URLField):
-            return "URL"
+            return "url"
         elif isinstance(self._field, models.GenericIPAddressField):
             return "IPv4|IPv6"
         elif isinstance(self._field, models.UUIDField):
-            return "UUID"
+            return "uuid"
         elif isinstance(self._field, (models.FloatField, models.DecimalField)):
-            return "FLOAT"
+            return "float"
         elif isinstance(self._field, (models.FileField, models.FilePathField)):
-            return "PATH"
+            return "path"
         elif isinstance(self._field, models.DateTimeField):
             return "ISO 8601"
         elif isinstance(self._field, models.DateField):
@@ -126,7 +126,7 @@ class ModelObjectParser(ParamType):
             return "HH:MM:SS.sss"
         elif isinstance(self._field, models.DurationField):
             return "ISO 8601"
-        return "TXT"
+        return "txt"
 
     def __init__(
         self,
