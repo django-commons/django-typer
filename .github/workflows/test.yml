@@ -959,6 +959,16 @@ jobs:
       - run: ls -la *.coverage
       - run: just coverage
 
+      - name: Store merged coverage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: coverage-merged
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f
         with:
