@@ -13,6 +13,10 @@ v4.0.0 (2026-09-XX)
   Implements `Add a command option that will wrap execute() in a transaction
   <https://github.com/django-commons/django-typer/issues/219>`_. See :ref:`atomic`.
 * Fixed chain mode being switched off when a chained command defines an initializer
+* Implemented `ModelObjectParser should have a setting that returns the lookup value if no row
+  was found. <https://github.com/django-commons/django-typer/issues/218>`_ - see the
+  ``return_lookup_on_miss`` parameter. The return value of ``on_error`` handlers is now
+  documented as the parsed value.
 * The click command tree Typer builds for a command is now cached per app and only rebuilt
   when commands, groups, callbacks or finalizers are registered, instead of being rebuilt
   several times on every invocation

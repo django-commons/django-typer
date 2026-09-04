@@ -2168,6 +2168,80 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         with self.assertRaisesMessage(CommandError, "Test custom error"):
             call_command("field_value", "P541X")
 
+    def test_return_lookup_on_miss_command(self):
+        # an existing email resolves to the model instance
+        obj = ShellCompleteTester.objects.create(email_field="jon@example.com")
+        self.assertEqual(
+            call_command("model_or_lookup", "jon@example.com"), f"found:{obj.pk}"
+        )
+        # a missing email falls through to the lookup value
+        self.assertEqual(
+            call_command("model_or_lookup", "new@example.com"), "new:new@example.com"
+        )
+        self.assertEqual(
+            run_command("model_or_lookup", "new@example.com")[0].strip(),
+            "new:new@example.com",
+        )
+        # missing values of coerced field types come back coerced, not as str
+        self.assertEqual(
+            call_command(
+                "model_or_lookup",
+                "new@example.com",
+                "--uuid",
+                "00000000-0000-0000-0000-000000000000",
+            ),
+            "new:new@example.com new:00000000-0000-0000-0000-000000000000",
+        )
+        # malformed values are still errors
+        with self.assertRaisesMessage(CommandError, "is not a valid UUIDField"):
+            call_command("model_or_lookup", "new@example.com", "--uuid", "not-a-uuid")
+
+    def test_return_lookup_on_miss_parser(self):
+        from uuid import UUID
+        from django_typer.parsers.model import ModelObjectParser
+
+        parser = ModelObjectParser(
+            ShellCompleteTester, "uuid_field", return_lookup_on_miss=True
+        )
+        hit = parser.convert("12345678-1234-5678-1234-567812345678", None, None)
+        self.assertIsInstance(hit, ShellCompleteTester)
+        self.assertEqual(hit.uuid_field, UUID("12345678-1234-5678-1234-567812345678"))
+
+        miss = parser.convert("00000000-0000-0000-0000-000000000001", None, None)
+        self.assertEqual(miss, UUID("00000000-0000-0000-0000-000000000001"))
+        self.assertIsInstance(miss, UUID)
+
+        # a format error still goes to on_error and its return value is used
+        calls = []
+
+        def on_error(model_cls, value, exc):
+            calls.append((model_cls, value, exc))
+            return "handled"
+
+        parser = ModelObjectParser(
+            ShellCompleteTester,
+            "uuid_field",
+            return_lookup_on_miss=True,
+            on_error=on_error,
+        )
+        self.assertEqual(parser.convert("garbage", None, None), "handled")
+        self.assertEqual(len(calls), 1)
+        self.assertIs(calls[0][0], ShellCompleteTester)
+        self.assertEqual(calls[0][1], "garbage")
+        self.assertIsInstance(calls[0][2], ValueError)
+
+        # but a miss never reaches on_error when return_lookup_on_miss is set
+        self.assertEqual(
+            parser.convert("00000000-0000-0000-0000-000000000002", None, None),
+            UUID("00000000-0000-0000-0000-000000000002"),
+        )
+        self.assertEqual(len(calls), 1)
+
+        # default behavior is unchanged
+        parser = ModelObjectParser(ShellCompleteTester, "uuid_field")
+        with self.assertRaisesMessage(CommandError, "does not exist!"):
+            parser.convert("00000000-0000-0000-0000-000000000001", None, None)
+
     def test_return_queryset(self):
         completions = get_values(self.shellcompletion.complete("queryset P54"))
         self.assertTrue("P541D" in completions)

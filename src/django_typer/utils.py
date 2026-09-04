@@ -459,6 +459,7 @@ def model_parser_completer(
     on_error: ModelObjectParser.error_handler | None = ModelObjectParser.on_error,
     order_by: str | t.Sequence[str] | None = None,
     return_type: ReturnType = ModelObjectParser.return_type,
+    return_lookup_on_miss: bool = ModelObjectParser.return_lookup_on_miss,
 ) -> dict[str, t.Any]:
     """
     A factory function that returns a dictionary that can be used to specify
@@ -493,9 +494,12 @@ def model_parser_completer(
     :param distinct: whether to filter out already provided parameters in the
         completion suggestions, True by default
     :param on_error: a callable that will be called if the parser lookup fails
-        to produce a matching object - by default a CommandError will be raised
+        to produce a matching object - by default a CommandError will be raised.
+        Whatever it returns becomes the parsed value.
     :param return_type: An enumeration switch to return either a model instance,
         queryset or model field value type.
+    :param return_lookup_on_miss: return the (coerced) lookup value instead of
+        erroring when no matching object exists, default: False
     """
     return {
         "parser": ModelObjectParser(
@@ -504,6 +508,7 @@ def model_parser_completer(
             case_insensitive=case_insensitive,
             on_error=on_error,
             return_type=return_type,
+            return_lookup_on_miss=return_lookup_on_miss,
         ),
         "shell_complete": ModelObjectCompleter(
             model_or_qry,
