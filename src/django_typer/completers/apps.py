@@ -1,7 +1,7 @@
-from click import Context, Parameter
-from click.core import ParameterSource
-from click.shell_completion import CompletionItem
 from django.apps import apps
+from typer._click import Context, Parameter
+from typer._click.core import ParameterSource
+from typer._click.shell_completion import CompletionItem
 
 
 def app_labels(ctx: Context, param: Parameter, incomplete: str) -> list[CompletionItem]:

@@ -1,5 +1,5 @@
 import typing as t
-from click.shell_completion import CompletionItem
+from typer._click.shell_completion import CompletionItem
 
 
 def custom_fallback(args: t.List[str], incomplete: str) -> t.List[CompletionItem]:

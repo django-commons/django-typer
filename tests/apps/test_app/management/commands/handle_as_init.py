@@ -1,4 +1,4 @@
-from click import get_current_context
+from typer._click.globals import get_current_context
 
 from django_typer.management import TyperCommand, command, initialize
 

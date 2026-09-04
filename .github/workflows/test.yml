@@ -43,35 +43,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
-        django-version:
-          - "dj52" # April 2028
-          - "dj61" # April 2027
-        dependencies:
-          - "lowest-direct"
-          - "highest"
-        exclude:
-
-          - python-version: "3.10"
-            dependencies: "highest"
+        include:
+          # Django 5.2
           - python-version: "3.11"
+            django-version: "dj52"
             dependencies: "lowest-direct"
+
           - python-version: "3.12"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.13"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.14"
-            dependencies: "lowest-direct"
+            django-version: "dj52"
+            dependencies: "highest"
+
           - python-version: "3.15"
+            django-version: "dj52"
+            dependencies: "highest"
+
+          # Django 6.1
+          - python-version: "3.12"
+            django-version: "dj61"
             dependencies: "lowest-direct"
 
-          - django-version: "dj61"
-            dependencies: "lowest-direct"
+          - python-version: "3.13"
+            django-version: "dj61"
+            dependencies: "highest"
 
-          - python-version: "3.10"
+          - python-version: "3.14"
             django-version: "dj61"
-          - python-version: "3.11"
+            dependencies: "highest"
+
+          - python-version: "3.15"
             django-version: "dj61"
+            dependencies: "highest"
     env:
       COVERAGE_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}.coverage
       ENV_FILE: py${{ matrix.python-version }}-linux-${{ matrix.django-version }}
@@ -83,7 +92,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -97,11 +106,13 @@ jobs:
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
         timeout-minutes: 60
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         shell: bash
         env:
@@ -127,7 +138,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -135,13 +146,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -156,7 +167,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -168,11 +179,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: rhysd/action-setup-vim@febef33995d6649302e9d88dda81e071b68f16a7
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -195,7 +208,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -203,13 +216,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -224,7 +237,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -237,7 +250,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
@@ -303,7 +316,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -316,11 +329,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Unit Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -342,7 +357,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -350,13 +365,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
     env:
       COVERAGE_FILE: linux-bash-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -370,7 +385,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -383,11 +398,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Test Tab Completion
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -414,7 +431,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -422,13 +439,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
     env:
       COVERAGE_FILE: linux-fish-py${{ matrix.python-version }}-${{ matrix.django-version }}.coverage
@@ -442,7 +459,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -455,11 +472,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Install Fish shell
         run: |
           sudo apt-get update
@@ -489,7 +508,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -497,13 +516,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -518,7 +537,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -531,7 +550,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
@@ -571,7 +590,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -579,13 +598,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -600,7 +619,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -613,7 +632,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
@@ -643,7 +662,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -651,13 +670,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -672,7 +691,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -685,7 +704,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
@@ -723,7 +742,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -731,13 +750,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -752,7 +771,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -767,11 +786,13 @@ jobs:
         run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
         shell: powershell
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Powershell Tab Completion Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -804,7 +825,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
@@ -812,13 +833,13 @@ jobs:
           - "lowest-direct"
           - "highest"
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             dependencies: "highest"
           - python-version: "3.15"
             dependencies: "lowest-direct"
           - python-version: "3.15"
             django-version: "dj52"
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
 
     env:
@@ -833,7 +854,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
@@ -848,11 +869,13 @@ jobs:
         run: echo "C:\Users\runneradmin\.local\bin" >> $env:GITHUB_PATH
         shell: pwsh
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Run Powershell Tab Completion Tests
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -909,16 +932,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: 3.14
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Install Release Dependencies
         env:
           TEST_PYTHON: ${{ steps.sp.outputs.python-path }}
@@ -933,6 +958,16 @@ jobs:
 
       - run: ls -la *.coverage
       - run: just coverage
+
+      - name: Store merged coverage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: coverage-merged
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f

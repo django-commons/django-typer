@@ -28,8 +28,6 @@ import os
 import sys
 import typing as t
 
-import click
-
 from django_typer.utils import get_current_command, rich_installed
 
 PATCH_APPLIED = False
@@ -46,19 +44,6 @@ def apply() -> None:
     if PATCH_APPLIED:
         return
     PATCH_APPLIED = True
-
-    try:
-        # Django calls colorama.init() if colorama is installed
-        # this screws up forced terminals on platforms other than windows that
-        # are not attached to ttys. Upstream Django should change the init
-        # call to a just_fix_windows_console - we undo this and redo the right
-        # thing here.
-        import colorama  # pyright: ignore[reportMissingModuleSource]
-
-        colorama.deinit()
-        colorama.just_fix_windows_console()
-    except ImportError:
-        pass
 
     if rich_installed:
         from rich.console import Console  # pyright: ignore[reportMissingImports]
@@ -86,6 +71,7 @@ def apply() -> None:
         # it uses - revisit this if/when typer exposes control of the
         # console object.
         from typer import rich_utils
+        from typer._click.globals import get_current_context
 
         console_getter = rich_utils._get_rich_console
 
@@ -97,7 +83,7 @@ def apply() -> None:
             Of all the patching this is the sketchiest.
             """
             console = console_getter(stderr=stderr)
-            ctx = click.get_current_context(silent=True)
+            ctx = get_current_context(silent=True)
             cmd = get_current_command()
             console.no_color = (
                 ctx.params.get("no_color", "NO_COLOR" in os.environ)
@@ -122,7 +108,7 @@ def apply() -> None:
     # when Argument helps are gettext_lazy proxies. This is I think actually
     # a problem with typer that can be fixed in a number of different ways
     # but this is the easiest
-    from click import _compat
+    from typer._click import _compat
 
     strip_ansi = _compat.strip_ansi
     _compat.strip_ansi = lambda value: strip_ansi(str(value))

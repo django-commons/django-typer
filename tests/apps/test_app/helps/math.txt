@@ -8,6 +8,6 @@
 │ --help                      Show this message and exit.                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ divide              Divide the given numbers.                                │
-│ multiply            Multiply the given numbers.                              │
+│ multiply  Multiply the given numbers.                                        │
+│ divide    Divide the given numbers.                                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯

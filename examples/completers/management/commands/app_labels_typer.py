@@ -1,9 +1,8 @@
 import typing as t
 import typer
-from click import Context, Parameter
-from click.shell_completion import CompletionItem
 from django.apps import apps
 
+from django_typer.completers import CompletionItem, Context, Parameter
 from django_typer.management import Typer
 
 app = Typer()

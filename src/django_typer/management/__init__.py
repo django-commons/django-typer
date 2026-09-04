@@ -10,8 +10,6 @@ from importlib import import_module
 from pathlib import Path
 from types import MethodType, SimpleNamespace
 
-import click
-from click.shell_completion import CompletionItem
 from django.core.management import get_commands
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
@@ -24,13 +22,19 @@ patch.apply()
 
 import typer
 import typer.core
+from typer import _click
+from typer._click.globals import get_current_context
+from typer._click.shell_completion import CompletionItem
+from typer.core import TyperArgument as CoreTyperArgument
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
+from typer.core import TyperOption as CoreTyperOption
 from typer.main import get_command as get_typer_command
 from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
 
+from ..config import manage_script as manage_script_setting
 from ..config import show_locals, traceback_config, use_rich_tracebacks
 from ..types import (
     ForceColor,
@@ -241,7 +245,7 @@ def _common_options(  # pyright: ignore[reportRedeclaration]
 
 # cache common params to avoid this extra work on every command
 # we cant resolve these at module scope because translations break it
-_common_params: t.Sequence[click.Argument | click.Option] = []
+_common_params: t.Sequence[CoreTyperArgument | CoreTyperOption] = []
 
 
 def _normalize_suppressed_arguments(
@@ -266,7 +270,7 @@ def _normalize_suppressed_arguments(
 
 def _get_common_params(
     command: type[TyperCommand],
-) -> t.Sequence[click.Argument | click.Option]:
+) -> t.Sequence[CoreTyperArgument | CoreTyperOption]:
     """Use typer to convert the common options to click options"""
     global _common_params
     if not _common_params:
@@ -358,7 +362,7 @@ class Context(TyperContext):
 
     def __init__(
         self,
-        command: click.Command,
+        command: _click.Command,
         parent: Context | None = None,
         django_command: TyperCommand | None = None,
         supplied_params: dict[str, t.Any] | None = None,
@@ -404,7 +408,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
     and Groups.
     """
 
-    context_class: type[click.Context] = Context
+    context_class: type[_click.Context] = Context
     django_command: type[TyperCommand]
     _callback: t.Callable[..., t.Any] | None = None
     _callback_is_method: bool | None = None
@@ -435,7 +439,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         infrastructure the conversion happens.
         """
 
-    def get_params(self, ctx: click.Context) -> list[click.Parameter]:
+    def get_params(self, ctx: _click.Context) -> list[_click.Parameter]:
         """
         We override get_params to check to make sure that prompt_required is not set for
         parameters that have already been prompted for during the initial parse phase.
@@ -449,7 +453,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         params = super().get_params(ctx)
         for param in params:
             if (
-                isinstance(param, click.Option)
+                isinstance(param, CoreTyperOption)
                 and param.prompt
                 and param.prompt_required
                 and getattr(ctx, "supplied_params", {}).get(param.name, None)
@@ -461,7 +465,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         return modified
 
     def shell_complete(
-        self, ctx: click.Context, incomplete: str
+        self, ctx: _click.Context, incomplete: str
     ) -> list[CompletionItem]:
         """
         By default if the incomplete string is a space and there are no completions
@@ -473,9 +477,23 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
             completions = super().shell_complete(
                 ctx, min(getattr(ctx, "_opt_prefixes", [""]))
             )
+        # Typer's vendored click dropped chain support - any command may be part
+        # of a chained group, so sibling commands are valid completions at any
+        # point during command completion.
+        parent = ctx
+        while parent.parent is not None:
+            parent = parent.parent
+            if getattr(parent.command, "chain", False):
+                completions.extend(
+                    CompletionItem(name, help=command.get_short_help_str())
+                    for name, command in _click.core._complete_visible_commands(
+                        parent, incomplete
+                    )
+                    if name not in parent._protected_args
+                )
         return completions
 
-    def common_params(self) -> t.Sequence[click.Argument | click.Option]:
+    def common_params(self) -> t.Sequence[CoreTyperArgument | CoreTyperOption]:
         """
         Add the common parameters to this group only if this group is the root
         command's user specified initialize callback.
@@ -490,7 +508,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         self,
         *args,
         callback: t.Callable[..., t.Any] | None,
-        params: list[click.Parameter] | None = None,
+        params: list[_click.Parameter] | None = None,
         **kwargs: t.Any,
     ):
         params = params or []
@@ -502,7 +520,7 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         def call_with_self(*args, **kwargs):
             if not callback:
                 return
-            ctx = t.cast(Context, click.get_current_context())
+            ctx = t.cast(Context, get_current_context())
             return callback(
                 *args,
                 **{
@@ -589,7 +607,30 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
     and :doc:`click:advanced` for more information.
     """
 
-    def list_commands(self, ctx: click.Context) -> list[str]:
+    chain: bool = False
+    """
+    Whether this group chains subcommands. Typer's vendored click dropped chain
+    support, so django-typer tracks the setting itself and reimplements the
+    chain behavior of click's Group on this class.
+    """
+
+    def __init__(
+        self,
+        *args,
+        subcommand_metavar: str | None = None,
+        **kwargs: t.Any,
+    ):
+        if subcommand_metavar is None and self.chain:
+            subcommand_metavar = "COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]..."
+        super().__init__(*args, subcommand_metavar=subcommand_metavar, **kwargs)
+        if self.chain:
+            for param in self.params:
+                if isinstance(param, CoreTyperArgument) and not param.required:
+                    raise RuntimeError(
+                        "A group in chain mode cannot have optional arguments."
+                    )
+
+    def list_commands(self, ctx: _click.Context) -> list[str]:
         """
         Do our best to list commands in definition order.
         """
@@ -601,16 +642,31 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 cmds.remove(defined)
         return ordered + cmds
 
-    def invoke(self, ctx: click.Context) -> t.Any:
+    def parse_args(self, ctx: _click.Context, args: list[str]) -> list[str]:
         """
-        Override click.Group.invoke to include the group callback's return value in
-        the results list when chain=True and invoke_without_command=True. In Click's
-        default implementation the group callback's return is discarded in chain mode;
-        here we prepend it to the subcommand results so finalize handlers can see it.
+        In chain mode all remaining arguments are protected so that they can be
+        resolved into a sequence of subcommands by :meth:`invoke`.
+        """
+        if not self.chain:
+            return super().parse_args(ctx, args)
+        if not args and self.no_args_is_help and not ctx.resilient_parsing:
+            raise _click.exceptions.NoArgsIsHelpError(ctx)
+        ctx._protected_args = _click.Command.parse_args(self, ctx, args)
+        ctx.args = []
+        return ctx.args
 
-        Hopefully this gets fixed upstream and we can remove this override.
+    def invoke(self, ctx: _click.Context) -> t.Any:
         """
-        if not self.chain or not self.invoke_without_command:
+        Reimplements click's Group.invoke chain mode, which Typer's vendored click
+        dropped. Each subcommand context is created in sequence after the group
+        callback has run and the list of subcommand results is passed to the result
+        callback (finalizer).
+
+        Unlike click, when ``invoke_without_command`` is set the group callback's
+        return value is included at the front of the results list so that finalize
+        handlers can see it.
+        """
+        if not self.chain:
             return super().invoke(ctx)
 
         def _process_result(value: t.Any) -> t.Any:
@@ -618,27 +674,27 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 value = ctx.invoke(self._result_callback, value, **ctx.params)
             return value
 
-        # No subcommands provided — run group callback and pass its return as a
-        # single-element list (or empty list if it returned None) to the finalizer.
-        prot_args = getattr(ctx, "_protected_args", None) or getattr(
-            ctx, "protected_args", None
-        )
-        if not prot_args:
-            with ctx:
-                group_rv = click.Command.invoke(self, ctx)
-                return _process_result([group_rv] if group_rv is not None else [])
+        if not ctx._protected_args:
+            if self.invoke_without_command:
+                # No subcommands provided - run group callback and pass its return
+                # as a single-element list (or empty list if it returned None) to
+                # the finalizer.
+                with ctx:
+                    group_rv = _click.Command.invoke(self, ctx)
+                    return _process_result([group_rv] if group_rv is not None else [])
+            ctx.fail("Missing command.")
 
-        args = [*prot_args, *ctx.args]
+        args = [*ctx._protected_args, *ctx.args]
         ctx.args = []
-        if hasattr(ctx, "_protected_args"):
-            ctx._protected_args = []
-        else:
-            # remove when support for click 8.1.8 dropped
-            ctx.protected_args = []  # type: ignore
+        ctx._protected_args = []
 
+        # In chain mode we create the contexts step by step, but after the base
+        # command has been invoked. Because at that point we do not know the
+        # subcommands yet, the invoked subcommand attribute is set to ``*`` to
+        # inform the command that subcommands are executed but nothing else.
         with ctx:
             ctx.invoked_subcommand = "*" if args else None
-            group_rv = click.Command.invoke(self, ctx)
+            group_rv = _click.Command.invoke(self, ctx)
 
             contexts = []
             while args:
@@ -654,7 +710,11 @@ class DTGroup(DjangoTyperMixin, CoreTyperGroup):
                 contexts.append(sub_ctx)
                 args, sub_ctx.args = sub_ctx.args, []
 
-            rv = [group_rv] if group_rv is not None else []
+            rv = (
+                [group_rv]
+                if group_rv is not None and self.invoke_without_command
+                else []
+            )
             for sub_ctx in contexts:
                 with sub_ctx:
                     rv.append(sub_ctx.command.invoke(sub_ctx))
@@ -690,7 +750,7 @@ class Finalizer(t.Generic[P, R]):
         if self.is_method:
             cmd = kwargs.pop("_command", None) or (
                 getattr(
-                    t.cast(Context, click.get_current_context(silent=True)),
+                    t.cast(Context, get_current_context(silent=True)),
                     "django_command",
                     None,
                 )
@@ -1003,7 +1063,9 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         super().__init__(
             name=name,
             cls=type(
-                "_DTGroup", (cls or DTGroup,), {"django_command": self.django_command}
+                "_DTGroup",
+                (cls or DTGroup,),
+                {"django_command": self.django_command, "chain": bool(chain)},
             ),
             invoke_without_command=invoke_without_command,
             no_args_is_help=no_args_is_help,
@@ -1093,9 +1155,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 help=t.cast(str, help),
                 epilog=epilog,
                 short_help=t.cast(str, short_help),
-                options_metavar=(
-                    options_metavar or self._info_val_str("options_metavar")
-                ),
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -1215,7 +1275,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
-        deprecated: bool = False,
+        deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
@@ -1223,6 +1283,38 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # intentionally blank - suppresses inheritance of typer's docstring
         """ """  # noqa: D419
         typer_instance.parent = self
+
+        # Typer resolves settings omitted from add_typer() from the sub-app's
+        # callback and then its constructor, but rich_help_panel, options_metavar
+        # and deprecated never reach that lookup (see fastapi/typer#1934), so a
+        # sub-app's own values are silently lost. Resolve them here instead.
+        def inherited(attr: str, value: t.Any) -> t.Any:
+            if not isinstance(value, DefaultPlaceholder):
+                return value  # explicitly passed to add_typer()
+            for source in (
+                typer_instance.registered_callback,
+                typer_instance.info,
+                typer_instance,
+            ):
+                candidate = getattr(source, attr, value)
+                if not isinstance(candidate, DefaultPlaceholder):
+                    return candidate
+            return value
+
+        rich_help_panel = inherited("rich_help_panel", rich_help_panel)
+        options_metavar = inherited("options_metavar", options_metavar)
+        if options_metavar is None or isinstance(options_metavar, DefaultPlaceholder):
+            options_metavar = self._info_val_str("options_metavar")
+        # sub-groups and commands registered on the sub-app after this point
+        # inherit the resolved value, as they would from a Typer constructor arg
+        typer_instance.info.options_metavar = options_metavar
+        deprecated = inherited("deprecated", deprecated)
+        # our callback() records the function name on the callback info, which
+        # Typer would otherwise prefer over the name the sub-app was given
+        if isinstance(name, DefaultPlaceholder) and not isinstance(
+            typer_instance.info.name, DefaultPlaceholder
+        ):
+            name = typer_instance.info.name
         typer_instance.django_command = self.django_command
 
         assert cls  # cls must be interface compatible with DTGroup
@@ -1231,7 +1323,14 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
             type(
                 "_DTGroup",
                 (cls,),
-                {"django_command": self.django_command},
+                {
+                    "django_command": self.django_command,
+                    "chain": bool(
+                        typer_instance.info.chain
+                        if isinstance(chain, DefaultPlaceholder)
+                        else chain
+                    ),
+                },
             )
             if not isinstance(cls, DefaultPlaceholder)
             else typer_instance.info.cls
@@ -1335,14 +1434,17 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        options_metavar = options_metavar or self._info_val_str("options_metavar")
 
         def create_app(
             func: t.Callable[t.Concatenate[TC, P2], R2],
         ) -> Typer[P2, R2]:
             grp: Typer[P2, R2] = Typer(  # pyright: ignore[reportAssignmentType]
                 name=name or _strip_static(func).__name__.replace("_", "-"),
-                cls=type("_DTGroup", (cls,), {"django_command": self.django_command}),
+                cls=type(
+                    "_DTGroup",
+                    (cls,),
+                    {"django_command": self.django_command, "chain": bool(chain)},
+                ),
                 invoke_without_command=invoke_without_command,
                 no_args_is_help=no_args_is_help,
                 subcommand_metavar=subcommand_metavar,
@@ -1362,9 +1464,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 **kwargs,
             )
             self.add_typer(
-                grp,
-                name=name or _strip_static(func).__name__.replace("_", "-"),
-                options_metavar=options_metavar,
+                grp, name=name or _strip_static(func).__name__.replace("_", "-")
             )
             return grp
 
@@ -2211,11 +2311,7 @@ class TyperCommandMeta(type):
                 if grp.top_level:
                     cpy = deepcopy(grp)
                     cpy.parent = typer_app
-                    typer_app.add_typer(
-                        cpy,
-                        name=cpy.info.name,
-                        options_metavar=cpy.info.options_metavar or options_metavar,
-                    )
+                    typer_app.add_typer(cpy, name=cpy.info.name)
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
@@ -2342,7 +2438,7 @@ class CommandNode:
                     )
                     for name in (
                         self.context.command.list_commands(self.context)
-                        if isinstance(self.context.command, click.Group)
+                        if isinstance(self.context.command, CoreTyperGroup)
                         else []
                     )
                 },
@@ -2432,10 +2528,10 @@ class TyperParser:
         :param param: the click parameter to wrap as an argparse Action
         """
 
-        param: click.Parameter
+        param: _click.Parameter
         required: bool = False
 
-        def __init__(self, param: click.Parameter):
+        def __init__(self, param: _click.Parameter):
             self.param = param
 
         @property
@@ -3052,9 +3148,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        options_metavar = options_metavar or cmd.typer_app._info_val_str(
-            "options_metavar"
-        )
         if called_from_command_definition():
             return group(
                 name=name,
@@ -3068,7 +3161,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 help=help,
                 epilog=epilog,
                 short_help=short_help,
-                options_metavar=options_metavar,
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -3092,7 +3185,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 help=help,
                 epilog=epilog,
                 short_help=short_help,
-                options_metavar=options_metavar,
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -3103,7 +3196,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             cmd.typer_app.add_typer(
                 grp,
                 name=name or func.__name__.replace("_", "-"),
-                options_metavar=options_metavar,
             )
             return grp
 
@@ -3129,14 +3221,14 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         _command_context.stack.pop()
-        if isinstance(exc_val, click.exceptions.Exit):
+        if isinstance(exc_val, typer.Exit):
             sys.exit(exc_val.exit_code)
-        if isinstance(exc_val, click.exceptions.UsageError):
+        if isinstance(exc_val, _click.exceptions.UsageError):
             err_msg = (
                 self.missing_args_message.format(
                     parameter=getattr(getattr(exc_val, "param", None), "name", "")
                 )
-                if isinstance(exc_val, click.exceptions.MissingParameter)
+                if isinstance(exc_val, _click.exceptions.MissingParameter)
                 else str(exc_val)
             )
 
@@ -3225,7 +3317,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         with self:
             if getattr(self, "_called_from_command_line", False):
-                script = get_usage_script(prog_name)
+                script = manage_script_setting() or get_usage_script(prog_name)
                 if isinstance(script, Path):
                     prog_name = str(script)
                     if not str(prog_name).startswith(("..", "/", ".")):

@@ -163,6 +163,12 @@ Most shells work best when the manage script is installed as an executable on th
 is not always the case, especially in development environments. In these scenarios completion
 installation *may still work*, but you may need to always invoke the script from the same path.
 
+.. tip::
+
+    The command name completions are installed for is detected from the invoking script. If the
+    detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT`` setting,
+    see :ref:`configure-manage-script`.
+
 
 .. _completion_fallbacks:
 
@@ -196,7 +202,9 @@ To define custom completion logic for your arguments_ and options_ pass the ``sh
 parameter in your type hint annotations. django-typer_ comes with a
 :ref:`few provided completers <completers>` for common Django_ types. One of the provided completers
 completes Django_ app labels and names. We might build a similar completer that only works for
-Django_ app labels like this:
+Django_ app labels like this. The ``Context``, ``Parameter`` and ``CompletionItem`` types a
+completer works with are re-exported from :mod:`django_typer.completers` - import them from there
+rather than from Click_, which is no longer a dependency of django-typer_:
 
 .. tabs::
 

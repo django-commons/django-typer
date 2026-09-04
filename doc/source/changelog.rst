@@ -4,6 +4,96 @@
 Change Log
 ==========
 
+v4.0.0 (2026-09-XX)
+===================
+
+* Support Typer 0.26.8+
+* Fixed `Typer app options do not inherit/override correctly
+  <https://github.com/django-commons/django-typer/issues/256>`_
+* Drop dependency on Click (vendored by Typer). The Click types needed to write completers
+  and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
+  ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
+* Drop support for Python 3.10
+* Passing a ``prompt_required=False`` option flag without a value no longer triggers
+  the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
+  prompted or pass the value explicitly.
+* Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
+* Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
+
+
+Migrating from 3.x to 4.x
+-------------------------
+
+* Python 3.10 is no longer supported, 4.x requires Python 3.11 or later.
+
+* Typer_ 0.26.8 or later is required and Click_ is no longer a dependency of django-typer_. Typer_
+  now vendors Click_, so the ``click`` package may not be installed in your environment and even
+  when it is, its classes are not the ones Typer_ uses. If your commands import from ``click``:
+
+  - Import the types used to write completers from :mod:`django_typer.completers`:
+
+    .. code-block:: python
+
+        # 3.x
+        from click import Context, Parameter
+        from click.shell_completion import CompletionItem
+
+        # 4.x
+        from django_typer.completers import CompletionItem, Context, Parameter
+
+  - Import the types used to write parsers from :mod:`django_typer.parsers`:
+
+    .. code-block:: python
+
+        # 3.x
+        from click import Context, Parameter, ParamType
+
+        # 4.x
+        from django_typer.parsers import Context, Parameter, ParamType
+
+  - Use ``typer.Exit``, ``typer.Abort`` and ``typer.BadParameter`` in place of their ``click``
+    counterparts. Raising :exc:`~django.core.management.CommandError` remains the recommended
+    way to report errors from a command.
+
+  - Replace calls to ``click.get_current_context()`` with a parameter annotated as
+    :class:`~django_typer.management.Context` on the command, group or callback that needs it,
+    Typer_ will pass the active context in. :func:`~django_typer.utils.get_current_command`
+    continues to provide the running command instance.
+
+  - ``isinstance`` checks against ``click`` classes will no longer match.
+
+  - The ``click_type`` parameter to ``typer.Option`` and ``typer.Argument`` was removed upstream,
+    pass the type to ``parser`` instead. Parsers already passed through ``parser`` are unaffected:
+    plain callables and ``ParamType`` subclasses, including ones derived from a separately
+    installed Click_, continue to work.
+
+* Options declared with ``prompt=True, prompt_required=False`` no longer prompt when the flag is
+  passed without a value, doing so is now a usage error. Omit the flag to be prompted or pass
+  the value explicitly.
+
+* If you document your commands with the ``typer`` directive from sphinxcontrib-typer_, upgrade
+  it to 0.10 or later. Earlier releases drive the real Click_ package and fail against
+  Typer_ 0.26+.
+
+* The program name shown in the ``Usage:`` line of command help (and used when installing shell
+  completions) is now the bare command name whenever that name resolves on the path, including when
+  the script was launched through a shim or wrapper of the same name or through a relative path to
+  the same script. Previously the full path was shown in these cases. Set
+  ``DJANGO_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
+  :ref:`configure-manage-script`.
+
+* No changes are required for chained groups (``chain=True``), finalizers, the provided
+  completers and parsers, custom shell completer classes registered with
+  :func:`~django_typer.shells.register_completion_class` or the shellcompletion command. These
+  were reimplemented or adapted internally and behave as before.
+
+
+v3.9.0 (2026-09-02)
+===================
+
+* Support Click 8.5.x
+
+
 v3.8.0 (2026-08-04)
 ===================
 

@@ -1,4 +1,6 @@
+import inspect
 import typer
+from typer.models import DefaultPlaceholder
 from django.test import TestCase
 
 from django_typer.management import (
@@ -96,6 +98,14 @@ class InterfaceTests(TestCase):
         typer_params = set(get_named_arguments(typer.Typer.add_typer))
 
         self.assertFalse(dt_params.symmetric_difference(typer_params))
+        # Typer's add_typer() defaults deprecated to a bare False, which makes it
+        # impossible to inherit the sub-app's value (fastapi/typer#1934) - we use
+        # the Default() sentinel deliberately. Drop this once fixed upstream.
+        dt_params.remove("deprecated")
+        self.assertIsInstance(
+            inspect.signature(Typer.add_typer).parameters["deprecated"].default,
+            DefaultPlaceholder,
+        )
         self.assertEqual(
             self.compare_defaults(dt_params, Typer.add_typer, typer.Typer.add_typer),
             len(dt_params),

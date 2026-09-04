@@ -243,6 +243,50 @@ class BasicTests(TestCase):
             cmd_idx = hlp.index("Commands")
             self.assertTrue(hlp.index(" z", cmd_idx) < hlp.index(" y", cmd_idx))
 
+    def test_add_typer_inherits_sub_app_settings(self):
+        """
+        Settings given to a sub-app's constructor or callback must survive
+        add_typer() when they are not repeated there, while explicit add_typer()
+        arguments still take precedence - see issue #256.
+        """
+        from typer.main import get_command as get_typer_command
+
+        buffer = StringIO()
+        cmd = get_command("add_typer_opts", stdout=buffer, no_color=True)
+        groups = get_typer_command(cmd.typer_app).commands
+        self.assertEqual(set(groups), {"top", "inst", "cb", "expl"})
+
+        expected = {
+            "inst": ("Instance Panel", True, "[INST OPTS]"),
+            "cb": ("Callback Panel", True, "[CB OPTS]"),
+            "expl": ("Explicit Panel", False, "[EXPL OPTS]"),
+        }
+        for name, (panel, deprecated, options_metavar) in expected.items():
+            self.assertEqual(groups[name].rich_help_panel, panel, name)
+            self.assertEqual(groups[name].deprecated, deprecated, name)
+            self.assertEqual(groups[name].options_metavar, options_metavar, name)
+
+        cmd.print_help("./manage.py", "add_typer_opts")
+        root_help = buffer.getvalue()
+        if rich_installed:
+            for panel in ("Instance Panel", "Callback Panel", "Explicit Panel"):
+                self.assertIn(panel, root_help)
+            self.assertNotIn("Ignored Panel", root_help)
+        self.assertIn("inst", root_help)
+        self.assertIn("cb", root_help)
+
+        for name, (_, _, options_metavar) in expected.items():
+            buffer.seek(0)
+            buffer.truncate()
+            cmd.print_help("./manage.py", "add_typer_opts", name)
+            self.assertIn(options_metavar, buffer.getvalue())
+        self.assertNotIn("[IGNORED OPTS]", buffer.getvalue())
+
+        # the sub-apps still run
+        self.assertEqual(call_command("add_typer_opts", "inst", "leaf1"), "leaf1")
+        self.assertEqual(call_command("add_typer_opts", "cb", "leaf2"), "leaf2")
+        self.assertEqual(call_command("add_typer_opts", "expl", "leaf3"), "leaf3")
+
     def test_cmd_metavar(self):
         """
         Test that metavar inheritance and overrides work as expected.

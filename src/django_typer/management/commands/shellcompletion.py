@@ -29,17 +29,14 @@ import typing as t
 from pathlib import Path
 from types import ModuleType
 
-from click import get_current_context
-from click.core import ParameterSource
-from click.shell_completion import (
-    CompletionItem,
-    split_arg_string,  # pyright: ignore[reportPrivateImportUsage]
-)
 from django.core.management import CommandError, ManagementUtility
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from shellingham import ShellDetectionFailure
 from typer import Argument, Option
+from typer._click.core import ParameterSource
+from typer._click.globals import get_current_context
+from typer._click.shell_completion import CompletionItem, split_arg_string
 from typer.main import get_command as get_typer_command
 
 from django_typer.completers import these_strings
@@ -229,6 +226,7 @@ class Command(TyperCommand):
         shell: t.Annotated[
             str | None,
             Option(
+                "--shell",
                 help=t.cast(
                     str,
                     _("The shell to use."),

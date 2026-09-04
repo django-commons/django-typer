@@ -4,8 +4,8 @@
  Echo the given message the given number of times.                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    message      TEXT      [required]                                       │
-│      echoes       [ECHOES]  Number of times to echo the message.             │
+│ *    message       TEXT     [required]                                       │
+│      [echoes]      INTEGER  Number of times to echo the message.             │
 │                             [default: 1]                                     │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮

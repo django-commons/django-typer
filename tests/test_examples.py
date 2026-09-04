@@ -5,6 +5,7 @@ from django_typer.management import get_command
 from tests.utils import rich_installed, run_command, similarity
 
 basic_help = """
+                                                                                
  Usage: ./manage.py basic [OPTIONS] ARG1 ARG2                                   
                                                                                 
  A basic command that uses Typer                                                
@@ -61,7 +62,7 @@ Options:
 
 multi_help_no_rich = """
 Usage: ./manage.py multi [OPTIONS] COMMAND [ARGS]...
-  
+
   A command that defines subcommands.
 
 Options:
@@ -107,10 +108,11 @@ Options:
 """
 
 multi_help = """
+                                                                                
  Usage: ./manage.py multi [OPTIONS] COMMAND [ARGS]...                           
- 
-  A command that defines subcommands.
-
+                                                                                
+ A command that defines subcommands.                                            
+                                                                                
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
@@ -129,12 +131,13 @@ multi_help = """
 │ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ create   Create an object.                                                   │
-│ delete   Delete an object.                                                   │
+│ create  Create an object.                                                    │
+│ delete  Delete an object.                                                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 multi_create_help = """
+                                                                                
  Usage: ./manage.py multi create [OPTIONS] NAME                                 
                                                                                 
  Create an object.                                                              
@@ -148,12 +151,13 @@ multi_create_help = """
 """
 
 multi_delete_help = """
+                                                                                
  Usage: ./manage.py multi delete [OPTIONS] ID                                   
                                                                                 
  Delete an object.                                                              
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    id      INTEGER  The id of the object to delete. [required].            │
+│ *    id      INTEGER  The id of the object to delete. [required]             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -161,6 +165,7 @@ multi_delete_help = """
 """
 
 hierarchy_help = """
+                                                                                
  Usage: ./manage.py hierarchy [OPTIONS] COMMAND [ARGS]...                       
                                                                                 
  A more complex command that defines a hierarchy of subcommands.                
@@ -183,7 +188,7 @@ hierarchy_help = """
 │ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ math   Do some math at the given precision.                                  │
+│ math  Do some math at the given precision.                                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
@@ -210,6 +215,7 @@ Commands:
 """
 
 hierarchy_math_help = """
+                                                                                
  Usage: ./manage.py hierarchy math [OPTIONS] COMMAND [ARGS]...                  
                                                                                 
  Do some math at the given precision.                                           
@@ -220,12 +226,13 @@ hierarchy_math_help = """
 │ --help                      Show this message and exit.                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ divide     Divide the given numbers.                                         │
-│ multiply   Multiply the given numbers.                                       │
+│ multiply  Multiply the given numbers.                                        │
+│ divide    Divide the given numbers.                                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 hierarchy_math_divide_help = """
+                                                                                
  Usage: ./manage.py hierarchy math divide [OPTIONS] NUMERATOR DENOMINATOR       
                                                                                 
  Divide the given numbers.                                                      
@@ -241,12 +248,13 @@ hierarchy_math_divide_help = """
 """
 
 hierarchy_math_multiply_help = """
+                                                                                
  Usage: ./manage.py hierarchy math multiply [OPTIONS] NUMBERS...                
                                                                                 
  Multiply the given numbers.                                                    
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│ *    numbers      NUMBERS...  The numbers to multiply [required]             │
+│ *    numbers...      FLOAT  The numbers to multiply [required]               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
@@ -263,8 +271,8 @@ Options:
   --help               Show this message and exit.
 
 Commands:
-  divide    Divide the given numbers.
   multiply  Multiply the given numbers.
+  divide    Divide the given numbers.
 """
 
 hierarchy_math_divide_help_no_rich = """
@@ -398,20 +406,15 @@ class ExampleTests(TestCase):
             "multiply",
             "--help",
         )[0].strip()
-        try:
-            self.assertGreater(
-                similarity(
-                    observed_help,
-                    hierarchy_math_multiply_help
-                    if rich_installed
-                    else hierarchy_math_multiply_help_no_rich,
-                ),
-                0.99,
-            )
-        except AssertionError:
-            import ipdb
-
-            ipdb.set_trace()
+        self.assertGreater(
+            similarity(
+                observed_help,
+                hierarchy_math_multiply_help
+                if rich_installed
+                else hierarchy_math_multiply_help_no_rich,
+            ),
+            0.99,
+        )
 
         self.assertEqual(
             run_command(

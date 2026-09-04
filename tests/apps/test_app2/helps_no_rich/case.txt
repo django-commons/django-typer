@@ -6,5 +6,5 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  lower  Convert the given string to upper case.
   upper  Convert the given string to upper case.
+  lower  Convert the given string to upper case.

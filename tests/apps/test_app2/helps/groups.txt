@@ -33,10 +33,10 @@
 │ --skip-checks                                 Skip system checks.            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ echo       Echo the given message the given number of times.                 │
-│ math       Do some math at the given precision.                              │
-│ setting     Get or set Django settings.                                      │
-│ string     String operations.                                                │
+│ echo     Echo the given message the given number of times.                   │
+│ math     Do some math at the given precision.                                │
+│ string   String operations.                                                  │
+│ setting  Get or set Django settings.                                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
                                                                                 
  Overridden from test_app.                                                      

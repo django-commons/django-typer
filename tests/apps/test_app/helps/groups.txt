@@ -1,3 +1,4 @@
+                                                                                
  Usage: ./manage.py groups [OPTIONS] COMMAND [ARGS]...                          
                                                                                 
  Test multiple groups commands and callbacks                                    
@@ -20,7 +21,7 @@
 │ --skip-checks              Skip system checks.                               │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ echo          Echo the given message.                                        │
-│ math          Do some math at the given precision.                           │
-│ string        String operations.                                             │
+│ echo    Echo the given message.                                              │
+│ math    Do some math at the given precision.                                 │
+│ string  String operations.                                                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯

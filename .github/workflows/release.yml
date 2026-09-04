@@ -17,13 +17,13 @@ jobs:
   lint:
     permissions:
       contents: read
-    uses: ./.github/workflows/lint.yml
+    uses: $/.github/workflows/lint.yml
 
   test:
     permissions:
       contents: read
       id-token: write # to allow codecov oidc upload
-    uses: ./.github/workflows/test.yml
+    uses: $/.github/workflows/test.yml
 
   build:
     name: Build Package
@@ -38,17 +38,19 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.14" # for tomlib
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
           restore-cache: false
           save-cache: false
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Verify Tag
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
@@ -99,7 +101,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
 
   github-release:
     name: Publish GitHub Release
@@ -119,7 +121,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Sign the dists with Sigstore
-        uses: sigstore/gh-action-sigstore-python@5b79a39c381910c090341a2c9b0bf022c8b387e1
+        uses: sigstore/gh-action-sigstore-python@790bc6befb9d733738f18d8f895854b453640ec9
         with:
           inputs: >-
             ./dist/*.tar.gz
@@ -167,7 +169,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Publish distribution 📦 to TestPyPI
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true

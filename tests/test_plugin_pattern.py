@@ -41,6 +41,7 @@ Options:
 """
 
 adapted_rich_help = """
+                                                                                
  Usage: ./manage.py adapted [OPTIONS] COMMAND [ARGS]...                         
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -62,12 +63,13 @@ adapted_rich_help = """
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ adapted                                                                      │
-│ echo      Echo both messages.                                                │
+│ echo     Echo both messages.                                                 │
 │ no-self                                                                      │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
-adapted_adapted_rich_help = """                           
+adapted_adapted_rich_help = """
+                                                                                
  Usage: ./manage.py adapted adapted [OPTIONS] MESSAGE                           
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
@@ -92,6 +94,7 @@ Options:
 """
 
 adapted_echo_rich_help = """
+                                                                                
  Usage: ./manage.py adapted echo [OPTIONS] MSG1 MSG2                            
                                                                                 
  Echo both messages.                                                            
@@ -106,6 +109,7 @@ adapted_echo_rich_help = """
 """
 
 adapted_help_no_adapters = """
+                                                                                
  Usage: ./manage.py adapted [OPTIONS] MESSAGE                                   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮

@@ -29,12 +29,12 @@ jobs:
     strategy:
       matrix:
         # run static analysis on bleeding and trailing edges
-        python-version: ["3.10", "3.15"]
+        python-version: ["3.11", "3.15"]
         django-version:
           - "dj52" # April 2028
           - "dj61" # April 2027
         exclude:
-          - python-version: "3.10"
+          - python-version: "3.11"
             django-version: "dj61"
           - python-version: "3.15"
             django-version: "dj52"
@@ -47,18 +47,20 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         id: sp
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
 
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: false
       - name: Install Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: "1.58.0"
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |

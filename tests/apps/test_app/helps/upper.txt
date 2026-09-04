@@ -4,9 +4,9 @@
  Convert the given string to upper case.                                        
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
-│   begin      [BEGIN]  The starting index of the string to operate on.        │
-│                       [default: 0]                                           │
-│   end        [END]    The ending index of the string to operate on.          │
+│   [begin]      INTEGER  The starting index of the string to operate on.      │
+│                         [default: 0]                                         │
+│   [end]        INTEGER  The ending index of the string to operate on.        │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │

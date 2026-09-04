@@ -13,7 +13,8 @@ from django.test import TestCase
 from django_typer.management import get_command
 from tests.utils import rich_installed, run_command, similarity
 
-native_help_rich = """                                              
+native_help_rich = """
+                                                                                
  Usage: ./manage.py native [OPTIONS] NAME                                       
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
@@ -58,7 +59,8 @@ Options:
   --help             Show this message and exit.
 """
 
-native_groups_help_rich = """                                                   
+native_groups_help_rich = """
+                                                                                
  Usage: ./manage.py native_groups [OPTIONS] COMMAND [ARGS]...                   
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -93,13 +95,14 @@ native_groups_help_rich = """
 │ --skip-checks                                 Skip system checks.            │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ grp1                                                                         │
 │ main                                                                         │
+│ grp1                                                                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_groups_main_help_rich = """
- Usage: ./manage.py native_groups main [OPTIONS] NAME                            
+                                                                                
+ Usage: ./manage.py native_groups main [OPTIONS] NAME                           
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    name      TEXT  [required]                                              │
@@ -110,21 +113,23 @@ native_groups_main_help_rich = """
 """
 
 native_groups_grp1_help_rich = """
- Usage: ./manage.py native_groups grp1 [OPTIONS] COMMAND [ARGS]...               
+                                                                                
+ Usage: ./manage.py native_groups grp1 [OPTIONS] COMMAND [ARGS]...              
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --flag    --no-flag      [default: no-flag]                                  │
 │ --help                   Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1                                                                         │
 │ cmd2                                                                         │
+│ cmd1                                                                         │
 │ subgrp                                                                       │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_groups_grp1_subgrp_help_rich = """
- Usage: ./manage.py native_groups grp1 subgrp [OPTIONS] MSG COMMAND [ARGS]...    
+                                                                                
+ Usage: ./manage.py native_groups grp1 subgrp [OPTIONS] MSG COMMAND [ARGS]...   
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    msg      TEXT  [required]                                               │
@@ -135,18 +140,20 @@ native_groups_grp1_subgrp_help_rich = """
 """
 
 native_groups_grp1_cmd1_help_rich = """
- Usage: ./manage.py native_groups grp1 cmd1 [OPTIONS] COUNT                      
+                                                                                
+ Usage: ./manage.py native_groups grp1 cmd1 [OPTIONS] COUNT                     
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    count      INTEGER  [required]                                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.                                  │
-╰──────────────────────────────────────────────────────────────────────────────
+╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_groups_grp1_cmd2_help_rich = """
- Usage: ./manage.py native_groups grp1 cmd2 [OPTIONS] FRACTION                   
+                                                                                
+ Usage: ./manage.py native_groups grp1 cmd2 [OPTIONS] FRACTION                  
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
 │ *    fraction      FLOAT  [required]                                         │
@@ -354,6 +361,7 @@ class TestNativeGroupsWithSelf(TestNativeGroups):
 
 
 native_tweaks_help_rich = """
+                                                                                
  Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮

@@ -2,8 +2,14 @@
 Typer_ supports custom parsers for options and arguments. If you would
 like to type a parameter with a type that isn't supported by Typer_ you can
 `implement your own parser
-<https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_, or
-:class:`click.ParamType` in :doc:`click <click:parameter-types>` parlance.
+<https://typer.tiangolo.com/tutorial/parameter-types/custom-types>`_, or a
+``ParamType`` in :doc:`click <click:parameter-types>` parlance. Typer_ vendors the
+Click_ ``ParamType``, ``Context`` and ``Parameter`` types, so import them from here
+rather than from Click_ or from Typer_'s private modules:
+
+.. code-block:: python
+
+    from django_typer.parsers import Context, Parameter, ParamType
 
 This package contains a collection of parsers that turn strings into useful
 Django types. Pass these parsers to the `parser` argument of ``typer.Option`` and
@@ -24,3 +30,7 @@ Django types. Pass these parsers to the `parser` argument of ``typer.Option`` an
         - Raises a :exc:`~django.core.management.CommandError` if the value is invalid.
         - Handles the case where the param and context are None.
 """
+
+from typer._click import Context as Context
+from typer._click import Parameter as Parameter
+from typer._click.types import ParamType as ParamType

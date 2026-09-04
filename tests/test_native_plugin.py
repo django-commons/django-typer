@@ -11,6 +11,7 @@ from tests.utils import run_command
 from . import test_native, test_native_inheritance, test_plugin_pattern
 
 native_override_init_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -36,14 +37,15 @@ native_override_init_help_rich = """
 │                                             output.                          │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ grp1   Override GRP1 (initialize only)                                       │
-│ grp2   test_app2::grp2                                                       │
 │ main                                                                         │
+│ grp1  Override GRP1 (initialize only)                                        │
+│ grp2  test_app2::grp2                                                        │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 
 native_override_init_grp1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init grp1 [OPTIONS] COMMAND [ARGS]...       
                                                                                 
  Override GRP1 (initialize only)                                                
@@ -53,13 +55,14 @@ native_override_init_grp1_help_rich = """
 │ --help                 Show this message and exit.                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1                                                                         │
 │ cmd2                                                                         │
+│ cmd1                                                                         │
 │ subgrp                                                                       │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_groups_grp2_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init grp2 [OPTIONS] COMMAND [ARGS]...       
                                                                                 
  test_app2::grp2                                                                
@@ -68,11 +71,12 @@ native_groups_grp2_help_rich = """
 │ --help          Show this message and exit.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1   test_app2::grp2::grp2_cmd1                                            │
+│ cmd1  test_app2::grp2::grp2_cmd1                                             │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_groups_grp2_cmd1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override_init grp2 cmd1 [OPTIONS] G2ARG1             
                                                                                 
  test_app2::grp2::grp2_cmd1                                                     
@@ -216,6 +220,7 @@ class TestNativeInitOverride(
 
 
 native_tweaks_help_rich = """
+                                                                                
  Usage: ./manage.py native_tweaks [OPTIONS] NAME                                
                                                                                 
 ╭─ Arguments ──────────────────────────────────────────────────────────────────╮
@@ -249,6 +254,7 @@ native_tweaks_help_rich = """
 
 
 native_override_grp1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 [OPTIONS] COMMAND [ARGS]...            
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
@@ -256,29 +262,31 @@ native_override_grp1_help_rich = """
 │ --help                   Show this message and exit.                         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ cmd1                                                                         │
 │ cmd2                                                                         │
-│ subgrp   Override SUBGROUP                                                   │
+│ cmd1                                                                         │
+│ subgrp  Override SUBGROUP                                                    │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_override_subgrp_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 subgrp [OPTIONS] COMMAND [ARGS]...     
                                                                                 
  Override SUBGROUP                                                              
                                                                                 
 ╭─ Options ────────────────────────────────────────────────────────────────────╮
 │ --option1    --no-option1      [default: no-option1]                         │
-│ --option2    --no-option2      [default: no-option2]                            │
+│ --option2    --no-option2      [default: no-option2]                         │
 │ --help                         Show this message and exit.                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ sg-cmd1   Subgroup command 1. No args.                                       │
-│ sg-cmd2   Subgroup command 2, Takes an int.                                  │
+│ sg-cmd1  Subgroup command 1. No args.                                        │
+│ sg-cmd2  Subgroup command 2, Takes an int.                                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 
 native_override_sgcmd1_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 subgrp sg-cmd1 [OPTIONS]               
                                                                                 
  Subgroup command 1. No args.                                                   
@@ -289,6 +297,7 @@ native_override_sgcmd1_help_rich = """
 """
 
 native_override_sgcmd2_help_rich = """
+                                                                                
  Usage: ./manage.py native_override grp1 subgrp sg-cmd2 [OPTIONS] NUMBER        
                                                                                 
  Subgroup command 2, Takes an int.                                              

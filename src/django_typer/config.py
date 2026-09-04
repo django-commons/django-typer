@@ -36,3 +36,13 @@ def use_rich_tracebacks() -> bool:
     return rich_installed and (
         (isinstance(cfg, dict) and not cfg.get("no_install", False)) or cfg is True
     )
+
+
+def manage_script() -> str | None:
+    """
+    Return the ``DJANGO_MANAGE_SCRIPT`` setting if it is set. When set, this name is used
+    verbatim as the program name in command help and as the command name shell
+    completions are installed for, instead of detecting it from the invoking script.
+    """
+    name = getattr(settings, "DJANGO_MANAGE_SCRIPT", None)
+    return str(name) if name else None

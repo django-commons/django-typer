@@ -208,7 +208,7 @@ class TestGroups(TestCase):
             )
         else:
             self.assertIn("manage.py groups echo [OPTIONS] MESSAGE", result[0])
-            self.assertIn("Got unexpected extra argument (5)", result[1])
+            self.assertIn("Got unexpected extra argument(s) (5)", result[1])
             with self.assertRaises(TypeError):
                 call_command("groups", "echo", "hey!", echoes=5)
             with self.assertRaises(TypeError):
@@ -366,7 +366,7 @@ class TestGroups(TestCase):
                 "manage.py groups string STRING case upper [OPTIONS]",
                 result[0],
             )
-            self.assertIn("Got unexpected extra arguments (4 9)", result[1].strip())
+            self.assertIn("Got unexpected extra argument(s) (4 9)", result[1].strip())
             grp_cmd.string("annamontes")
             with self.assertRaises(TypeError):
                 self.assertEqual(grp_cmd.upper(4, 9), "annaMONTEs")

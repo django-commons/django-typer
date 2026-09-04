@@ -7,13 +7,20 @@ from functools import cached_property
 from importlib.resources import files
 from pathlib import Path
 
-from click.core import Command as ClickCommand
-from click.shell_completion import CompletionItem, ShellComplete, add_completion_class
 from django.template import Context, Engine
 from django.template.backends.django import Template as DjangoTemplate
 from django.template.base import Template as BaseTemplate
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.utils.translation import gettext as _
+from typer._click.core import Command as ClickCommand
+from typer._click.core import Context as ClickContext
+from typer._click.shell_completion import (
+    CompletionItem,
+    ShellComplete,
+    _resolve_incomplete,
+    add_completion_class,
+)
+from typer.core import TyperGroup
 
 __all__ = ["DjangoTyperShellCompleter", "register_completion_class"]
 
@@ -21,6 +28,67 @@ if t.TYPE_CHECKING:  # pragma: no cover
     from django_typer.management.commands.shellcompletion import (
         Command as ShellCompletion,
     )
+
+
+def _resolve_context(
+    cli: ClickCommand,
+    ctx_args: cabc.MutableMapping[str, t.Any],
+    prog_name: str,
+    args: list[str],
+) -> ClickContext:
+    """
+    Produce the context hierarchy starting with the command and traversing the
+    complete arguments. This only follows the commands, it doesn't trigger input
+    prompts or callbacks.
+
+    This is click's implementation which Typer's vendored click stripped of chain
+    support - chained groups must step through every subcommand.
+    """
+    ctx_args["resilient_parsing"] = True
+    with cli.make_context(prog_name, args.copy(), **ctx_args) as ctx:
+        args = [*ctx._protected_args, *ctx.args]
+
+        while args:
+            command = ctx.command
+
+            if isinstance(command, TyperGroup):
+                if not getattr(command, "chain", False):
+                    name, cmd, args = command.resolve_command(ctx, args)
+
+                    if cmd is None:
+                        return ctx
+
+                    with cmd.make_context(
+                        name, args, parent=ctx, resilient_parsing=True
+                    ) as sub_ctx:
+                        ctx = sub_ctx
+                        args = [*ctx._protected_args, *ctx.args]
+                else:
+                    sub_ctx = ctx
+
+                    while args:
+                        name, cmd, args = command.resolve_command(ctx, args)
+
+                        if cmd is None:
+                            return ctx
+
+                        with cmd.make_context(
+                            name,
+                            args,
+                            parent=ctx,
+                            allow_extra_args=True,
+                            allow_interspersed_args=False,
+                            resilient_parsing=True,
+                        ) as sub_sub_ctx:
+                            sub_ctx = sub_sub_ctx
+                            args = sub_ctx.args
+
+                    ctx = sub_ctx
+                    args = [*sub_ctx._protected_args, *sub_ctx.args]
+            else:
+                break
+
+    return ctx
 
 
 class DjangoTyperShellCompleter(ShellComplete):
@@ -142,7 +210,10 @@ class DjangoTyperShellCompleter(ShellComplete):
         """
         if self.command.fallback:
             return self.command.fallback(args, incomplete)
-        return super().get_completions(args[1:], incomplete)
+        args = args[1:]
+        ctx = _resolve_context(self.cli, self.ctx_args, self.prog_name, args)
+        obj, incomplete = _resolve_incomplete(ctx, args, incomplete)
+        return obj.shell_complete(ctx, incomplete)
 
     def get_completion_args(self) -> tuple[list[str], str]:
         """
@@ -186,7 +257,11 @@ class DjangoTyperShellCompleter(ShellComplete):
         * **shell**: the name of the shell
         """
         return {
-            **super().source_vars(),
+            # Typer's vendored click stubs out ShellComplete.source_vars, so we
+            # provide click's base variables ourselves
+            "complete_func": self.func_name,
+            "complete_var": self.complete_var,
+            "prog_name": self.prog_name,
             "manage_script": self.command.manage_script,
             "manage_script_name": self.command.manage_script_name,
             "python": sys.executable,
@@ -334,4 +409,4 @@ def register_completion_class(cls: type[DjangoTyperShellCompleter]) -> None:
     Register a shell completion class for use with the Django shellcompletion command.
     """
     _completers[cls.name] = cls
-    add_completion_class(cls)
+    add_completion_class(cls, cls.name)

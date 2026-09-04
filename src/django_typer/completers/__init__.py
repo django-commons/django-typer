@@ -31,13 +31,22 @@ types:
   :func:`~django_typer.completers.settings.languages`.
 - **settings**: Complete Django settings variable names using
   :func:`~django_typer.completers.settings.setting`.
+
+Completer functions receive a ``Context``, a ``Parameter`` and the incomplete string
+and return a list of ``CompletionItem`` objects. Typer_ vendors these Click_ types,
+so import them from here rather than from Click_ or from Typer_'s private modules:
+
+.. code-block:: python
+
+    from django_typer.completers import CompletionItem, Context, Parameter
 """
 
 import typing as t
 
-from click import Context, Parameter
-from click.core import ParameterSource
-from click.shell_completion import CompletionItem
+from typer._click import Context as Context
+from typer._click import Parameter as Parameter
+from typer._click.core import ParameterSource
+from typer._click.shell_completion import CompletionItem as CompletionItem
 
 Completer = t.Callable[[Context, Parameter, str], list[CompletionItem]]
 
