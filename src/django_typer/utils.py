@@ -17,7 +17,7 @@ from django.db.models import Model
 from django.db.models.query import QuerySet
 
 from .completers.model import ModelObjectCompleter
-from .config import traceback_config
+from .config import manage_script, traceback_config
 from .parsers.model import ModelObjectParser, ReturnType
 
 # DO NOT IMPORT ANYTHING FROM TYPER HERE - SEE patch.py
@@ -66,20 +66,37 @@ def get_usage_script(script: str | None = None) -> Path | str:
     Return the script name if it is on the path or the absolute path to the script
     if it is not.
 
+    The name is used when invoking it from the shell would run the given script. This
+    is true when the name resolves on the path to the script itself, or when the
+    script was launched through an absolute path (i.e. the shell resolved it from the
+    path, possibly through a shim or wrapper of the same name). A script invoked
+    through an explicit relative path is only reported by name if it is the same file
+    the path resolves to.
+
+    If ``script`` is not given and the ``DJANGO_MANAGE_SCRIPT`` setting is set, it is returned
+    verbatim in lieu of any detection.
+
     :param script: The script name to check. If None the current script is used.
     :return: The script name or the relative path to the script from cwd.
     """
     import shutil
 
+    if not script:
+        override = manage_script()
+        if override:
+            return override
+
     cmd_pth = Path(script or sys.argv[0])
     on_path: str | Path | None = shutil.which(cmd_pth.name)
     on_path = on_path and Path(on_path)
-    if (
-        on_path
-        and on_path.is_absolute()
-        and (on_path == cmd_pth.absolute() or not cmd_pth.is_file())
-    ):
-        return cmd_pth.name
+    if on_path and on_path.is_absolute():
+        if cmd_pth.is_absolute() or not cmd_pth.is_file():
+            return cmd_pth.name
+        try:
+            if on_path.samefile(cmd_pth):
+                return cmd_pth.name
+        except OSError:  # pragma: no cover
+            pass
     try:
         return cmd_pth.absolute().relative_to(Path(os.getcwd()))
     except ValueError:

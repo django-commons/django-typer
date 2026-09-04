@@ -34,6 +34,7 @@ from typer.main import get_params_convertors_ctx_param_name_from_function
 from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder
 
+from ..config import manage_script as manage_script_setting
 from ..config import show_locals, traceback_config, use_rich_tracebacks
 from ..types import (
     ForceColor,
@@ -3316,7 +3317,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """
         with self:
             if getattr(self, "_called_from_command_line", False):
-                script = get_usage_script(prog_name)
+                script = manage_script_setting() or get_usage_script(prog_name)
                 if isinstance(script, Path):
                     prog_name = str(script)
                     if not str(prog_name).startswith(("..", "/", ".")):

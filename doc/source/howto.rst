@@ -688,6 +688,34 @@ per-deployment basis:
     the Typer_ application. It is best to not set these and allow users to configure tracebacks
     via the ``DT_RICH_TRACEBACK_CONFIG`` setting.
 
+.. _configure-manage-script:
+
+Configure the Manage Script Name
+--------------------------------
+
+The usage line in command help, and the command name shell completions are installed for, are
+derived from the script that was invoked. When the script is available as a command on the path
+(e.g. an installed entry point, or a shim or wrapper of the same name that launches it) only its
+name is shown. Otherwise the path to the script relative to the current working directory is shown:
+
+.. code-block:: console
+
+    $ manage basic --help
+    Usage: manage basic [OPTIONS] ARG1 ARG2
+
+    $ python manage.py basic --help
+    Usage: ./manage.py basic [OPTIONS] ARG1 ARG2
+
+If this detection does not produce the name you want, for example when your script is launched by
+a wrapper with a different name, set ``DJANGO_MANAGE_SCRIPT``. It is used verbatim in place of the
+detected name for command help and by :django-admin:`shellcompletion` when no
+``--manage-script`` is given.
+
+.. code-block:: python
+    :caption: settings.py
+
+    DJANGO_MANAGE_SCRIPT = "mycli"
+
 Add Help Text to Commands
 -------------------------
 
