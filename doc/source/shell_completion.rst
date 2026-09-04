@@ -518,6 +518,42 @@ parameter and the :class:`~django_typer.parsers.model.ReturnType` enumeration:
             ...
 
 
+Missing Objects
+~~~~~~~~~~~~~~~
+
+By default a lookup that matches no row raises a ``CommandError``, or calls the ``on_error``
+handler if one was provided (whatever the handler returns becomes the parsed value). For
+create-or-update style commands it is often more convenient to receive the lookup value itself
+when nothing matches. Pass ``return_lookup_on_miss=True`` and the parser will return the value,
+coerced to the field's type, instead of erroring. Values that cannot be coerced to the field
+type remain errors. Typer_ does not support ``Union`` type hints, so keep the parameter
+annotated with the model class and check the type at runtime:
+
+.. code-block:: python
+
+    from django_typer.management import TyperCommand
+    from django_typer.utils import model_parser_completer
+
+
+    class Command(TyperCommand):
+        def handle(
+            self,
+            user: Annotated[
+                User,
+                typer.Argument(
+                    **model_parser_completer(
+                        User,
+                        lookup_field="email",
+                        return_lookup_on_miss=True,
+                    )
+                ),
+            ],
+        ):
+            if not isinstance(user, User):
+                user = User.objects.create(email=user)
+            ...
+
+
 Fields with Choices
 ~~~~~~~~~~~~~~~~~~~
 
