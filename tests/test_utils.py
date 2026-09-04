@@ -251,3 +251,118 @@ def test_parse_iso_duration():
     # partial / ambiguous with new designators
     assert parse_iso_duration("P1Y2") == (timedelta(days=365), "2")
     assert parse_iso_duration("P1Y2M3") == (timedelta(days=365 + 60), "3")
+
+
+def _make_exe(path: Path) -> Path:
+    """Create an executable file that shutil.which() can find on all platforms."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if sys.platform == "win32":
+        path = path.with_suffix(".bat")
+        path.write_text("@echo off\r\nexit /b 0\r\n")
+    else:
+        path.write_text("#!/bin/sh\nexit 0\n")
+    path.chmod(path.stat().st_mode | 0o111)
+    return path
+
+
+def test_get_usage_script_on_path(tmp_path, monkeypatch):
+    """A script launched by name from the path reports its bare name."""
+    script = _make_exe(tmp_path / "bin" / "dt_probe")
+    monkeypatch.setenv("PATH", str(script.parent))
+    assert shutil.which(script.name) == str(script)
+    assert get_usage_script(str(script)) == script.name
+
+
+def test_get_usage_script_shim_on_path(tmp_path, monkeypatch):
+    """
+    When the name on the path is a shim/wrapper (pyenv, asdf, .cmd wrappers on
+    windows, ...) that launches the real script, the bare name is still the
+    correct way to invoke it.
+    """
+    shim = _make_exe(tmp_path / "shims" / "dt_probe")
+    script = _make_exe(tmp_path / "venv" / "bin" / "dt_probe")
+    monkeypatch.setenv("PATH", str(shim.parent))
+    assert shutil.which(script.name) == str(shim)
+    assert get_usage_script(str(script)) == script.name
+
+
+def test_get_usage_script_relative_path_to_script_on_path(tmp_path, monkeypatch):
+    """
+    Invoking the script on the path through a relative path (../venv/bin/x)
+    still reports the bare name - the relative path must be normalized before
+    comparing it to the path resolution.
+    """
+    script = _make_exe(tmp_path / "bin" / "dt_probe")
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    monkeypatch.chdir(proj)
+    monkeypatch.setenv("PATH", str(script.parent))
+    relative = os.path.join("..", "bin", script.name)
+    assert Path(relative).is_file()
+    assert get_usage_script(relative) == script.name
+
+
+def test_get_usage_script_shadowed_by_different_script_on_path(tmp_path, monkeypatch):
+    """
+    Invoking a different script by relative path that shares its name with a
+    command on the path must report the relative path, not the name.
+    """
+    on_path = _make_exe(tmp_path / "bin" / "dt_probe")
+    proj = tmp_path / "proj"
+    local = _make_exe(proj / "dt_probe")
+    monkeypatch.chdir(proj)
+    monkeypatch.setenv("PATH", str(on_path.parent))
+    # (on windows which() searches the cwd first and finds the local script)
+    assert shutil.which(local.name)
+    usage = get_usage_script(f".{os.sep}{local.name}")
+    assert isinstance(usage, Path)
+    assert usage == Path(local.name)
+
+
+def test_get_usage_script_not_on_path(tmp_path, monkeypatch):
+    """A script that cannot be found on the path reports its path from cwd."""
+    script = _make_exe(tmp_path / "venv" / "bin" / "dt_probe")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    assert shutil.which(script.name) is None
+    usage = get_usage_script(str(script))
+    assert isinstance(usage, Path)
+    assert usage == Path("venv") / "bin" / script.name
+
+
+def test_get_usage_script_manage_script_setting(tmp_path, monkeypatch):
+    """DJANGO_MANAGE_SCRIPT overrides script detection when no script is given."""
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    monkeypatch.setattr(sys, "argv", [str(tmp_path / "proj" / "manage.py")])
+    with override_settings(DJANGO_MANAGE_SCRIPT="mycli"):
+        assert get_usage_script() == "mycli"
+        # an explicitly requested script still wins
+        assert (
+            get_usage_script(str(tmp_path / "x" / "y"))
+            == (tmp_path / "x" / "y").absolute()
+        )
+    with override_settings(DJANGO_MANAGE_SCRIPT=None):
+        assert isinstance(get_usage_script(), Path)
+
+
+def test_create_parser_manage_script_setting():
+    """The DJANGO_MANAGE_SCRIPT setting is used as the prog name in command help."""
+    from django_typer.management import get_command
+
+    command = get_command("basic")
+    command._called_from_command_line = True
+    with override_settings(DJANGO_MANAGE_SCRIPT="mycli"):
+        assert command.create_parser("./manage.py", "basic").prog_name == "mycli"
+    assert command.create_parser("./manage.py", "basic").prog_name == "./manage.py"
+
+
+def test_manage_script_setting_help_usage():
+    """DJANGO_MANAGE_SCRIPT is used as the program name in help printed from the command line."""
+    from tests.utils import run_command
+
+    stdout, stderr, retcode = run_command(
+        "basic", "--settings", "tests.settings.manage_script", "--help"
+    )
+    assert retcode == 0, stderr
+    assert "Usage: mycli basic" in stdout
+    assert "manage.py" not in stdout

@@ -163,6 +163,12 @@ Most shells work best when the manage script is installed as an executable on th
 is not always the case, especially in development environments. In these scenarios completion
 installation *may still work*, but you may need to always invoke the script from the same path.
 
+.. tip::
+
+    The command name completions are installed for is detected from the invoking script. If the
+    detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT`` setting,
+    see :ref:`configure-manage-script`.
+
 
 .. _completion_fallbacks:
 
