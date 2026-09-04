@@ -472,10 +472,8 @@ different caller with different expectations:
      - traceback on stderr (see :ref:`configure-rich-exception-tracebacks`), exit status 1
      - the exception raised
      - the exception raised
-   * - is given bad or missing arguments
-     - help and the error on stderr, exit status 1
-     - ``CommandError`` raised
-     - not applicable, no parsing happens
+
+Every cell of this table is checked by ``tests/test_exit.py``.
 
 Some guidance that follows from the table:
 
