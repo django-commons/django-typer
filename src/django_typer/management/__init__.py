@@ -1117,13 +1117,42 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
     def django_command(self, cmd: type[TyperCommand] | None):
         self._django_command = cmd
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        # mirrors typer.Typer.__call__ but invokes the cached click command
-        # instead of rebuilding the tree on every call
+    def __call__(  # type: ignore[override]
+        self,
+        args: t.Sequence[str] | None = None,
+        prog_name: str | None = None,
+        **extra: t.Any,
+    ) -> R:
+        """
+        Run the app: build the context for the given arguments and invoke the
+        command. Unlike :meth:`typer.Typer.__call__` this does not go through
+        click's ``main()`` driver. In the driver's non-standalone mode a
+        :exc:`typer.Exit` is turned into a plain return value, which
+        :class:`~django.core.management.BaseCommand` would then print as output
+        (issue #318). Here every exception, including ``Exit``, reaches
+        :meth:`TyperCommand.__exit__`, which implements the exit policy: a real
+        exit status from the command line and a
+        :exc:`~django.core.management.CommandError` for Python callers.
+
+        :param args: the arguments to parse, defaults to ``sys.argv[1:]``
+        :param prog_name: the program name for usage messages
+        :param extra: passed to ``make_context()`` (e.g. ``supplied_params`` and
+            ``django_command``)
+        """
         if sys.excepthook != except_hook:
             sys.excepthook = except_hook
         try:
-            return get_typer_command(self)(*args, **kwargs)
+            command = get_typer_command(self)
+            if args is None:  # pragma: no cover
+                args = sys.argv[1:]
+            if prog_name is None:  # pragma: no cover
+                prog_name = f"{sys.argv[0]} {self.info.name}"
+            try:
+                with command.make_context(prog_name, list(args), **extra) as ctx:
+                    return command.invoke(ctx)
+            except EOFError as e:
+                # input ended at a prompt - click treats this as an abort
+                raise typer.Abort() from e
         except Exception as e:
             setattr(
                 e,
@@ -1645,7 +1674,7 @@ class BoundProxy(t.Generic[P, R]):
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         if isinstance(self.proxied, Typer) and not self.proxied.parent:
             # if we're calling a top level Typer app we need invoke Typer's call
-            return self.proxied(*args, **kwargs)
+            return t.cast(t.Callable[..., R], self.proxied)(*args, **kwargs)
         elif isinstance(self.proxied, Finalizer):
             return self.proxied(*args, _command=self.command, **kwargs)
         return _get_direct_function(self.command, self.proxied)(*args, **kwargs)
@@ -2756,11 +2785,16 @@ class TyperParser:
             # the context is deliberately not entered/closed here - it is kept for
             # the execute phase (see DjangoTyperMixin.make_context) so arguments are
             # only parsed once and resources opened by conversion outlive parsing
-            ctx = cmd.make_context(
-                info_name=f"{self.prog_name} {self.subcommand}",
-                django_command=self.django_command,
-                args=list(args),
-            )
+            try:
+                ctx = cmd.make_context(
+                    info_name=f"{self.prog_name} {self.subcommand}",
+                    django_command=self.django_command,
+                    args=list(args),
+                )
+            except typer.Exit as exit:
+                # --help and friends: the output has been written and, like
+                # argparse, parsing ends the process with that status
+                sys.exit(exit.exit_code)
             _stash_parsed_context(self.django_command, args, t.cast(Context, ctx))
             common = {
                 **_remove_suppressed(
@@ -3369,8 +3403,27 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         _command_context.stack.pop()
+        from_cli = getattr(self, "_called_from_command_line", False)
         if isinstance(exc_val, typer.Exit):
-            sys.exit(exc_val.exit_code)
+            # Exit carries only a status - the command has already said whatever
+            # it wanted to say. From the command line become that status, for
+            # Python callers surface it the way Django commands report failure.
+            if exc_val.exit_code == 0:
+                return True
+            if from_cli:
+                sys.exit(exc_val.exit_code)
+            raise CommandError(
+                f"{self._name} exited with code {exc_val.exit_code}",
+                returncode=exc_val.exit_code,
+            ) from exc_val
+        if isinstance(exc_val, typer.Abort):
+            # a declined confirmation or an interrupted prompt
+            if from_cli:
+                self.stderr.write("Aborted!")
+                sys.exit(1)
+            raise CommandError("Aborted!", returncode=1) from exc_val
+        if isinstance(exc_val, KeyboardInterrupt) and from_cli:
+            sys.exit(130)
         if isinstance(exc_val, _click.exceptions.UsageError):
             err_msg = (
                 self.missing_args_message.format(
@@ -3573,11 +3626,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         with self:
             result = self.typer_app(
                 args=args,
-                standalone_mode=False,
+                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
                 supplied_params=options,
                 django_command=self,
-                complete_var=None,
-                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
             )
             if not self.is_compound_command and isinstance(
                 self.typer_app.info.result_callback, Finalizer
