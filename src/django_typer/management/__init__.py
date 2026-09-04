@@ -289,6 +289,41 @@ COMMON_DEFAULTS = {
 }
 
 
+def _stash_parsed_context(command: TyperCommand, args: list[str], ctx: Context) -> None:
+    """
+    Keep the context :class:`~django_typer.management.TyperParser` parsed so the
+    execute phase can reuse it. The stash is thread local because parse and execute
+    always happen in the same thread of the same call.
+    """
+    _discard_parsed_context(command)
+    _command_context.parsed = (command, args, ctx)
+
+
+def _take_parsed_context(
+    command: TyperCommand | None, args: list[str]
+) -> Context | None:
+    """
+    Pop the parsed context for this command if it matches the arguments about to
+    be executed, otherwise return None and leave any stash alone.
+    """
+    parsed = getattr(_command_context, "parsed", None)
+    if parsed and command is not None and parsed[0] is command and parsed[1] == args:
+        del _command_context.parsed
+        return parsed[2]
+    return None
+
+
+def _discard_parsed_context(command: TyperCommand) -> None:
+    """
+    Close and forget a parsed context that will not be executed, releasing any
+    resources conversion opened.
+    """
+    parsed = getattr(_command_context, "parsed", None)
+    if parsed and parsed[0] is command:
+        del _command_context.parsed
+        parsed[2].close()
+
+
 def _remove_suppressed(
     command: TyperCommand, params: dict[str, t.Any], manual: set[str] | None = None
 ) -> dict[str, t.Any]:
@@ -371,35 +406,41 @@ class Context(TyperContext):
         super().__init__(command, parent=parent, **kwargs)
         if django_command:
             self.django_command = django_command
-            if supplied_params:
-                # if we're at the top level, default django parameters that
-                # were suppressed may have been injected into execute() and
-                # wound up here. We remove them to keep the interface honest
-                supplied_params = _remove_suppressed(
-                    self.django_command,
-                    supplied_params,
-                    {
-                        param.name
-                        for param in get_typer_command(
-                            self.django_command.typer_app
-                        ).params
-                        if param.name
-                    },
-                )
         else:
             assert parent
             self.django_command = parent.django_command
-
-        if supplied_params:
-            self._supplied_params = supplied_params
-
-        self.params = self.ParamDict(
-            {**self.params, **self.supplied_params},
-            supplied=list(self.supplied_params.keys()),
-        )
+        self._apply_supplied_params(supplied_params)
         self.children = []
         if parent:
             parent.children.append(self)
+
+    def _apply_supplied_params(
+        self, supplied_params: dict[str, t.Any] | None = None
+    ) -> None:
+        """
+        Record parameters supplied via :func:`~django.core.management.call_command`
+        on this context and block the parser from overwriting them. This runs at
+        construction and again when a context parsed by
+        :class:`~django_typer.management.TyperParser` is reused for execution.
+        """
+        if supplied_params and not self.parent:
+            # if we're at the top level, default django parameters that
+            # were suppressed may have been injected into execute() and
+            # wound up here. We remove them to keep the interface honest
+            supplied_params = _remove_suppressed(
+                self.django_command,
+                supplied_params,
+                {param.name for param in self.command.params if param.name},
+            )
+        if supplied_params:
+            self._supplied_params = supplied_params
+        # supplied parameters lead so parameter order matches a context that was
+        # seeded with them before parsing, which is what callers have always seen
+        merged = dict(self.supplied_params)
+        merged.update(
+            {k: v for k, v in self.params.items() if k not in self.supplied_params}
+        )
+        self.params = self.ParamDict(merged, supplied=list(self.supplied_params.keys()))
 
 
 class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
@@ -438,6 +479,30 @@ class DjangoTyperMixin(with_typehint(CoreTyperGroup)):  # type: ignore[misc]
         not seem to be a good approach to do this given how deep in the click
         infrastructure the conversion happens.
         """
+
+    def make_context(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self,
+        info_name: str | None,
+        args: list[str],
+        parent: _click.Context | None = None,
+        **extra: t.Any,
+    ) -> _click.Context:
+        """
+        Django's :class:`~django.core.management.BaseCommand` parses in one step and
+        executes in another, so :class:`~django_typer.management.TyperParser` has
+        usually already parsed these arguments into a context by the time Typer_
+        asks for one during execution. Reuse that context rather than parsing (and
+        converting, prompting and running callbacks) a second time. Resources the
+        parse opened, like files, stay open until execution finishes.
+        """
+        if parent is None:
+            parsed = _take_parsed_context(extra.get("django_command"), list(args))
+            if parsed is not None:
+                parsed.command = self
+                parsed.info_name = info_name
+                parsed._apply_supplied_params(extra.get("supplied_params"))
+                return parsed
+        return super().make_context(info_name, args, parent=parent, **extra)
 
     def get_params(self, ctx: _click.Context) -> list[_click.Parameter]:
         """
@@ -2608,24 +2673,29 @@ class TyperParser:
             base class)
         """
         with self.django_command:
+            args = list(args or [])
             cmd = get_typer_command(self.django_command.typer_app)
-            with cmd.make_context(
+            # the context is deliberately not entered/closed here - it is kept for
+            # the execute phase (see DjangoTyperMixin.make_context) so arguments are
+            # only parsed once and resources opened by conversion outlive parsing
+            ctx = cmd.make_context(
                 info_name=f"{self.prog_name} {self.subcommand}",
                 django_command=self.django_command,
-                args=list(args or []),
-            ) as ctx:
-                common = {
-                    **_remove_suppressed(
-                        self.django_command,
-                        COMMON_DEFAULTS,
-                        {param.name for param in cmd.params if param.name},
-                    ),
-                    **ctx.params,
-                }
-                self.django_command._traceback = common.get(
-                    "traceback", self.django_command._traceback
-                )
-                return _ParsedArgs(args=args or [], **common)
+                args=list(args),
+            )
+            _stash_parsed_context(self.django_command, args, t.cast(Context, ctx))
+            common = {
+                **_remove_suppressed(
+                    self.django_command,
+                    COMMON_DEFAULTS,
+                    {param.name for param in cmd.params if param.name},
+                ),
+                **ctx.params,
+            }
+            self.django_command._traceback = common.get(
+                "traceback", self.django_command._traceback
+            )
+            return _ParsedArgs(args=args, **common)
 
     def add_argument(self, *args, **kwargs):
         """
@@ -3493,6 +3563,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                     },
                 )
         finally:
+            # if handle() never reached the typer app the parsed context is stale
+            _discard_parsed_context(self)
             self.no_color = no_color
             self.force_color = force_color
             self.skip_checks = skip_checks

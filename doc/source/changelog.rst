@@ -8,6 +8,8 @@ v4.0.0 (2026-09-XX)
 ===================
 
 * Support Typer 0.26.8+
+* Fixed `Avoid redundant context construction <https://github.com/django-commons/django-typer/issues/210>`_
+* Fixed `FileBinaryRead: file is already closed <https://github.com/django-commons/django-typer/issues/209>`_
 * Fixed `Typer app options do not inherit/override correctly
   <https://github.com/django-commons/django-typer/issues/256>`_
 * Drop dependency on Click (vendored by Typer). The Click types needed to write completers
