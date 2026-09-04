@@ -119,7 +119,9 @@ elif rdbms == "postgres":
         # a second database for the multi-database transaction tests
         "other": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB", "postgres"),
+            "NAME": os.environ.get(
+                "POSTGRES_OTHER_DB", os.environ.get("POSTGRES_DB", "postgres")
+            ),
             "USER": os.environ.get("POSTGRES_USER", "postgres"),
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
             "HOST": os.environ.get("POSTGRES_HOST", ""),

@@ -5,7 +5,10 @@ command ends successfully (a return, typer.Exit(0) or sys.exit(0)) and rolls
 back on every other outcome. See https://github.com/django-commons/django-typer/issues/219
 """
 
+import os
+
 from django.core.management import CommandError, call_command
+from django.db import connections
 from django.test import TestCase, TransactionTestCase
 
 from django_typer.management import TyperCommand, get_command
@@ -161,6 +164,13 @@ class AtomicCommandLineTests(TransactionTestCase):
         # subprocesses run by earlier tests may have committed rows
         for alias in self.databases:
             ShellCompleteTester.objects.using(alias).all().delete()
+        # point the subprocess at the test databases - on sqlite the test
+        # database is the configured file, on postgres it is a separate database
+        self.env = {
+            **os.environ,
+            "POSTGRES_DB": str(connections["default"].settings_dict["NAME"]),
+            "POSTGRES_OTHER_DB": str(connections["other"].settings_dict["NAME"]),
+        }
 
     def test_transaction_follows_the_exit_status(self):
         table = [
@@ -178,7 +188,15 @@ class AtomicCommandLineTests(TransactionTestCase):
             with self.subTest(how=how):
                 ShellCompleteTester.objects.all().delete()
                 _, stderr, retcode = run_command(
-                    "atomic_chain", "--no-color", "write", "a", "write", "b", "end", how
+                    "atomic_chain",
+                    "--no-color",
+                    "write",
+                    "a",
+                    "write",
+                    "b",
+                    "end",
+                    how,
+                    env=self.env,
                 )
                 self.assertEqual(retcode, status, stderr)
                 self.assertEqual(rows(), expected_rows)
@@ -197,6 +215,7 @@ class AtomicCommandLineTests(TransactionTestCase):
             "c",
             "end",
             "valueerror",
+            env=self.env,
         )
         self.assertEqual(retcode, 1, stderr)
         self.assertEqual(rows("default"), 1)
