@@ -116,3 +116,130 @@ class ExitPolicyTests(TestCase):
         self.assertIn("Usage:", stdout)
         with self.assertRaises(SystemExit):
             call_command("exit_codes", "--help")
+
+
+class ExitMatrixTests(TestCase):
+    """
+    One check per cell of the table in the "Exit Codes, Errors and Aborts" how-to
+    section. Each row is one way a command can end, each column one invocation
+    context. Keep this in step with doc/source/howto.rst.
+    """
+
+    # (row label, subcommand args, command line, call_command, direct call)
+    #   command line: (exit status, stdout check, stderr check) - a check is a
+    #       string that must be contained, "" for nothing printed, or None to skip
+    #   call_command / direct: ("returns", value) or ("raises", type, returncode,
+    #       message fragment) - None means not applicable
+    MATRIX = [
+        (
+            "returns a value",
+            ["ok"],
+            (0, "done", ""),
+            ("returns", "done"),
+            ("returns", "done"),
+        ),
+        (
+            "raises CommandError(msg, returncode=n)",
+            ["error", "--code", "2"],
+            (2, "", "CommandError: something went wrong"),
+            ("raises", CommandError, 2, "something went wrong"),
+            ("raises", CommandError, 2, "something went wrong"),
+        ),
+        (
+            "raises typer.Exit(0)",
+            ["exit", "--code", "0"],
+            (0, "", ""),
+            ("returns", None),
+            ("raises", typer.Exit, 0, None),
+        ),
+        (
+            "raises typer.Exit(n)",
+            ["exit", "--code", "3"],
+            (3, "", ""),
+            ("raises", CommandError, 3, "exited with code 3"),
+            ("raises", typer.Exit, 3, None),
+        ),
+        (
+            "raises typer.Abort()",
+            ["abort"],
+            (1, "", "Aborted!"),
+            ("raises", CommandError, 1, "Aborted!"),
+            ("raises", typer.Abort, None, None),
+        ),
+        (
+            "calls sys.exit(n)",
+            ["sysexit", "--code", "4"],
+            (4, "", ""),
+            ("raises", SystemExit, 4, None),
+            ("raises", SystemExit, 4, None),
+        ),
+        (
+            "is interrupted",
+            ["interrupt"],
+            (130, "", ""),
+            ("raises", KeyboardInterrupt, None, None),
+            ("raises", KeyboardInterrupt, None, None),
+        ),
+        (
+            "raises any other exception",
+            ["boom"],
+            (1, "", "RuntimeError: unexpected failure"),
+            ("raises", RuntimeError, None, "unexpected failure"),
+            ("raises", RuntimeError, None, "unexpected failure"),
+        ),
+        (
+            "is given bad arguments",
+            ["exit", "--code", "notanint"],
+            (1, "Usage:", "is not a valid"),
+            ("raises", CommandError, 1, "is not a valid"),
+            None,
+        ),
+    ]
+
+    def check_outcome(self, expected, invoke):
+        if expected[0] == "returns":
+            self.assertEqual(invoke(), expected[1])
+            return
+        _, exc_type, returncode, fragment = expected
+        with self.assertRaises(exc_type) as raised:
+            invoke()
+        exc = raised.exception
+        if returncode is not None:
+            status = exc.code if isinstance(exc, SystemExit) else None
+            if isinstance(exc, CommandError):
+                status = exc.returncode
+            elif isinstance(exc, typer.Exit):
+                status = exc.exit_code
+            self.assertEqual(status, returncode)
+        if fragment is not None:
+            self.assertIn(fragment, str(exc))
+
+    def test_command_line_column(self):
+        for label, args, (status, out, err), _, _ in self.MATRIX:
+            with self.subTest(row=label):
+                stdout, stderr, retcode = run_command("exit_codes", "--no-color", *args)
+                self.assertEqual(retcode, status, stderr)
+                for expected, actual in ((out, stdout), (err, stderr)):
+                    if expected == "":
+                        self.assertEqual(actual.strip(), "")
+                    elif expected is not None:
+                        self.assertIn(expected, actual)
+                if label == "raises any other exception":
+                    self.assertIn("Traceback", stderr)
+                else:
+                    self.assertNotIn("Traceback", stderr)
+
+    def test_call_command_column(self):
+        for label, args, _, expected, _ in self.MATRIX:
+            with self.subTest(row=label):
+                self.check_outcome(expected, lambda: call_command("exit_codes", *args))
+
+    def test_direct_call_column(self):
+        cmd = get_command("exit_codes")
+        for label, args, _, _, expected in self.MATRIX:
+            if expected is None:
+                continue  # not applicable - nothing is parsed on a direct call
+            with self.subTest(row=label):
+                name, *rest = args
+                kwargs = {"code": int(rest[1])} if rest else {}
+                self.check_outcome(expected, lambda: getattr(cmd, name)(**kwargs))
