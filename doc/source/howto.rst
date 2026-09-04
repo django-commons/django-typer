@@ -338,6 +338,8 @@ finalizers at higher levels in the command hierarchy.
     :ref:`plugin pattern. <plugins>`
 
 
+.. _call_commands:
+
 Call Commands from Code
 -----------------------
 
@@ -406,6 +408,88 @@ You may also fetch a subcommand function directly by passing its path:
     Also refer to the :func:`~django_typer.management.get_command` docs and :ref:`here <default_cmd>`
     and :ref:`here <multi_commands>` for the nuances of calling commands when handle() is and is
     not implemented.
+
+
+.. _exit_behavior:
+
+Exit Codes, Errors and Aborts
+-----------------------------
+
+A command function can end in a number of ways: by returning a value, by raising
+:exc:`~django.core.management.CommandError`, :exc:`typer.Exit` or :exc:`typer.Abort`, by calling
+:func:`sys.exit`, by being interrupted, or by raising some other exception. What happens next
+depends on how the command was invoked, because each of the three invocation contexts has a
+different caller with different expectations:
+
+- **From the command line** (``manage.py mycommand``) the caller is the shell. The outcome is a
+  process exit status and, where appropriate, a message on stderr.
+- **From** :func:`~django.core.management.call_command` the caller is Python code that wants a
+  return value or an exception it can catch. This is Django_'s contract for management commands:
+  failures are reported by raising :exc:`~django.core.management.CommandError`, which carries the
+  exit status as its ``returncode``.
+- **Called directly** as a function (``mycommand()``, ``mycommand.subcommand()`` or
+  ``get_command("mycommand", "subcommand")()``, see :ref:`calling commands from code
+  <call_commands>`) it is a plain Python call. django-typer_ does not interpose: whatever the
+  function returns is returned and whatever it raises propagates unchanged.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 24 28 24 24
+
+   * - The command ...
+     - Command line
+     - :func:`~django.core.management.call_command`
+     - Direct call
+   * - returns a value
+     - value printed to stdout (see :ref:`printing`), exit status 0
+     - value returned
+     - value returned
+   * - raises ``CommandError(msg, returncode=n)``
+     - ``CommandError: msg`` on stderr, exit status *n*
+     - ``CommandError`` raised
+     - ``CommandError`` raised
+   * - raises ``typer.Exit(0)``
+     - exit status 0, nothing printed
+     - ``None`` returned
+     - ``typer.Exit`` raised
+   * - raises ``typer.Exit(n)``
+     - exit status *n*, nothing printed
+     - ``CommandError`` raised with ``returncode=n``, chained from the ``Exit``
+     - ``typer.Exit`` raised
+   * - raises ``typer.Abort()`` (a declined confirmation, or input ending at a prompt)
+     - ``Aborted!`` on stderr, exit status 1
+     - ``CommandError("Aborted!")`` raised with ``returncode=1``
+     - ``typer.Abort`` raised
+   * - calls ``sys.exit(n)``
+     - exit status *n*
+     - ``SystemExit`` raised
+     - ``SystemExit`` raised
+   * - is interrupted (``KeyboardInterrupt``)
+     - exit status 130, nothing printed
+     - ``KeyboardInterrupt`` raised
+     - ``KeyboardInterrupt`` raised
+   * - raises any other exception
+     - traceback on stderr (see :ref:`configure-rich-exception-tracebacks`), exit status 1
+     - the exception raised
+     - the exception raised
+   * - is given bad or missing arguments
+     - help and the error on stderr, exit status 1
+     - ``CommandError`` raised
+     - not applicable, no parsing happens
+
+Some guidance that follows from the table:
+
+- :exc:`typer.Exit` carries nothing but a status. If there is something to say, say it first,
+  for example with ``typer.echo(..., err=True)`` or ``self.stderr.write(...)``, then raise
+  ``Exit``. From the command line nothing else is printed.
+- To fail with a message, prefer ``raise CommandError(msg, returncode=n)``. It is the Django_
+  idiom, it behaves the same way from every context, and other Django_ code already knows how to
+  handle it.
+- ``Exit(0)`` means success. From :func:`~django.core.management.call_command` it is
+  indistinguishable from returning ``None``.
+- ``--help`` and ``--version`` end the process during argument parsing, from the command line
+  and from :func:`~django.core.management.call_command` alike, just as they do for any
+  :class:`~django.core.management.BaseCommand`.
 
 
 .. _default_options:
