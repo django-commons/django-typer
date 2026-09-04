@@ -531,3 +531,33 @@ class TestPrintResultHowTo(TestCase):
 
 class TestPrintResultTyperHowTo(TestPrintResultHowTo):
     command = "print_result_typer"
+
+
+@override_settings(
+    INSTALLED_APPS=[
+        "tests.apps.howto",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+    ]
+)
+class TestAtomicHowTo(TestCase):
+    command = "atomic"
+
+    def test_howto_atomic(self):
+        from django.contrib.auth.models import Group
+
+        call_command(self.command, "create", "a", "create", "b", "rename", "a", "c")
+        self.assertEqual(
+            sorted(Group.objects.values_list("name", flat=True)), ["b", "c"]
+        )
+
+        # the failing subcommand rolls back the ones that ran before it
+        with self.assertRaises(Group.DoesNotExist):
+            call_command(self.command, "create", "d", "delete", "nope")
+        self.assertEqual(
+            sorted(Group.objects.values_list("name", flat=True)), ["b", "c"]
+        )
+
+
+class TestAtomicTyperHowTo(TestAtomicHowTo):
+    command = "atomic_typer"

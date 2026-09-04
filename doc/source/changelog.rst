@@ -8,6 +8,11 @@ v4.0.0 (2026-09-XX)
 ===================
 
 * Support Typer 0.26.8+
+* Added :attr:`~django_typer.management.TyperCommand.atomic` to run a command's whole
+  invocation - initializer, chained subcommands and finalizer - in a database transaction.
+  Implements `Add a command option that will wrap execute() in a transaction
+  <https://github.com/django-commons/django-typer/issues/219>`_. See :ref:`atomic`.
+* Fixed chain mode being switched off when a chained command defines an initializer
 * The click command tree Typer builds for a command is now cached per app and only rebuilt
   when commands, groups, callbacks or finalizers are registered, instead of being rebuilt
   several times on every invocation
