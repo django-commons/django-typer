@@ -18,7 +18,7 @@ class Command(TyperCommand, rich_markup_mode="rich"):
     def handle(
         self,
         email: Annotated[
-            ShellCompleteTester,  # Typer rejects unions, annotate with the model
+            ShellCompleteTester,  # Typer rejects Model | str, annotate with the model
             typer.Argument(
                 **model_parser_completer(
                     ShellCompleteTester,

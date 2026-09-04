@@ -66,9 +66,10 @@ class ModelObjectParser(ParamType):
         after coercion to the field type (e.g. a ``UUID`` for a ``UUIDField``), so
         the caller receives a valid key it can use to create the missing row. Values
         that fail coercion are still errors. Only meaningful when ``return_type`` is
-        :attr:`ReturnType.MODEL_INSTANCE`. Typer_ does not accept ``Union`` type
-        hints, so keep the parameter annotated with the model class and check the
-        type of the value at runtime:
+        :attr:`ReturnType.MODEL_INSTANCE`. Typer_ rejects unions of two or more
+        concrete types (``User | str``), though ``| None`` is fine, so keep the
+        parameter annotated with the model class and check the type of the value
+        at runtime:
 
     .. code-block:: python
 
