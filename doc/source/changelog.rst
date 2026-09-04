@@ -24,6 +24,8 @@ v4.0.0 (2026-09-XX)
   prompted or pass the value explicitly.
 * Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
 * Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
+* Fixed `typer.Exit is swallowed on the execute() path: exit code returned as output and
+  process exits 0 <https://github.com/django-commons/django-typer/issues/318>`_
 
 
 Migrating from 3.x to 4.x

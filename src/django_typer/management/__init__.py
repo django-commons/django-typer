@@ -3571,14 +3571,47 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :return: t.Any object returned by the Typer app
         """
         with self:
-            result = self.typer_app(
-                args=args,
-                standalone_mode=False,
-                supplied_params=options,
-                django_command=self,
-                complete_var=None,
-                prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
-            )
+            # We resolve and invoke the click command directly instead of routing
+            # through the Typer app's own driver (Typer.__call__ -> main -> _main).
+            # In non-standalone mode that driver catches typer.Exit itself and
+            # returns its exit code as a plain int instead of letting it propagate,
+            # which makes it invisible to the typer.Exit handling in our own
+            # __exit__ below and lets Django print the exit code to stdout as if
+            # it were command output. Invoking the command ourselves lets
+            # typer.Exit (and any other exception) reach __exit__ as designed.
+            # Shell completion is not a concern on this path (it is already
+            # disabled by never passing a complete_var), so the driver's shell
+            # completion short-circuit isn't needed here either.
+            cmd = get_typer_command(self.typer_app)
+            if sys.excepthook != except_hook:
+                sys.excepthook = except_hook
+            try:
+                with cmd.make_context(
+                    f"{sys.argv[0]} {self.typer_app.info.name}",
+                    list(args),
+                    django_command=self,
+                    supplied_params=options,
+                ) as ctx:
+                    result = cmd.invoke(ctx)
+            except KeyboardInterrupt as e:
+                # Mirror the driver's own KeyboardInterrupt -> exit code 130 mapping
+                raise typer.Exit(130) from e
+            except Exception as e:
+                # Typer.__call__ (and its django-typer mirror) normally tags any
+                # exception that escapes the app with a DeveloperExceptionConfig so
+                # the installed excepthook can render a pretty traceback - with
+                # locals, if configured. We bypass that wrapper entirely here, so
+                # we replicate the tagging ourselves.
+                setattr(
+                    e,
+                    _typer_developer_exception_attr_name,
+                    DeveloperExceptionConfig(
+                        pretty_exceptions_enable=self.typer_app.pretty_exceptions_enable,
+                        pretty_exceptions_show_locals=self.typer_app.pretty_exceptions_show_locals,
+                        pretty_exceptions_short=self.typer_app.pretty_exceptions_short,
+                    ),
+                )
+                raise
             if not self.is_compound_command and isinstance(
                 self.typer_app.info.result_callback, Finalizer
             ):
