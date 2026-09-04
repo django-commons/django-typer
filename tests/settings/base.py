@@ -98,7 +98,13 @@ if rdbms == "sqlite":
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
             "TEST": {"NAME": BASE_DIR / "db.sqlite3"},
-        }
+        },
+        # a second database for the multi-database transaction tests
+        "other": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "other.sqlite3",
+            "TEST": {"NAME": BASE_DIR / "other.sqlite3"},
+        },
     }
 elif rdbms == "postgres":
     DATABASES = {
@@ -109,7 +115,17 @@ elif rdbms == "postgres":
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
             "HOST": os.environ.get("POSTGRES_HOST", ""),
             "PORT": os.environ.get("POSTGRES_PORT", ""),
-        }
+        },
+        # a second database for the multi-database transaction tests
+        "other": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "postgres"),
+            "USER": os.environ.get("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", ""),
+            "PORT": os.environ.get("POSTGRES_PORT", ""),
+            "TEST": {"NAME": "test_other"},
+        },
     }
 
 

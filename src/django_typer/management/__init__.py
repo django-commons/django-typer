@@ -6,6 +6,7 @@ import threading
 import typing as t
 import weakref
 from collections import deque
+from contextlib import ExitStack, contextmanager
 from copy import copy, deepcopy
 from functools import cache, cached_property
 from importlib import import_module
@@ -16,6 +17,7 @@ from django.core.management import get_commands
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.base import OutputWrapper as BaseOutputWrapper
 from django.core.management.color import Style as ColorStyle
+from django.db import DEFAULT_DB_ALIAS, connections, transaction
 from django.utils.functional import Promise, classproperty
 
 from django_typer import patch
@@ -1314,6 +1316,14 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                     {
                         "django_command": self.django_command,
                         "common_init": self.parent is None,
+                        # the callback's class replaces the group class typer
+                        # builds, so carry the app's chain setting over unless
+                        # the initializer sets it explicitly
+                        "chain": bool(
+                            self.info.chain
+                            if isinstance(chain, DefaultPlaceholder)
+                            else chain
+                        ),
                     },
                 ),
                 invoke_without_command=invoke_without_command,
@@ -2995,6 +3005,23 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     print_result: bool = True
     """Turn on/off automatic write to stdout of results returned by command"""
 
+    atomic: bool | str | t.Sequence[str] = False
+    """
+    Run everything :meth:`execute` does - the initializer, the subcommand(s) and any
+    finalizer - inside one database transaction
+    (:func:`django.db.transaction.atomic`).
+
+    ``True`` uses the database named by the command's ``database`` option when it
+    declares one, otherwise the default database. A string names a single alias,
+    ``"__all__"`` wraps every configured database and a sequence of aliases opens
+    a nested block for each in order.
+
+    The transaction commits when the command returns, raises ``typer.Exit(0)`` or
+    calls ``sys.exit(0)`` and rolls back on every other outcome (see
+    :ref:`exit_behavior`). Command functions called directly from Python are plain
+    calls and are not wrapped.
+    """
+
     _handle: t.Callable[..., t.Any]
     _traceback: bool = False
     _help_kwarg: str | None = Default(None)
@@ -3687,7 +3714,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.skip_checks = options["skip_checks"]
         self._executing = True
         try:
-            with self:
+            with self, self._transaction(options):
                 # base class requires force_color, no_color and skip_checks to be
                 # present - we allow them to be suppressed
                 return super().execute(
@@ -3706,6 +3733,48 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.no_color = no_color
             self.force_color = force_color
             self.skip_checks = skip_checks
+
+    def _atomic_aliases(self, options: dict[str, t.Any]) -> list[str]:
+        """
+        The database aliases :attr:`atomic` asks :meth:`execute` to wrap in a
+        transaction, in the order the blocks should be entered.
+        """
+        if not self.atomic:
+            return []
+        if self.atomic is True:
+            return [options.get("database") or DEFAULT_DB_ALIAS]
+        if self.atomic == "__all__":
+            return list(connections)
+        if isinstance(self.atomic, str):
+            return [self.atomic]
+        return list(self.atomic)
+
+    @contextmanager
+    def _transaction(self, options: dict[str, t.Any]) -> t.Iterator[None]:
+        """
+        Wrap the body in the transaction(s) :attr:`atomic` asks for. Any exception
+        rolls back, except a ``sys.exit()`` with a zero status which is success:
+        the transaction commits first and the exit continues afterwards.
+        ``typer.Exit`` never reaches this level - the exit policy in
+        :meth:`__exit__` has already turned it into a return (status 0) or a
+        :exc:`~django.core.management.CommandError`/``sys.exit`` (otherwise).
+        """
+        aliases = self._atomic_aliases(options)
+        if not aliases:
+            yield
+            return
+        clean_exit: SystemExit | None = None
+        with ExitStack() as stack:
+            for alias in aliases:
+                stack.enter_context(transaction.atomic(using=alias))
+            try:
+                yield
+            except SystemExit as exc:
+                if exc.code not in (None, 0):
+                    raise
+                clean_exit = exc
+        if clean_exit is not None:
+            raise clean_exit
 
     def echo(self, message: t.Any | None = None, nl: bool = True, err: bool = False):
         """
