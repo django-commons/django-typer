@@ -89,6 +89,8 @@ def get_usage_script(script: str | None = None) -> Path | str:
     cmd_pth = Path(script or sys.argv[0])
     on_path: str | Path | None = shutil.which(cmd_pth.name)
     on_path = on_path and Path(on_path)
+    # which() may return a relative path if PATH has relative entries and on windows
+    # it searches the cwd first, returning .\name - a cwd hit is not "on the path"
     if on_path and on_path.is_absolute():
         if cmd_pth.is_absolute() or not cmd_pth.is_file():
             return cmd_pth.name

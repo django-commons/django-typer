@@ -255,10 +255,12 @@ def test_parse_iso_duration():
 
 def _make_exe(path: Path) -> Path:
     """Create an executable file that shutil.which() can find on all platforms."""
+    path.parent.mkdir(parents=True, exist_ok=True)
     if sys.platform == "win32":
         path = path.with_suffix(".bat")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("#!/bin/sh\nexit 0\n")
+        path.write_text("@echo off\r\nexit /b 0\r\n")
+    else:
+        path.write_text("#!/bin/sh\nexit 0\n")
     path.chmod(path.stat().st_mode | 0o111)
     return path
 
