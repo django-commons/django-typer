@@ -18,6 +18,7 @@ v4.0.0 (2026-09-XX)
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
 * Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
+* Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
 
 
 Migrating from 3.x to 4.x
@@ -73,6 +74,13 @@ Migrating from 3.x to 4.x
 * If you document your commands with the ``typer`` directive from sphinxcontrib-typer_, upgrade
   it to 0.10 or later. Earlier releases drive the real Click_ package and fail against
   Typer_ 0.26+.
+
+* The program name shown in the ``Usage:`` line of command help (and used when installing shell
+  completions) is now the bare command name whenever that name resolves on the path, including when
+  the script was launched through a shim or wrapper of the same name or through a relative path to
+  the same script. Previously the full path was shown in these cases. Set
+  ``DJANGO_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
+  :ref:`configure-manage-script`.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with
