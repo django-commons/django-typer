@@ -171,3 +171,5 @@ requirements-test*.txt
 constraints.txt
 bandit.sarif
 .claude/worktrees/
+other.sqlite3
+other.sqlite3-journal

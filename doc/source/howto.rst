@@ -488,6 +488,111 @@ Some guidance that follows from the table:
   :class:`~django.core.management.BaseCommand`.
 
 
+.. _atomic:
+
+Wrap a Command in a Transaction
+-------------------------------
+
+Django_'s :class:`~django.core.management.BaseCommand` has no option to run a command inside a
+database transaction (its ``output_transaction`` attribute only decorates SQL that a command
+prints). A :class:`~django_typer.management.TyperCommand` invocation may run an
+:ref:`initializer <initializer>`, several :ref:`chained <call_commands>` subcommands and a
+:ref:`finalizer <howto_finalizers>`, so it is useful to be able to make the whole invocation
+atomic. Set the class attribute :attr:`~django_typer.management.TyperCommand.atomic` and everything
+:meth:`~django.core.management.BaseCommand.execute` runs is wrapped in
+:func:`django.db.transaction.atomic`:
+
+.. tabs::
+
+    .. tab:: Django-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/atomic.py
+            :language: python
+            :linenos:
+
+    .. tab:: Typer-style
+
+        .. literalinclude:: ../../tests/apps/howto/management/commands/atomic_typer.py
+            :language: python
+            :linenos:
+
+Running ``manage.py atomic create a create b delete c`` creates nothing: the last subcommand
+raises and rolls back the first two.
+
+:attr:`~django_typer.management.TyperCommand.atomic` accepts:
+
+.. list-table::
+   :widths: 30 70
+
+   * - ``True``
+     - The database named by the command's ``database`` option when it declares one (on the
+       initializer or on ``handle()``), otherwise the default database. This mirrors how Django_'s
+       own commands resolve their ``--database`` option.
+   * - ``"other"``
+     - The database with that alias.
+   * - ``("default", "other")``
+     - A nested :func:`~django.db.transaction.atomic` block for each alias, entered in that order.
+   * - ``"__all__"``
+     - Every database in :setting:`DATABASES`.
+
+The transaction applies when the command is run from the command line or through
+:func:`~django.core.management.call_command`, the two contexts in which django-typer_ drives the
+command. Command functions called directly from Python are plain calls and are not wrapped. The
+transaction commits when the command succeeds and rolls back on every other outcome in the
+:ref:`exit table <exit_behavior>`:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 24 24 24
+
+   * - The command ...
+     - :func:`~django.core.management.call_command`
+     - Command line
+     - Transaction
+   * - returns a value
+     - value returned
+     - normal return
+     - commit
+   * - raises ``typer.Exit(0)``
+     - ``None`` returned
+     - normal return
+     - commit
+   * - raises ``typer.Exit(n)``
+     - ``CommandError``, ``returncode=n``
+     - ``SystemExit(n)``
+     - rollback
+   * - raises ``typer.Abort()``
+     - ``CommandError("Aborted!")``
+     - ``SystemExit(1)``
+     - rollback
+   * - calls ``sys.exit(0)``
+     - ``SystemExit(0)``
+     - ``SystemExit(0)``
+     - commit
+   * - calls ``sys.exit(n)``
+     - ``SystemExit(n)``
+     - ``SystemExit(n)``
+     - rollback
+   * - is interrupted (``KeyboardInterrupt``)
+     - ``KeyboardInterrupt``
+     - ``SystemExit(130)``
+     - rollback
+   * - raises ``CommandError(returncode=n)``
+     - ``CommandError``
+     - ``SystemExit(n)``
+     - rollback
+   * - raises any other exception
+     - the exception
+     - the exception
+     - rollback
+
+.. note::
+
+    Separate databases are separate transactions. A sequence of aliases or ``"__all__"`` rolls
+    every database back when the command fails, but the commits at the end are still made one
+    database at a time.
+
+
 .. _default_options:
 
 Change Default Django Options
