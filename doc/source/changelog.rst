@@ -15,6 +15,7 @@ v4.0.0 (2026-09-XX)
 * Passing a ``prompt_required=False`` option flag without a value no longer triggers
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
+* Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
 
 
 Migrating from 3.x to 4.x
