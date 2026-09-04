@@ -45,19 +45,6 @@ def apply() -> None:
         return
     PATCH_APPLIED = True
 
-    try:
-        # Django calls colorama.init() if colorama is installed
-        # this screws up forced terminals on platforms other than windows that
-        # are not attached to ttys. Upstream Django should change the init
-        # call to a just_fix_windows_console - we undo this and redo the right
-        # thing here.
-        import colorama  # pyright: ignore[reportMissingModuleSource]
-
-        colorama.deinit()
-        colorama.just_fix_windows_console()
-    except ImportError:
-        pass
-
     if rich_installed:
         from rich.console import Console  # pyright: ignore[reportMissingImports]
 
