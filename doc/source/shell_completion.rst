@@ -166,8 +166,61 @@ installation *may still work*, but you may need to always invoke the script from
 .. tip::
 
     The command name completions are installed for is detected from the invoking script. If the
-    detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT`` setting,
-    see :ref:`configure-manage-script`.
+    detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT``
+    setting, see :ref:`configure-manage-script`.
+
+
+.. _wrapped_invocations:
+
+Completions for Wrapped Invocations
+-----------------------------------
+
+It is common to run the manage script through another tool, for example a just_ recipe
+(``just manage``), ``poetry run manage`` or ``uv run manage``. Completions cannot be installed for
+a multi-word invocation like this directly: shells register completions for a single command word
+(``just``), and the wrapping tool does not delegate completion of its arguments. The manage script
+also cannot be detected correctly when it is run this way, because the process is started by the
+wrapper, so the script django-typer_ sees may be a temporary file or a path that is not on your
+path.
+
+The solution is to give the wrapped invocation a single-word name:
+
+1. Create a one line wrapper script on your path that forwards to the wrapped invocation:
+
+   .. tabs::
+
+      .. tab:: bash, zsh, fish
+
+         .. code-block:: bash
+            :caption: ~/.local/bin/manage
+
+            #!/bin/sh
+            exec just manage "$@"
+
+      .. tab:: powershell
+
+         .. code-block:: bat
+            :caption: manage.cmd
+
+            @just manage %*
+
+2. Tell django-typer_ that ``manage`` is the name of the command, so that help output and
+   completion installation use it instead of the detected script:
+
+   .. code-block:: python
+      :caption: settings.py
+
+      DJANGO_MANAGE_SCRIPT = "manage"
+
+3. Install completions through the wrapper:
+
+   .. code-block:: console
+
+      $ manage shellcompletion install
+
+Tab completion now works when you type ``manage <TAB>`` and help output reads ``Usage: manage ...``.
+Completions are not available when you type ``just manage <TAB>``, because just_ (like most task
+runners) does not complete the arguments of its recipes.
 
 
 .. _completion_fallbacks:

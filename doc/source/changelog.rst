@@ -25,6 +25,7 @@ v4.0.0 (2026-09-XX)
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
 * Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
+* Documented `installing shell completion for a just manage script <https://github.com/django-commons/django-typer/issues/190>`_ and other wrapped invocations, see :ref:`wrapped_invocations`. Multi-word manage scripts remain unsupported (`#191 <https://github.com/django-commons/django-typer/issues/191>`_).
 * Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
 
 
