@@ -3397,6 +3397,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """The name of the django command"""
         return self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
 
+    _executing: bool = False
+    """True while Django's execute() is driving this command."""
+
     def __enter__(self):
         _command_context.__dict__.setdefault("stack", []).append(self)
         return self
@@ -3404,7 +3407,11 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     def __exit__(self, exc_type, exc_val, exc_tb):
         _command_context.stack.pop()
         from_cli = getattr(self, "_called_from_command_line", False)
-        if isinstance(exc_val, typer.Exit):
+        # The termination policy below applies when django-typer is driving the
+        # command: from the command line or through Django's execute() path
+        # (call_command). Command functions called directly from Python are plain
+        # calls and whatever they raise propagates unchanged.
+        if isinstance(exc_val, typer.Exit) and (from_cli or self._executing):
             # Exit carries only a status - the command has already said whatever
             # it wanted to say. From the command line become that status, for
             # Python callers surface it the way Django commands report failure.
@@ -3416,7 +3423,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 f"{self._name} exited with code {exc_val.exit_code}",
                 returncode=exc_val.exit_code,
             ) from exc_val
-        if isinstance(exc_val, typer.Abort):
+        if isinstance(exc_val, typer.Abort) and (from_cli or self._executing):
             # a declined confirmation or an interrupted prompt
             if from_cli:
                 self.stderr.write("Aborted!")
@@ -3678,6 +3685,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             self.force_color = options["force_color"]
         if options.get("skip_checks", None) is not None:
             self.skip_checks = options["skip_checks"]
+        self._executing = True
         try:
             with self:
                 # base class requires force_color, no_color and skip_checks to be
@@ -3692,6 +3700,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                     },
                 )
         finally:
+            self._executing = False
             # if handle() never reached the typer app the parsed context is stale
             _discard_parsed_context(self)
             self.no_color = no_color

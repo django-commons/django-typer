@@ -92,11 +92,12 @@ Migrating from 3.x to 4.x
 * :exc:`typer.Exit`, :exc:`typer.Abort` and :exc:`KeyboardInterrupt` leaving a command now
   follow one policy. From the command line the process exits with the status (``Abort``
   prints ``Aborted!`` and exits 1, an interrupt exits 130) and nothing else is printed.
-  From Python, via :func:`~django.core.management.call_command` or by calling the command
-  object, a non-zero ``Exit`` and an ``Abort`` raise
+  From :func:`~django.core.management.call_command`, a non-zero ``Exit`` and an ``Abort`` raise
   :exc:`~django.core.management.CommandError` with ``returncode`` set, and ``Exit(0)``
-  returns ``None``. Previously ``Exit`` was returned (and printed) as the command's output
-  when executed and ended the process when the command object was called directly.
+  returns ``None``. Command functions called directly from Python are plain calls and
+  whatever they raise propagates unchanged. Previously ``Exit`` was returned (and printed)
+  as the command's output when executed and ended the process when the command object was
+  called directly. See :ref:`exit_behavior`.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with

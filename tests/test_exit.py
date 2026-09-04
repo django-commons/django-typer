@@ -56,12 +56,28 @@ class ExitPolicyTests(TestCase):
             call_command("exit_codes_handle", code=5)
         self.assertEqual(raised.exception.returncode, 5)
 
-    def test_exit_from_a_direct_call(self):
+    def test_direct_calls_are_plain_python_calls(self):
+        # calling command functions directly bypasses django-typer's policy:
+        # whatever the function raises propagates unchanged
         cmd = get_command("exit_codes_handle")
-        self.assertIsNone(cmd(code=0))
-        with self.assertRaises(CommandError) as raised:
+        with self.assertRaises(typer.Exit) as raised:
+            cmd(code=0)
+        self.assertEqual(raised.exception.exit_code, 0)
+        with self.assertRaises(typer.Exit) as raised:
             cmd(code=4)
-        self.assertEqual(raised.exception.returncode, 4)
+        self.assertEqual(raised.exception.exit_code, 4)
+
+        cmd = get_command("exit_codes")
+        self.assertEqual(cmd.ok(), "done")
+        with self.assertRaises(typer.Exit):
+            cmd.exit(code=4)
+        with self.assertRaises(typer.Abort):
+            cmd.abort()
+        with self.assertRaises(typer.Exit):
+            get_command("exit_codes", "exit")(code=6)
+        with self.assertRaises(CommandError) as raised:
+            cmd.error(code=2)
+        self.assertEqual(raised.exception.returncode, 2)
 
     def test_abort(self):
         stdout, stderr, retcode = run_command("exit_codes", "--no-color", "abort")
