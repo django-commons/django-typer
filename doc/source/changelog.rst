@@ -11,6 +11,8 @@ v4.0.0 (2026-09-XX)
 * The click command tree Typer builds for a command is now cached per app and only rebuilt
   when commands, groups, callbacks or finalizers are registered, instead of being rebuilt
   several times on every invocation
+* Fixed `typer.Exit is swallowed on the execute() path: exit code returned as output and
+  process exits 0 <https://github.com/django-commons/django-typer/issues/318>`_
 * Fixed `Avoid redundant context construction <https://github.com/django-commons/django-typer/issues/210>`_
 * Fixed `FileBinaryRead: file is already closed <https://github.com/django-commons/django-typer/issues/209>`_
 * Fixed `Typer app options do not inherit/override correctly
@@ -86,6 +88,15 @@ Migrating from 3.x to 4.x
   the same script. Previously the full path was shown in these cases. Set
   ``DJANGO_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
   :ref:`configure-manage-script`.
+
+* :exc:`typer.Exit`, :exc:`typer.Abort` and :exc:`KeyboardInterrupt` leaving a command now
+  follow one policy. From the command line the process exits with the status (``Abort``
+  prints ``Aborted!`` and exits 1, an interrupt exits 130) and nothing else is printed.
+  From Python, via :func:`~django.core.management.call_command` or by calling the command
+  object, a non-zero ``Exit`` and an ``Abort`` raise
+  :exc:`~django.core.management.CommandError` with ``returncode`` set, and ``Exit(0)``
+  returns ``None``. Previously ``Exit`` was returned (and printed) as the command's output
+  when executed and ended the process when the command object was called directly.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with
