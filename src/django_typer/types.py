@@ -57,12 +57,10 @@ def show_locals(context, param, _):
         show = param.name == "show_locals"
         install_traceback({**traceback_config(), "show_locals": show})
         # Typer renders uncaught exceptions with its own hook using the app level
-        # setting, so keep that in step with the flag as well
-        # (access on the class - on the instance typer_app is a bound proxy)
-        command = getattr(context, "django_command", None)
-        typer_app = getattr(type(command), "typer_app", None) if command else None
-        if typer_app is not None:
-            typer_app.pretty_exceptions_show_locals = show
+        # setting, so keep that in step with the flag as well. This callback only
+        # ever runs on django-typer's own context, which always carries the
+        # command (access the app on the class - on the instance it is a proxy).
+        type(context.django_command).typer_app.pretty_exceptions_show_locals = show
 
 
 Version = Annotated[
