@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import inspect
 import sys
+import threading
 import typing as t
+import weakref
 from collections import deque
 from copy import copy, deepcopy
 from functools import cache, cached_property
@@ -29,10 +31,14 @@ from typer.core import TyperArgument as CoreTyperArgument
 from typer.core import TyperCommand as CoreTyperCommand
 from typer.core import TyperGroup as CoreTyperGroup
 from typer.core import TyperOption as CoreTyperOption
-from typer.main import get_command as get_typer_command
-from typer.main import get_params_convertors_ctx_param_name_from_function
+from typer.main import (
+    _typer_developer_exception_attr_name,
+    except_hook,
+    get_params_convertors_ctx_param_name_from_function,
+)
+from typer.main import get_command as _build_click_command
 from typer.models import Context as TyperContext
-from typer.models import Default, DefaultPlaceholder
+from typer.models import Default, DefaultPlaceholder, DeveloperExceptionConfig
 
 from ..config import manage_script as manage_script_setting
 from ..config import show_locals, traceback_config, use_rich_tracebacks
@@ -287,6 +293,58 @@ COMMON_DEFAULTS = {
     key: value.default
     for key, value in inspect.signature(_common_options).parameters.items()
 }
+
+
+_click_commands: weakref.WeakKeyDictionary[typer.Typer, tuple[t.Any, t.Any]] = (
+    weakref.WeakKeyDictionary()
+)
+_click_commands_lock = threading.RLock()
+
+
+def _app_signature(app: typer.Typer) -> tuple[t.Any, ...]:
+    """
+    A cheap fingerprint of everything Typer_ reads when it builds the click command
+    tree for an app: the registered commands, callback and result callback (by
+    identity), the help strings django-typer may resolve after the fact, and the
+    same for every sub-app. If it changes the cached tree is stale.
+    """
+    info = app.info
+    return (
+        id(app.registered_callback),
+        id(info.result_callback),
+        info.help,
+        tuple((id(cmd), cmd.help) for cmd in app.registered_commands),
+        tuple(
+            (id(grp), _app_signature(grp.typer_instance))
+            for grp in app.registered_groups
+            if grp.typer_instance
+        ),
+    )
+
+
+def get_typer_command(app: typer.Typer) -> t.Any:
+    """
+    Build the click command tree for a Typer_ app, or return the tree built last
+    time if nothing has been registered on the app since. Typer_ rebuilds the tree
+    on every call and Django's parse/execute split means a single invocation would
+    otherwise build it several times over.
+
+    The cache is keyed weakly by app and validated by :func:`_app_signature`, so
+    registering a command, group, callback or finalizer anywhere in the tree causes
+    a rebuild on the next use. Builds are serialized so concurrent first uses share
+    one tree.
+    """
+    # on a command instance typer_app resolves to a throwaway BoundProxy - key
+    # the cache on the underlying app so every access shares one entry
+    app = getattr(app, "proxied", app)
+    signature = _app_signature(app)
+    with _click_commands_lock:
+        cached = _click_commands.get(app)
+        if cached is not None and cached[0] == signature:
+            return cached[1]
+        command = _build_click_command(app)
+        _click_commands[app] = (signature, command)
+        return command
 
 
 def _stash_parsed_context(command: TyperCommand, args: list[str], ctx: Context) -> None:
@@ -1056,7 +1114,23 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         self._django_command = cmd
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        return super().__call__(*args, **kwargs)
+        # mirrors typer.Typer.__call__ but invokes the cached click command
+        # instead of rebuilding the tree on every call
+        if sys.excepthook != except_hook:
+            sys.excepthook = except_hook
+        try:
+            return get_typer_command(self)(*args, **kwargs)
+        except Exception as e:
+            setattr(
+                e,
+                _typer_developer_exception_attr_name,
+                DeveloperExceptionConfig(
+                    pretty_exceptions_enable=self.pretty_exceptions_enable,
+                    pretty_exceptions_show_locals=self.pretty_exceptions_show_locals,
+                    pretty_exceptions_short=self.pretty_exceptions_short,
+                ),
+            )
+            raise
 
     def __get__(self, obj, _=None) -> Typer[P, R]:
         """

@@ -8,6 +8,9 @@ v4.0.0 (2026-09-XX)
 ===================
 
 * Support Typer 0.26.8+
+* The click command tree Typer builds for a command is now cached per app and only rebuilt
+  when commands, groups, callbacks or finalizers are registered, instead of being rebuilt
+  several times on every invocation
 * Fixed `Avoid redundant context construction <https://github.com/django-commons/django-typer/issues/210>`_
 * Fixed `FileBinaryRead: file is already closed <https://github.com/django-commons/django-typer/issues/209>`_
 * Fixed `Typer app options do not inherit/override correctly
