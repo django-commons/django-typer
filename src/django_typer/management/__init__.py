@@ -1461,9 +1461,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 **kwargs,
             )
             self.add_typer(
-                grp,
-                name=name or _strip_static(func).__name__.replace("_", "-"),
-                options_metavar=options_metavar,
+                grp, name=name or _strip_static(func).__name__.replace("_", "-")
             )
             return grp
 
@@ -2310,11 +2308,7 @@ class TyperCommandMeta(type):
                 if grp.top_level:
                     cpy = deepcopy(grp)
                     cpy.parent = typer_app
-                    typer_app.add_typer(
-                        cpy,
-                        name=cpy.info.name,
-                        options_metavar=cpy.info.options_metavar or options_metavar,
-                    )
+                    typer_app.add_typer(cpy, name=cpy.info.name)
 
             # remove the groups from the class to allow __getattr__ to control
             # which group instance is returned based on call context
@@ -3202,7 +3196,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             cmd.typer_app.add_typer(
                 grp,
                 name=name or func.__name__.replace("_", "-"),
-                options_metavar=options_metavar,
             )
             return grp
 
