@@ -2059,6 +2059,40 @@ class TestShellCompletersAndParsers(ParserCompleterMixin, TestCase):
         for s in ["str1", "str2", "ustr"]:
             self.assertIn(f"{s}", result)
 
+    def test_chained_group_completions(self):
+        # sibling commands of a chained group remain valid completions after a
+        # subcommand has been given, but commands already used are not repeated
+        result = self.shellcompletion.complete("chain com").strip()
+        self.assertIn("command1", result)
+        self.assertIn("command2", result)
+
+        result = self.shellcompletion.complete("chain command1 ").strip()
+        self.assertIn("command2", result)
+        self.assertNotIn("command1", result)
+
+        result = self.shellcompletion.complete("chain command1 --option one com")
+        self.assertIn("command2", result)
+        self.assertNotIn("command1", result)
+
+        result = self.shellcompletion.complete(
+            "chain command1 --option one command2 --option two "
+        )
+        self.assertNotIn("command1", result)
+        self.assertNotIn("command2", result)
+
+        # an unknown subcommand ends context resolution at the group, which then
+        # offers its own commands
+        result = self.shellcompletion.complete("chain bogus ")
+        self.assertIn("command1", result)
+        self.assertIn("command2", result)
+        result = self.shellcompletion.complete("groups bogus ")
+        self.assertIn("math", result)
+        self.assertIn("echo", result)
+
+        # surplus arguments after a leaf command stop resolution at that command
+        result = self.shellcompletion.complete("groups echo hello 5 surplus ")
+        self.assertIn("--help", result)
+
     def test_chain_and_commands_completer(self):
         result = self.shellcompletion.complete("completion --cmd dj").strip()
 
