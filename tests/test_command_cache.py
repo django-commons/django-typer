@@ -123,6 +123,40 @@ class CommandTreeCacheTests(SimpleTestCase):
         # the parent's entry was not disturbed by building the child
         self.assertIs(parent_tree, get_typer_command(Command.typer_app))
 
+    def test_change_during_build_is_not_cached_stale(self):
+        from tests.apps.test_app.management.commands.cache_target import Command
+
+        app = Command.typer_app
+        baseline_help = get_typer_command(app).help  # warm
+        with mgmt._click_commands_lock:
+            mgmt._click_commands.pop(app, None)
+        original = app.info.help
+
+        real = mgmt._build_click_command
+
+        def build_while_changed(*args, **kwargs):
+            # another thread changes the app while this build is in flight, so
+            # the tree we build reflects a state the caller never fingerprinted
+            app.info.help = "transient help"
+            return real(*args, **kwargs)
+
+        mgmt._build_click_command = build_while_changed
+        try:
+            first = get_typer_command(app)
+        finally:
+            mgmt._build_click_command = real
+        self.assertEqual(first.help, "transient help")
+
+        # ... and then restores it, so the original signature describes the app
+        # again. That tree must not be served for it.
+        app.info.help = original
+        with count_builds() as builds:
+            second = get_typer_command(app)
+        self.assertEqual(builds["n"], 1)
+        self.assertIsNot(first, second)
+        self.assertEqual(second.help, baseline_help)
+        self.assertIs(second, get_typer_command(app))
+
     def test_parallel_fresh_instances(self):
         workers, iterations = 16, 20
         barrier = threading.Barrier(workers)
