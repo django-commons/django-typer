@@ -337,13 +337,17 @@ def get_typer_command(app: typer.Typer) -> t.Any:
     # on a command instance typer_app resolves to a throwaway BoundProxy - key
     # the cache on the underlying app so every access shares one entry
     app = getattr(app, "proxied", app)
-    signature = _app_signature(app)
     with _click_commands_lock:
+        signature = _app_signature(app)
         cached = _click_commands.get(app)
         if cached is not None and cached[0] == signature:
             return cached[1]
         command = _build_click_command(app)
-        _click_commands[app] = (signature, command)
+        # registration is not serialized with the build - only cache the tree if
+        # the app is still as it was when we fingerprinted it, so a cached entry
+        # always describes the state its tree was built from
+        if _app_signature(app) == signature:
+            _click_commands[app] = (signature, command)
         return command
 
 
