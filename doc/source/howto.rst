@@ -901,6 +901,12 @@ detected name for command help and by :django-admin:`shellcompletion` when no
 
     DJANGO_MANAGE_SCRIPT = "mycli"
 
+.. tip::
+
+    If you run your manage script through another command, like a just_ recipe or
+    ``poetry run``, see :ref:`wrapped_invocations` for how to get help output and tab completion
+    working with the wrapper.
+
 Add Help Text to Commands
 -------------------------
 
