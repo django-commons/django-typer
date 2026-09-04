@@ -6,6 +6,7 @@ command - see issue #318.
 import sys
 
 import typer
+from django.core.management import CommandError
 
 from django_typer.management import TyperCommand, command
 
@@ -31,3 +32,15 @@ class Command(TyperCommand):
     @command()
     def sysexit(self, code: int = 0):
         sys.exit(code)
+
+    @command()
+    def error(self, code: int = 1):
+        raise CommandError("something went wrong", returncode=code)
+
+    @command()
+    def boom(self):
+        raise RuntimeError("unexpected failure")
+
+    @command()
+    def ok(self):
+        return "done"
