@@ -473,8 +473,6 @@ different caller with different expectations:
      - the exception raised
      - the exception raised
 
-Every cell of this table is checked by ``tests/test_exit.py``.
-
 Some guidance that follows from the table:
 
 - :exc:`typer.Exit` carries nothing but a status. If there is something to say, say it first,
