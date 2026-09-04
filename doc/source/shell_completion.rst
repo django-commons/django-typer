@@ -526,8 +526,9 @@ handler if one was provided (whatever the handler returns becomes the parsed val
 create-or-update style commands it is often more convenient to receive the lookup value itself
 when nothing matches. Pass ``return_lookup_on_miss=True`` and the parser will return the value,
 coerced to the field's type, instead of erroring. Values that cannot be coerced to the field
-type remain errors. Typer_ does not support ``Union`` type hints, so keep the parameter
-annotated with the model class and check the type at runtime:
+type remain errors. Typer_ rejects unions of two or more concrete types (``User | str``), though
+``| None`` is fine, so keep the parameter annotated with the model class and check the type at
+runtime:
 
 .. code-block:: python
 
