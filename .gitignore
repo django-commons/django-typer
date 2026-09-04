@@ -170,3 +170,4 @@ zizmor.sarif
 requirements-test*.txt
 constraints.txt
 bandit.sarif
+.claude/worktrees/
