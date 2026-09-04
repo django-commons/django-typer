@@ -1154,9 +1154,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
                 help=t.cast(str, help),
                 epilog=epilog,
                 short_help=t.cast(str, short_help),
-                options_metavar=(
-                    options_metavar or self._info_val_str("options_metavar")
-                ),
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -1304,6 +1302,11 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
 
         rich_help_panel = inherited("rich_help_panel", rich_help_panel)
         options_metavar = inherited("options_metavar", options_metavar)
+        if options_metavar is None or isinstance(options_metavar, DefaultPlaceholder):
+            options_metavar = self._info_val_str("options_metavar")
+        # sub-groups and commands registered on the sub-app after this point
+        # inherit the resolved value, as they would from a Typer constructor arg
+        typer_instance.info.options_metavar = options_metavar
         deprecated = inherited("deprecated", deprecated)
         # our callback() records the function name on the callback info, which
         # Typer would otherwise prefer over the name the sub-app was given
@@ -1430,7 +1433,6 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        options_metavar = options_metavar or self._info_val_str("options_metavar")
 
         def create_app(
             func: t.Callable[t.Concatenate[TC, P2], R2],
@@ -3145,9 +3147,6 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :param rich_help_panel: the rich help panel to use - if rich is installed
             this can be used to group commands into panels in the help output.
         """
-        options_metavar = options_metavar or cmd.typer_app._info_val_str(
-            "options_metavar"
-        )
         if called_from_command_definition():
             return group(
                 name=name,
@@ -3161,7 +3160,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 help=help,
                 epilog=epilog,
                 short_help=short_help,
-                options_metavar=options_metavar,
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
@@ -3185,7 +3184,7 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 help=help,
                 epilog=epilog,
                 short_help=short_help,
-                options_metavar=options_metavar,
+                options_metavar=t.cast(str, options_metavar),
                 add_help_option=add_help_option,
                 hidden=hidden,
                 deprecated=deprecated,
