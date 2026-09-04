@@ -1276,7 +1276,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         options_metavar: str | None = Default(None),
         add_help_option: bool = Default(True),
         hidden: bool = Default(False),
-        deprecated: bool = False,
+        deprecated: bool = Default(False),
         # Rich settings
         rich_help_panel: str | None = Default(None),
         **kwargs: t.Any,
@@ -1284,6 +1284,33 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         # intentionally blank - suppresses inheritance of typer's docstring
         """ """  # noqa: D419
         typer_instance.parent = self
+
+        # Typer resolves settings omitted from add_typer() from the sub-app's
+        # callback and then its constructor, but rich_help_panel, options_metavar
+        # and deprecated never reach that lookup (see fastapi/typer#1934), so a
+        # sub-app's own values are silently lost. Resolve them here instead.
+        def inherited(attr: str, value: t.Any) -> t.Any:
+            if not isinstance(value, DefaultPlaceholder):
+                return value  # explicitly passed to add_typer()
+            for source in (
+                typer_instance.registered_callback,
+                typer_instance.info,
+                typer_instance,
+            ):
+                candidate = getattr(source, attr, value)
+                if not isinstance(candidate, DefaultPlaceholder):
+                    return candidate
+            return value
+
+        rich_help_panel = inherited("rich_help_panel", rich_help_panel)
+        options_metavar = inherited("options_metavar", options_metavar)
+        deprecated = inherited("deprecated", deprecated)
+        # our callback() records the function name on the callback info, which
+        # Typer would otherwise prefer over the name the sub-app was given
+        if isinstance(name, DefaultPlaceholder) and not isinstance(
+            typer_instance.info.name, DefaultPlaceholder
+        ):
+            name = typer_instance.info.name
         typer_instance.django_command = self.django_command
 
         assert cls  # cls must be interface compatible with DTGroup

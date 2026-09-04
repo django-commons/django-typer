@@ -8,6 +8,7 @@ v4.0.0 (2026-09-XX)
 ===================
 
 * Support Typer 0.26.8+
+* Fixed `Typer app options do not inherit/override correctly <https://github.com/django-commons/django-typer/issues/256>`_
 * Drop dependency on Click (vendored by Typer). The Click types needed to write completers
   and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
   ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
