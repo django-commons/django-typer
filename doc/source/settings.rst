@@ -13,8 +13,10 @@ module always wins over the environment.
 
 ``DT_MANAGE_SCRIPT``
 --------------------
+.. setting:: DT_MANAGE_SCRIPT
 
-**Default:** not set. **Environment variable:** ``DT_MANAGE_SCRIPT``.
+**Default:** not set
+**Environment variable:**  ``DT_MANAGE_SCRIPT``
 
 The program name to show in the ``Usage:`` line of command help and to install shell completions
 for. When not set the name is detected from the script that was invoked, which is right for
@@ -32,8 +34,10 @@ The value is used verbatim. See :ref:`howto:Configure the Manage Script Name` an
 
 ``DT_PRINT_RESULT``
 -------------------
+.. setting:: DT_PRINT_RESULT
 
-**Default:** ``False``. **Environment variable:** ``DT_PRINT_RESULT`` (``1``, ``true``, ``yes``
+**Default:** ``False``
+**Environment variable:** ``DT_PRINT_RESULT`` (``1``, ``true``, ``yes``
 or ``on`` to enable, case insensitive).
 
 Whether a truthy value returned from a command is written to stdout, as
@@ -51,6 +55,7 @@ See :ref:`howto:Toggle on/off result printing` and :ref:`howto:Exit Codes, Error
 
 ``DT_RICH_TRACEBACK_CONFIG``
 ----------------------------
+.. setting:: DT_RICH_TRACEBACK_CONFIG
 
 **Default:** ``{"show_locals": False}``.
 
