@@ -63,11 +63,12 @@ Configures the :doc:`rich <rich:index>` traceback hook django-typer_ installs wh
 available. The value is a dictionary of keyword arguments for :func:`rich.traceback.install`,
 for example ``show_locals``, ``width`` or ``suppress``, plus one django-typer_ specific key:
 
-- ``no_install`` - when ``True`` the hook is not installed at all. Use this if your project
-  manages rich tracebacks itself.
+- ``no_install`` - when ``True`` the hook is not installed, but the rest of the configuration
+  still applies to Typer_'s own exception rendering. Use this if your project installs rich
+  tracebacks itself.
 
-``True`` selects the defaults. ``False`` or ``None`` also fall back to the defaults, so to switch
-the hook off use ``no_install``.
+``True`` selects the defaults. ``False`` or ``None`` switches rich tracebacks off entirely, and
+tracebacks are rendered the way Django_ renders them.
 
 .. code-block:: python
     :caption: settings.py

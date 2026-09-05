@@ -73,8 +73,8 @@ def get_usage_script(script: str | None = None) -> Path | str:
     through an explicit relative path is only reported by name if it is the same file
     the path resolves to.
 
-    If ``script`` is not given and the ``DT_MANAGE_SCRIPT`` setting is set, it is returned
-    verbatim in lieu of any detection.
+    If ``script`` is not given and ``DT_MANAGE_SCRIPT`` is set, in the settings module or
+    failing that in the environment, it is returned verbatim in lieu of any detection.
 
     :param script: The script name to check. If None the current script is used.
     :return: The script name or the relative path to the script from cwd.
