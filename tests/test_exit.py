@@ -339,6 +339,29 @@ class PrintResultDefaultTests(TestCase):
             self.assertEqual(call_command("exit_codes", "ok"), "done")
         self.assertEqual(output.getvalue().strip(), "done")
 
+    def test_environment_variable_turns_it_on(self):
+        import os
+
+        base = {**os.environ, "PYTHONPATH": os.getcwd()}
+        cases = (
+            ("1", "done"),
+            ("true", "done"),
+            ("YES", "done"),
+            ("0", ""),
+            ("false", ""),
+            ("", ""),
+        )
+        for value, expected in cases:
+            with self.subTest(value=value):
+                stdout, stderr, retcode = run_command(
+                    "exit_codes",
+                    "--settings",
+                    "tests.settings.no_print_result",
+                    "ok",
+                    env={**base, "DT_PRINT_RESULT": value},
+                )
+                self.assertEqual((retcode, stdout.strip()), (0, expected), stderr)
+
     def test_field_wins_over_setting(self):
         # print_result = True on the command beats a project default of off
         output = StringIO()

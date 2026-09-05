@@ -164,7 +164,7 @@ installation *may still work*, but you may need to always invoke the script from
 .. tip::
 
     The command name completions are installed for is detected from the invoking script. If the
-    detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT``
+    detected name is not right for your deployment, override it with the ``DT_MANAGE_SCRIPT``
     setting, see :ref:`howto:Configure the Manage Script Name`.
 
 
@@ -206,7 +206,7 @@ The solution is to give the wrapped invocation a single-word name:
    .. code-block:: python
       :caption: settings.py
 
-      DJANGO_MANAGE_SCRIPT = "manage"
+      DT_MANAGE_SCRIPT = "manage"
 
 3. Install completions through the wrapper:
 

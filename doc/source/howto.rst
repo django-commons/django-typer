@@ -880,14 +880,14 @@ name is shown. Otherwise the path to the script relative to the current working 
     Usage: ./manage.py basic [OPTIONS] ARG1 ARG2
 
 If this detection does not produce the name you want, for example when your script is launched by
-a wrapper with a different name, set ``DJANGO_MANAGE_SCRIPT``. It is used verbatim in place of the
+a wrapper with a different name, set ``DT_MANAGE_SCRIPT``. It is used verbatim in place of the
 detected name for command help and by :django-admin:`shellcompletion` when no
 ``--manage-script`` is given.
 
 .. code-block:: python
     :caption: settings.py
 
-    DJANGO_MANAGE_SCRIPT = "mycli"
+    DT_MANAGE_SCRIPT = "mycli"
 
 .. tip::
 
