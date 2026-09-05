@@ -183,6 +183,9 @@ from django_typer.management import TyperCommand, group
 
 
 class Command(TyperCommand):
+    # values returned from the commands are written to stdout
+    print_result = True
+
     help = _("A more complex command that defines a hierarchy of subcommands.")
 
     precision = 2
@@ -237,6 +240,9 @@ from django_typer.management import Typer
 
 app = Typer(help=_("A more complex command that defines a hierarchy of subcommands."))
 
+
+# values returned from the commands are written to stdout
+app.django_command.print_result = True
 
 math_grp = Typer(help=_("Do some math at the given precision."))
 

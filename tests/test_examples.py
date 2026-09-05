@@ -318,6 +318,25 @@ class ExampleTests(TestCase):
             0.99,
         )
 
+    def test_hierarchy_prints_results_by_itself(self):
+        # the README and docs index show these outputs - the example must produce
+        # them without the test suite's DT_PRINT_RESULT setting
+        settings = f"{self.settings}_no_print_result"
+        divide = ["math", "--precision", "5", "divide", "10", "2.1"]
+        self.assertEqual(
+            run_command("hierarchy", "--settings", settings, *divide, parse_json=False)[
+                0
+            ].strip(),
+            "4.76190",
+        )
+        multiply = ["math", "multiply", "10", "2"]
+        self.assertEqual(
+            run_command(
+                "hierarchy", "--settings", settings, *multiply, parse_json=False
+            )[0].strip(),
+            "20.00",
+        )
+
     @pytest.mark.rich
     @pytest.mark.no_rich
     def test_multi(self):
