@@ -441,7 +441,7 @@ different caller with different expectations:
      - :func:`~django.core.management.call_command`
      - Direct call
    * - returns a value
-     - value printed to stdout (see :ref:`printing`), exit status 0
+     - exit status 0, nothing printed unless :ref:`print_result` is set
      - value returned
      - value returned
    * - raises ``CommandError(msg, returncode=n)``
@@ -1074,13 +1074,17 @@ stdout/stderr streams:
             :linenos:
 
 
+.. _print_result:
+
 Toggle on/off result printing
 -----------------------------
 
-Django's :class:`~django.core.management.BaseCommand` will print any truthy values returned from the
-:meth:`~django.core.management.BaseCommand.handle` method. This may not always be desired behavior.
-By default :class:`~django_typer.management.TyperCommand` will do the same, but you may toggle this
-behavior off by setting the class field ``print_result`` to False.
+Django's :class:`~django.core.management.BaseCommand` writes any truthy value returned from
+:meth:`~django.core.management.BaseCommand.handle` to stdout.
+:class:`~django_typer.management.TyperCommand` does not: return values are for callers (see
+:ref:`call_commands`) and output is whatever the command chooses to print. To get Django_'s
+behavior back, set the class field ``print_result`` to True and truthy return values will be
+written to stdout:
 
 
 .. tabs::
@@ -1097,7 +1101,11 @@ behavior off by setting the class field ``print_result`` to False.
             :language: python
             :linenos:
 
-.. warning::
+The default can also be changed for a whole project with the ``DT_PRINT_RESULT`` setting. A
+command's own ``print_result`` field, when set, takes precedence over it.
 
-    We may switch the default behavior to not print in the future, so if you want guaranteed forward
-    compatible behavior you should set this field.
+.. note::
+
+    Prior to version 4.0 results were printed by default. If your commands rely on their return
+    values reaching stdout, set ``print_result = True`` on them or ``DT_PRINT_RESULT = True`` in
+    your settings.

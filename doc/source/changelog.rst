@@ -30,6 +30,9 @@ v4.0.0 (2026-09-XX)
   and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
   ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
 * Drop support for Python 3.10
+* BREAKING: Values returned from commands are no longer written to stdout by default. Set
+  ``print_result = True`` on a command, or ``DT_PRINT_RESULT = True`` in settings, to restore
+  the previous behavior.
 * Passing a ``prompt_required=False`` option flag without a value no longer triggers
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
@@ -108,6 +111,12 @@ Migrating from 3.x to 4.x
   whatever they raise propagates unchanged. Previously ``Exit`` was returned (and printed)
   as the command's output when executed and ended the process when the command object was
   called directly. See :ref:`exit_behavior`.
+
+* Return values are no longer printed. In 3.x a truthy value returned from a command was
+  written to stdout, mirroring :class:`~django.core.management.BaseCommand`. In 4.x nothing
+  is printed unless the command sets ``print_result = True`` or the project sets
+  ``DT_PRINT_RESULT = True`` - see :ref:`print_result`. If a command's return value doubled
+  as its output, set one of those or write the output explicitly.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with
