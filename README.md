@@ -37,7 +37,7 @@ Please refer to the [full documentation](https://django-typer.readthedocs.io/) f
 
 ## 🚨 Upgrade Notice
 
-**There are breaking changes between 2.x and 3.x, mostly involving shell tab completion. [See the changelog for migration steps](https://django-typer.readthedocs.io/en/latest/changelog.html#migrating-from-2-x-to-3-x)**.
+**There are breaking changes between 3.x and 4.x, Typer vendored Click and we no longer depend on it. Any Click imports will need to change. [See the changelog for migration steps](https://django-typer.readthedocs.io/en/latest/changelog.html#migrating-from-3-x-to-4-x)**.
 
 ## Installation
 

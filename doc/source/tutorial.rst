@@ -1,7 +1,5 @@
 .. include:: ./refs.rst
 
-.. _building_commands:
-
 ===========================
 Tutorial: Building Commands
 ===========================
@@ -264,7 +262,7 @@ that make this easy. Let's see what the relevant updates to our closepoll comman
 .. note::
 
     For tab-completions to work you will need to
-    :ref:`install the shell completion scripts for your shell <shellcompletions>`.
+    :ref:`install the shell completion scripts for your shell <shell_completion:Tutorial: Tab-Completions>`.
 
 
 Putting it all together

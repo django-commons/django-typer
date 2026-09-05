@@ -11,7 +11,7 @@ v4.0.0 (2026-09-XX)
 * Added :attr:`~django_typer.management.TyperCommand.atomic` to run a command's whole
   invocation - initializer, chained subcommands and finalizer - in a database transaction.
   Implements `Add a command option that will wrap execute() in a transaction
-  <https://github.com/django-commons/django-typer/issues/219>`_. See :ref:`atomic`.
+  <https://github.com/django-commons/django-typer/issues/219>`_. See :ref:`howto:Wrap a Command in a Transaction`.
 * Fixed chain mode being switched off when a chained command defines an initializer
 * Implemented `ModelObjectParser should have a setting that returns the lookup value if no row
   was found. <https://github.com/django-commons/django-typer/issues/218>`_ - see the
@@ -41,7 +41,7 @@ v4.0.0 (2026-09-XX)
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.
 * Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
-* Documented `installing shell completion for a just manage script <https://github.com/django-commons/django-typer/issues/190>`_ and other wrapped invocations, see :ref:`wrapped_invocations`. Multi-word manage scripts remain unsupported (`#191 <https://github.com/django-commons/django-typer/issues/191>`_).
+* Documented `installing shell completion for a just manage script <https://github.com/django-commons/django-typer/issues/190>`_ and other wrapped invocations, see :ref:`shell_completion:Completions for Wrapped Invocations`. Multi-word manage scripts remain unsupported (`#191 <https://github.com/django-commons/django-typer/issues/191>`_).
 * Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
 
 
@@ -104,7 +104,7 @@ Migrating from 3.x to 4.x
   the script was launched through a shim or wrapper of the same name or through a relative path to
   the same script. Previously the full path was shown in these cases. Set
   ``DJANGO_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
-  :ref:`configure-manage-script`.
+  :ref:`howto:Configure the Manage Script Name`.
 
 * :exc:`typer.Exit`, :exc:`typer.Abort` and :exc:`KeyboardInterrupt` leaving a command now
   follow one policy. From the command line the process exits with the status (``Abort``
@@ -114,13 +114,13 @@ Migrating from 3.x to 4.x
   returns ``None``. Command functions called directly from Python are plain calls and
   whatever they raise propagates unchanged. Previously ``Exit`` was returned (and printed)
   as the command's output when executed and ended the process when the command object was
-  called directly. See :ref:`exit_behavior`.
+  called directly. See :ref:`howto:Exit Codes, Errors and Aborts`.
 
 * Return values are no longer printed. In 3.x a truthy value returned from a command was
   written to stdout, mirroring :class:`~django.core.management.BaseCommand`. In 4.x nothing
   is printed unless the command sets ``print_result = True`` or the project sets
-  ``DT_PRINT_RESULT = True`` - see :ref:`print_result`. If a command's return value doubled
-  as its output, set one of those or write the output explicitly.
+  ``DT_PRINT_RESULT = True`` - see :ref:`howto:Toggle on/off result printing`. If a command's
+  return value doubled as its output, set one of those or write the output explicitly.
 
 * No changes are required for chained groups (``chain=True``), finalizers, the provided
   completers and parsers, custom shell completer classes registered with
@@ -417,8 +417,9 @@ Shell Completions
         manage shellcompletion --shell zsh complete "command string"
         manage shellcompletion uninstall
 
-* The function signature for :ref:`shellcompletion fallbacks <completion_fallbacks>` has changed.
-  The fallback signature is now:
+* The function signature for :ref:`shellcompletion fallbacks
+  <shell_completion:Integrating with Other CLI Completion Libraries>` has changed. The fallback
+  signature is now:
 
     .. code-block::
 
