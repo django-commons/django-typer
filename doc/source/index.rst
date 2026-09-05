@@ -90,8 +90,9 @@ based interface that Django developers will be familiar with. All of the
 
 .. warning::
 
-    There are breaking changes between 3.x and 4.x, Typer_ vendored Click_ and :pypi:`django-typer`
-    no longer depends on it. Any Click imports will need to change.
+    There are breaking changes between 3.x and 4.x. Typer_ now vendors Click_, so
+    :pypi:`django-typer` no longer depends on the external ``click`` package. Any ``click``
+    imports will need to change.
     :ref:`See the changelog for migration steps <changelog:Migrating from 3.x to 4.x>`.
 
 :big:`Installation`
