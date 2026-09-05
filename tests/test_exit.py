@@ -292,3 +292,52 @@ class PrintResultDefaultTests(TestCase):
         with override_settings(DT_PRINT_RESULT=True), redirect_stdout(output):
             self.assertEqual(call_command(cmd, "ok"), "done")
         self.assertEqual(output.getvalue().strip(), "")
+
+    def test_stdout_option_respects_the_default(self):
+        # call_command(stdout=...) makes Django swap in its own wrapper - result
+        # printing must still follow the setting there
+        with override_settings(DT_PRINT_RESULT=False):
+            buffer = StringIO()
+            self.assertEqual(call_command("exit_codes", "ok", stdout=buffer), "done")
+            self.assertEqual(buffer.getvalue(), "")
+            buffer = StringIO()
+            call_command("exit_codes", "say", "hello", stdout=buffer)
+            self.assertEqual(buffer.getvalue().strip(), "hello")
+        with override_settings(DT_PRINT_RESULT=True):
+            buffer = StringIO()
+            self.assertEqual(call_command("exit_codes", "ok", stdout=buffer), "done")
+            self.assertEqual(buffer.getvalue().strip(), "done")
+
+    def test_reused_instance_keeps_writing(self):
+        # with printing off, a run must not leave stdout disabled for the next run
+        cmd = get_command("exit_codes")
+        output = StringIO()
+        with override_settings(DT_PRINT_RESULT=False), redirect_stdout(output):
+            cmd = get_command("exit_codes")
+            self.assertEqual(call_command(cmd, "ok"), "done")
+            call_command(cmd, "say", "still here")
+            cmd.say("and here")
+        self.assertEqual(output.getvalue().split(), ["still", "here", "and", "here"])
+
+    def test_disable_flag_is_per_thread(self):
+        import threading
+
+        from django_typer.management import OutputWrapper
+
+        out = StringIO()
+        wrapper = OutputWrapper(out)
+        wrapper.disable = True
+        self.assertTrue(wrapper.disable)
+        seen: dict[str, bool] = {}
+
+        def other_thread():
+            seen["disabled"] = wrapper.disable
+            wrapper.write("from the other thread")
+
+        thread = threading.Thread(target=other_thread)
+        thread.start()
+        thread.join()
+        self.assertFalse(seen["disabled"])
+        self.assertIn("from the other thread", out.getvalue())
+        wrapper.write("dropped")
+        self.assertNotIn("dropped", out.getvalue())
