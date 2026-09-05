@@ -51,6 +51,11 @@ class Command(TyperCommand):
         self.stdout.write(message)
 
     @command()
+    def spew(self, size: int = 300000):
+        """Write a lot - more than a pipe buffers - to stdout."""
+        self.stdout.write("x" * size)
+
+    @command()
     def wait_then_exit(self, code: int = 0):
         """Signal that we are running, wait to be released, then exit."""
         started.set()
