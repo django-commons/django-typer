@@ -458,6 +458,10 @@ different caller with different expectations:
      - exit status 130, nothing printed
      - ``KeyboardInterrupt`` raised
      - ``KeyboardInterrupt`` raised
+   * - writes to a pipe whose reader has gone away (``| head``)
+     - exit status 1, nothing printed
+     - ``BrokenPipeError`` raised
+     - ``BrokenPipeError`` raised
    * - raises any other exception
      - traceback on stderr (see :ref:`configure-rich-exception-tracebacks`), exit status 1
      - the exception raised

@@ -115,6 +115,43 @@ class ExitPolicyTests(TestCase):
         self.assertIsInstance(outcome["error"], CommandError)
         self.assertEqual(outcome["error"].returncode, 3)
 
+    def test_writing_to_a_closed_pipe(self):
+        # `./manage.py cmd | head`: the reader goes away mid-write. From the
+        # command line that is not a fault - exit 1 with nothing on stderr.
+        import errno
+        import os
+        import subprocess
+        import sys
+
+        env = {**os.environ, "PYTHONPATH": os.getcwd()}
+        proc = subprocess.Popen(
+            [
+                sys.executable,
+                "manage.py",
+                "exit_codes",
+                "--no-color",
+                "say",
+                "x" * 300000,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+        assert proc.stdout is not None
+        proc.stdout.read(5)
+        proc.stdout.close()  # the reader has had enough
+        _, stderr = proc.communicate(timeout=30)
+        self.assertEqual(proc.returncode, 1)
+        self.assertEqual(stderr.decode().strip(), "")
+
+        # a Python caller with a broken pipe gets the error like any other
+        class ClosedPipe(StringIO):
+            def write(self, s):
+                raise BrokenPipeError(errno.EPIPE, "Broken pipe")
+
+        with self.assertRaises(BrokenPipeError):
+            call_command("exit_codes", "say", "hello", stdout=ClosedPipe())
+
     def test_abort(self):
         stdout, stderr, retcode = run_command("exit_codes", "--no-color", "abort")
         self.assertEqual(retcode, 1)

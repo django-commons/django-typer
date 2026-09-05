@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import errno
 import inspect
 import sys
 import threading
@@ -3496,6 +3497,13 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
             raise CommandError("Aborted!", returncode=1) from exc_val
         if isinstance(exc_val, KeyboardInterrupt) and from_cli:
             sys.exit(130)
+        if isinstance(exc_val, OSError) and exc_val.errno == errno.EPIPE and from_cli:
+            # the reader of our output went away (e.g. `| head`) - that is not a
+            # fault. Like click's driver, exit quietly and keep the interpreter's
+            # final flush of the standard streams from raising it again.
+            sys.stdout = t.cast(t.TextIO, _click.utils.PacifyFlushWrapper(sys.stdout))
+            sys.stderr = t.cast(t.TextIO, _click.utils.PacifyFlushWrapper(sys.stderr))
+            sys.exit(1)
         if isinstance(exc_val, _click.exceptions.UsageError):
             err_msg = (
                 self.missing_args_message.format(
