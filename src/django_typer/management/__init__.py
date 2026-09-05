@@ -3447,8 +3447,23 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         """The name of the django command"""
         return self.typer_app.info.name or self.__module__.rsplit(".", maxsplit=1)[-1]
 
-    _executing: bool = False
-    """True while Django's execute() is driving this command."""
+    @property
+    def _executing(self) -> bool:
+        """
+        True while Django's execute() is driving this command in the current
+        thread. Kept per thread so that a command instance shared between threads
+        does not have one thread's execute() finishing switch the exit policy off
+        for another that is still running.
+        """
+        return getattr(getattr(self, "_executing_state", None), "value", False)
+
+    @_executing.setter
+    def _executing(self, value: bool) -> None:
+        if "_executing_state" not in self.__dict__:
+            self._executing_state = threading.local()
+        self._executing_state.value = value
+
+    _executing_state: threading.local
 
     def __enter__(self):
         _command_context.__dict__.setdefault("stack", []).append(self)
