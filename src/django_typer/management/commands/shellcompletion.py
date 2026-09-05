@@ -109,6 +109,9 @@ class Command(TyperCommand):
 
     help = t.cast(str, _("Install autocompletion for the current shell."))
 
+    # completions are returned, this setting prints them (new in 4.0)
+    print_result = True
+
     # disable the system checks - no reason to run these for this one-off command
     requires_system_checks = ()
     requires_migrations_checks = False
