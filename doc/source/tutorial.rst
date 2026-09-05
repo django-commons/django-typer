@@ -25,7 +25,7 @@ Upstream Libraries
 django-typer_ merges the Django_ :class:`~django.core.management.BaseCommand` interface with the
 Typer_ interface and Typer_ itself is built on top of :doc:`click <click:quickstart>`. This means
 when using django-typer_ you will encounter interfaces and concepts from *all three* of these
-upstream libraries:
+upstream libraries.
 
 * :class:`~django.core.management.BaseCommand`
 
@@ -43,10 +43,11 @@ upstream libraries:
 
 * :doc:`click <click:quickstart>`
 
-    The :doc:`click <click:quickstart>` interfaces and concepts are relatively hidden by Typer_, but
-    occasionally you may need to refer to the :doc:`click <click:quickstart>` documentation when you
-    want to implement more complex behaviors like passing
-    :class:`context parameters <click.Context>`. It is not necessary to familiarize yourself with
+    In `version 0.26.0 Typer <https://github.com/fastapi/typer/releases/tag/0.26.0>`_ vendored
+    click, bringing 8.3.1 into it's own code base. This change is present in version 4 of
+    django-typer_. Where necessary we wrap and re-export Typer's private click interfaces. There is
+    no longer a direct dependency on :doc:`click <click:quickstart>` and over time Typer_'s vendored
+    version will diverge. It is not necessary to familiarize yourself with
     :doc:`click <click:quickstart>` to use django-typer_, but you should know that it exists and is
     the engine behind much of this functionality.
 
