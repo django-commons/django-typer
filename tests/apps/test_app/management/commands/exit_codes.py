@@ -4,6 +4,7 @@ command - see issue #318.
 """
 
 import sys
+import threading
 
 import typer
 from django.core.management import CommandError
@@ -48,3 +49,15 @@ class Command(TyperCommand):
     @command()
     def say(self, message: str):
         self.stdout.write(message)
+
+    @command()
+    def wait_then_exit(self, code: int = 0):
+        """Signal that we are running, wait to be released, then exit."""
+        started.set()
+        release.wait(timeout=10)
+        raise typer.Exit(code)
+
+
+# used by the tests to interleave executions of a shared command instance
+started = threading.Event()
+release = threading.Event()

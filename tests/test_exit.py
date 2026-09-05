@@ -82,6 +82,39 @@ class ExitPolicyTests(TestCase):
             cmd.error(code=2)
         self.assertEqual(raised.exception.returncode, 2)
 
+    def test_exit_policy_survives_another_thread_finishing(self):
+        # execute() tracks "django-typer is driving this command" per thread, so
+        # a shared instance finishing in one thread must not turn the policy off
+        # for a run still in progress in another
+        import threading
+
+        from tests.apps.test_app.management.commands import exit_codes
+
+        cmd = get_command("exit_codes")
+        exit_codes.started.clear()
+        exit_codes.release.clear()
+        outcome: dict[str, BaseException | str] = {}
+
+        def run_slow():
+            try:
+                outcome["result"] = call_command(cmd, "wait-then-exit", "--code", "3")
+            except BaseException as err:  # noqa: BLE001
+                outcome["error"] = err
+
+        slow = threading.Thread(target=run_slow)
+        slow.start()
+        try:
+            self.assertTrue(exit_codes.started.wait(timeout=10))
+            # a full execution on the same instance in this thread
+            self.assertEqual(call_command(cmd, "ok"), "done")
+        finally:
+            exit_codes.release.set()
+            slow.join(timeout=10)
+
+        self.assertNotIn("result", outcome)
+        self.assertIsInstance(outcome["error"], CommandError)
+        self.assertEqual(outcome["error"].returncode, 3)
+
     def test_abort(self):
         stdout, stderr, retcode = run_command("exit_codes", "--no-color", "abort")
         self.assertEqual(retcode, 1)
