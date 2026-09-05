@@ -30,6 +30,8 @@ v4.0.0 (2026-09-05)
   and parsers are re-exported from :mod:`django_typer.completers` (``Context``, ``Parameter``,
   ``CompletionItem``) and :mod:`django_typer.parsers` (``Context``, ``Parameter``, ``ParamType``)
 * Drop support for Python 3.10
+* Added a :doc:`settings <settings>` reference. ``DT_MANAGE_SCRIPT`` and ``DT_PRINT_RESULT``
+  may also be given as environment variables of the same name.
 * BREAKING: Values returned from commands are no longer written to stdout by default. Set
   ``print_result = True`` on a command, or ``DT_PRINT_RESULT = True`` in settings, to restore
   the previous behavior.
@@ -42,7 +44,7 @@ v4.0.0 (2026-09-05)
   prompted or pass the value explicitly.
 * Fixed `Fix documentation PDF build <https://github.com/django-commons/django-typer/issues/228>`_
 * Documented `installing shell completion for a just manage script <https://github.com/django-commons/django-typer/issues/190>`_ and other wrapped invocations, see :ref:`shell_completion:Completions for Wrapped Invocations`. Multi-word manage scripts remain unsupported (`#191 <https://github.com/django-commons/django-typer/issues/191>`_).
-* Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DJANGO_MANAGE_SCRIPT`` setting to override the detected program name.
+* Fixed `get_usage_script resolves full path when command is resolvable on path <https://github.com/django-commons/django-typer/issues/310>`_ and added the ``DT_MANAGE_SCRIPT`` setting to override the detected program name.
 
 
 Migrating from 3.x to 4.x
@@ -103,7 +105,7 @@ Migrating from 3.x to 4.x
   completions) is now the bare command name whenever that name resolves on the path, including when
   the script was launched through a shim or wrapper of the same name or through a relative path to
   the same script. Previously the full path was shown in these cases. Set
-  ``DJANGO_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
+  ``DT_MANAGE_SCRIPT`` to pin the name if you need a specific value, see
   :ref:`howto:Configure the Manage Script Name`.
 
 * :exc:`typer.Exit`, :exc:`typer.Abort` and :exc:`KeyboardInterrupt` leaving a command now

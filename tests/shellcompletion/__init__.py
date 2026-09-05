@@ -933,7 +933,7 @@ class _WrappedScriptCompleteTestCase(_InstalledScriptCompleteTestCase):
     """
     The manage script is run through a wrapper command on the path that forwards to
     ``python manage.py``, the way a ``just manage`` recipe or ``poetry run manage``
-    would, and the ``DJANGO_MANAGE_SCRIPT`` setting names the wrapper. This is the
+    would, and the ``DT_MANAGE_SCRIPT`` setting names the wrapper. This is the
     documented way to get completions for wrapped invocations:
 
     https://github.com/django-commons/django-typer/issues/190
@@ -990,7 +990,7 @@ class _WrappedScriptCompleteTestCase(_InstalledScriptCompleteTestCase):
             init_kwargs["shell"] = self.shell
         if fallback:
             kwargs["fallback"] = fallback
-        with override_settings(DJANGO_MANAGE_SCRIPT=self.manage_script):
+        with override_settings(DT_MANAGE_SCRIPT=self.manage_script):
             self.command.init(**init_kwargs)
             self.command.install(**kwargs)
         self.verify_install(script=script)
@@ -999,7 +999,7 @@ class _WrappedScriptCompleteTestCase(_InstalledScriptCompleteTestCase):
         from django.test import override_settings
 
         kwargs = {"manage_script": script} if script else {}
-        with override_settings(DJANGO_MANAGE_SCRIPT=self.manage_script):
+        with override_settings(DT_MANAGE_SCRIPT=self.manage_script):
             if self.shell:
                 self.command.init(shell=self.shell)
             self.command.uninstall(**kwargs)

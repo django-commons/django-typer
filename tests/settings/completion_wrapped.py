@@ -6,4 +6,4 @@ invocations like ``just manage`` or ``poetry run manage``.
 
 from .completion import *  # noqa: F403
 
-DJANGO_MANAGE_SCRIPT = "manage"
+DT_MANAGE_SCRIPT = "manage"

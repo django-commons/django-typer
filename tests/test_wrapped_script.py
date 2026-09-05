@@ -2,7 +2,7 @@
 Tests for the documented way to get help output and tab completion working when the
 manage script is run through another command, e.g. a ``just manage`` recipe,
 ``poetry run manage`` or ``uv run manage``: a one word wrapper script on the path that
-forwards to the wrapped invocation, plus the ``DJANGO_MANAGE_SCRIPT`` setting naming it.
+forwards to the wrapped invocation, plus the ``DT_MANAGE_SCRIPT`` setting naming it.
 
 https://github.com/django-commons/django-typer/issues/190
 https://github.com/django-commons/django-typer/issues/191
@@ -66,7 +66,7 @@ def run_wrapped(
 def test_wrapper_help_usage(tmp_path):
     """
     Help printed through the wrapper names the wrapper, but only when
-    DJANGO_MANAGE_SCRIPT says so - otherwise the launched script is what gets detected.
+    DT_MANAGE_SCRIPT says so - otherwise the launched script is what gets detected.
     """
     wrapper = make_wrapper(tmp_path / "bin")
 
@@ -105,7 +105,7 @@ def test_wrapper_shellcompletion_complete(tmp_path):
 )
 def test_wrapper_completion_source(tmp_path, monkeypatch, shell, registration):
     """
-    With DJANGO_MANAGE_SCRIPT set the shellcompletion command treats the wrapper as a
+    With DT_MANAGE_SCRIPT set the shellcompletion command treats the wrapper as a
     command installed on the path and renders a completion script that registers it,
     rather than a script path installation (which fish and powershell refuse).
     """
@@ -123,7 +123,7 @@ def test_wrapper_completion_source(tmp_path, monkeypatch, shell, registration):
         prog_name=command.manage_script_name, command=command
     ).is_installed
 
-    with override_settings(DJANGO_MANAGE_SCRIPT=WRAPPER):
+    with override_settings(DT_MANAGE_SCRIPT=WRAPPER):
         command.manage_script = None  # type: ignore[assignment]
         assert command.manage_script == WRAPPER
         completer = command.shell_class(
