@@ -111,6 +111,7 @@ class ExitPolicyTests(TestCase):
             exit_codes.release.set()
             slow.join(timeout=10)
 
+        self.assertFalse(slow.is_alive(), "the command did not finish")
         self.assertNotIn("result", outcome)
         self.assertIsInstance(outcome["error"], CommandError)
         self.assertEqual(outcome["error"].returncode, 3)

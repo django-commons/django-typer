@@ -3460,11 +3460,10 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
 
     @_executing.setter
     def _executing(self, value: bool) -> None:
-        if "_executing_state" not in self.__dict__:
-            self._executing_state = threading.local()
         self._executing_state.value = value
 
     _executing_state: threading.local
+    """Per-thread execute() state, created once per instance in __init__."""
 
     def __enter__(self):
         _command_context.__dict__.setdefault("stack", []).append(self)
@@ -3539,6 +3538,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         **kwargs: t.Any,
     ):
         assert self.typer_app.info.name
+        # created here, not lazily, so concurrent first uses of a shared instance
+        # cannot race to create it
+        self._executing_state = threading.local()
         _load_command_plugins(self.typer_app.info.name)
         _add_common_initializer(self)
         _resolve_help(self)
