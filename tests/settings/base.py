@@ -176,3 +176,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SETTINGS_FILE = 1
 
 ROOT_URLCONF = "tests.urls"
+
+# the test commands were written when returned values were printed by default -
+# keep that project wide, individual tests exercise the 4.x default explicitly
+DT_PRINT_RESULT = True

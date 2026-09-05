@@ -46,3 +46,12 @@ def manage_script() -> str | None:
     """
     name = getattr(settings, "DJANGO_MANAGE_SCRIPT", None)
     return str(name) if name else None
+
+
+def print_result() -> bool:
+    """
+    The project wide default for whether truthy values returned from commands are
+    written to stdout. Off unless the ``DT_PRINT_RESULT`` setting is true. A command
+    may override it with its ``print_result`` class field.
+    """
+    return bool(getattr(settings, "DT_PRINT_RESULT", False))

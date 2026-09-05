@@ -7,9 +7,12 @@ carrying the status as ``returncode``, and Exit(0) is simply success.
 See https://github.com/django-commons/django-typer/issues/318
 """
 
+from contextlib import redirect_stdout
+from io import StringIO
+
 import typer
 from django.core.management import CommandError, call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from django_typer.management import get_command
 from tests.utils import run_command
@@ -134,7 +137,7 @@ class ExitMatrixTests(TestCase):
         (
             "returns a value",
             ["ok"],
-            (0, "done", ""),
+            (0, "", ""),
             ("returns", "done"),
             ("returns", "done"),
         ),
@@ -217,7 +220,10 @@ class ExitMatrixTests(TestCase):
     def test_command_line_column(self):
         for label, args, (status, out, err), _, _ in self.MATRIX:
             with self.subTest(row=label):
-                stdout, stderr, retcode = run_command("exit_codes", "--no-color", *args)
+                # the documented behavior is the default, not the test suite's setting
+                stdout, stderr, retcode = run_command(
+                    "exit_codes", "--settings", "tests.settings.no_print_result", *args
+                )
                 self.assertEqual(retcode, status, stderr)
                 for expected, actual in ((out, stdout), (err, stderr)):
                     if expected == "":
@@ -243,3 +249,46 @@ class ExitMatrixTests(TestCase):
                 name, *rest = args
                 kwargs = {"code": int(rest[1])} if rest else {}
                 self.check_outcome(expected, lambda: getattr(cmd, name)(**kwargs))
+
+
+class PrintResultDefaultTests(TestCase):
+    """The 4.x default: returned values are not printed unless asked for."""
+
+    def test_default_is_off(self):
+        stdout, stderr, retcode = run_command(
+            "exit_codes", "--settings", "tests.settings.no_print_result", "ok"
+        )
+        self.assertEqual((retcode, stdout.strip(), stderr.strip()), (0, "", ""))
+        output = StringIO()
+        with override_settings(DT_PRINT_RESULT=False), redirect_stdout(output):
+            self.assertEqual(call_command("exit_codes", "ok"), "done")
+        self.assertEqual(output.getvalue().strip(), "")
+
+    def test_setting_turns_it_on(self):
+        # tests.settings.base sets DT_PRINT_RESULT = True
+        stdout, stderr, retcode = run_command("exit_codes", "--no-color", "ok")
+        self.assertEqual((retcode, stdout.strip()), (0, "done"))
+        output = StringIO()
+        with override_settings(DT_PRINT_RESULT=True), redirect_stdout(output):
+            self.assertEqual(call_command("exit_codes", "ok"), "done")
+        self.assertEqual(output.getvalue().strip(), "done")
+
+    def test_field_wins_over_setting(self):
+        # print_result = True on the command beats a project default of off
+        output = StringIO()
+        with (
+            override_settings(
+                INSTALLED_APPS=["tests.apps.howto"], DT_PRINT_RESULT=False
+            ),
+            redirect_stdout(output),
+        ):
+            self.assertEqual(call_command("print_result"), "This will be printed")
+        self.assertEqual(output.getvalue().strip(), "This will be printed")
+
+        # ... and print_result = False beats a project default of on
+        cmd = get_command("exit_codes")
+        cmd.print_result = False
+        output = StringIO()
+        with override_settings(DT_PRINT_RESULT=True), redirect_stdout(output):
+            self.assertEqual(call_command(cmd, "ok"), "done")
+        self.assertEqual(output.getvalue().strip(), "")

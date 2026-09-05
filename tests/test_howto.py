@@ -512,21 +512,22 @@ class TestPrintResultHowTo(TestCase):
     def test_howto_print_result_run(self):
         self.assertEqual(
             run_command(self.command, "--settings", "tests.settings.howto")[0].strip(),
-            "",
+            "This will be printed",
         )
 
     def test_howto_print_result_call(self):
         output = StringIO()
         with redirect_stdout(output):
-            self.assertEqual(call_command(self.command), "This will not be printed")
-        self.assertEqual(output.getvalue().strip(), "")
+            self.assertEqual(call_command(self.command), "This will be printed")
+        self.assertEqual(output.getvalue().strip(), "This will be printed")
 
     def test_howto_print_result_obj(self):
-        command = get_command(self.command)
-        self.assertEqual(
-            command.handle(),
-            "This will not be printed",
-        )
+        # calling the function directly never prints
+        output = StringIO()
+        with redirect_stdout(output):
+            command = get_command(self.command)
+            self.assertEqual(command.handle(), "This will be printed")
+        self.assertEqual(output.getvalue().strip(), "")
 
 
 class TestPrintResultTyperHowTo(TestPrintResultHowTo):

@@ -43,6 +43,7 @@ from typer.models import Context as TyperContext
 from typer.models import Default, DefaultPlaceholder, DeveloperExceptionConfig
 
 from ..config import manage_script as manage_script_setting
+from ..config import print_result as print_result_default
 from ..config import show_locals, traceback_config, use_rich_tracebacks
 from ..types import (
     ForceColor,
@@ -3002,8 +3003,14 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
     force_color: bool = False
     skip_checks: bool = False
 
-    print_result: bool = True
-    """Turn on/off automatic write to stdout of results returned by command"""
+    print_result: bool | None = None
+    """
+    Whether truthy values returned by the command are written to stdout, as
+    :class:`~django.core.management.BaseCommand` does. Off by default: return values
+    are for callers, output is whatever the command chooses to print. Set to True to
+    turn it on for this command, or set the ``DT_PRINT_RESULT`` setting to change the
+    project wide default. None means use the setting.
+    """
 
     atomic: bool | str | t.Sequence[str] = False
     """
@@ -3672,7 +3679,11 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 result = self.typer_app.info.result_callback(
                     result, **options, _command=self
                 )
-            self.stdout.disable = not self.print_result
+            self.stdout.disable = not (
+                self.print_result
+                if self.print_result is not None
+                else print_result_default()
+            )
             return result
 
     def run_from_argv(self, argv):
