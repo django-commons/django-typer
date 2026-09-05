@@ -3770,8 +3770,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 )
         finally:
             self._executing = False
-            if isinstance(self.stdout, OutputWrapper):
-                self.stdout.disable = False
+            # stdout is ours once _run() has wrapped it; before that it may be
+            # Django's, where this is a harmless plain attribute
+            t.cast(OutputWrapper, self.stdout).disable = False
             # if handle() never reached the typer app the parsed context is stale
             _discard_parsed_context(self)
             self.no_color = no_color
