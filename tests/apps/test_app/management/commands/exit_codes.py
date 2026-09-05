@@ -44,3 +44,7 @@ class Command(TyperCommand):
     @command()
     def ok(self):
         return "done"
+
+    @command()
+    def say(self, message: str):
+        self.stdout.write(message)

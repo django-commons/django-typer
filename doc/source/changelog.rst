@@ -33,6 +33,10 @@ v4.0.0 (2026-09-XX)
 * BREAKING: Values returned from commands are no longer written to stdout by default. Set
   ``print_result = True`` on a command, or ``DT_PRINT_RESULT = True`` in settings, to restore
   the previous behavior.
+* Fixed result printing being applied to the wrong stream: with ``print_result`` off the
+  returned value was still written when ``stdout=`` was passed to
+  :func:`~django.core.management.call_command`, and a command instance reused after a run
+  dropped its own output.
 * Passing a ``prompt_required=False`` option flag without a value no longer triggers
   the prompt - Typer's vendored Click dropped support for this. Omit the flag to be
   prompted or pass the value explicitly.

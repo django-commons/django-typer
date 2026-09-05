@@ -2834,7 +2834,23 @@ class OutputWrapper(BaseOutputWrapper):
     returned from command functions.
     """
 
-    disable: bool = False
+    _disabled: threading.local
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any):
+        super().__init__(*args, **kwargs)
+        self._disabled = threading.local()
+
+    @property
+    def disable(self) -> bool:
+        """
+        Drop writes while set. The flag is per thread so that a command instance
+        shared between threads cannot silence another thread's output.
+        """
+        return getattr(self._disabled, "value", False)
+
+    @disable.setter
+    def disable(self, value: bool) -> None:
+        self._disabled.value = value
 
     def write(self, msg="", style_func=None, ending=None):
         """
@@ -3665,6 +3681,18 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
         :return: t.Any object returned by the Typer app
         """
         with self:
+            # BaseCommand.execute() swaps in Django's own OutputWrapper when
+            # stdout=/stderr= are given - ours is what understands result
+            # printing and non-string messages, so wrap those again
+            for name in ("stdout", "stderr"):
+                wrapper = getattr(self, name)
+                if not isinstance(wrapper, OutputWrapper):
+                    replacement = OutputWrapper(wrapper._out, ending=wrapper.ending)
+                    replacement.style_func = wrapper.style_func
+                    setattr(self, name, replacement)
+            # a previous execution on this instance may have left result printing
+            # disabled - every execution starts with stdout enabled
+            self.stdout.disable = False
             result = self.typer_app(
                 args=args,
                 prog_name=f"{sys.argv[0]} {self.typer_app.info.name}",
@@ -3679,6 +3707,9 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 result = self.typer_app.info.result_callback(
                     result, **options, _command=self
                 )
+            # BaseCommand.execute() writes a truthy return value to stdout after
+            # handle() returns - disable stdout for that write when result printing
+            # is off. execute() re-enables it once it has returned.
             self.stdout.disable = not (
                 self.print_result
                 if self.print_result is not None
@@ -3739,6 +3770,8 @@ class TyperCommand(BaseCommand, metaclass=TyperCommandMeta):
                 )
         finally:
             self._executing = False
+            if isinstance(self.stdout, OutputWrapper):
+                self.stdout.disable = False
             # if handle() never reached the typer app the parsed context is stale
             _discard_parsed_context(self)
             self.no_color = no_color
