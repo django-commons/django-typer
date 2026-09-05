@@ -1,7 +1,5 @@
 .. include:: ./refs.rst
 
-.. _shellcompletions:
-
 =========================
 Tutorial: Tab-Completions
 =========================
@@ -167,10 +165,8 @@ installation *may still work*, but you may need to always invoke the script from
 
     The command name completions are installed for is detected from the invoking script. If the
     detected name is not right for your deployment, override it with the ``DJANGO_MANAGE_SCRIPT``
-    setting, see :ref:`configure-manage-script`.
+    setting, see :ref:`howto:Configure the Manage Script Name`.
 
-
-.. _wrapped_invocations:
 
 Completions for Wrapped Invocations
 -----------------------------------
@@ -223,8 +219,6 @@ Completions are not available when you type ``just manage <TAB>``, because just_
 runners) does not complete the arguments of its recipes.
 
 
-.. _completion_fallbacks:
-
 Integrating with Other CLI Completion Libraries
 -----------------------------------------------
 
@@ -246,17 +240,16 @@ the box.
 provides hooks for implementing libraries to provide completions for their own commands.*
 
 
-.. _define-shellcompletions:
-
 Defining Custom Completions
 ===========================
 
 To define custom completion logic for your arguments_ and options_ pass the ``shell_completion``
 parameter in your type hint annotations. django-typer_ comes with a
-:ref:`few provided completers <completers>` for common Django_ types. One of the provided completers
-completes Django_ app labels and names. We might build a similar completer that only works for
-Django_ app labels like this. The ``Context``, ``Parameter`` and ``CompletionItem`` types a
-completer works with are re-exported from :mod:`django_typer.completers` - import them from there
+:ref:`few provided completers <reference/completers:Completers>` for common Django_ types. One
+of the provided completers completes Django_ app labels and names. We might build a similar
+completer that only works for Django_ app labels like this. The ``Context``, ``Parameter`` and
+``CompletionItem`` types a completer works with are re-exported from
+:mod:`django_typer.completers` - import them from there
 rather than from Click_, which is no longer a dependency of django-typer_:
 
 .. tabs::
@@ -280,8 +273,6 @@ rather than from Click_, which is no longer a dependency of django-typer_:
     See the :class:`~django_typer.completers.model.ModelObjectCompleter` for a completer that works
     for many Django_ model field types.
 
-
-.. _debug-shellcompletions:
 
 Debugging Tab Completers
 ========================
@@ -507,7 +498,7 @@ Model Objects
 This completer/parser pairing provides the ability to fetch a model object from one of its fields.
 Most field types are supported. Additionally any other field can be set as the help text that some
 shells support. Refer to the reference documentation and the
-:ref:`polls tutorial <building_commands>` for more information.
+:ref:`polls tutorial <tutorial:Tutorial: Building Commands>` for more information.
 
 .. warning::
 
@@ -693,8 +684,8 @@ shells. There are two main extension points:
    is generated and installed.
 
    You may also override the classes for the supported shells by registering your own class.
-   We recommend using the :ref:`plugins <plugins>` pattern to do this so that your custom
-   completers will respect :setting:`INSTALLED_APPS` order.
+   We recommend using the :ref:`plugins <extensions:Tutorial: Inheritance & Plugins>` pattern to
+   do this so that your custom completers will respect :setting:`INSTALLED_APPS` order.
 
 2. Override the completion script templates for your shell. The completion script templates are
    stored in the ``django_typer/templates``. You may override these templates in your project to
