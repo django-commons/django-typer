@@ -1236,11 +1236,13 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         if callback:
             self.is_method = is_method(callback)
 
+        if cls is None:
+            cls = DTGroup
         super().__init__(
             name=name,
             cls=type(
                 "_DTGroup",
-                (cls or DTGroup,),
+                (cls,),
                 {"django_command": self.django_command, "chain": bool(chain)},
             ),
             invoke_without_command=invoke_without_command,
