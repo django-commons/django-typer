@@ -31,3 +31,6 @@ would like us to showcase a package,
        transpilers for extending Django's url reversal and enums to JavaScript.
    * - `django-routines <https://pypi.org/project/django-routines>`_
      - Define named sequences of management commands in Django settings files for batched execution.
+   * - `django-systemd <https://pypi.org/project/django-systemd>`_
+     - Ship renderable systemd unit templates with your apps and manage project services through the
+       django admin.
