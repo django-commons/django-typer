@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659
+        uses: actions-rust-lang/setup-rust-toolchain@ecabd13d1c56bd1345c230e542e9144811ad706f
       - name: Install jq
         run: |
           sudo apt-get update
@@ -54,7 +54,7 @@ jobs:
           retention-days: 7
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd
+        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63
         with:
           sarif_file: results.sarif
 
