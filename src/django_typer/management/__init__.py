@@ -1236,8 +1236,7 @@ class Typer(typer.Typer, t.Generic[P, R], metaclass=AppFactory):
         if callback:
             self.is_method = is_method(callback)
 
-        if cls is None:
-            cls = DTGroup
+        cls = cls or DTGroup
         super().__init__(
             name=name,
             cls=type(

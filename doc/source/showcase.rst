@@ -24,8 +24,6 @@ would like us to showcase a package,
 
    * - Package
      - Description
-   * - `django-tailwind-cli <https://pypi.org/project/django-tailwind-cli>`_
-     - Django and Tailwind integration based on the prebuilt Tailwind CSS CLI.
    * - `django-render-static <https://pypi.org/project/django-render-static>`_
      - Use Django's template engines to render static files at deployment or package time. Includes
        transpilers for extending Django's url reversal and enums to JavaScript.
@@ -33,4 +31,4 @@ would like us to showcase a package,
      - Define named sequences of management commands in Django settings files for batched execution.
    * - `django-systemd <https://pypi.org/project/django-systemd>`_
      - Ship renderable systemd unit templates with your apps and manage project services through the
-       django admin.
+       Django admin.
