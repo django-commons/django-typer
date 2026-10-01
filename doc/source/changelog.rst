@@ -4,6 +4,11 @@
 Change Log
 ==========
 
+v4.1.2 (2026-10-01)
+===================
+
+* Drop :pypi:`django-tailwind-cli` from the showcase.
+
 v4.1.1 (2026-09-30)
 ===================
 
