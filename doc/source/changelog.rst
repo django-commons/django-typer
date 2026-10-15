@@ -4,6 +4,13 @@
 Change Log
 ==========
 
+v4.2.0 (2026-10-15)
+===================
+
+* Regenerate translations with :pypi:`django-autotranslate` 2.0 and Google's paid API
+* Add :pypi:`django-autotranslate` to the showcase.
+* Add :pypi:`django-snapshots` to the showcase.
+
 v4.1.2 (2026-10-01)
 ===================
 
