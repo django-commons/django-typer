@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-typer"
-version = "4.1.2"
+version = "4.2.0"
 requires-python = ">=3.11,<4.0"
 description = "Use Typer to define the CLI for your Django management commands."
 authors = [
@@ -247,6 +247,10 @@ docs = [
 ]
 profiling = [
     "tuna>=0.5.11",
+]
+# machine translate the library's messages with just translate
+translate = [
+    "django-autotranslate[google]>=2.0,<3.0",
 ]
 psycopg3 = [
     "psycopg>=3.1.8",
