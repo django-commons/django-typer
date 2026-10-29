@@ -412,7 +412,10 @@ jobs:
           uv sync --group test -p "$TEST_PYTHON" --group "$TEST_DJANGO_VERSION" --resolution "$DEPENDENCY_RESOLUTION"
           source .venv/bin/activate
           just test-bash || exit 1
-          sudo apt-get remove --purge -y powershell
+          # ubuntu-24.04 ships pwsh via apt, ubuntu-26.04 ships a tarball symlinked
+          # into /usr/bin, so remove whichever form is present and assert it's gone
+          sudo apt-get remove --purge -y powershell || true
+          ! command -v pwsh
           pytest --cov-append ./tests/shellcompletion/test_shell_resolution.py::test_get_win_shell_failure || exit 1
 
       - name: Store coverage files
